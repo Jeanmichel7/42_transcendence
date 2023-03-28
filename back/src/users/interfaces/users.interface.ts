@@ -1,11 +1,11 @@
 export interface Users {
     id: number,
-    name: string,
-    firstname: string,
-    lastname: string,
+    firstName: string,
+    lastName: string,
+    pseudo: string,
     email: string,
     password: string,
     description?: string,
-    avatar: string,
-    isAdmin?: boolean,
+    avatar?: string,
+    is_admin?: boolean,
 }

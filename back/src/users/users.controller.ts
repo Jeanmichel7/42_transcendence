@@ -1,6 +1,9 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
+
+//privilégier le typage de l'interace plutôt que de l'entité
 import { Users } from './interfaces/users.interface';
+
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
@@ -8,31 +11,39 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get()
-    findAll(): Users[] {
-        return this.usersService.findAll();
+    async findAll(): Promise<Users[]> {
+        const result = await this.usersService.findAll();
+        console.log("result : ", result)
+        return result;
     }
 
     @Get(':id')
-    findOne(@Param('id') params: string): Users {
-        console.log("params : ", params);
-        return this.usersService.findOne(params);
+    async findOne(@Param('id') params: string): Promise<Users> {
+        // console.log("params : ", params);
+        const result = this.usersService.findOne(params);
+        return result;
     }
 
     @Post()
-    createUser(@Body() newUser: CreateUserDto): void {
-        console.error("new user : ", newUser);
-        this.usersService.createUser(newUser);
+    async createUser(@Body() newUser: CreateUserDto): Promise<Users> {
+        // console.error("new user : ", newUser);
+        const result = await this.usersService.createUser(newUser);
+        return result;
     }
 
     @Patch(':id')
-    updateUser(@Param('id') id: string, @Body() updateUser: CreateUserDto) {
-        console.error("update user : ", updateUser);
-        return this.usersService.updateUser(id, updateUser);
+    async updateUser(@Param('id') id: string, @Body() updateUser: CreateUserDto)
+    : Promise<Users> {
+        // console.error("update user id: ", id);
+        // console.error("update user body: ", updateUser);
+        const result = await this.usersService.updateUser(id, updateUser);
+        return result;
     }
 
     @Delete(':id')
-    deleteUser(@Param('id') id: string) {
-        return this.usersService.deleteUser(id);
+    async deleteUser(@Param('id') id: string): Promise<HttpStatus> {
+        await this.usersService.deleteUser(id);
+        // const result = await this.usersService.deleteUser(id);
+        return HttpStatus.NO_CONTENT; // 204
     }
 }
-

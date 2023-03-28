@@ -50,3 +50,26 @@ sudo apt install pgadmin4
 
 # Configure the webserver, if you installed pgadmin4-web:
 sudo /usr/pgadmin4/bin/setup-web.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Controler retour une promesse ?
+Service retourne une promesse ?
+Format de retour standard ?
