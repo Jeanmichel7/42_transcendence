@@ -21,6 +21,13 @@ export class UsersService {
         return userFind;
     }
 
+    async findOneByPseudo(pseudo: string): Promise<UserInfo> {
+        let userFind = await this.userRepository.findOneBy({pseudo: pseudo});
+        if(!userFind)
+            throw new NotFoundException(`User ${pseudo} not found`);
+        return userFind;
+    }
+
     async findAll(): Promise<UserInfo[]> {
         const users = this.userRepository.find();
         if(!users)
@@ -39,7 +46,10 @@ export class UsersService {
         return userFind;
     }
 
-    createUser(newUser: CreateUserDto): Promise<UserInfo> {
+    async createUser(newUser: CreateUserDto): Promise<UserInfo> {
+        const result = await this.userRepository.findOneBy({pseudo: newUser.pseudo});
+        if(result)
+            throw new NotFoundException(`User ${newUser.pseudo} already exist`);
         return this.userRepository.save(newUser);
     }
 
@@ -108,6 +118,7 @@ export class UsersService {
 
         // delete user
         
-        this.userRepository.delete({id: id});
+        const result = await this.userRepository.delete({id: id});
+        // console.log("result : ", result)
     }
 }

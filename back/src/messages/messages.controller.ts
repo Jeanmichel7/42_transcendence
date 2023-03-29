@@ -20,6 +20,12 @@ export class MessageController {
         const result = await this.MessageService.findAll();
         return result;
     }
+    
+    @Get(':id')
+    async findOne(@Param('id', ParseIntPipe) id:bigint): Promise<Message> {
+        const result = await this.MessageService.findOne(id);
+        return result;
+    }
 
     @Get('/user/:id')
     async findAllOfUser(@Param('id', ParseIntPipe) id: bigint)

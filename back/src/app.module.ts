@@ -4,10 +4,11 @@ import { TypeOrmModule }                from '@nestjs/typeorm';
 
 import { typeOrmConfig }                from '../config/typeorm.config';
 
+import { AuthModule }                   from './auth/auth.module';
 // import { AppController }                from './app.controller';
-import { AppService }                   from './app.service';
+// import { AppService }                   from './app.service';
 import { UsersModule }                  from './users/users.module';
-import { MessageModule }                   from './messages/messages.module';
+import { MessageModule }                from './messages/messages.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { MessageModule }                   from './messages/messages.module';
       inject: [ConfigService],
     }),
     UsersModule,
-    MessageModule
+    MessageModule,
+    AuthModule,
   ],
   // controllers: [AppController],
   // providers: [AppService],

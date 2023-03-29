@@ -21,11 +21,13 @@ export class UserInfo extends BaseEntity{
 
     @Column({
         type: 'text',
+        unique: true
     })
     pseudo: string;
 
     @Column({
         type: 'text',
+        unique: true
     })
     email: string;
 

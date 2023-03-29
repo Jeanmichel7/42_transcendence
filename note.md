@@ -79,3 +79,4 @@ sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 get pwd when get user ?!
+user : unique psuedo, email

@@ -56,7 +56,21 @@ export class UsersController {
     @Delete(':id')
     async deleteUser(@Param('id', ParseIntPipe) id: bigint): Promise<HttpStatus> {
         await this.usersService.deleteUser(id);
-        // const result = await this.usersService.deleteUser(id);
         return HttpStatus.NO_CONTENT; // 204
     }
 }
+
+/*
+/users, GET
+/users/:id, GET
+/users, POST
+/users/:id, PATCH
+/users/:id, PUT
+/users/:id, DELETE
+
+/messages, GET
+/messages/user/:id, GET
+/messages/user/:userId/:userDestId, POST
+/messages/:id, PATCH
+/messages/:id, DELETE
+*/

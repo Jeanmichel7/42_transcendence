@@ -9,18 +9,6 @@ export class MessageInfo extends BaseEntity{
     })
     id: bigint;
 
-    // @Column({
-    //     nullable: true,
-    //     type: 'bigint',
-    // })
-    // ownerUserId: number;
-
-    // @Column({
-    //     nullable: true,
-    //     type: 'bigint',
-    // })
-    // destUserId: number;
-
     @Column({
         type: 'text',
     })
@@ -40,10 +28,10 @@ export class MessageInfo extends BaseEntity{
     })
     updateAt: string;
 
-    @ManyToOne(() => UserInfo, user => user.id)
+    @ManyToOne(() => UserInfo, user => user.id, {onDelete: 'CASCADE'})
     ownerUser: bigint;
 
-    @ManyToOne(() => UserInfo, user => user.id)
+    @ManyToOne(() => UserInfo, user => user.id, {onDelete: 'CASCADE'})
     destUser: bigint;
 
 }

@@ -1,4 +1,5 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, Length, IS_STRONG_PASSWORD } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, Length, IsStrongPassword } from "class-validator";
+import { Unique } from "typeorm";
 
 export class CreateUserDto {
     @IsOptional()
@@ -15,6 +16,7 @@ export class CreateUserDto {
 
     @IsNotEmpty({message: "The pseudo is required"})
     @Length(3, 20, {message: "The pseudo must be between 3 and 20 characters"})
+    // @Unique("", [],{message: "The pseudo is already taken"})
     readonly pseudo:string;
 
     @IsNotEmpty()
@@ -22,8 +24,11 @@ export class CreateUserDto {
     readonly email:string;
 
     @IsNotEmpty()
-    // @IS_STRONG_PASSWORD()
     @MinLength(8)
+    @IsStrongPassword(
+        {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1, },
+        {message: "The password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, one number and one symbol."}
+    )
     readonly password:string;
 
     @IsOptional()
