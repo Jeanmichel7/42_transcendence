@@ -32,11 +32,12 @@ export class MessageController {
     }
 
     @Post('user/:userId/:userDestId')
+    @UsePipes(ValidationPipe)
     async createMessage(
         @Param('userId', ParseIntPipe) userId: bigint,
         @Param('userDestId', ParseIntPipe) userDestId: bigint,
         @Body() newMessage: CreateMessageDto
-    ) {
+    ): Promise<Message> {
         // console.error("new message : ", newMessage);
 
         const userSend = await this.UsersService.findOneWithMessages(userId);
@@ -49,6 +50,22 @@ export class MessageController {
         // console.log("message : ", message);
 
         return message;
+    }
+
+    @Patch(':id')
+    @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
+    async patchMessage(@Param('id', ParseIntPipe) id: bigint, @Body() updateMessage: CreateMessageDto)
+    : Promise<Message> {
+        // console.error("update message id: ", id);
+        // console.error("update message body: ", updateMessage);
+        const result = await this.MessageService.patchMessage(id, updateMessage);
+        return result;
+    }
+
+    @Delete(':id')
+    async deleteMessage(@Param('id', ParseIntPipe) id: bigint): Promise<HttpStatus> {
+        await this.MessageService.deleteMessage(id);
+        return HttpStatus.NO_CONTENT; // 204
     }
 
 

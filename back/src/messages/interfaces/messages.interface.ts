@@ -1,7 +1,7 @@
 export interface Message {
     id: bigint;
-    // ownerUserId: bigint;
-    // destUserId: bigint;
+    ownerUser: bigint;
+    destUser: bigint;
     data: string;
     createAt: string;
     updateAt: string;

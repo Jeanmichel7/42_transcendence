@@ -13,6 +13,13 @@ export class MessageService {
         @InjectRepository(MessageInfo) private readonly msgRepository: Repository<MessageInfo>,
     ) {}
 
+    async findOne(id: bigint): Promise<MessageInfo> {
+        const result = await this.msgRepository.findOneBy({id: id});
+        if(!result)
+            throw new NotFoundException(`Message with id ${id} not found`);
+        return result;
+    }
+
     async findAll(): Promise<MessageInfo[]> {
         const messages = this.msgRepository.find();
         if(!messages)
@@ -20,32 +27,12 @@ export class MessageService {
         return messages;
     }
 
-    async findAllOfUser(user) {
-        console.log("user reveiced : ", user.messagesReceive)
-
-        // let index = user.id;
-        // let result = await this.msgRepository.find({
-        //     where: {destUser: user.id},
-        //     // relations: ["destUser", "ownerUser"]
-        // });
-        // console.log("result : ", result);
-
-        // result.forEach(e => {
-        //     console.error(e.destUser)
-        // })
-        return user.messagesReceive;
-    }
-
     async createMessage(
         message: CreateMessageDto,
         userSend: UserInfo,
         userReceive: UserInfo
-    ){
-        console.log("message : ", message)
+    ): Promise<MessageInfo> {
         const newMessage = await this.msgRepository.save({
-            // ...message,
-            // ownerUserId: userSend.id,
-            // destUserId: userReceive.id,
             data: message.data,
         });
 
@@ -55,6 +42,43 @@ export class MessageService {
         await userReceive.save();
 
         return newMessage;
+    }
+
+    async patchMessage(
+        id: bigint,
+        updateMessage: CreateMessageDto
+    ): Promise<MessageInfo> {
+        // console.log("updateMessage : ", updateMessage)
+
+        let messageToUpdate = await this.findOne(id)
+        // console.log("messageToUpdate : ", messageToUpdate)
+
+        if(!messageToUpdate)
+            throw new NotFoundException(`Message with id ${id} not found`);
+        
+        // check auth
+
+        await this.msgRepository.update(
+            {id: id},
+            {
+                data: updateMessage.data,
+                updateAt: () => 'CURRENT_TIMESTAMP'
+            }
+        );
+
+        const result: MessageInfo = await this.findOne(id);
+        return result;
+    }
+
+    async deleteMessage(id: bigint): Promise<MessageInfo> {
+        const result = await this.findOne(id);
+        if(!result)
+            throw new NotFoundException(`Message with id ${id} not found`);
+
+        // check auth
+
+        await this.msgRepository.delete({id: id});
+        return result;
     }
 
 }

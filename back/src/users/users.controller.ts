@@ -13,7 +13,7 @@ export class UsersController {
     @Get()
     async findAll(): Promise<User[]> {
         const result = await this.usersService.findAll();
-        console.log("result : ", result)
+        // console.log("result : ", result)
         return result;
     }
 
@@ -26,7 +26,7 @@ export class UsersController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    @HttpCode(201)
+    // @HttpCode(201)
     async createUser(@Body() newUser: CreateUserDto): Promise<User> {
         // console.error("new user : ", newUser);
         const result = await this.usersService.createUser(newUser);

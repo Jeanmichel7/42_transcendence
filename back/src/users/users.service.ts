@@ -13,19 +13,19 @@ export class UsersService {
         @InjectRepository(UserInfo) private readonly userRepository: Repository<UserInfo>,
     ) {}
 
-    async findAll(): Promise<UserInfo[]> {
-        const users = this.userRepository.find();
-        if(!users)
-            throw new NotFoundException(`Users not found`);
-        return users;
-    }
-
     async findOne(id: bigint): Promise<UserInfo> {
         let userFind = await this.userRepository.findOneBy({id: id});
 
         if(!userFind)
             throw new NotFoundException(`User with id ${id} not found`);
         return userFind;
+    }
+
+    async findAll(): Promise<UserInfo[]> {
+        const users = this.userRepository.find();
+        if(!users)
+            throw new NotFoundException(`Users not found`);
+        return users;
     }
 
     async findOneWithMessages(id: bigint): Promise<UserInfo> {
