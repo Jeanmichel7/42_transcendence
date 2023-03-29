@@ -1,5 +1,5 @@
-export interface Users {
-    id: number,
+export interface User {
+    id: bigint,
     firstName: string,
     lastName: string,
     pseudo: string,
