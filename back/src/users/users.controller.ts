@@ -1,5 +1,7 @@
-import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+// import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 //privilégier le typage de l'interace plutôt que de l'entité
 import { User } from './interfaces/users.interface';
@@ -9,7 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
-
+    
     @Get()
     async findAll(): Promise<User[]> {
         const result = await this.usersService.findAll();
@@ -17,13 +19,15 @@ export class UsersController {
         return result;
     }
 
+    // @UseGuards(AuthGuard)
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) params: bigint): Promise<User> {
         // console.log("params : ", params);
         const result = this.usersService.findOne(params);
         return result;
     }
-
+    
+    @Public()
     @Post()
     @UsePipes(ValidationPipe)
     // @HttpCode(201)

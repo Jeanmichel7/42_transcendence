@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import * as bcrypt from 'bcrypt';
+
+
+
 //privilégier le typage de l'entity plutôt que de l'interface
 import { UserInfo } from 'src/typeorm';
 
@@ -50,6 +54,12 @@ export class UsersService {
         const result = await this.userRepository.findOneBy({pseudo: newUser.pseudo});
         if(result)
             throw new NotFoundException(`User ${newUser.pseudo} already exist`);
+
+        const salt = await bcrypt.genSalt();
+        const hash = await bcrypt.hash(newUser.password, salt);
+        // console.error("hash : ", hash);
+
+        newUser.password = hash;
         return this.userRepository.save(newUser);
     }
 
