@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { MessageInfo } from 'src/typeorm';
 
 @Entity('users')
 export class UserInfo extends BaseEntity{
@@ -6,7 +7,7 @@ export class UserInfo extends BaseEntity{
     @PrimaryGeneratedColumn({
         type: 'bigint',
     })
-    id: number;
+    id: bigint;
 
     @Column({
         type: 'text',
@@ -20,11 +21,13 @@ export class UserInfo extends BaseEntity{
 
     @Column({
         type: 'text',
+        unique: true
     })
     pseudo: string;
 
     @Column({
         type: 'text',
+        unique: true
     })
     email: string;
 
@@ -51,5 +54,12 @@ export class UserInfo extends BaseEntity{
         nullable: true,
     })
     description: string;
+
+    @OneToMany(() => MessageInfo, message => message.ownerUser)
+    messagesSend: MessageInfo[];
+
+    @OneToMany(() => MessageInfo, message => message.destUser)
+    messagesReceive: MessageInfo[];
+
 }
 

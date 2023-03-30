@@ -13,19 +13,47 @@ export class UsersService {
         @InjectRepository(UserInfo) private readonly userRepository: Repository<UserInfo>,
     ) {}
 
-    findAll(): Promise<UserInfo[]> {
-        return this.userRepository.find();
+    async findOne(id: bigint): Promise<UserInfo> {
+        let userFind = await this.userRepository.findOneBy({id: id});
+
+        if(!userFind)
+            throw new NotFoundException(`User with id ${id} not found`);
+        return userFind;
     }
 
-    findOne(id: string): Promise<UserInfo> {
-        return this.userRepository.findOneBy({id: parseInt(id)});
+    async findOneByPseudo(pseudo: string): Promise<UserInfo> {
+        let userFind = await this.userRepository.findOneBy({pseudo: pseudo});
+        if(!userFind)
+            throw new NotFoundException(`User ${pseudo} not found`);
+        return userFind;
     }
 
-    createUser(newUser: CreateUserDto): Promise<UserInfo> {
+    async findAll(): Promise<UserInfo[]> {
+        const users = this.userRepository.find();
+        if(!users)
+            throw new NotFoundException(`Users not found`);
+        return users;
+    }
+
+    async findOneWithMessages(id: bigint): Promise<UserInfo> {
+        let userFind = await this.userRepository.findOne({
+            where: {id: id},
+            relations: ["messagesSend", "messagesReceive"]
+        });
+
+        if(!userFind)
+            throw new NotFoundException(`User with id ${id} not found`);
+        return userFind;
+    }
+
+    async createUser(newUser: CreateUserDto): Promise<UserInfo> {
+        const result = await this.userRepository.findOneBy({pseudo: newUser.pseudo});
+        if(result)
+            throw new NotFoundException(`User ${newUser.pseudo} already exist`);
         return this.userRepository.save(newUser);
     }
 
-    async updateUser(id: string, updateUser: CreateUserDto): Promise<UserInfo> {
+    async patchUser(id: bigint, updateUser: CreateUserDto): Promise<UserInfo> {
         // console.log("updateUser : ", updateUser)
 
         let userToUpdate = await this.findOne(id)
@@ -38,19 +66,19 @@ export class UsersService {
 
         let res;
         if(updateUser.firstName)
-            res = await this.userRepository.update({id: parseInt(id)}, {firstName: updateUser.firstName});
+            res = await this.userRepository.update({id: id}, {firstName: updateUser.firstName});
         if(updateUser.lastName)
-            res = await this.userRepository.update({id: parseInt(id)}, {lastName: updateUser.lastName});
+            res = await this.userRepository.update({id: id}, {lastName: updateUser.lastName});
         if(updateUser.pseudo)
-            res = await this.userRepository.update({id: parseInt(id)}, {pseudo: updateUser.pseudo});
+            res = await this.userRepository.update({id: id}, {pseudo: updateUser.pseudo});
         if(updateUser.email)
-            res = await this.userRepository.update({id: parseInt(id)}, {email: updateUser.email});
+            res = await this.userRepository.update({id: id}, {email: updateUser.email});
         if(updateUser.password)
-            res = await this.userRepository.update({id: parseInt(id)}, {password: updateUser.password});
+            res = await this.userRepository.update({id: id}, {password: updateUser.password});
         if(updateUser.description)
-            res = await this.userRepository.update({id: parseInt(id)}, {description: updateUser.description});
+            res = await this.userRepository.update({id: id}, {description: updateUser.description});
         if(updateUser.avatar)
-            res = await this.userRepository.update({id: parseInt(id)}, {avatar: updateUser.avatar});
+            res = await this.userRepository.update({id: id}, {avatar: updateUser.avatar});
 
         // check res
         // return { update: true, user: updateUser, data: res };
@@ -59,7 +87,27 @@ export class UsersService {
         return result;
     }
 
-    async deleteUser(id: string): Promise<void> {
+    async updateUser(id: bigint, updateUser: CreateUserDto): Promise<UserInfo> {
+        // console.log("updateUser : ", updateUser)
+
+        let userToUpdate = await this.findOne(id)
+        // console.log("userToUpdate : ", userToUpdate)
+
+        if(!userToUpdate)
+        throw new NotFoundException(`User with id ${id} not found`);
+        
+        // check auth
+
+        let res = await this.userRepository.update({id: id}, updateUser);        
+
+        // check res
+        // return { update: true, user: updateUser, data: res };
+
+        const result = await this.findOne(id);
+        return result;
+    }
+
+    async deleteUser(id: bigint): Promise<void> {
         // check user exist
         let userFound = await this.findOne(id);
 
@@ -70,6 +118,7 @@ export class UsersService {
 
         // delete user
         
-        this.userRepository.delete({id: parseInt(id)});
+        const result = await this.userRepository.delete({id: id});
+        // console.log("result : ", result)
     }
 }

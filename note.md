@@ -1,5 +1,14 @@
 ### BACK END
-npm i -g @nestjs/cli
+npm run start:dev
+
+### DB
+sudo service postgresql start
+            ou
+systemctl postgresql start
+
+
+
+
 
 
 
@@ -61,15 +70,5 @@ sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 
-
-
-
-
-
-
-
-
-
-Controler retour une promesse ?
-Service retourne une promesse ?
-Format de retour standard ?
+get pwd when get user ?!
+user : unique psuedo, email
