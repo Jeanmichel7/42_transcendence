@@ -59,18 +59,3 @@ export class UsersController {
         return HttpStatus.NO_CONTENT; // 204
     }
 }
-
-/*
-/users, GET
-/users/:id, GET
-/users, POST
-/users/:id, PATCH
-/users/:id, PUT
-/users/:id, DELETE
-
-/messages, GET
-/messages/user/:id, GET
-/messages/user/:userId/:userDestId, POST
-/messages/:id, PATCH
-/messages/:id, DELETE
-*/
