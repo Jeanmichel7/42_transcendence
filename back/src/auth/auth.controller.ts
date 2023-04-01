@@ -23,45 +23,30 @@ export class AuthController {
     @Post('login')
     @UsePipes(ValidationPipe)
     logIn(@Body() signInDto: AuthDto) : Promise<AuthResponse> {
-        return this.authService.logIn(signInDto.pseudo, signInDto.password);
+        return this.authService.logIn(signInDto.login, signInDto.password);
     }
 
 /*
-https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOauth&response_type=code
+https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code
 */
     @Public()
-    @Get('loginOauth')
-    async logInOauth(@Req() req: Request, @Res() res: Response) {
-        let token = await this.authService.logInOauth(req, res);
-        console.log("token : ", token);
-
-        let result = {
-            token: token,
-            message: "Vous êtes connecté",
-            redirection: "http://localhost:5500/front/index.html"
-        }
-
-        // const redirectUrl = `http://localhost:5500/front/index.html`;
-        // return res.redirect(redirectUrl);
-        return res.status(HttpStatus.OK).json(result);
+    @Get('loginOAuth')
+    async logInOAuth(@Req() req: Request, @Res() res: Response) {
+        let token = await this.authService.logInOAuth(req, res);
+        return res.status(HttpStatus.OK).json({access_token: token});
     }
 
     // @Public()
-    // @Get('loginOauth')
-    // logInOauth() {
+    // @Post('2fa')
+    // async twoFactorAuth(@Req() req: Request, @Res() res: Response) {
+    //     let token = await this.authService.twoFactorAuth(req, res);
+    //     console.log("token : ", token);
 
-    //     // return this.authService.logInOauth();
+    //     return {
+    //         access_token: token,
+    //     };
+
     // }
 
-//http://localhost:5500/front/?code=d0252129f3fddc9aa70ebda1c32eb9c51957ca6470c06fa7ba8a9af57cd943c6
-//http://localhost:5500/front/?error=access_denied&error_description=The+resource+owner+or+authorization+server+denied+the+request.
-
-
-
-    // @UseGuards(AuthGuard)
-    // @Get('profile')
-    // getProfile(@Request() req) {
-    //     return req.user;
-    // }
-    
 }
+

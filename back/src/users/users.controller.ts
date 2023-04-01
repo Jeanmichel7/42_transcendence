@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-// import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
 
 //privilégier le typage de l'interace plutôt que de l'entité
@@ -28,7 +28,7 @@ export class UsersController {
     }
     
     @Public()
-    @Post()
+    @Post('register')
     @UsePipes(ValidationPipe)
     // @HttpCode(201)
     async createUser(@Body() newUser: CreateUserDto): Promise<User> {
@@ -36,6 +36,13 @@ export class UsersController {
         const result = await this.usersService.createUser(newUser);
         return result;
     }
+
+    // @Public()
+    // @Post('OAuthregister')
+    // @UsePipes(ValidationPipe)
+    // async createOAuthUser(@)
+
+
 
     @Patch(':id')
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))

@@ -25,11 +25,18 @@ export class UsersService {
         return userFind;
     }
 
-    async findOneByPseudo(pseudo: string): Promise<UserInfo> {
-        let userFind = await this.userRepository.findOneBy({pseudo: pseudo});
+    async findOneByLogin(login: string): Promise<UserInfo> {
+        let userFind = await this.userRepository.findOneBy({login: login});
         if(!userFind)
-            throw new NotFoundException(`User ${pseudo} not found`);
+            throw new NotFoundException(`User ${login} not found`);
         return userFind;
+    }
+
+    async userAlreadyExist(login: string): Promise<Boolean> {
+        let userFind = await this.userRepository.findOneBy({login: login});
+        if(!userFind)
+            return false;
+        return true;
     }
 
     async findAll(): Promise<UserInfo[]> {
@@ -51,9 +58,9 @@ export class UsersService {
     }
 
     async createUser(newUser: CreateUserDto): Promise<UserInfo> {
-        const result = await this.userRepository.findOneBy({pseudo: newUser.pseudo});
+        const result = await this.userRepository.findOneBy({login: newUser.login});
         if(result)
-            throw new NotFoundException(`User ${newUser.pseudo} already exist`);
+            throw new NotFoundException(`User ${newUser.login} already exist`);
 
         const salt = await bcrypt.genSalt();
         const hash = await bcrypt.hash(newUser.password, salt);
@@ -61,6 +68,20 @@ export class UsersService {
 
         newUser.password = hash;
         return this.userRepository.save(newUser);
+    }
+
+    async createOAuthUser(data) {
+        console.log("data ne wuser: ", data);
+        const newUser = new UserInfo();
+        newUser.firstName = data.first_name;
+        newUser.lastName = data.last_name;
+        newUser.login = data.login;
+        newUser.email = data.email;
+        // newUser.password = data.password;
+        // newUser.description = data.description;
+        newUser.avatar = data.image.link;
+
+        return await this.userRepository.save(newUser);
     }
 
     async patchUser(id: bigint, updateUser: CreateUserDto): Promise<UserInfo> {
@@ -79,8 +100,8 @@ export class UsersService {
             res = await this.userRepository.update({id: id}, {firstName: updateUser.firstName});
         if(updateUser.lastName)
             res = await this.userRepository.update({id: id}, {lastName: updateUser.lastName});
-        if(updateUser.pseudo)
-            res = await this.userRepository.update({id: id}, {pseudo: updateUser.pseudo});
+        if(updateUser.login)
+            res = await this.userRepository.update({id: id}, {login: updateUser.login});
         if(updateUser.email)
             res = await this.userRepository.update({id: id}, {email: updateUser.email});
         if(updateUser.password)

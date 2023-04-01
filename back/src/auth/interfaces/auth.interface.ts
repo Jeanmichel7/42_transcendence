@@ -1,5 +1,5 @@
 export interface Auth {
-    pseudo: string;
+    login: string;
     password: string;
 }
 

@@ -23,7 +23,7 @@ export class UserInfo extends BaseEntity{
         type: 'text',
         unique: true
     })
-    pseudo: string;
+    login: string;
 
     @Column({
         type: 'text',
@@ -33,6 +33,7 @@ export class UserInfo extends BaseEntity{
 
     @Column({
         type: 'text',
+        nullable: true,
     })
     password: string;
 

@@ -14,15 +14,16 @@ export class CreateUserDto {
     @Length(3,20, {message: "The last name must be between 3 and 20 characters"})
     readonly lastName:string;
 
-    @IsNotEmpty({message: "The pseudo is required"})
-    @Length(3, 20, {message: "The pseudo must be between 3 and 20 characters"})
-    // @Unique("", [],{message: "The pseudo is already taken"})
-    readonly pseudo:string;
+    @IsNotEmpty({message: "The login is required"})
+    @Length(3, 20, {message: "The login must be between 3 and 20 characters"})
+    // @Unique("", [],{message: "The login is already taken"})
+    readonly login:string;
 
     @IsNotEmpty()
     @IsEmail()
     readonly email:string;
 
+    @IsOptional()
     @IsNotEmpty()
     @MinLength(8)
     @IsStrongPassword(
