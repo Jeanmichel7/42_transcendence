@@ -34,7 +34,7 @@ export class CreateUserDto {
 
     @IsOptional()
     @IsBoolean()
-    readonly is_admin?:boolean;
+    readonly role?:string;
     
     @IsOptional()
     @IsString()
@@ -43,4 +43,8 @@ export class CreateUserDto {
     @IsOptional()
     @IsString()
     readonly description?:string;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly is_2fa?:boolean;
 }

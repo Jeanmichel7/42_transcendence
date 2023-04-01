@@ -1,10 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
-
-
 
 //privilégier le typage de l'entity plutôt que de l'interface
 import { UserInfo } from 'src/typeorm';
@@ -47,14 +45,14 @@ export class UsersService {
     }
 
     async findOneWithMessages(id: bigint): Promise<UserInfo> {
-        let userFind = await this.userRepository.findOne({
+        let userFund = await this.userRepository.findOne({
             where: {id: id},
             relations: ["messagesSend", "messagesReceive"]
         });
 
-        if(!userFind)
+        if(!userFund)
             throw new NotFoundException(`User with id ${id} not found`);
-        return userFind;
+        return userFund;
     }
 
     async createUser(newUser: CreateUserDto): Promise<UserInfo> {
@@ -71,7 +69,7 @@ export class UsersService {
     }
 
     async createOAuthUser(data) {
-        console.log("data ne wuser: ", data);
+        // console.log("data ne wuser: ", data);
         const newUser = new UserInfo();
         newUser.firstName = data.first_name;
         newUser.lastName = data.last_name;
@@ -84,16 +82,47 @@ export class UsersService {
         return await this.userRepository.save(newUser);
     }
 
+    // async getJWTByHeader(req) {
+    //     const authHeader = req.headers.authorization;
+    //     if (authHeader) {
+    //         const token = authHeader.split(' ')[1];
+    //         return token;
+    //     }
+    //     return null;
+    // }
+
+    async active2fa(userId: bigint): Promise<UserInfo> {
+        let userToUpdate = await this.findOne(userId)
+        if(!userToUpdate)
+            throw new NotFoundException(`User with id ${userId} not found`);
+
+        let resultUpdate = await this.userRepository.update({id: userId}, {is_2fa: true});
+        if (resultUpdate.affected === 0)
+            throw new BadRequestException(`L'option 2FA de l'user ${userId} n'a pas été mise a jour.`);
+
+        const user = await this.findOne(userId);
+        return user;
+    }
+
+    async desactive2fa(userId: bigint): Promise<UserInfo> {
+        let userToUpdate = await this.findOne(userId)
+        if(!userToUpdate)
+            throw new NotFoundException(`User with id ${userId} not found`);
+
+        let resultUpdate = await this.userRepository.update({id: userId}, {is_2fa: false});
+        if (resultUpdate.affected === 0)
+            throw new BadRequestException(`L'option 2FA de l'user ${userId} n'a pas été mise a jour.`);
+
+        const user = await this.findOne(userId);
+        return user;
+    }
+
     async patchUser(id: bigint, updateUser: CreateUserDto): Promise<UserInfo> {
         // console.log("updateUser : ", updateUser)
 
         let userToUpdate = await this.findOne(id)
-        // console.log("userToUpdate : ", userToUpdate)
-
         if(!userToUpdate)
-        throw new NotFoundException(`User with id ${id} not found`);
-        
-        // check auth
+            throw new NotFoundException(`User with id ${id} not found`);
 
         let res;
         if(updateUser.firstName)
@@ -119,17 +148,12 @@ export class UsersService {
     }
 
     async updateUser(id: bigint, updateUser: CreateUserDto): Promise<UserInfo> {
-        // console.log("updateUser : ", updateUser)
 
         let userToUpdate = await this.findOne(id)
-        // console.log("userToUpdate : ", userToUpdate)
-
         if(!userToUpdate)
-        throw new NotFoundException(`User with id ${id} not found`);
+            throw new NotFoundException(`User with id ${id} not found`);
         
-        // check auth
-
-        let res = await this.userRepository.update({id: id}, updateUser);        
+        let res = await this.userRepository.update({id: id}, updateUser);
 
         // check res
         // return { update: true, user: updateUser, data: res };
@@ -139,16 +163,10 @@ export class UsersService {
     }
 
     async deleteUser(id: bigint): Promise<void> {
-        // check user exist
         let userFound = await this.findOne(id);
-
         if(!userFound)
             throw new NotFoundException(`User with id ${id} not found`);
 
-        // check auth 
-
-        // delete user
-        
         const result = await this.userRepository.delete({id: id});
         // console.log("result : ", result)
     }

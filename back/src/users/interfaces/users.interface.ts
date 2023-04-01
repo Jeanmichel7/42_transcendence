@@ -7,5 +7,6 @@ export interface User {
     password?: string,
     description?: string,
     avatar?: string,
-    is_admin?: boolean,
+    role?: string,
+    is_2fa?: boolean,
 }
