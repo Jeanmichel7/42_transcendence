@@ -7,7 +7,6 @@ import { jwtConstants } from './guard/constants';
 import { HttpModule } from '@nestjs/axios';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guard/auth.guard';
-import { AuthOwnUserGuard } from './guard/authOwnUser.guard';
 
 @Module({
   imports: [
@@ -23,8 +22,7 @@ import { AuthOwnUserGuard } from './guard/authOwnUser.guard';
     AuthService, 
     {
       provide: APP_GUARD,
-      useClass: AuthGuard, 
-      
+      useClass: AuthGuard,
     },
   ],
   controllers: [AuthController],
