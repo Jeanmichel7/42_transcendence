@@ -27,6 +27,7 @@ export class UsersController {
         return result;
     }
     
+    /* probably useless but I keep it for now */ 
     @Public()
     @Post('register')
     @UsePipes(ValidationPipe)
@@ -36,30 +37,6 @@ export class UsersController {
         const result = await this.usersService.createUser(newUser);
         return result;
     }
-
-
-    @Get(':id/active2fa')
-    @UseGuards(AuthOwnUserGuard)
-    async active2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
-        // console.error("new user : ", newUser);
-        const result = await this.usersService.active2fa(userId);
-        return result;
-    }
-
-    @Get(':id/desactive2fa')
-    @UseGuards(AuthOwnUserGuard)
-    async desactive2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
-        // console.error("new user : ", newUser);
-        const result = await this.usersService.desactive2fa(userId);
-        return result;
-    }
-
-    // @Public()
-    // @Post('OAuthregister')
-    // @UsePipes(ValidationPipe)
-    // async createOAuthUser(@)
-
-
 
     @Patch(':id')
     @UseGuards(AuthOwnUserGuard)
@@ -89,4 +66,46 @@ export class UsersController {
         await this.usersService.deleteUser(id);
         return HttpStatus.NO_CONTENT; // 204
     }
+
+
+
+
+
+
+
+    /* ************************************************ */
+    /*                                                  */
+    /*                         2FA                      */
+    /*                                                  */
+    /* ************************************************ */
+    
+    @Get(':id/active2fa')
+    @UseGuards(AuthOwnUserGuard)
+    async active2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
+        // console.error("new user : ", newUser);
+        const result = await this.usersService.active2fa(userId);
+        return result;
+    }
+
+    @Get(':id/desactive2fa')
+    @UseGuards(AuthOwnUserGuard)
+    async desactive2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
+        // console.error("new user : ", newUser);
+        const result = await this.usersService.desactive2fa(userId);
+        return result;
+    }
+
+
+
+    /* ************************************************ */
+    /*                                                  */
+    /*                      FRIENDS                     */
+    /*                                                  */
+    /* ************************************************ */
+
+    //addfrinds
+    //bloquefriend
+    //removefriend
+
+
 }
