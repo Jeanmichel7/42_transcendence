@@ -30,6 +30,8 @@ https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bf
         };
     }
 
+
+    
     // @Public()
     // @Get('loginOAuth')
     // async logInOAuth(@Req() req: Request, @Res() res: Response): Promise<any> {

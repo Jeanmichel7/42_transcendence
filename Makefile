@@ -1,12 +1,12 @@
 name = transcendence
 all:
 	printf "Launch configuration ${name}..."
-	mkdir -p ~/data/main
-	docker-compose --env-file .env up
+	mkdir -p ~/data
+	docker-compose up
 
 build:
 	printf "Building configuration ${name}..."
-	mkdir -p ~/data/main
+	mkdir -p ~/data
 	docker-compose up --build
 
 down:
