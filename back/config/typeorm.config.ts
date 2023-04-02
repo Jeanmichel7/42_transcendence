@@ -4,7 +4,7 @@ import entities from 'src/typeorm';
 
 export const typeOrmConfig = async (configService: ConfigService)
 : Promise<TypeOrmModuleOptions> => {
-  console.log("host : ", configService.get('DB_HOST'));
+  console.log("db host : ", configService.get('DB_HOST'));
 
   return {
     type: 'postgres',

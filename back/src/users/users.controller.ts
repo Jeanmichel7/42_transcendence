@@ -38,8 +38,6 @@ export class UsersController {
         return result;
     }
 
-
-    
     @Patch(':id')
     @UseGuards(AuthOwnUserGuard)
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))

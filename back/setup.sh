@@ -7,7 +7,6 @@ while ! docker inspect postgres | grep IPAddress > /dev/null; do
 done
 
 ip=$(docker inspect postgres | grep IPAddress | grep -oP '(?<="IPAddress": ")[^"]+' | sed -n '1p')
-echo DB_HOST=$ip
 export DB_HOST=$ip
 
 exec "$@"
