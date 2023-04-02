@@ -2,7 +2,8 @@ name = transcendence
 all:
 	printf "Launch configuration ${name}..."
 	mkdir -p ~/data
-	docker-compose up
+	docker-compose up -d
+	docker-compose logs postgres nestjs
 
 build:
 	printf "Building configuration ${name}..."
@@ -30,5 +31,8 @@ clean:
 	docker system prune -a
 
 re:	fclean all
+
+logs:
+	docker-compose logs -f postgres nestjs
 
 .PHONY	: all build down re clean fclean

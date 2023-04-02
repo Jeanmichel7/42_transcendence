@@ -12,6 +12,7 @@ services:
     links:
       - postgres
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./back:/usr/src/app
     restart: always
 
@@ -35,8 +36,8 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: jrasser@jrasser.com
-      PGADMIN_DEFAULT_PASSWORD: jrasser
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
     networks:

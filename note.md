@@ -77,9 +77,13 @@ sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 
-
+42_transcendence/.env
 VOLUME_DB=/home/jrasser/data
-DB_HOST=172.28.0.3
+DB_USERNAME=jrasser
+DB_PASSWORD=jrasser
+DB_NAME=pong_db
+
+42_transcendence/back/.env
 DB_PORT=5432
 DB_USERNAME=jrasser
 DB_PASSWORD=jrasser
