@@ -26,6 +26,7 @@ export class UsersController {
         const result = this.usersService.findOne(params);
         return result;
     }
+
     
     /* probably useless but I keep it for now */ 
     @Public()
@@ -39,6 +40,7 @@ export class UsersController {
     }
 
     @Patch(':id')
+
     @UseGuards(AuthOwnUserGuard)
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
     async patchUser(@Param('id', ParseIntPipe) id: bigint, @Body() updateUser: CreateUserDto)
@@ -66,6 +68,7 @@ export class UsersController {
         await this.usersService.deleteUser(id);
         return HttpStatus.NO_CONTENT; // 204
     }
+
 
 
 
@@ -106,6 +109,7 @@ export class UsersController {
     //addfrinds
     //bloquefriend
     //removefriend
+
 
 
 }

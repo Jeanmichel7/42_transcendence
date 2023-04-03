@@ -8,10 +8,12 @@ import { HttpModule } from '@nestjs/axios';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guard/auth.guard';
 
+
 @Module({
   imports: [
     UsersModule,
     HttpModule,
+
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
@@ -25,6 +27,7 @@ import { AuthGuard } from './guard/auth.guard';
       useClass: AuthGuard,
     },
   ],
+
   controllers: [AuthController],
   exports: [AuthService],
 })

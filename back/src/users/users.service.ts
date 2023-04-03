@@ -49,7 +49,6 @@ export class UsersService {
             where: {id: id},
             relations: ["messagesSend", "messagesReceive"]
         });
-
         if(!userFund)
             throw new NotFoundException(`User with id ${id} not found`);
         return userFund;

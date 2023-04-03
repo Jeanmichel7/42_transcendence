@@ -19,9 +19,11 @@ export class CreateUserDto {
     // @Unique("", [],{message: "The login is already taken"})
     readonly login:string;
 
+
     @IsNotEmpty()
     @IsEmail()
     readonly email:string;
+
 
     @IsOptional()
     @IsNotEmpty()
@@ -30,11 +32,13 @@ export class CreateUserDto {
         {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1, },
         {message: "The password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, one number and one symbol."}
     )
+
     password:string;
 
     @IsOptional()
     @IsBoolean()
     readonly role?:string;
+
     
     @IsOptional()
     @IsString()
@@ -47,4 +51,5 @@ export class CreateUserDto {
     @IsOptional()
     @IsBoolean()
     readonly is_2fa?:boolean;
+
 }

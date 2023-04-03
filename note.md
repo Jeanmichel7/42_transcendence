@@ -70,13 +70,6 @@ http://localhost:5050/
 
 
 
-
-
-
-
-
-
-
 42_transcendence/.env
 VOLUME_DB=/home/jrasser/data
 DB_USERNAME=jrasser

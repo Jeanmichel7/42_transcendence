@@ -25,6 +25,7 @@ export class UserInfo extends BaseEntity{
     })
     login: string;
 
+
     @Column({
         type: 'text',
         unique: true
