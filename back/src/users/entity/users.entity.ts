@@ -23,7 +23,8 @@ export class UserInfo extends BaseEntity{
         type: 'text',
         unique: true
     })
-    pseudo: string;
+    login: string;
+
 
     @Column({
         type: 'text',
@@ -33,15 +34,16 @@ export class UserInfo extends BaseEntity{
 
     @Column({
         type: 'text',
+        nullable: true,
     })
     password: string;
 
     @Column({
-        type: 'boolean',
-        default: false,
-        nullable: true,
+        type: 'text',
+        default: 'user',
+        // nullable: true,
     })
-    is_admin: boolean;
+    role: string;
 
     @Column({
         type: 'text',
@@ -54,6 +56,13 @@ export class UserInfo extends BaseEntity{
         nullable: true,
     })
     description: string;
+
+    @Column({
+        type: 'boolean',
+        default: false,
+        nullable: true,
+    })
+    is_2fa: boolean;
 
     @OneToMany(() => MessageInfo, message => message.ownerUser)
     messagesSend: MessageInfo[];

@@ -1,0 +1,73 @@
+version: '3'
+services:
+  react:
+    build: front/
+    container_name: react
+    networks:
+      - transcendence-network
+    ports:
+      - 3006:3006
+    depends_on:
+      - nestjs
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock
+      - ./front:/usr/src/app
+    restart: always
+
+  nestjs:
+    build: back/
+    container_name: nestjs
+    networks:
+      - transcendence-network
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./back:/usr/src/app
+    restart: always
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    networks:
+      - transcendence-network
+    ports:
+      - 5432:5432
+    volumes:
+      - database:/var/lib/postgresql/
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - transcendence-network
+
+# ------------------------------------------------------------------------- #
+volumes:
+  database:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${VOLUME_DB}
+      o: bind
+
+
+# ------------------------------------------------------------------------- #
+networks:
+  transcendence-network:
+    driver: bridge

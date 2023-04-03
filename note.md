@@ -34,7 +34,7 @@ sudo su - postgres
 psql
 
 create user jrasser with password 'jrasser';
-create databse pong_db;
+create database pong_db;
 grant all privileges on database pong_db to jrasser;
 <!-- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO <nom_utilisateur>; -->
 <!-- GRANT SELECT ON ALL TABLES IN SCHEMA public TO <nom_utilisateur>; -->
@@ -60,6 +60,7 @@ sudo apt install pgadmin4
 # Configure the webserver, if you installed pgadmin4-web:
 sudo /usr/pgadmin4/bin/setup-web.sh
 
+http://localhost:5050/
 
 
 
@@ -69,6 +70,16 @@ sudo /usr/pgadmin4/bin/setup-web.sh
 
 
 
+42_transcendence/.env
+VOLUME_DB=/home/jrasser/data
+DB_USERNAME=jrasser
+DB_PASSWORD=jrasser
+DB_NAME=pong_db
 
-get pwd when get user ?!
-user : unique psuedo, email
+42_transcendence/back/.env
+DB_PORT=5432
+DB_USERNAME=jrasser
+DB_PASSWORD=jrasser
+DB_NAME=pong_db
+JWT_SECRET=blablabla
+

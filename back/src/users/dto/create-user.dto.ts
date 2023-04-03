@@ -14,26 +14,31 @@ export class CreateUserDto {
     @Length(3,20, {message: "The last name must be between 3 and 20 characters"})
     readonly lastName:string;
 
-    @IsNotEmpty({message: "The pseudo is required"})
-    @Length(3, 20, {message: "The pseudo must be between 3 and 20 characters"})
-    // @Unique("", [],{message: "The pseudo is already taken"})
-    readonly pseudo:string;
+    @IsNotEmpty({message: "The login is required"})
+    @Length(3, 20, {message: "The login must be between 3 and 20 characters"})
+    // @Unique("", [],{message: "The login is already taken"})
+    readonly login:string;
+
 
     @IsNotEmpty()
     @IsEmail()
     readonly email:string;
 
+
+    @IsOptional()
     @IsNotEmpty()
     @MinLength(8)
     @IsStrongPassword(
         {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1, },
         {message: "The password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, one number and one symbol."}
     )
-    readonly password:string;
+
+    password:string;
 
     @IsOptional()
     @IsBoolean()
-    readonly is_admin?:boolean;
+    readonly role?:string;
+
     
     @IsOptional()
     @IsString()
@@ -42,4 +47,9 @@ export class CreateUserDto {
     @IsOptional()
     @IsString()
     readonly description?:string;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly is_2fa?:boolean;
+
 }

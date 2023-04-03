@@ -1,15 +1,18 @@
-import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Req, Res, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+
+// import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { AuthOwnUserGuard } from 'src/auth/guard/authOwnUser.guard';
 
 //privilégier le typage de l'interace plutôt que de l'entité
 import { User } from './interfaces/users.interface';
-
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
-
+    
     @Get()
     async findAll(): Promise<User[]> {
         const result = await this.usersService.findAll();
@@ -24,7 +27,10 @@ export class UsersController {
         return result;
     }
 
-    @Post()
+    
+    /* probably useless but I keep it for now */ 
+    @Public()
+    @Post('register')
     @UsePipes(ValidationPipe)
     // @HttpCode(201)
     async createUser(@Body() newUser: CreateUserDto): Promise<User> {
@@ -34,6 +40,8 @@ export class UsersController {
     }
 
     @Patch(':id')
+
+    @UseGuards(AuthOwnUserGuard)
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
     async patchUser(@Param('id', ParseIntPipe) id: bigint, @Body() updateUser: CreateUserDto)
     : Promise<User> {
@@ -44,6 +52,7 @@ export class UsersController {
     }
 
     @Put(':id')
+    @UseGuards(AuthOwnUserGuard)
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
     async updateUser(@Param('id', ParseIntPipe) id: bigint, @Body() updateUser: CreateUserDto)
     : Promise<User> {
@@ -54,8 +63,53 @@ export class UsersController {
     }
 
     @Delete(':id')
+    @UseGuards(AuthOwnUserGuard)
     async deleteUser(@Param('id', ParseIntPipe) id: bigint): Promise<HttpStatus> {
         await this.usersService.deleteUser(id);
         return HttpStatus.NO_CONTENT; // 204
     }
+
+
+
+
+
+
+
+
+    /* ************************************************ */
+    /*                                                  */
+    /*                         2FA                      */
+    /*                                                  */
+    /* ************************************************ */
+    
+    @Get(':id/active2fa')
+    @UseGuards(AuthOwnUserGuard)
+    async active2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
+        // console.error("new user : ", newUser);
+        const result = await this.usersService.active2fa(userId);
+        return result;
+    }
+
+    @Get(':id/desactive2fa')
+    @UseGuards(AuthOwnUserGuard)
+    async desactive2fa( @Param('id', ParseIntPipe) userId: bigint ): Promise<User> {
+        // console.error("new user : ", newUser);
+        const result = await this.usersService.desactive2fa(userId);
+        return result;
+    }
+
+
+
+    /* ************************************************ */
+    /*                                                  */
+    /*                      FRIENDS                     */
+    /*                                                  */
+    /* ************************************************ */
+
+    //addfrinds
+    //bloquefriend
+    //removefriend
+
+
+
 }
