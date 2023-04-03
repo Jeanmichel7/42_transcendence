@@ -1,6 +1,0 @@
-{
-    "name": "transcendence",
-    "scripts": {
-      "start": "sudo service postgresql start && cd back && npm run start:dev"
-    }
-  }
