@@ -59,11 +59,10 @@ export class UsersService {
         if(result)
             throw new NotFoundException(`User ${newUser.login} already exist`);
 
-        const salt = await bcrypt.genSalt();
-        const hash = await bcrypt.hash(newUser.password, salt);
-        // console.error("hash : ", hash);
-
-        newUser.password = hash;
+        // const salt = await bcrypt.genSalt();
+        // const hash = await bcrypt.hash(newUser.password, salt);
+        // // console.error("hash : ", hash);
+        // newUser.password = hash;
         return this.userRepository.save(newUser);
     }
 

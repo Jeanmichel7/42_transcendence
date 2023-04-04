@@ -1,8 +1,8 @@
 export interface Message {
-    id: bigint;
+    // id: bigint;
     ownerUser: bigint;
     destUser: bigint;
-    data: string;
-    createAt: string;
-    updateAt: string;
+    text: string | object;
+    // createAt: string;
+    // updateAt: string;
 }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Chat App</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <input type="text" id="messageInput">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const messageInput = document.getElementById("messageInput");
+
+      function sendMessage() {
+        const message = messageInput.value;
+        fetch('http://localhost:3000/messages/from/2/to/1', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': '*',
+			'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpyYXNzZXIiLCJzdWIiOiIxIiwiaWF0IjoxNjgwNjQ3ODIzLCJleHAiOjE2ODA4MjA2MjN9.2vhEQIqm2Skl5gUeha-Wp6W8dyAQVoIy6o4EGCgUb98'
+          },
+          body: JSON.stringify({
+            text: message
+          })
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error(error));
+      }
+
+      const sourceEvent = new EventSource('http://localhost:3000/messages/event/from/2/to/1');
+
+	  sourceEvent.onmessage = ({ data }) => {
+		console.log("data : ", data)
+		const message = document.createElement('li');
+		message.innerText = 'New message: ' + data;
+		document.body.appendChild(message);
+	}
+
+    //   sourceEvent.addEventListener('message', event => {
+	// 	console.log("event : ", event)
+	// 	if(event.data === undefined) 
+	// 		return;
+    //     const message = event.data;
+	// 	console.error("message : ", message)
+    //     const messagesList = document.getElementById("messages");
+    //     messagesList.innerHTML += `<li>${message.content}</li>`;
+    //   });
+    </script>
+  </body>
+</html>

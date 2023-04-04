@@ -12,7 +12,7 @@ export class MessageInfo extends BaseEntity{
     @Column({
         type: 'text',
     })
-    data: string;
+    text: string;
 
     @Column({
         nullable: true,

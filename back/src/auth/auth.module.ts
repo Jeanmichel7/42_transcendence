@@ -22,10 +22,10 @@ import { AuthGuard } from './guard/auth.guard';
   ],
   providers: [
     AuthService, 
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
   ],
 
   controllers: [AuthController],

@@ -31,7 +31,7 @@ services:
     restart: always
 
   postgres:
-    image: postgres
+    build: db/
     container_name: postgres
     networks:
       - transcendence-network

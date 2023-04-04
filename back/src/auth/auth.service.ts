@@ -61,6 +61,15 @@ export class AuthService {
         return JWToken;
     }
 
+    async getActuelUser(req): Promise<CreateUserDto> {
+        if(!req.authorization)
+            throw new UnauthorizedException();
+        const token = req.authorization.split(' ')[1];
+        const payload = this.jwtService.verify(token);
+        const user = await this.usersService.findOneByLogin(payload.username);
+        return user;
+    }
+
     // async logInOAuth(req: Request, res: Response): Promise<any> {
     //     //check req.querry
     //     const code: string = this.OAuthGetCode(req);

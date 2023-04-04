@@ -83,3 +83,11 @@ DB_PASSWORD=jrasser
 DB_NAME=pong_db
 JWT_SECRET=blablabla
 
+
+
+## DB SAVE
+sudo su - postgres
+psql
+pg_dump pong_db > save.sql
+\q
+docker cp postgres:/var/lib/postgresql/save.sql ./db/save.sql

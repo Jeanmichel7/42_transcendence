@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Transcendence</title>
+	<!-- <script src="index.js" defer></script> -->
+</head>
+
+<body>
+	<h1>Transcendence</h1>
+
+	<body>
+		<div id="messages"></div>
+		<form>
+			<input type="text" id="message" placeholder="Message" />
+			<button type="submit">Send</button>
+
+			<ul id="eventList"></ul>
+		</form>
+
+
+		<script>
+			const messagesDiv = document.querySelector('#messages');
+			const messageInput = document.querySelector('#message');
+			const form = document.querySelector('form');
+
+			// Créer une connexion avec le serveur d'événements
+			// const source = new EventSource('http://localhost:3000/messages/from/2/to/1');
+			const sourceee = new EventSource('/messages/event/2');
+			const eventList = document.querySelector("ul");
+
+			sourceee.onmessage = (e) => {
+				console.error("e: ", e)
+				const newElement = document.createElement("li");
+
+				newElement.innerText = `message: ${e.data}`;
+				document.body.appendChild(newElement);
+				eventList.appendChild(newElement);
+			};
+
+
+			// // Ecouter les événements du serveur
+			// source.addEventListener('http://localhost:3000/messages/from/2/to/1', (event) => {
+			// 	console.log("event data: ", event)
+			// 	const message = JSON.parse(event.data);
+			// 	const messageElement = document.createElement('div');
+			// 	messageElement.textContent = `${message.username}: ${message.text}`;
+			// 	messagesDiv.appendChild(messageElement);
+			// });
+
+			// Envoyer un message au serveur lorsque le formulaire est soumis
+			// form.addEventListener('submit', async (event) => {
+			// 	event.preventDefault();
+			// 	const message = messageInput.value;
+			// 	messageInput.value = '';
+			// 	let res = await fetch('http://localhost:3000/messages/event/2', {
+			// 		method: 'POST',
+			// 		headers: {
+			// 			'Content-Type': 'application/json'
+			// 		},
+			// 		body: JSON.stringify({
+			// 			text: message
+			// 		})
+			// 	});
+
+			// 	const data = await res.json();
+			// 	console.log(data);
+
+
+			// });
+		</script>
+	</body>
+</body>
+
+</html>

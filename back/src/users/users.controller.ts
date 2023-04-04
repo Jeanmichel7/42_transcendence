@@ -12,7 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
-    
+
     @Get()
     async findAll(): Promise<User[]> {
         const result = await this.usersService.findAll();
@@ -40,7 +40,6 @@ export class UsersController {
     }
 
     @Patch(':id')
-
     @UseGuards(AuthOwnUserGuard)
     @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
     async patchUser(@Param('id', ParseIntPipe) id: bigint, @Body() updateUser: CreateUserDto)

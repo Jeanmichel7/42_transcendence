@@ -19,10 +19,11 @@ export class CreateMessageDto {
     // @IsNumber()
     // readonly destUserId?: bigint;
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
     // @Length(1)
-    readonly data:string;
+    text:string;
 
     // @IsOptional()
     // @IsNotEmpty()
