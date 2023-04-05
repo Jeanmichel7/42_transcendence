@@ -133,6 +133,7 @@ export class MessageController {
     //     this.eventEmitter.emit(eventName, message);
     // }
 
+    // @UseGuards(AuthOwnUserGuard)
     @Sse('/event/from/:userIdFrom/to/:userIdTo')
     stream(
         @Param('userIdFrom', ParseIntPipe) userIdFrom: bigint,
@@ -155,7 +156,7 @@ export class MessageController {
             this.postCalled$.subscribe((postCalled) => {
 
 
-                // console.error("stream", req)
+                console.error("stream", req)
 
                 // Vérifie si la fonction @Post a été appelée
                 if (postCalled) {
