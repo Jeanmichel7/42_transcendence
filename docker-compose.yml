@@ -10,8 +10,8 @@ services:
     depends_on:
       - nestjs
     volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock
-      - ./front:/usr/src/app
+      - front:/usr/src/app
+      - /usr/src/app/node_modules
     restart: always
 
   nestjs:
@@ -27,7 +27,8 @@ services:
       - postgres
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./back:/usr/src/app
+      - back:/usr/src/app
+      - /usr/src/app/node_modules
     restart: always
 
   postgres:
@@ -63,6 +64,18 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  front:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${FRONT_VOLUME}
+      o: bind
+  back:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${BACK_VOLUME}
+      o: bind
 
 
 # ------------------------------------------------------------------------- #

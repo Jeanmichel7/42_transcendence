@@ -1,8 +1,7 @@
 name = transcendence
 all:
 	printf "Launch configuration ${name}..."
-	docker-compose up -d
-	docker-compose logs -f postgres nestjs
+	docker-compose up
 
 build:
 	printf "Building configuration ${name}..."
