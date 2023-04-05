@@ -10,8 +10,8 @@ services:
     depends_on:
       - nestjs
     volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock
-      - ./front:/usr/src/app
+      - front:/usr/src/app
+      - /usr/src/app/node_modules
     restart: always
 
   nestjs:
@@ -27,18 +27,19 @@ services:
       - postgres
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./back:/usr/src/app
+      - back:/usr/src/app
+      - /usr/src/app/node_modules
     restart: always
 
   postgres:
-    image: postgres
+    build: db/
     container_name: postgres
     networks:
       - transcendence-network
     ports:
       - 5432:5432
     volumes:
-      - database:/var/lib/postgresql/
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -59,11 +60,19 @@ services:
 
 # ------------------------------------------------------------------------- #
 volumes:
-  database:
+  postgres_data:
+  pgadmin_data:
+  front:
     driver: local
     driver_opts:
       type: none
-      device: ${VOLUME_DB}
+      device: ${FRONT_VOLUME}
+      o: bind
+  back:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${BACK_VOLUME}
       o: bind
 
 

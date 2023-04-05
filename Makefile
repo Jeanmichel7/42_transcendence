@@ -1,12 +1,10 @@
 name = transcendence
 all:
 	printf "Launch configuration ${name}..."
-	mkdir -p ~/data
 	docker-compose up
 
 build:
 	printf "Building configuration ${name}..."
-	mkdir -p ~/data
 	docker-compose up --build
 
 down:
@@ -23,7 +21,6 @@ fclean:
 	docker system prune --all --force --volumes
 	docker volume prune --force
 	docker network prune --force
-	sudo rm -rf ~/data
 
 clean:
 	printf "Cleaning configuration ${name}..."
