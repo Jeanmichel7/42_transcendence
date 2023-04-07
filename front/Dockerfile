@@ -23,4 +23,4 @@ EXPOSE 3006
 # RUN npm run start
 
 # Set the command to start the app
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
