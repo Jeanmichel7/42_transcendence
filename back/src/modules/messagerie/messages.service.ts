@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
@@ -9,6 +9,7 @@ import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessageInterface } from './interfaces/messages.interface';
 import { UserInterface } from '../users/interfaces/users.interface';
+import { MessageBtwTwoUserInterface } from './interfaces/messagesBetweenTwoUsers.interface';
 
 
 
@@ -23,7 +24,7 @@ export class MessageService {
 		const message: MessageEntity = await this.messageRepository.findOneBy({ id: id });
 		if (!message)
 			throw new NotFoundException(`Message with id ${id} not found`);
-		const result: MessageInterface = { ...message };
+		const result: MessageInterface = message;
 		return result;
 	}
 
@@ -51,17 +52,28 @@ export class MessageService {
 		return allMessages;
 	}
 
-	async getMessagesBetweenUsers(userIdFrom: bigint, userIdTo: bigint): Promise<MessageInterface[]> {
-		const messages: MessageEntity[] = await this.messageRepository.find({
-			where: {
-				ownerUser: userIdFrom,
-				destUser: userIdFrom,
-			},
-			select: ["id", "text", "createdAt", "updatedAt", "ownerUser", "destUser"],
-		});
-		console.error("messages : ", messages)
+	async getMessagesBetweenUsers(userIdFrom: bigint, userIdTo: bigint): Promise<MessageBtwTwoUserInterface[]> {
+		const messages: MessageEntity[] = await this.messageRepository.createQueryBuilder('message')
+    .leftJoinAndSelect('message.ownerUser', 'ownerUser')
+    .leftJoinAndSelect('message.destUser', 'destUser')
+		.select(['message', 'ownerUser.firstName', 'destUser.firstName', 'destUser.lastName', 'ownerUser.lastName'])
+    .where(
+      '(ownerUser.id = :userIdFrom AND destUser.id = :userIdTo) OR (ownerUser.id = :userIdTo AND destUser.id = :userIdFrom)',
+      { userIdFrom, userIdTo }
+    )
+    .getMany();
 
-		return messages;
+		const result: MessageBtwTwoUserInterface[] = messages.map(e=>{
+			return {
+				id: e.id,
+				text: e.text,
+				createdAt: e.createdAt,
+				updatedAt: e.updatedAt,
+				firstNameOwner: e.ownerUser.firstName,
+				lastNameOwner: e.destUser.lastName
+			}
+		})
+		return result;
 	}
 
 
@@ -111,8 +123,8 @@ export class MessageService {
 
 		const newMessage: MessageEntity = await this.messageRepository.save({
 			text: message.text,
-			ownerUser: userSend.id,
-			destUser: userReceive.id,
+			ownerUser: userSend,
+			destUser: userReceive,
 		});
 		console.error("apres save : ", newMessage);
 		// userSend.messagesSend = [...userSend.messagesSend, newMessage];

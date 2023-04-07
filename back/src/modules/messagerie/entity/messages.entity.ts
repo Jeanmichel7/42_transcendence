@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 @Entity('messages')
 export class MessageEntity extends BaseEntity {
@@ -28,10 +29,14 @@ export class MessageEntity extends BaseEntity {
 	})
 	updatedAt: string;
 
-	@ManyToOne(() => UserEntity, user => user.id, { onDelete: 'CASCADE' })
-	ownerUser: bigint;
+	@ManyToOne(() => UserEntity, user => user.id, { 
+		onDelete: 'CASCADE' 
+	})
+	ownerUser: UserInterface;
 
-	@ManyToOne(() => UserEntity, user => user.id, { onDelete: 'CASCADE' })
-	destUser: bigint;
+	@ManyToOne(() => UserEntity, user => user.id, { 
+		onDelete: 'CASCADE' 
+	})
+	destUser: UserInterface;
 
 }

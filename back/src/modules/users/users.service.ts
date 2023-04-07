@@ -70,7 +70,7 @@ export class UsersService {
 		return this.userRepository.save(newUser);
 	}
 
-	async createOAuthUser(data) {
+	async createOAuthUser(data): Promise<UserInterface> {
 		// console.log("data ne wuser: ", data);
 		const newUser = new UserEntity();
 		newUser.firstName = data.first_name;
@@ -81,7 +81,11 @@ export class UsersService {
 		// newUser.description = data.description;
 		newUser.avatar = data.image.link;
 
-		return await this.userRepository.save(newUser);
+		const user: UserEntity = await this.userRepository.save(newUser);
+		if (!user)
+			throw new NotFoundException(`User ${newUser.login} not created`);
+		const result: UserInterface = { ...user };
+		return result;
 	}
 
 	// async getJWTByHeader(req) {

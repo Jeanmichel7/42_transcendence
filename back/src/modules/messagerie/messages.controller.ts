@@ -11,6 +11,7 @@ import { UserEntity } from '../users/entity/users.entity';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
+import { MessageBtwTwoUserInterface } from './interfaces/messagesBetweenTwoUsers.interface';
 
 @Controller('messages')
 export class MessageController {
@@ -47,9 +48,9 @@ export class MessageController {
 	async getMessages(
 		@Param('userId', ParseIntPipe) userId: bigint,
 		@Param('userIdTo', ParseIntPipe) userIdTo: bigint,
-	): Promise<MessageInterface[]>
+	): Promise<MessageBtwTwoUserInterface[]>
 	{
-		const result: MessageInterface[] = await this.MessageService.getMessagesBetweenUsers(userId, userIdTo);
+		const result: MessageBtwTwoUserInterface[] = await this.MessageService.getMessagesBetweenUsers(userId, userIdTo);
 		return result;
 	}
 
