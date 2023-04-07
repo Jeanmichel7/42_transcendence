@@ -1,19 +1,5 @@
 version: '3'
 services:
-  react:
-    build: front/
-    container_name: react
-    networks:
-      - transcendence-network
-    ports:
-      - 3006:3006
-    depends_on:
-      - nestjs
-    volumes:
-      - front:/usr/src/app
-      - /usr/src/app/node_modules
-    restart: always
-
   nestjs:
     build: back/
     container_name: nestjs
@@ -23,12 +9,10 @@ services:
       - 3000:3000
     depends_on:
       - postgres
-    links:
-      - postgres
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - back:/usr/src/app
-      - /usr/src/app/node_modules
+      - back:/app
+      - /app/node_modules
     restart: always
 
   postgres:
@@ -44,6 +28,20 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+    restart: always
+
+  react:
+    build: front/
+    container_name: react
+    networks:
+      - transcendence-network
+    ports:
+      - 3006:3006
+    depends_on:
+      - nestjs
+    volumes:
+      - front:/app
+      - /app/node_modules
     restart: always
 
   pgadmin:

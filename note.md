@@ -1,3 +1,25 @@
+# TODO
+
+erreur 500 
+nestjs    | [Nest] 1883  - 04/07/2023, 1:36:31 AM   ERROR [ExceptionsHandler] jwt expired
+nestjs    | TokenExpiredError: jwt expired
+nestjs    |     at /app/node_modules/jsonwebtoken/verify.js:190:21
+nestjs    |     at getSecret (/app/node_modules/jsonwebtoken/verify.js:97:14)
+nestjs    |     at Object.module.exports [as verify] (/app/node_modules/jsonwebtoken/verify.js:101:10)
+nestjs    |     at JwtService.verify (/app/node_modules/@nestjs/jwt/dist/jwt.service.js:38:20)
+nestjs    |     at AuthOwner.canActivate (/app/src/modules/auth/guard/authOwner.guard.ts:16:37)
+nestjs    |     at GuardsConsumer.tryActivate (/app/node_modules/@nestjs/core/guards/guards-consumer.js:15:34)
+nestjs    |     at canActivateFn (/app/node_modules/@nestjs/core/router/router-execution-context.js:134:59)
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:42:37
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:23
+nestjs    |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+
+
+
+
+
+
+
 ### BACK END
 npm run start:dev
 

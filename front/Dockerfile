@@ -8,6 +8,9 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
+# Create a node_modules folder inside the container
+RUN mkdir /app/node_modules
+
 # Install dependencies
 RUN npm install
 
