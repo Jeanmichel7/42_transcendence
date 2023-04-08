@@ -17,6 +17,18 @@ export class UsersService {
 	async findUser(id: bigint): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: id },
+			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "is2FAEnabled"]
+		});
+
+		if (!user)
+			throw new NotFoundException(`User with id ${id} not found`);
+		const result: UserInterface = { ...user };
+		return result;
+	}
+
+	async findProfile(id: bigint): Promise<UserInterface> {
+		const user: UserEntity = await this.userRepository.findOne({
+			where: { id: id },
 			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"]
 		});
 
@@ -29,7 +41,7 @@ export class UsersService {
 	async findOneByLogin(login: string): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { login: login },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"]
+			select: ["id", "firstName", "lastName", "login"]
 		});
 
 		if (!user)
@@ -78,7 +90,7 @@ export class UsersService {
 		newUser.login = data.login;
 		newUser.email = data.email;
 		// newUser.password = data.password;
-		// newUser.description = data.description;
+		newUser.description = data.description;
 		newUser.avatar = data.image.link;
 
 		const user: UserEntity = await this.userRepository.save(newUser);
@@ -104,7 +116,7 @@ export class UsersService {
 
 		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: true });
 		if (resultUpdate.affected === 0)
-			throw new BadRequestException(`L'option 2FA de l'user ${userId} n'a pas été mise a jour.`);
+			throw new BadRequestException(`L'option 2FA de l'user ${userId} has not be enabled.`);
 
 		const user = await this.findUser(userId);
 		return user;
@@ -117,18 +129,16 @@ export class UsersService {
 
 		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: false });
 		if (resultUpdate.affected === 0)
-			throw new BadRequestException(`L'option 2FA de l'user ${userId} n'a pas été mise a jour.`);
+			throw new BadRequestException(`2FA of user ${userId} has not been disabled.`);
 
 		const user = await this.findUser(userId);
 		return user;
 	}
 
 	async patchUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
-		// console.log("updateUser : ", updateUser)
-
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
-			throw new NotFoundException(`User with id ${id} not found`);
+			throw new NotFoundException(`User ${id} not found`);
 
 		const updateData: Partial<UserEntity> = {};
 		if (updateUser.firstName) updateData.firstName = updateUser.firstName;
@@ -140,35 +150,34 @@ export class UsersService {
 		if (updateUser.avatar) updateData.avatar = updateUser.avatar;
 	
 		if (Object.keys(updateData).length > 0) {
-			await this.userRepository.update({ id: id }, updateData);
+			if((await this.userRepository.update({ id: id }, updateData)).affected === 0)
+				throw new BadRequestException(`User ${id} has not been updated.`);
 		}
-		// check res
-		// return { update: true, user: updateUser, data: res };
 
 		const result: UserInterface = await this.findUser(id);
 		return result;
 	}
 
 	async updateUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
-
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
-			throw new NotFoundException(`User with id ${id} not found`);
+			throw new NotFoundException(`User ${id} not found`);
 
 		let res = await this.userRepository.update({ id: id }, updateUser);
-		// check res
-		// return { update: true, user: updateUser, data: res };
+		if(res.affected === 0)
+			throw new BadRequestException(`User ${id} has not been updated.`);
 
 		const result: UserInterface = await this.findUser(id);
 		return result;
 	}
 
-	async deleteUser(id: bigint): Promise<void> {
+	async deleteUser(id: bigint): Promise<void | string> {
 		let userFound = await this.findUser(id);
 		if (!userFound)
 			throw new NotFoundException(`User with id ${id} not found`);
 
 		const result = await this.userRepository.delete({ id: id });
-		// console.log("result : ", result)
+		if (result.affected === 0)
+			return `User ${id} not deleted`;
 	}
 }

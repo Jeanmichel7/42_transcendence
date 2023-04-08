@@ -19,7 +19,7 @@ export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
-        private readonly httpService: HttpService
+        // private readonly httpService: HttpService
     ) {}
 
     // async logIn(username: string, pass: string): Promise<any> {

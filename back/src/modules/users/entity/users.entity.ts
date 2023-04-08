@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { MessageInterface } from 'src/modules/messagerie/interfaces/messages.interface';
 
@@ -63,11 +63,11 @@ export class UserEntity extends BaseEntity{
     })
     is2FAEnabled: boolean;
 
-    @OneToMany(() => MessageEntity, message => message.ownerUser)
-    messagesSend: MessageInterface[];
+    @OneToMany(() => MessageEntity, message => message.ownerUser, { cascade: true })
+    messagesSend: MessageEntity[];
 
-    @OneToMany(() => MessageEntity, message => message.destUser)
-    messagesReceive: MessageInterface[];
+    @OneToMany(() => MessageEntity, message => message.destUser, { cascade: true })
+    messagesReceive: MessageEntity[];
 
 }
 

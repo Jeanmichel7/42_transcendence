@@ -32,11 +32,11 @@ export class MessageEntity extends BaseEntity {
 	@ManyToOne(() => UserEntity, user => user.id, { 
 		onDelete: 'CASCADE' 
 	})
-	ownerUser: UserInterface;
+	ownerUser: UserEntity;
 
 	@ManyToOne(() => UserEntity, user => user.id, { 
-		onDelete: 'CASCADE' 
+		onDelete: 'CASCADE',
 	})
-	destUser: UserInterface;
+	destUser: UserEntity;
 
 }

@@ -13,6 +13,7 @@ down:
 
 fclean:
 	printf "Total clean of all configurations docker"
+	docker system prune -a
 	docker ps -qa | xargs -r docker stop
 	docker volume ls -q | xargs -r docker volume rm
 	docker network prune --force

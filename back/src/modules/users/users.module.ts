@@ -4,11 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
+import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
+import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
+
 import { UserEntity } from './entity/users.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity,]) ],
-  providers: [UsersService],
+  imports: [TypeOrmModule.forFeature([UserEntity]) ],
+  providers: [UsersService, AuthOwner, AuthAdmin],
   controllers: [UsersController],
   exports: [UsersService]
 })

@@ -16,7 +16,21 @@ nestjs    |     at Layer.handle [as handle_request] (/app/node_modules/express/l
 
 
 
-
+create user same email 
+2023-04-08 16:39:43.297 UTC [3035] ERROR:  duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+postgres  | 2023-04-08 16:39:43.297 UTC [3035] DETAIL:  Key (email)=(ogin@student.42.mulhouse.fr) already exists.
+postgres  | 2023-04-08 16:39:43.297 UTC [3035] STATEMENT:  INSERT INTO "users"("firstName", "lastName", "login", "email", "password", "role", "avatar", "description", "is2FAEnabled") VALUES ($1, $2, $3, $4, $5, DEFAULT, $6, DEFAULT, DEFAULT) RETURNING "id", "role", "is2FAEnabled"
+nestjs    | [Nest] 1438  - 04/08/2023, 4:39:43 PM   ERROR [ExceptionsHandler] duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+nestjs    | QueryFailedError: duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+nestjs    |     at PostgresQueryRunner.query (/app/src/driver/postgres/PostgresQueryRunner.ts:299:19)
+nestjs    |     at processTicksAndRejections (node:internal/process/task_queues:95:5)
+nestjs    |     at InsertQueryBuilder.execute (/app/src/query-builder/InsertQueryBuilder.ts:163:33)
+nestjs    |     at SubjectExecutor.executeInsertOperations (/app/src/persistence/SubjectExecutor.ts:428:42)
+nestjs    |     at SubjectExecutor.execute (/app/src/persistence/SubjectExecutor.ts:137:9)
+nestjs    |     at EntityPersistExecutor.execute (/app/src/persistence/EntityPersistExecutor.ts:197:21)
+nestjs    |     at UsersController.createUser (/app/src/modules/users/users.controller.ts:43:33)
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:46:28
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17
 
 
 

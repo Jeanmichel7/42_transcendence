@@ -1,26 +1,34 @@
-import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 import { UserInterface } from './interfaces/users.interface';
 import { UserCreateDTO } from './dto/user.create.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
-import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
-import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
-import { UserEntity } from './entity/users.entity';
+import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
 	@Get()
-	@UseGuards(AuthAdmin)
+	// @UseGuards(AuthAdmin)
 	async findAll(): Promise<UserInterface[]> {
 		const result: UserInterface[] = await this.usersService.findAll();
 		return result;
 	}
 
+	//Get profile of user
+	@Get(':userId/profil')
+	async findProfile(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
+		const result: UserInterface = await this.usersService.findProfile(params);
+		return result;
+	}
+
+
+	// enelever elem is2FA actived des users
 	@Get(':userId')
+	@UseGuards(AuthOwnerAdmin)
 	async findOne(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
 		const result: UserInterface = await this.usersService.findUser(params);
 		return result;
@@ -36,7 +44,7 @@ export class UsersController {
 	}
 
 	@Patch(':userId')
-	@UseGuards(AuthOwner, AuthAdmin)
+	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async patchUser(
 		@Param('userId', ParseIntPipe) id: bigint,
@@ -47,7 +55,7 @@ export class UsersController {
 	}
 
 	@Put(':userId')
-	@UseGuards(AuthOwner, AuthAdmin)
+	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async updateUser(
 		@Param('userId', ParseIntPipe) id: bigint,
@@ -58,7 +66,7 @@ export class UsersController {
 	}
 
 	@Delete(':userId')
-	@UseGuards(AuthOwner, AuthAdmin)
+	@UseGuards(AuthOwnerAdmin)
 	async deleteUser(@Param('userId', ParseIntPipe) id: bigint): Promise<HttpStatus> {
 		await this.usersService.deleteUser(id);
 		return HttpStatus.NO_CONTENT; // 204
@@ -78,17 +86,15 @@ export class UsersController {
 	/* ************************************************ */
 
 	@Get(':userId/active2fa')
-	@UseGuards(AuthOwner, AuthAdmin)
+	@UseGuards(AuthOwnerAdmin)
 	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		// console.error("new user : ", newUser);
 		const result: UserInterface = await this.usersService.active2fa(userId);
 		return result;
 	}
 
 	@Get(':userId/desactive2fa')
-	@UseGuards(AuthOwner, AuthAdmin)
+	@UseGuards(AuthOwnerAdmin)
 	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		// console.error("new user : ", newUser);
 		const result: UserInterface = await this.usersService.desactive2fa(userId);
 		return result;
 	}

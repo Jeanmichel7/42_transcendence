@@ -12,13 +12,13 @@ export class AuthOwner implements CanActivate {
     const token = request.headers.authorization?.split(' ')[1];
 
     if (!token)
-      throw new UnauthorizedException("You are not authorized to access this resource loser")
+      throw new UnauthorizedException("You are not authorized to access this resource")
     const payload = this.jwtService.verify(token);
 
     const userId = request.params.userId;
     if (payload.sub === userId)
       return true;
 
-    throw new UnauthorizedException("You are not authorized to access this resource loser2")
+    throw new UnauthorizedException("You are not authorized to access this resource")
   }
 }
