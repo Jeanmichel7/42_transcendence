@@ -1,38 +1,44 @@
-import { IsNotEmpty, IsString, IsOptional, Length, IS_STRONG_PASSWORD, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsOptional, Length, MinLength, IsStrongPassword, IsEmail } from "class-validator";
 
-export class MessagePatchDTO {
+export class UserPatchDTO {
+    @IsOptional()
+    @IsNotEmpty({message : "The first name is required"})
+    @Length(3, 20, {message: "The first name must be between 3 and 20 characters"})
+    readonly firstName: string;
+    
+    @IsOptional()
+    @IsNotEmpty({message: "The last name is required"})
+    @Length(3,20, {message: "The last name must be between 3 and 20 characters"})
+    readonly lastName:string;
+
+    @IsOptional()
+    @IsNotEmpty({message: "The login is required"})
+    @Length(3, 20, {message: "The login must be between 3 and 20 characters"})
+    readonly login:string;
+
     @IsOptional()
     @IsNotEmpty()
-    @IsNumber()
-    readonly id?: bigint;
+    @IsEmail()
+    readonly email:string;
 
-    // @IsOptional()
-    // @IsNotEmpty()
-    // @IsNumber()
-    // readonly ownerUserId?: number;
-
-    // @IsNotEmpty()
-    // readonly ownerUserId?: bigint;
-
-    // @IsOptional()
-    // @IsNotEmpty()
-    // @IsNumber()
-    // readonly destUserId?: bigint;
+    @IsOptional()
+    @IsNotEmpty()
+    @MinLength(8)
+    @IsStrongPassword(
+        {minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1, },
+        {message: "The password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, one number and one symbol."}
+    )
+    password:string;
 
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    // @Length(1)
-    text:string;
+    readonly avatar?:string;
 
-    // @IsOptional()
-    // @IsNotEmpty()
-    // @IsString()
-    // readonly createAt?:string;
-
-    // @IsOptional()
-    // @IsNotEmpty()
-    // @IsString()
-    // readonly updateAt?:string;
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    readonly description?:string;
 
 }
+

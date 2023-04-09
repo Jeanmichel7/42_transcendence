@@ -7,17 +7,21 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
 import { UserInterface } from './interfaces/users.interface';
+import { UserPatchDTO } from './dto/user.patch.dto';
+import { UserLoginDTO } from './dto/user.login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+		private jwtService: JwtService,
 	) { }
 
 	async findUser(id: bigint): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: id },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "is2FAEnabled"]
+			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"]
 		});
 
 		if (!user)
@@ -29,7 +33,7 @@ export class UsersService {
 	async findProfile(id: bigint): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: id },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"]
+			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar",]
 		});
 
 		if (!user)
@@ -75,10 +79,9 @@ export class UsersService {
 		if (result)
 			throw new NotFoundException(`User ${newUser.login} already exist`);
 
-		// const salt = await bcrypt.genSalt();
-		// const hash = await bcrypt.hash(newUser.password, salt);
-		// // console.error("hash : ", hash);
-		// newUser.password = hash;
+		const salt: string = await bcrypt.genSalt();
+		const hash: string = await bcrypt.hash(newUser.password, salt);
+		newUser.password = hash;
 		return this.userRepository.save(newUser);
 	}
 
@@ -98,6 +101,20 @@ export class UsersService {
 			throw new NotFoundException(`User ${newUser.login} not created`);
 		const result: UserInterface = { ...user };
 		return result;
+	}
+
+	async login(data: UserLoginDTO): Promise<string> {
+		const user: UserEntity = await this.userRepository.findOneBy({ login: data.login });
+		if (!user)
+			throw new NotFoundException(`User ${data.login} not found`);
+
+		const isMatch = await bcrypt.compare(data.password, user.password);
+		if (!isMatch)
+			throw new BadRequestException(`Wrong password`);
+
+		const payload = { username: user.login, sub: user.id };
+		const token = await this.jwtService.signAsync(payload);
+		return token;
 	}
 
 	// async getJWTByHeader(req) {
@@ -135,10 +152,12 @@ export class UsersService {
 		return user;
 	}
 
-	async patchUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
+	async patchUser(id: bigint, updateUser: UserPatchDTO): Promise<UserInterface> {
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
+
+		// crypt new password
 
 		const updateData: Partial<UserEntity> = {};
 		if (updateUser.firstName) updateData.firstName = updateUser.firstName;

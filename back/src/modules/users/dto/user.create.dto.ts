@@ -1,7 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, Length, IsStrongPassword } from "class-validator";
 
 export class UserCreateDTO {
-
     @IsNotEmpty({message : "The first name is required"})
     @Length(3, 20, {message: "The first name must be between 3 and 20 characters"})
     readonly firstName: string;

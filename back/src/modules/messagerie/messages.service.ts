@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { Equal, Repository } from 'typeorm';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { MessageCreateDTO } from './dto/message.create.dto';
-import { MessageInterface } from './interfaces/messages.interface';
-// import { UserInterface } from '../users/interfaces/users.interface';
-import { MessageBtwTwoUserInterface } from './interfaces/messagesBetweenTwoUsers.interface';
+import { MessageInterface } from './interfaces/message.interface';
+import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
+import { MessageCreatedEvent } from './event/message.event';
 
 
 
@@ -17,6 +18,7 @@ export class MessageService {
 	constructor(
 		@InjectRepository(MessageEntity) private readonly messageRepository: Repository<MessageEntity>,
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+		private readonly eventEmitter: EventEmitter2,
 		) { }
 
 	async findAll(): Promise<MessageInterface[]> {
@@ -113,19 +115,20 @@ export class MessageService {
 		await userSend.save();
 		userReceive.messagesReceive = [...userReceive.messagesReceive, newMessage];
 		await userReceive.save();
+
 		
 		// const result = await this.messageRepository
     // .createQueryBuilder("message")
     // .leftJoinAndSelect("message.ownerUser", "ownerUser")
     // .leftJoinAndSelect("message.destUser", "destUser")
 		// .select([
-		// 	'message',
+			// 	'message',
 		// 	'ownerUser.id','ownerUser.firstName','ownerUser.lastName','ownerUser.login',
 		// 	'destUser.id', 'destUser.firstName', 'destUser.lastName', 'destUser.login'
 		// ])
     // .where("message.id = :id", { id: newMessage.id })
     // .getOne();
-
+		
 		const result:MessageInterface = await this.messageRepository.findOne({
 			// select: ["id", "text", "createdAt", "updatedAt" ],
 			select: {
@@ -149,7 +152,7 @@ export class MessageService {
 			},
 			where: { id: newMessage.id },
 		});
-
+		this.eventEmitter.emit('message.created', new MessageCreatedEvent(result));
 		return result;
 	}
 

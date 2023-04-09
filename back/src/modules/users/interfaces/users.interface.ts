@@ -1,4 +1,4 @@
-import { MessageInterface } from 'src/modules/messagerie/interfaces/messages.interface';
+import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
 
 export interface UserInterface {
     id: bigint,

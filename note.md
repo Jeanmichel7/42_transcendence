@@ -34,6 +34,17 @@ nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17
 
 
 
+
+patch user
+get password / crypt new
+
+
+
+
+
+
+
+
 ### BACK END
 npm run start:dev
 

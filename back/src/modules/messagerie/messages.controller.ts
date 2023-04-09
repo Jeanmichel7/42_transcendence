@@ -1,14 +1,15 @@
 import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, HttpCode, ParseIntPipe, UsePipes, ValidationPipe, Sse, UseGuards, Header } from '@nestjs/common';
 
 import { MessageService } from './messages.service';
-import { MessageInterface } from './interfaces/messages.interface';
-import { MessageBtwTwoUserInterface } from './interfaces/messagesBetweenTwoUsers.interface';
+import { MessageInterface } from './interfaces/message.interface';
+import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
 
 import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessagePatchDTO } from './dto/message.patch.dto';
 
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
+import { Public } from '../auth/decorators/public.decorator';
 
 
 @Controller('messages')
@@ -53,6 +54,7 @@ export class MessageController {
 		return result;
 	}
 
+	// @Public()
 	@Post('/from/:userId/to/:userIdTo')
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(ValidationPipe)
@@ -67,6 +69,7 @@ export class MessageController {
 	}
 
 	@Patch(':messageId/user/:userId')
+	// userId dans l'url ou recuperer l'user owner via l;id du message?
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async patchMessage(

@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 
 import { UserInterface } from './interfaces/users.interface';
 import { UserCreateDTO } from './dto/user.create.dto';
+import { UserLoginDTO } from './dto/user.login.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
@@ -26,7 +27,6 @@ export class UsersController {
 	}
 
 
-	// enelever elem is2FA actived des users
 	@Get(':userId')
 	@UseGuards(AuthOwnerAdmin)
 	async findOne(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
@@ -43,6 +43,17 @@ export class UsersController {
 		return result;
 	}
 
+	@Post('login')
+	@Public()
+	@UsePipes(ValidationPipe)
+	async login(@Body() newUser: UserLoginDTO): Promise<string> {
+		const result: string = await this.usersService.login(newUser);
+		return result;
+	}
+
+
+	//put/pach lequel modifie tout ?
+	//get old pass and crypt new pass
 	@Patch(':userId')
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
@@ -54,6 +65,7 @@ export class UsersController {
 		return result;
 	}
 
+	//get old pass and crypt new pass
 	@Put(':userId')
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
