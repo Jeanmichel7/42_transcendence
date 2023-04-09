@@ -1,3 +1,50 @@
+# TODO
+
+erreur 500 
+nestjs    | [Nest] 1883  - 04/07/2023, 1:36:31 AM   ERROR [ExceptionsHandler] jwt expired
+nestjs    | TokenExpiredError: jwt expired
+nestjs    |     at /app/node_modules/jsonwebtoken/verify.js:190:21
+nestjs    |     at getSecret (/app/node_modules/jsonwebtoken/verify.js:97:14)
+nestjs    |     at Object.module.exports [as verify] (/app/node_modules/jsonwebtoken/verify.js:101:10)
+nestjs    |     at JwtService.verify (/app/node_modules/@nestjs/jwt/dist/jwt.service.js:38:20)
+nestjs    |     at AuthOwner.canActivate (/app/src/modules/auth/guard/authOwner.guard.ts:16:37)
+nestjs    |     at GuardsConsumer.tryActivate (/app/node_modules/@nestjs/core/guards/guards-consumer.js:15:34)
+nestjs    |     at canActivateFn (/app/node_modules/@nestjs/core/router/router-execution-context.js:134:59)
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:42:37
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:23
+nestjs    |     at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+
+
+
+create user same email 
+2023-04-08 16:39:43.297 UTC [3035] ERROR:  duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+postgres  | 2023-04-08 16:39:43.297 UTC [3035] DETAIL:  Key (email)=(ogin@student.42.mulhouse.fr) already exists.
+postgres  | 2023-04-08 16:39:43.297 UTC [3035] STATEMENT:  INSERT INTO "users"("firstName", "lastName", "login", "email", "password", "role", "avatar", "description", "is2FAEnabled") VALUES ($1, $2, $3, $4, $5, DEFAULT, $6, DEFAULT, DEFAULT) RETURNING "id", "role", "is2FAEnabled"
+nestjs    | [Nest] 1438  - 04/08/2023, 4:39:43 PM   ERROR [ExceptionsHandler] duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+nestjs    | QueryFailedError: duplicate key value violates unique constraint "UQ_97672ac88f789774dd47f7c8be3"
+nestjs    |     at PostgresQueryRunner.query (/app/src/driver/postgres/PostgresQueryRunner.ts:299:19)
+nestjs    |     at processTicksAndRejections (node:internal/process/task_queues:95:5)
+nestjs    |     at InsertQueryBuilder.execute (/app/src/query-builder/InsertQueryBuilder.ts:163:33)
+nestjs    |     at SubjectExecutor.executeInsertOperations (/app/src/persistence/SubjectExecutor.ts:428:42)
+nestjs    |     at SubjectExecutor.execute (/app/src/persistence/SubjectExecutor.ts:137:9)
+nestjs    |     at EntityPersistExecutor.execute (/app/src/persistence/EntityPersistExecutor.ts:197:21)
+nestjs    |     at UsersController.createUser (/app/src/modules/users/users.controller.ts:43:33)
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:46:28
+nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17
+
+
+
+
+patch user
+get password / crypt new
+
+
+
+
+
+
+
+
 ### BACK END
 npm run start:dev
 
@@ -83,3 +130,11 @@ DB_PASSWORD=jrasser
 DB_NAME=pong_db
 JWT_SECRET=blablabla
 
+
+
+## DB SAVE
+sudo su - postgres
+psql
+pg_dump pong_db > save.sql
+\q
+docker cp postgres:/var/lib/postgresql/save.sql ./db/save.sql

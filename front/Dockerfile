@@ -8,6 +8,9 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
+# Create a node_modules folder inside the container
+RUN mkdir /app/node_modules
+
 # Install dependencies
 RUN npm install
 
@@ -20,4 +23,4 @@ EXPOSE 3006
 # RUN npm run start
 
 # Set the command to start the app
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

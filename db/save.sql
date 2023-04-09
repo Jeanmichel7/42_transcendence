@@ -27,8 +27,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public.messages (
     id bigint NOT NULL,
     data text NOT NULL,
-    "createAt" timestamp without time zone DEFAULT now(),
-    "updateAt" timestamp without time zone DEFAULT now(),
+    "createdAt" timestamp without time zone DEFAULT now(),
+    "updatedAt" timestamp without time zone DEFAULT now(),
     "ownerUserId" bigint,
     "destUserId" bigint
 );
@@ -71,7 +71,7 @@ CREATE TABLE public.users (
     role text DEFAULT 'user'::text NOT NULL,
     avatar text,
     description text,
-    is_2fa boolean DEFAULT false
+    is2FAEnabled boolean DEFAULT false
 );
 
 
@@ -116,17 +116,17 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.messages (id, data, "createAt", "updateAt", "ownerUserId", "destUserId") FROM stdin;
+COPY public.messages (id, data, "createdAt", "updatedAt", "ownerUserId", "destUserId") FROM stdin;
 1	Hello	2023-04-03 21:59:01.513004	2023-04-03 21:59:01.513004	1	2
 2	How are you?	2023-04-03 21:59:09.657163	2023-04-03 21:59:09.657163	1	2
 3	Hi, fine and you?	2023-04-03 21:59:24.824867	2023-04-03 21:59:24.824867	2	1
-4	Fine, fine, s'up?	2023-04-03 21:59:43.135403	2023-04-03 21:59:43.135403	1	2
+4	Fine, fine, sup?	2023-04-03 21:59:43.135403	2023-04-03 21:59:43.135403	1	2
 5	nothing	2023-04-03 21:59:57.204036	2023-04-03 21:59:57.204036	2	1
 \.
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
-COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, is_2fa) FROM stdin;
+COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, is2FAEnabled) FROM stdin;
 1	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	https://cdn.intra.42.fr/users/3dad5fa0bc635c6dcc9e94e5804d0bdb/jrasser.jpg	\N	f
 2	username	userlastname	userlogin	userlogin@student.42.mulhouse.fr	\N	user	https://img.freepik.com/vecteurs-premium/avatar-du-profil-utilisateur-feminin-est-femme-personnage-pour-economiseur-ecran-emotions_505620-617.jpg	\N	f
 3	name	lastname	login	ogin@student.42.mulhouse.fr	\N	user	https://img.freepik.com/vecteurs-premium/avatar-du-profil-utilisateur-feminin-est-femme-personnage-pour-economiseur-ecran-emotions_505620-617.jpg	\N	f

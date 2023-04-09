@@ -2,7 +2,7 @@ FROM node:18
 
 RUN apt-get update && apt-get install -y docker docker.io
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
@@ -12,10 +12,10 @@ RUN npm install
 
 # Bundle app source
 COPY . .
-COPY setup.sh /usr/src/app/setup.sh
-RUN chmod +x /usr/src/app/setup.sh
+COPY setup.sh /app/setup.sh
+RUN chmod +x /app/setup.sh
 
-ENTRYPOINT [ "/usr/src/app/setup.sh" ]
+ENTRYPOINT [ "/app/setup.sh" ]
 
 # Creates a "dist" folder with the production build
 # RUN npm run build

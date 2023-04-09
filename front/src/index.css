@@ -1,13 +1,21 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components{
+
+    .sidebar{
+        @apply p-4 m-4 text-white text-lg hover:text-[#1e1e4e]
+         hover:bg-slate-50 hover:rounded-full transition-all  
+    }  
+
+    .pong_sidebar{
+        @apply  p-3 mr-16 ml-12 text-rose-600 font-bold 
+        text-lg border-2 rounded-3xl border-rose-600 
+    }
+
+    .play-button {
+        @apply p-6 text-center text-white font-bold font-mono border-double 
+        border-4 rounded-xl border-rose-600 hover:bg-rose-600 transition-all
+    }
 }
