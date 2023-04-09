@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
+import { UserRelationEntity } from './user.relation.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity{
@@ -69,10 +70,24 @@ export class UserEntity extends BaseEntity{
     })
     status: string;
 
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    secret2FA: string;
+
+
     @OneToMany(() => MessageEntity, message => message.ownerUser, { cascade: true })
     messagesSend: MessageEntity[];
 
     @OneToMany(() => MessageEntity, message => message.destUser, { cascade: true })
     messagesReceive: MessageEntity[];
+
+    // @OneToMany(() => UserEntity, (user) => user.friends)
+    // friends: UserEntity[];
+
+    @ManyToMany(() => UserRelationEntity)
+    @JoinTable()
+    friends: UserRelationEntity[];
 }
 

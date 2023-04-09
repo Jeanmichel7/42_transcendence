@@ -8,6 +8,7 @@ import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { UserEntity } from './entity/users.entity';
+// import { UserRelationEntity } from './entity/user.relation.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity]) ],

@@ -16,6 +16,8 @@ export class AuthController {
     //     return this.authService.logIn(signInDto.login, signInDto.password);
     // }
 
+
+    
 /*
 https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code
 */
