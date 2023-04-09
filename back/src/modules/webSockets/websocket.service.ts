@@ -10,18 +10,21 @@ import { MessageInterface } from "src/modules/messagerie/interfaces/message.inte
     methods: ["GET", "POST"],
   },
 })
-export class SocketEvents {
+export class WebsocketService {
   @WebSocketServer() server: Server;
 
   /* ************************* */
   /*         Messagerie        */
   /* ************************* */
 
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    console.log("user is connected", client.id);
+  }
 
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log("user is disconnected", client.id);
+  }
 
-
-
- 
   @SubscribeMessage("joinPrivateRoom")
   async handleJoin(
     @MessageBody() data: { user1Id: string; user2Id: string },
@@ -30,6 +33,15 @@ export class SocketEvents {
     const privateRoomName = this.PrivateRoomName(data.user1Id, data.user2Id);
     client.join(privateRoomName);
     console.log("joined private room", privateRoomName , data);
+  }
+
+  async handleLeave(
+    @MessageBody() data: { user1Id: string; user2Id: string },
+    @ConnectedSocket() client: Socket
+  ) {
+    const privateRoomName = this.PrivateRoomName(data.user1Id, data.user2Id);
+    client.leave(privateRoomName);
+    console.log("left private room", privateRoomName , data);
   }
 
   emitMessage(message: MessageInterface) {
@@ -44,27 +56,9 @@ export class SocketEvents {
 
 
 
-
-
   /* ************************* */
   /*           Chat            */
   /* ************************* */
-
-    // async handleConnection(
-  //   client: Socket,
-  // ) {
-  //   const token = client.handshake.auth.token;
-  //   const userId = client.handshake.query.userId;
-  //   // console.error("token = ", token)
-  //   console.log("client connected", userId, client.id);
-  //   // client.join(`user-${userId}`);
-  // }
-
-  // async handleDisconnect(client: Socket) {
-  //   console.log("client disconnected", client.id);
-  // }
-
-  
 
     // @SubscribeMessage("message")
     // handleEvent(

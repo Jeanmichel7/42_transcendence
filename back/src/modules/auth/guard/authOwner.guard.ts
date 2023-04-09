@@ -16,7 +16,7 @@ export class AuthOwner implements CanActivate {
     const payload = this.jwtService.verify(token);
     
     const userId = request.params.userId;
-    console.error("userId : ", userId, "payload.sub : ", payload.sub);
+    // console.error("userId : ", userId, "payload.sub : ", payload.sub);
     if (payload.sub === userId)
       return true;
 
