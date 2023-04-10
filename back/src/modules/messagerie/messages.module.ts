@@ -24,3 +24,4 @@ import { WebsocketModule } from 'src/modules/webSockets/websocket.module';
   controllers: [MessageController],
 })
 export class MessageModule {}
+

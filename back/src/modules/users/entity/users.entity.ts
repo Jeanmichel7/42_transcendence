@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
+import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity{
@@ -69,10 +70,37 @@ export class UserEntity extends BaseEntity{
     })
     status: string;
 
+    @Column({
+        type: 'text',
+        nullable: true,
+    })
+    secret2FA: string;
+
+    @Column({
+		nullable: true,
+		type: 'timestamp',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	createdAt: Date;
+
+	@Column({
+		nullable: true,
+		type: 'timestamp',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	updatedAt: Date;
+
+
     @OneToMany(() => MessageEntity, message => message.ownerUser, { cascade: true })
     messagesSend: MessageEntity[];
 
     @OneToMany(() => MessageEntity, message => message.destUser, { cascade: true })
     messagesReceive: MessageEntity[];
+
+    @OneToMany(() => UserRelationEntity, (userRelation) => userRelation.userRelation)
+    friends: UserEntity[];
+
+    @OneToMany(() => UserRelationEntity, (userRelation) => userRelation.userRelation)
+    blocked: UserEntity[];
 }
 

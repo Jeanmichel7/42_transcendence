@@ -3,7 +3,6 @@ import { UsersService } from './users.service';
 
 import { UserInterface } from './interfaces/users.interface';
 import { UserCreateDTO } from './dto/user.create.dto';
-import { UserLoginDTO } from './dto/user.login.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
@@ -35,7 +34,7 @@ export class UsersController {
 	}
 
 	/* probably useless but I keep it for now */
-	@Post('signIn')
+	@Post('sign-in')
 	@Public()
 	@UsePipes(ValidationPipe)
 	async createUser(@Body() newUser: UserCreateDTO): Promise<UserInterface> {
@@ -43,16 +42,6 @@ export class UsersController {
 		return result;
 	}
 
-	@Post('login')
-	@Public()
-	@UsePipes(ValidationPipe)
-	async login(@Body() newUser: UserLoginDTO): Promise<string> {
-		const result: string = await this.usersService.login(newUser);
-		return result;
-	}
-
-
-	//put/pach lequel modifie tout ?
 	//get old pass and crypt new pass
 	@Patch(':userId')
 	@UseGuards(AuthOwnerAdmin)
@@ -88,40 +77,6 @@ export class UsersController {
 
 
 
-
-
-
-	/* ************************************************ */
-	/*                                                  */
-	/*                         2FA                      */
-	/*                                                  */
-	/* ************************************************ */
-
-	@Get(':userId/active2fa')
-	@UseGuards(AuthOwnerAdmin)
-	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.active2fa(userId);
-		return result;
-	}
-
-	@Get(':userId/desactive2fa')
-	@UseGuards(AuthOwnerAdmin)
-	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.desactive2fa(userId);
-		return result;
-	}
-
-
-
-	/* ************************************************ */
-	/*                                                  */
-	/*                      FRIENDS                     */
-	/*                                                  */
-	/* ************************************************ */
-
-	//addfrinds
-	//bloquefriend
-	//removefriend
 
 
 

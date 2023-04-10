@@ -6,6 +6,7 @@ export interface UserInterface {
     lastName: string,
     login: string,
     email: string,
+    status: string,
     password?: string,
     description?: string,
     avatar?: string,
@@ -13,4 +14,6 @@ export interface UserInterface {
     is2FAEnabled?: boolean,
     messagesSend?: MessageInterface[],
     messagesReceive?: MessageInterface[],
+    createdAt?: Date,
+    updatedAt?: Date,
 }

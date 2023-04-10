@@ -3,19 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-//privilégier le typage de l'entity plutôt que de l'interface
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
 import { UserInterface } from './interfaces/users.interface';
 import { UserPatchDTO } from './dto/user.patch.dto';
-import { UserLoginDTO } from './dto/user.login.dto';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
-		private jwtService: JwtService,
+		@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
 	) { }
 
 	async findUser(id: bigint): Promise<UserInterface> {
@@ -52,16 +48,6 @@ export class UsersService {
 			throw new NotFoundException(`User ${login} not found`);
 		const result: UserInterface = { ...user };
 		return result;
-	}
-
-	async userAlreadyExist(login: string): Promise<Boolean> {
-		const user: UserEntity = await this.userRepository.findOne({
-			where: { login: login },
-			select: ["id"]
-		});
-		if (!user)
-			return false;
-		return true;
 	}
 
 	async findAll(): Promise<UserInterface[]> {
@@ -103,55 +89,6 @@ export class UsersService {
 		return result;
 	}
 
-	async login(data: UserLoginDTO): Promise<string> {
-		const user: UserEntity = await this.userRepository.findOneBy({ login: data.login });
-		if (!user)
-			throw new NotFoundException(`User ${data.login} not found`);
-
-		const isMatch = await bcrypt.compare(data.password, user.password);
-		if (!isMatch)
-			throw new BadRequestException(`Wrong password`);
-
-		const payload = { username: user.login, sub: user.id };
-		const token = await this.jwtService.signAsync(payload);
-		return token;
-	}
-
-	// async getJWTByHeader(req) {
-	//     const authHeader = req.headers.authorization;
-	//     if (authHeader) {
-	//         const token = authHeader.split(' ')[1];
-	//         return token;
-	//     }
-	//     return null;
-	// }
-
-	async active2fa(userId: bigint): Promise<UserInterface> {
-		let userToUpdate: UserInterface = await this.findUser(userId)
-		if (!userToUpdate)
-			throw new NotFoundException(`User with id ${userId} not found`);
-
-		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: true });
-		if (resultUpdate.affected === 0)
-			throw new BadRequestException(`L'option 2FA de l'user ${userId} has not be enabled.`);
-
-		const user = await this.findUser(userId);
-		return user;
-	}
-
-	async desactive2fa(userId: bigint): Promise<UserInterface> {
-		let userToUpdate = await this.findUser(userId)
-		if (!userToUpdate)
-			throw new NotFoundException(`User with id ${userId} not found`);
-
-		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: false });
-		if (resultUpdate.affected === 0)
-			throw new BadRequestException(`2FA of user ${userId} has not been disabled.`);
-
-		const user = await this.findUser(userId);
-		return user;
-	}
-
 	async patchUser(id: bigint, updateUser: UserPatchDTO): Promise<UserInterface> {
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
@@ -182,7 +119,11 @@ export class UsersService {
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
 
-		let res = await this.userRepository.update({ id: id }, updateUser);
+		let res = await this.userRepository.update({ id: id }, {
+			...updateUser,
+			// password: await bcrypt.hash(updateUser.password, 10),
+			updatedAt: new Date()
+		});
 		if(res.affected === 0)
 			throw new BadRequestException(`User ${id} has not been updated.`);
 
@@ -199,4 +140,29 @@ export class UsersService {
 		if (result.affected === 0)
 			return `User ${id} not deleted`;
 	}
+
+
+
+
+
+
+
+	/* ************************************************ */
+	/*                                                  */
+	/*                       TOOLS                      */
+	/*                                                  */
+	/* ************************************************ */
+
+
+	private async userExist(userId: bigint): Promise<Boolean> {
+		const user: UserEntity = await this.userRepository.findOne({
+			where: { id: userId },
+			select: ["id"]
+		});
+		if (!user)
+			return false;
+		return true;
+	}
+
+
 }
