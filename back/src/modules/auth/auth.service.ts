@@ -72,6 +72,43 @@ export class AuthService {
 	}
 
 
+	
+	/* ************************************************ */
+	/*                                                  */
+	/*                         2FA                      */
+	/*                                                  */
+	/* ************************************************ */
+	
+	async active2fa(userId: bigint): Promise<UserInterface> {
+		let userToUpdate: UserInterface = await this.usersService.findUser(userId)
+		if (!userToUpdate)
+			throw new NotFoundException(`User with id ${userId} not found`);
+
+		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: true });
+		if (resultUpdate.affected === 0)
+			throw new BadRequestException(`L'option 2FA de l'user ${userId} has not be enabled.`);
+
+		const user = await this.usersService.findUser(userId);
+		return user;
+	}
+
+	async desactive2fa(userId: bigint): Promise<UserInterface> {
+		let userToUpdate = await this.usersService.findUser(userId)
+		if (!userToUpdate)
+			throw new NotFoundException(`User with id ${userId} not found`);
+
+		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: false });
+		if (resultUpdate.affected === 0)
+			throw new BadRequestException(`2FA of user ${userId} has not been disabled.`);
+
+		const user = await this.usersService.findUser(userId);
+		return user;
+	}
+
+
+	
+
+
 	/* ************************************************ */
 	/*                                                  */
 	/*                   Utils OAuths                   */

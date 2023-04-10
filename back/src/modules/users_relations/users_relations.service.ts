@@ -14,7 +14,6 @@ export class UsersRelationsService {
     @InjectRepository(UserRelationEntity) private readonly userRelationRepository: Repository<UserRelationEntity>,
   ) {}
 
-  //select pas tout les param user
   async getAllRelations(userId: bigint): Promise<UserRelationInterface[]> {
     const userRelations: UserRelationEntity[] = await this.userRelationRepository
     .createQueryBuilder('user_relation')

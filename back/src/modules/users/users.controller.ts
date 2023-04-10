@@ -34,7 +34,7 @@ export class UsersController {
 	}
 
 	/* probably useless but I keep it for now */
-	@Post('signIn')
+	@Post('sign-in')
 	@Public()
 	@UsePipes(ValidationPipe)
 	async createUser(@Body() newUser: UserCreateDTO): Promise<UserInterface> {
@@ -42,8 +42,6 @@ export class UsersController {
 		return result;
 	}
 
-
-	//put/pach lequel modifie tout ?
 	//get old pass and crypt new pass
 	@Patch(':userId')
 	@UseGuards(AuthOwnerAdmin)
@@ -80,27 +78,6 @@ export class UsersController {
 
 
 
-
-
-	/* ************************************************ */
-	/*                                                  */
-	/*                         2FA                      */
-	/*                                                  */
-	/* ************************************************ */
-
-	@Get(':userId/active2fa')
-	@UseGuards(AuthOwnerAdmin)
-	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.active2fa(userId);
-		return result;
-	}
-
-	@Get(':userId/desactive2fa')
-	@UseGuards(AuthOwnerAdmin)
-	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.desactive2fa(userId);
-		return result;
-	}
 
 
 }

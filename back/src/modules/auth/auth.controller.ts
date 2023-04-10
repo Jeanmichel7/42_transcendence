@@ -1,10 +1,13 @@
-import { Query, Controller, Get, Post, UsePipes, ValidationPipe, Body } from '@nestjs/common';
+import { Query, Controller, Get, Post, Put, UsePipes, ValidationPipe, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 
+import { UserInterface } from '../users/interfaces/users.interface';
+
 import { AuthResponse } from './interfaces/auth.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
+import { AuthOwnerAdmin } from './guard/authAdminOwner.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +34,27 @@ export class AuthController {
 			access_token: token
 		};
 	}
+
+	/* ************************************************ */
+	/*                                                  */
+	/*                         2FA                      */
+	/*                                                  */
+	/* ************************************************ */
+
+	@Put(':userId/active2fa')
+	@UseGuards(AuthOwnerAdmin)
+	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
+		const result: UserInterface = await this.authService.active2fa(userId);
+		return result;
+	}
+
+	@Put(':userId/desactive2fa')
+	@UseGuards(AuthOwnerAdmin)
+	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
+		const result: UserInterface = await this.authService.desactive2fa(userId);
+		return result;
+	}
+
 
 }
 

@@ -1,4 +1,3 @@
-import { timestamp } from 'rxjs';
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 export interface UserRelationInterface {
