@@ -103,38 +103,4 @@ export class UsersController {
 	}
 
 
-
-	/* ************************************************ */
-	/*                                                  */
-	/*                      FRIENDS                     */
-	/*                                                  */
-	/* ************************************************ */
-
-	//addfrinds
-	@Get(':userId/addfriend/:friendId')
-	@UseGuards(AuthOwnerAdmin)
-	async addFriend(
-		@Param('userId', ParseIntPipe) userId: bigint,
-		@Param('friendId', ParseIntPipe) friendId: bigint
-	): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.addFriend(userId, friendId);
-		return result;
-	}
-
-	@Get(':userId/allFriends')
-	@UseGuards(AuthOwnerAdmin)
-	async allFriends(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface[]> {
-		const result: UserInterface[] = await this.usersService.getAllFriendsofUser(userId);
-		return result;
-	}
-
-	//removefriend
-
-
-	//bloquefriend
-	
-
-	//deblockfriend
-
-
 }

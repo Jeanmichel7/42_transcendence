@@ -1,19 +1,18 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
-import { UserEntity } from './users.entity';
+import { UserEntity } from 'src/modules/users/entity/users.entity'
+import { timestamp } from 'rxjs';
 
 @Entity("users_relation")
-export class UserRelationEntity{
+export class UserRelationEntity extends BaseEntity{
 
     @PrimaryGeneratedColumn()
     id: bigint;
 
     @Column({
-      type: 'bigint',
+      type: 'text',
+      nullable: true,
     })
-    userId: bigint;
-
-    @Column()
     relationType: string;
 
     @Column({
@@ -21,19 +20,23 @@ export class UserRelationEntity{
       type: 'timestamp',
       default: () => 'CURRENT_TIMESTAMP',
     })
-    createdAt: string;
+    createdAt: Date
   
     @Column({
       nullable: true,
       type: 'timestamp',
       default: () => 'CURRENT_TIMESTAMP',
     })
-    updatedAt: string;
+    updatedAt: Date
+
+    @ManyToOne(() => UserEntity, (user) => user)
+    user: UserEntity;
 
     @ManyToOne(() => UserEntity, (user) => user.friends)
-    userFriend: UserEntity;
+    userRelation: UserEntity;
 
-    @ManyToOne(() => UserEntity, (user) => user.blocked)
-    userBlocked: UserEntity;
+    // @ManyToOne(() => UserEntity, (user) => user.blocked)
+    // userBlocked: UserEntity;
 }
+
 

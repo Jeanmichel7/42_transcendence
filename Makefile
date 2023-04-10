@@ -22,7 +22,7 @@ clean:
 	printf "Cleaning configuration ${name}..."
 	docker system prune -a
 
-re:	fclean all
+re:	down build
 
 logs:
 	docker-compose logs -f postgres nestjs

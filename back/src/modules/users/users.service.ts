@@ -7,13 +7,11 @@ import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
 import { UserInterface } from './interfaces/users.interface';
 import { UserPatchDTO } from './dto/user.patch.dto';
-import { UserRelationEntity } from './entity/user.relation.entity';
 
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
-		@InjectRepository(UserRelationEntity) private readonly userRelationRepository: Repository<UserRelationEntity>,
+		@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
 	) { }
 
 	async findUser(id: bigint): Promise<UserInterface> {
@@ -121,7 +119,11 @@ export class UsersService {
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
 
-		let res = await this.userRepository.update({ id: id }, updateUser);
+		let res = await this.userRepository.update({ id: id }, {
+			...updateUser,
+			// password: await bcrypt.hash(updateUser.password, 10),
+			updatedAt: new Date()
+		});
 		if(res.affected === 0)
 			throw new BadRequestException(`User ${id} has not been updated.`);
 
@@ -177,95 +179,6 @@ export class UsersService {
 
 
 
-
-
-	/* ************************************************ */
-	/*                                                  */
-	/*                      FRIENDS                     */
-	/*                                                  */
-	/* ************************************************ */
-
-	async addFriend(userId: bigint, friendId: bigint) {
-		const userToUpdate: UserEntity = await this.userRepository.findOne({
-			where: { id: userId },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"],
-			relations: ["friends"]
-		});
-
-		if(userToUpdate.id === friendId)
-			throw new BadRequestException(`User ${userId} can't add himself as friend`);
-
-		if (!userToUpdate)
-			throw new NotFoundException(`User with id ${userId} not found`);
-
-		const userFriend: UserEntity = await this.userRepository.findOne({
-			where: { id: friendId },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar"],
-			// relations: ["friends"]
-		});
-		if(!userFriend)
-			throw new NotFoundException(`User with id ${friendId} not found`);
-
-		// if(userToUpdate.friends.length > 0) {
-		// 	for (let i = 0; i < userToUpdate.friends.length; i++) {
-		// 		if(userToUpdate.friends[i].id === friendId)
-		// 			throw new BadRequestException(`User ${userId} already have friend ${friendId}`);
-		// 	}
-		// }
-		console.error("user friend : ", userFriend)
-
-		await this.userRelationRepository.save({
-			userId: userId,
-			relationType: "friend",
-			userFriend: userFriend
-		})
-
-
-		console.error("user friends avant : ", userToUpdate.friends)
-		userToUpdate.friends.push(userFriend);
-		const resultSave = await this.userRepository.save(userToUpdate.friends);
-		console.error("user friends apres : ", userToUpdate.friends)
-
-		console.error("result : ", resultSave)
-
-
-		const user: UserEntity = await this.userRepository.findOne({
-			where: { id: userId },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"],
-			relations: ["friends"]
-		});
-		if (!user)
-			throw new NotFoundException(`User with id ${userId} not found`);
-		console.error("user : ", user)
-
-
-		return resultSave;
-	}
-
-	async getAllFriendsofUser(userId: bigint): Promise<UserInterface[]> {
-		const user: UserEntity = await this.userRepository.findOne({
-			where: { id: userId },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"],
-			relations: ["friends"]
-		});
-		if (!user)
-			throw new NotFoundException(`User with id ${userId} not found`);
-		console.error("user : ", user)
-
-
-		const friends: UserInterface[] = [];
-		for (let i = 0; i < user.friends.length; i++) {
-			friends.push(user.friends[i]);
-		}
-		return friends;
-	}
-
-
-
-
-
-
-
 	/* ************************************************ */
 	/*                                                  */
 	/*                       TOOLS                      */
@@ -282,5 +195,6 @@ export class UsersService {
 			return false;
 		return true;
 	}
+
 
 }

@@ -7,8 +7,9 @@ import { typeOrmConfig }                from 'src/config/typeorm.config';
 
 import { AuthModule }                   from './modules/auth/auth.module';
 import { UsersModule }                  from './modules/users/users.module';
+import { UsersRelationsModule }         from './modules/users_relations/users_relations.module';
 import { MessageModule }                from './modules/messagerie/messages.module';
-import { WebsocketModule }                 from './modules/webSockets/websocket.module';
+import { WebsocketModule }              from './modules/webSockets/websocket.module';
 
 import { ServeStaticModule }            from '@nestjs/serve-static';
 import { join }                         from 'path';
@@ -28,6 +29,7 @@ import { join }                         from 'path';
     EventEmitterModule.forRoot(),
     WebsocketModule,
     UsersModule,
+    UsersRelationsModule,
     MessageModule,
     AuthModule,
   ],

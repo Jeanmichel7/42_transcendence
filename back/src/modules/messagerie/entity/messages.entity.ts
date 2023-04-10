@@ -20,14 +20,14 @@ export class MessageEntity extends BaseEntity {
 		type: 'timestamp',
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: string;
+	createdAt: Date;
 
 	@Column({
 		nullable: true,
 		type: 'timestamp',
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	updatedAt: string;
+	updatedAt: Date;
 
 	@ManyToOne(() => UserEntity, user => user.id, { 
 		onDelete: 'CASCADE' 

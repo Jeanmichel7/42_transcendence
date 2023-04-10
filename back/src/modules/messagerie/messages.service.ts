@@ -171,7 +171,7 @@ export class MessageService {
 			{ id: id },
 			{
 				text: updateMessage.text,
-				updatedAt: () => 'CURRENT_TIMESTAMP'
+				updatedAt: new Date()
 			}
 		);
 
