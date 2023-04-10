@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Chat App</title>
+	<link rel="stylesheet" href="index.css">
+	<script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script defer src="index.js"></script>
+	<!-- <script type="text/javascript"> window.onload = getUser </script> -->
+
+</head>
+
+<body onload="getUser()">
+	<h1> Messagerie </h1>
+	<p> Je suis user : <span id="user"></span></p>
+	
+	<main>
+		<div class="wrapper">
+			<div>
+				<h2>Messagerie user 2 - jrasser</h2>
+				<button onclick="joinRoom1()">Ouvrir</button>
+				<br>
+				<br>
+				<div id="Form1" class="hidden1">
+					<input type="text" id="messageInput1">
+					<button onclick="sendMessage1()">Send</button>
+					<ul id="messages1"></ul>
+				</div>
+			</div>
+			<div>
+				<h2>Messagerie user 4 - test</h2>
+				<button onclick="joinRoom2()">Ouvrir</button>
+				<br>
+				<br>
+				<div id="Form2" class="hidden2">
+					<input type="text" id="messageInput2">
+					<button onclick="sendMessage2()">Send</button>
+					<ul id="messages2"></ul>
+				</div>
+			</div>
+		</div>
+	</main>
+	
+	
+
+	
+	
+	
+	
+</body>
+
+</html>
