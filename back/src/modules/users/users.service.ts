@@ -60,6 +60,7 @@ export class UsersService {
 		return result;
 	}
 
+	/* probably useless but I keep it for now */
 	async createUser(newUser: UserCreateDTO): Promise<UserEntity> {
 		const result: UserEntity = await this.userRepository.findOneBy({ login: newUser.login });
 		if (result)
@@ -72,11 +73,14 @@ export class UsersService {
 	}
 
 	async createOAuthUser(data): Promise<UserInterface> {
-		// console.log("data ne wuser: ", data);
+		let login: string = data.login;
+		if(!this.isLoginAvailable(login))
+			login = login + Math.floor(Math.random() * 1000);
+
 		const newUser = new UserEntity();
 		newUser.firstName = data.first_name;
 		newUser.lastName = data.last_name;
-		newUser.login = data.login;
+		newUser.login = login;
 		newUser.email = data.email;
 		// newUser.password = data.password;
 		newUser.description = data.description;
@@ -163,6 +167,27 @@ export class UsersService {
 			return false;
 		return true;
 	}
+
+	private async isLoginAvailable(login: string): Promise<Boolean> {
+		const user: UserEntity = await this.userRepository.findOne({
+			where: { login: login },
+			select: ["id"]
+		});
+		if (!user)
+			return true;
+		return false;
+	}
+
+
+	// private async isEmailAvailable(email: string): Promise<Boolean> {
+	// 	const user: UserEntity = await this.userRepository.findOne({
+	// 		where: { email: email },
+	// 		select: ["id"]
+	// 	});
+	// 	if (!user)
+	// 		return true;
+	// 	return false;
+	// }
 
 
 }

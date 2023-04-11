@@ -10,6 +10,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../users/entity/users.entity';
 import { AuthOwner } from './guard/authOwner.guard';
 import { AuthAdmin } from './guard/authAdmin.guard';
+import { CryptoService } from '../crypto/crypto.service';
+
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { AuthAdmin } from './guard/authAdmin.guard';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    AuthOwner, AuthAdmin
+    AuthOwner, AuthAdmin,
+    CryptoService
   ],
   controllers: [AuthController]
 })
