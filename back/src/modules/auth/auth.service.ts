@@ -1,5 +1,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { toDataURL } from 'qrcode';
+import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { Observable } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
@@ -15,18 +17,29 @@ import { UserInterface } from '../users/interfaces/users.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { UserEntity } from '../users/entity/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { authenticator } from 'otplib';
+import { AuthInterface } from './interfaces/auth.interface';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class AuthService {
+	private salt: string;
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
+		private cryptoService: CryptoService,
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
 		// private readonly httpService: HttpService
-	) { }
+	) {
+		this.initSalt()
+	}
 
-	async login(data: UserLoginDTO): Promise<string> {
+	private async initSalt() {
+		this.salt = await bcrypt.genSalt(10);
+	}
+
+	async login(data: UserLoginDTO): Promise<AuthInterface> {
 		const user: UserEntity = await this.userRepository.findOneBy({ login: data.login });
 		if (!user)
 			throw new NotFoundException(`User ${data.login} not found`);
@@ -35,31 +48,60 @@ export class AuthService {
 		if (!isMatch)
 			throw new BadRequestException(`Wrong password`);
 
-		const payload = { username: user.login, sub: user.id };
-		const token = await this.jwtService.signAsync(payload);
-		return token;
+		let res: AuthInterface = {
+			accessToken: "",
+			user: user
+		}
+		if (user.is2FAEnabled)
+			return res
+
+		res.accessToken = await this.createJWT(user);
+		return res;
 	}
 
-	async logInOAuth(code: string): Promise<string> {
-		// console.error("code: ", code);
-		// check req.querry
+	async logInOAuth(code: string): Promise<AuthInterface> {
 		const accessToken: string = await this.OAuthGetToken(code);
-		const userData: UserInterface = await this.OAuthGetUserData(accessToken);
-		// console.log("userData: ", userData);
-
+		const userData42: UserInterface = await this.OAuthGetUserData(accessToken);
 
 		let user: UserInterface;
-		if (await this.isLoginAvailable(userData.login))
-			user = await this.usersService.createOAuthUser(userData);
+		if (await this.isLoginAvailable(userData42.login))
+			user = await this.usersService.createOAuthUser(userData42);
 		else
-			user = await this.usersService.findOneByLogin(userData.login);
+			user = await this.usersService.findOneByLogin(userData42.login);
 
+		let res: AuthInterface = {
+			accessToken: "need 2FA",
+			user: user
+		}
+		if (user.is2FAEnabled)
+			return res
 
+		res.accessToken = await this.createJWT(user);
+		return res;
+	}
 
-		// user 2FA enable ?
+	async loginOAuth2FA(code: string, userId: bigint) {
+		const user: UserEntity = await this.userRepository.findOne({
+			where: { id: userId },
+			select: ["id", "firstName", "lastName", "login", "secret2FA"]
+		});
+		if (!user)
+			throw new NotFoundException(`User ${userId} not found`);
 
-		const JWToken = await this.createJWT(user);
-		return JWToken;
+		let decryptedSecret = crypto.privateDecrypt(
+			this.cryptoService.getPrivateKey(),
+			Buffer.from(user.secret2FA, 'base64')
+		).toString();
+
+		const codeIsValid = authenticator.verify({ token: code, secret: decryptedSecret });
+		decryptedSecret = null;
+		if (!codeIsValid)
+			throw new BadRequestException(`Wrong code`);
+
+		return {
+			accessToken: await this.createJWT(user),
+			user: user
+		};
 	}
 
 	async getActuelUser(req): Promise<UserInterface> {
@@ -72,24 +114,41 @@ export class AuthService {
 	}
 
 
-	
+
+
+
 	/* ************************************************ */
 	/*                                                  */
 	/*                         2FA                      */
 	/*                                                  */
 	/* ************************************************ */
-	
-	async active2fa(userId: bigint): Promise<UserInterface> {
+
+	async active2fa(userId: bigint): Promise<string> {
 		let userToUpdate: UserInterface = await this.usersService.findUser(userId)
 		if (!userToUpdate)
 			throw new NotFoundException(`User with id ${userId} not found`);
 
-		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: true });
+		if(userToUpdate.is2FAEnabled)
+			throw new BadRequestException(`2FA of user ${userId} is already enabled.`);
+
+		const secret2FA: string = authenticator.generateSecret();
+		const encryptedSecret: string = crypto.publicEncrypt(
+			this.cryptoService.getPublicKey(),
+			Buffer.from(secret2FA)
+		).toString('base64');
+
+		let resultUpdate: UpdateResult = await this.userRepository.update({ id: userId }, { 
+			is2FAEnabled: true,
+			secret2FA: encryptedSecret
+		});
 		if (resultUpdate.affected === 0)
 			throw new BadRequestException(`L'option 2FA de l'user ${userId} has not be enabled.`);
+		
+		const otpauthUrl: string = authenticator.keyuri(userToUpdate.email, 'Transcendence', secret2FA);
+		const qrcode: string = await toDataURL(otpauthUrl);
 
-		const user = await this.usersService.findUser(userId);
-		return user;
+		// const user = await this.usersService.findUser(userId);
+		return qrcode;
 	}
 
 	async desactive2fa(userId: bigint): Promise<UserInterface> {
@@ -97,16 +156,19 @@ export class AuthService {
 		if (!userToUpdate)
 			throw new NotFoundException(`User with id ${userId} not found`);
 
-		let resultUpdate = await this.userRepository.update({ id: userId }, { is2FAEnabled: false });
+		if(!userToUpdate.is2FAEnabled)
+			throw new BadRequestException(`2FA of user ${userId} is already disabled.`);
+
+		let resultUpdate = await this.userRepository.update({ id: userId }, { 
+			is2FAEnabled: false,
+			secret2FA: null
+		});
 		if (resultUpdate.affected === 0)
 			throw new BadRequestException(`2FA of user ${userId} has not been disabled.`);
 
 		const user = await this.usersService.findUser(userId);
 		return user;
 	}
-
-
-	
 
 
 	/* ************************************************ */

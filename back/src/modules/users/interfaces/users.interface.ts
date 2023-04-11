@@ -12,6 +12,7 @@ export interface UserInterface {
     avatar?: string,
     role?: string,
     is2FAEnabled?: boolean,
+    secret2FA?: string,
     messagesSend?: MessageInterface[],
     messagesReceive?: MessageInterface[],
     createdAt?: Date,

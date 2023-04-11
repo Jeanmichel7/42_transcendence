@@ -25,7 +25,6 @@ export class UsersController {
 		return result;
 	}
 
-
 	@Get(':userId')
 	@UseGuards(AuthOwnerAdmin)
 	async findOne(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
