@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { createWriteStream, existsSync, unlinkSync, fstat, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
 import { UserInterface } from './interfaces/users.interface';
+import { ProfilInterface } from './interfaces/profil.interface';
 import { UserPatchDTO } from './dto/user.patch.dto';
+import axios from 'axios';
+import { join } from 'path';
 
 @Injectable()
 export class UsersService {
@@ -26,26 +30,25 @@ export class UsersService {
 		return result;
 	}
 
-	async findProfile(id: bigint): Promise<UserInterface> {
+	async findProfile(id: bigint): Promise<ProfilInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: id },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar",]
+			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "status"]
 		});
-
 		if (!user)
 			throw new NotFoundException(`User with id ${id} not found`);
-		const result: UserInterface = { ...user };
+		const result: ProfilInterface = { ...user };
 		return result;
 	}
 
-	async findOneByLogin(login: string): Promise<UserInterface> {
+	async findOneByMail(email: string): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
-			where: { login: login },
-			select: ["id", "firstName", "lastName", "login"]
+			where: { email: email },
+			select: ["id", "firstName", "lastName", "login", "is2FAEnabled"]
 		});
 
 		if (!user)
-			throw new NotFoundException(`User ${login} not found`);
+			throw new NotFoundException(`User ${email} not found`);
 		const result: UserInterface = { ...user };
 		return result;
 	}
@@ -66,25 +69,31 @@ export class UsersService {
 		if (result)
 			throw new NotFoundException(`User ${newUser.login} already exist`);
 
-		const salt: string = await bcrypt.genSalt();
-		const hash: string = await bcrypt.hash(newUser.password, salt);
-		newUser.password = hash;
-		return this.userRepository.save(newUser);
+		try {
+			const salt: string = await bcrypt.genSalt();
+			const hash: string = await bcrypt.hash(newUser.password, salt);
+			newUser.password = hash;
+			return this.userRepository.save(newUser);
+		} catch(e) {
+			throw new InternalServerErrorException(e);
+		}
 	}
 
-	async createOAuthUser(data): Promise<UserInterface> {
+
+	async createOAuthUser(data: any): Promise<UserInterface> {
 		let login: string = data.login;
-		if(!this.isLoginAvailable(login))
+		do
 			login = login + Math.floor(Math.random() * 1000);
+		while (!this.isLoginAvailable(login))
 
 		const newUser = new UserEntity();
 		newUser.firstName = data.first_name;
 		newUser.lastName = data.last_name;
 		newUser.login = login;
 		newUser.email = data.email;
-		// newUser.password = data.password;
 		newUser.description = data.description;
-		newUser.avatar = data.image.link;
+		const avatarName: string = await this.uploadAndSaveAvatar(data.image.link);
+		newUser.avatar = avatarName;
 
 		const user: UserEntity = await this.userRepository.save(newUser);
 		if (!user)
@@ -93,24 +102,33 @@ export class UsersService {
 		return result;
 	}
 
-	async patchUser(id: bigint, updateUser: UserPatchDTO): Promise<UserInterface> {
+	async patchUser(id: bigint, updateUser: UserPatchDTO, file: Express.Multer.File): Promise<UserInterface> {
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
 
-		// crypt new password
-
 		const updateData: Partial<UserEntity> = {};
+		if(file) { updateData.avatar = file.filename; this.deleteAvatar(userToUpdate.avatar); }
+		else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
 		if (updateUser.firstName) updateData.firstName = updateUser.firstName;
 		if (updateUser.lastName) updateData.lastName = updateUser.lastName;
 		if (updateUser.login) updateData.login = updateUser.login;
 		if (updateUser.email) updateData.email = updateUser.email;
-		if (updateUser.password) updateData.password = updateUser.password;
 		if (updateUser.description) updateData.description = updateUser.description;
-		if (updateUser.avatar) updateData.avatar = updateUser.avatar;
-	
+		if (updateUser.password) {
+			try {
+				const hash: string = await bcrypt.hash(updateUser.password, 10);
+				updateData.password = hash;
+			} catch(e) {
+				throw new InternalServerErrorException(e);
+			}
+		}
+
 		if (Object.keys(updateData).length > 0) {
-			if((await this.userRepository.update({ id: id }, updateData)).affected === 0)
+			if((await this.userRepository.update({ id: id }, {
+				...updateData,
+				updatedAt: new Date()
+			})).affected === 0)
 				throw new BadRequestException(`User ${id} has not been updated.`);
 		}
 
@@ -123,9 +141,15 @@ export class UsersService {
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
 
+		try {
+			const hash: string = await bcrypt.hash(updateUser.password, 10);
+			updateUser.password = hash;
+		} catch(e) {
+			throw new InternalServerErrorException(e);
+		}
+
 		let res = await this.userRepository.update({ id: id }, {
 			...updateUser,
-			// password: await bcrypt.hash(updateUser.password, 10),
 			updatedAt: new Date()
 		});
 		if(res.affected === 0)
@@ -178,16 +202,40 @@ export class UsersService {
 		return false;
 	}
 
+	private async uploadAndSaveAvatar(url: string ): Promise<string> {
+		const avatarName: string = 'avatar-' + Date.now() + '-' + Math.round(Math.random() * 1E6) + '.jpg';
+		const localImagePath: string = join(__dirname, '..', '..', '..', 'uploads', 'users_avatars', avatarName);
 
-	// private async isEmailAvailable(email: string): Promise<Boolean> {
-	// 	const user: UserEntity = await this.userRepository.findOne({
-	// 		where: { email: email },
-	// 		select: ["id"]
-	// 	});
-	// 	if (!user)
-	// 		return true;
-	// 	return false;
-	// }
+		if (!existsSync(join(__dirname, '..', '..', '..', 'uploads', 'users_avatars')))
+			mkdirSync(join(__dirname, '..', '..', '..', 'uploads', 'users_avatars'));
 
+		try {
+			const response = await axios({
+				url: url,
+				method: 'GET',
+				responseType: 'stream',
+			});
+			const writer = createWriteStream(localImagePath);
+			response.data.pipe(writer);
+			writer.on('finish', () => {
+				console.log('Image downloaded and saved successfully!');
+			});
+			writer.on('error', (error) => {
+				console.error('Error while saving the image:', error);
+			});
+			return avatarName;
+		} catch (error) {
+			console.error('Error while downloading the image:', error);
+		}
+	}
 
+	private async deleteAvatar(avatarName: string): Promise<void> {
+		const localPath = join(__dirname, '../../../uploads/users_avatars/' + avatarName);
+		try {
+			unlinkSync(localPath);
+			console.log("Delete File successfully.");
+		} catch (error) {
+			throw new BadRequestException(`Avatar ${avatarName} not deleted`);
+		}
+	}
 }

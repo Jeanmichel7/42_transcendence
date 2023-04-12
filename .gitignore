@@ -7,6 +7,11 @@
 # **/crypto/*.pem
 
 
+back/uploads/*
+
+
+
+
 # Logs
 logs
 *.log

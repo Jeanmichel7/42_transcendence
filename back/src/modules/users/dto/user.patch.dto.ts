@@ -4,22 +4,22 @@ export class UserPatchDTO {
     @IsOptional()
     @IsNotEmpty({message : "The first name is required"})
     @Length(3, 20, {message: "The first name must be between 3 and 20 characters"})
-    readonly firstName: string;
+    firstName: string;
     
     @IsOptional()
     @IsNotEmpty({message: "The last name is required"})
     @Length(3,20, {message: "The last name must be between 3 and 20 characters"})
-    readonly lastName:string;
+    lastName:string;
 
     @IsOptional()
     @IsNotEmpty({message: "The login is required"})
     @Length(3, 20, {message: "The login must be between 3 and 20 characters"})
-    readonly login:string;
+    login:string;
 
     @IsOptional()
     @IsNotEmpty()
     @IsEmail()
-    readonly email:string;
+    email:string;
 
     @IsOptional()
     @IsNotEmpty()
@@ -33,12 +33,12 @@ export class UserPatchDTO {
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    readonly avatar?:string;
+    avatar?:string;
 
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    readonly description?:string;
+    description?:string;
 
 }
 

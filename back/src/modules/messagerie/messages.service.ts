@@ -10,8 +10,6 @@ import { MessageInterface } from './interfaces/message.interface';
 import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
 import { MessageCreatedEvent } from './event/message.event';
 
-
-
 @Injectable()
 export class MessageService {
 	constructor(
@@ -37,27 +35,18 @@ export class MessageService {
 	}
 
 	async getAllMessageOfUser(userId: bigint): Promise<MessageInterface[]> {
-		const user: UserEntity = await this.userRepository.findOne({
-			where: { id: userId },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"],
-			relations: ["messagesSend", "messagesReceive"]
-		});
-		if (!user)
-			throw new NotFoundException(`User with id ${userId} not found`);
-
-		let allMessages: MessageInterface[];
-		allMessages = [...user.messagesSend, ...user.messagesReceive];
-
-		//trier par date...
-		allMessages.sort((a, b) => {
-			let d1 = new Date(a.createdAt);
-			let d2 = new Date(b.createdAt);
-			if( d1.getTime() < d2.getTime() ) return 1;
-			if( d1.getTime() > d2.getTime() ) return -1;
-			return 0;
-		});
-
-		return allMessages;
+		const messages: MessageEntity[] = await this.messageRepository.createQueryBuilder('message')
+    .leftJoinAndSelect('message.ownerUser', 'ownerUser')
+    .leftJoinAndSelect('message.destUser', 'destUser')
+		.select([
+			'message',
+			'ownerUser.id','ownerUser.firstName', 'ownerUser.lastName','ownerUser.login',
+			'destUser.id', 'destUser.firstName', 'destUser.lastName', 'destUser.login'
+		])
+    .where('(ownerUser.id = :userId OR destUser.id = :userId)', { userId })
+		.orderBy('message.createdAt', 'DESC')
+    .getMany();
+		return messages;
 	}
 
 	async getMessagesBetweenUsers(
@@ -76,6 +65,7 @@ export class MessageService {
       '(ownerUser.id = :userIdFrom AND destUser.id = :userIdTo) OR (ownerUser.id = :userIdTo AND destUser.id = :userIdFrom)',
       { userIdFrom, userIdTo }
     )
+		.orderBy('message.createdAt', 'DESC')
     .getMany();
 		
 		const result: MessageBtwTwoUserInterface[] = messages;
@@ -159,17 +149,11 @@ export class MessageService {
 		id: bigint,
 		updateMessage: MessageCreateDTO
 	): Promise<MessageInterface> {
-		// console.log("updateMessage : ", updateMessage)
-
 		let messageToUpdate = await this.findOne(id)
-		// console.log("messageToUpdate : ", messageToUpdate)
-
 		if (!messageToUpdate)
 			throw new NotFoundException(`Message with id ${id} not found`);
 
-		await this.messageRepository.update(
-			{ id: id },
-			{
+		await this.messageRepository.update({ id: id }, {
 				text: updateMessage.text,
 				updatedAt: new Date()
 			}
@@ -183,8 +167,6 @@ export class MessageService {
 		const message = await this.findOne(messageId);
 		if (!message)
 			throw new NotFoundException(`Message with id ${messageId} not found`);
-
-		// check auth
 
 		let result = await this.messageRepository.delete({ id: messageId });
 		if (result.affected === 0)

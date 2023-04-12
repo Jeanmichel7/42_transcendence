@@ -16,8 +16,6 @@ import { Public } from '../auth/decorators/public.decorator';
 export class MessageController {
 	constructor(
 		private readonly MessageService: MessageService,
-		// private UsersService: UsersService,
-		// private AuthService: AuthService,
 	) { }
 
 	@Get()
@@ -54,7 +52,6 @@ export class MessageController {
 		return result;
 	}
 
-	// @Public()
 	@Post('/from/:userId/to/:userIdTo')
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(ValidationPipe)
@@ -89,5 +86,4 @@ export class MessageController {
 		else
 			return HttpStatus.NOT_FOUND; // 404
 	}
-
 }

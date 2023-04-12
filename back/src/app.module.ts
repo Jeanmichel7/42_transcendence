@@ -2,8 +2,9 @@ import { MiddlewareConsumer, Module, NestModule }                       from '@n
 import { ConfigModule, ConfigService }  from '@nestjs/config';
 import { TypeOrmModule }                from '@nestjs/typeorm';
 import { EventEmitterModule }           from '@nestjs/event-emitter';
-import * as cors from 'cors';
+import { MulterModule }                 from '@nestjs/platform-express';
 import { typeOrmConfig }                from 'src/config/typeorm.config';
+import * as cors                        from 'cors';
 
 import { AuthModule }                   from './modules/auth/auth.module';
 import { UsersModule }                  from './modules/users/users.module';
@@ -26,6 +27,10 @@ import { join }                         from 'path';
       rootPath: join(__dirname, '..', 'src', 'client'),
       serveRoot: '/static'
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads', 'users_avatars'),
+      serveRoot: '/avatars'
+    }),
     EventEmitterModule.forRoot(),
     WebsocketModule,
     UsersModule,
@@ -35,11 +40,12 @@ import { join }                         from 'path';
   ],
 })
 
+// /home/jrasser/42_transcendence/back/uploads/users_avatars/420f91c67864248ded86e204aa98be2f.png
+
+
 // export class AppModule {}
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(cors()).forRoutes('*');
   }
 }
-
-
