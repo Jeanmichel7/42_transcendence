@@ -63,11 +63,15 @@ export class AuthService {
 		const accessToken: string = await this.OAuthGetToken(code);
 		const userData42: UserInterface = await this.OAuthGetUserData(accessToken);
 
-		let user: UserInterface;
-		if (await this.isLoginAvailable(userData42.login))
+		let user: UserInterface = null;
+		if (await this.userAlreadyExist(userData42.email)){
+			console.error("User already exist");
+			user = await this.usersService.findOneByMail(userData42.email);
+		}
+		else {
+			console.error("createOAuthUser");
 			user = await this.usersService.createOAuthUser(userData42);
-		else
-			user = await this.usersService.findOneByLogin(userData42.login);
+		}
 
 		let res: AuthInterface = {
 			accessToken: "need 2FA",
@@ -104,14 +108,14 @@ export class AuthService {
 		};
 	}
 
-	async getActuelUser(req): Promise<UserInterface> {
-		if (!req.authorization)
-			throw new UnauthorizedException();
-		const token = req.authorization.split(' ')[1];
-		const payload = this.jwtService.verify(token);
-		const user = await this.usersService.findOneByLogin(payload.username);
-		return user;
-	}
+	// async getActuelUser(req): Promise<UserInterface> {
+	// 	if (!req.authorization)
+	// 		throw new UnauthorizedException();
+	// 	const token = req.authorization.split(' ')[1];
+	// 	const payload = this.jwtService.verify(token);
+	// 	const user = await this.usersService.findOneByLogin(payload.username);
+	// 	return user;
+	// }
 
 
 
@@ -139,7 +143,8 @@ export class AuthService {
 
 		let resultUpdate: UpdateResult = await this.userRepository.update({ id: userId }, { 
 			is2FAEnabled: true,
-			secret2FA: encryptedSecret
+			secret2FA: encryptedSecret,
+			updatedAt: new Date()
 		});
 		if (resultUpdate.affected === 0)
 			throw new BadRequestException(`L'option 2FA de l'user ${userId} has not be enabled.`);
@@ -161,7 +166,8 @@ export class AuthService {
 
 		let resultUpdate = await this.userRepository.update({ id: userId }, { 
 			is2FAEnabled: false,
-			secret2FA: null
+			secret2FA: null,
+			updatedAt: new Date()
 		});
 		if (resultUpdate.affected === 0)
 			throw new BadRequestException(`2FA of user ${userId} has not been disabled.`);
@@ -196,7 +202,6 @@ export class AuthService {
 			return tokenResponse.data.access_token;
 		}
 		catch (error) {
-			// console.error(error);
 			throw new UnauthorizedException(error.response.data.message, error.status);
 		}
 	}
@@ -215,7 +220,6 @@ export class AuthService {
 			return data.data;
 		}
 		catch (error) {
-			// console.error(error.response);
 			throw new UnauthorizedException(error.response.data.message, error.status);
 		}
 	}
@@ -226,13 +230,13 @@ export class AuthService {
 		return token
 	}
 
-	private async isLoginAvailable(login: string): Promise<Boolean> {
+	private async userAlreadyExist(email: string): Promise<Boolean> {
 		const user: UserEntity = await this.userRepository.findOne({
-			where: { login: login },
+			where: { email: email },
 			select: ["id"]
 		});
 		if (!user)
-			return true;
-		return false;
+			return false;
+		return true;
 	}
 }

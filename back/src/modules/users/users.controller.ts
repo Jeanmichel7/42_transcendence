@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, ParseIntPipe, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Put, Delete, HttpStatus, ParseIntPipe, UsePipes, ValidationPipe, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 import { UserInterface } from './interfaces/users.interface';
@@ -6,6 +6,8 @@ import { UserCreateDTO } from './dto/user.create.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfilInterface } from './interfaces/profil.interface';
 
 @Controller('users')
 export class UsersController {
@@ -20,8 +22,8 @@ export class UsersController {
 
 	//Get profile of user
 	@Get(':userId/profil')
-	async findProfile(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.findProfile(params);
+	async findProfile(@Param('userId', ParseIntPipe) params: bigint): Promise<ProfilInterface> {
+		const result: ProfilInterface = await this.usersService.findProfile(params);
 		return result;
 	}
 
@@ -41,19 +43,19 @@ export class UsersController {
 		return result;
 	}
 
-	//get old pass and crypt new pass
 	@Patch(':userId')
+	@UseInterceptors(FileInterceptor('avatar'))
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async patchUser(
 		@Param('userId', ParseIntPipe) id: bigint,
-		@Body() body: UserCreateDTO
+		@Body() body: UserCreateDTO,
+		@UploadedFile() file: Express.Multer.File
 	): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.patchUser(id, body);
+		const result: UserInterface = await this.usersService.patchUser(id, body, file);
 		return result;
 	}
 
-	//get old pass and crypt new pass
 	@Put(':userId')
 	@UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))

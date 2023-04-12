@@ -4,7 +4,7 @@ import { generateKeyPairSync } from 'crypto';
 
 @Injectable()
 export class CryptoService {
-  private readonly publicKeyPath = './src/modules/crypto/public_key.pem';
+  private readonly publicKeyPath = 'src/modules/crypto/public_key.pem';
   private readonly privateKeyPath = 'src/modules/crypto/private_key.pem';
 
   constructor() {
