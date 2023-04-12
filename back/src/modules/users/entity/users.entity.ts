@@ -1,6 +1,8 @@
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
+import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
+import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity{
@@ -90,7 +92,7 @@ export class UserEntity extends BaseEntity{
 	})
 	updatedAt: Date;
 
-
+    // messagerie
     @OneToMany(() => MessageEntity, message => message.ownerUser, { cascade: true })
     messagesSend: MessageEntity[];
 
@@ -102,5 +104,47 @@ export class UserEntity extends BaseEntity{
 
     @OneToMany(() => UserRelationEntity, (userRelation) => userRelation.userRelation)
     blocked: UserEntity[];
+
+    // chat  messages
+    @OneToMany(() => ChatMessageEntity, (message) => message.user, {
+        cascade: true
+    })
+    chatMessages: ChatMessageEntity[];
+
+
+    //chat room
+    // @ManyToMany(() => ChatRoomEntity, (room) => room.users, {
+    //     cascade: true
+    // })
+    // rooms: ChatRoomEntity[];
+
+    @OneToMany(() => ChatRoomEntity, (room) => room.ownerUser, {
+        cascade: true
+    })
+    roomOwner: ChatRoomEntity[];
+
+
+
+
+    @ManyToMany(() => ChatRoomEntity, (room) => room.admins, {
+        cascade: true
+    })
+    roomAdmins: ChatRoomEntity[];
+
+    @ManyToMany(() => ChatRoomEntity, (room) => room.users, {
+        cascade: true
+    })
+    roomUsers: ChatRoomEntity[];
+
+    @ManyToMany(() => ChatRoomEntity, (room) => room.bannedUsers, {
+        cascade: true
+    })
+    roomBannedUser: ChatRoomEntity[];
+
+    @ManyToMany(() => ChatRoomEntity, (room) => room.mutedUsers, {
+        cascade: true
+    })
+    roomMutedUsers: ChatRoomEntity[];
+
 }
 

@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule }                       from '@nestjs/common';
+import { ChatController } from './modules/chat/chat.controller';
+import { ChatModule } from './modules/chat/chat.module';
 import { ConfigModule, ConfigService }  from '@nestjs/config';
 import { TypeOrmModule }                from '@nestjs/typeorm';
 import { EventEmitterModule }           from '@nestjs/event-emitter';
@@ -37,6 +39,7 @@ import { join }                         from 'path';
     UsersRelationsModule,
     MessageModule,
     AuthModule,
+    ChatModule,
   ],
 })
 

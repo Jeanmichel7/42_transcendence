@@ -9,7 +9,8 @@ build:
 
 down:
 	printf "Stop configuration ${name}..."
-	docker-compose down -v
+	docker-compose down
+	docker volume prune
 
 fclean:
 	printf "Total clean of all configurations docker"

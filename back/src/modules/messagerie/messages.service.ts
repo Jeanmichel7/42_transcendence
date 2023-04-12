@@ -16,6 +16,7 @@ export class MessageService {
 		@InjectRepository(MessageEntity) private readonly messageRepository: Repository<MessageEntity>,
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
 		private readonly eventEmitter: EventEmitter2,
+		
 		) { }
 
 	async findAll(): Promise<MessageInterface[]> {
@@ -95,11 +96,14 @@ export class MessageService {
 		if (userSend.id === userReceive.id)
 			throw new NotFoundException(`Hey ${userSend.login}, you can't send a message to yourself !`);
 
-		const newMessage: MessageEntity = await this.messageRepository.save({
+		const newMessage: MessageEntity = await MessageEntity.save({
 			text: messageToSave.text,
-			ownerUser: userSend,
-			destUser: userReceive,
 		});
+		if(!newMessage)
+			throw new NotFoundException(`Message not created`);
+		// newMessage.ownerUser = userSend;
+		// newMessage.destUser = userReceive;
+		// await newMessage.save();
 		userSend.messagesSend = [...userSend.messagesSend, newMessage];
 		await userSend.save();
 		userReceive.messagesReceive = [...userReceive.messagesReceive, newMessage];

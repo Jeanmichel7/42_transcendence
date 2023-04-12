@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity'
 
-@Entity("users_relation")
+@Entity("users-relation")
 export class UserRelationEntity extends BaseEntity{
 
     @PrimaryGeneratedColumn()
