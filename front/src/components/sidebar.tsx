@@ -1,13 +1,26 @@
 import React from 'react'
 import { BiChevronLeftCircle } from "react-icons/bi"
-import {useState} from 'react'
+import {useState, useRef, useEffect} from 'react'
 
 function SideBar() {
 
     const [open, setOpen] = useState(false);
 
+    let ref = useRef(document.createElement('div'));
+
+    useEffect( () => {
+
+    const ClickOutside = (event:any) => {
+        if (!ref.current.contains(event.target))
+            setOpen(false);
+    };
+    document.addEventListener('mousedown', ClickOutside)
+    return () => document.removeEventListener('mousedown', ClickOutside)
+
+    }, [ref])
+
   return (
-    <div className={` border-4 border-stone-300 shadow-inner shadow-gray-300 right-0 fixed h-screen ${ open ? "w-80" : "w-12" } duration-300 bg-slate-50 rounded-lg`} >
+    <div ref={ref} className={` border-4 z-50 border-stone-300 shadow-inner shadow-gray-300 right-0 fixed h-screen ${ open ? "w-80" : "w-12" } duration-300 bg-slate-50 rounded-lg`} >
 
         <BiChevronLeftCircle className= {`text-white text-4xl bg-[#1e1e4e] 
         rounded-full absolute -left-5 top-9 border-2 cursor-pointer 
