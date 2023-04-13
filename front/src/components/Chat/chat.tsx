@@ -7,6 +7,7 @@ import ButtonUser from './ButtonUser'
 import ChatRoom from './ChatRoom'
 
 function Chat() {
+
   return (
      <div className=" h-screen w-screen bg-[#1e1e4e] ">
         <Navbar />
@@ -18,13 +19,12 @@ function Chat() {
               <ButtonNewChannel />
               <ButtonUser />
               <ChatRoom />
-            </div>
+
+              {/* <PopUpKick visible={} /> */}
+            </div> 
 
         </div>
-
     </div>
-
   )
 }
-
 export default Chat
