@@ -1,7 +1,10 @@
 version: '3'
 services:
+
   nestjs:
-    build: back/
+    build:
+      context: ./back
+      dockerfile: ./docker/Dockerfile
     container_name: nestjs
     networks:
       - transcendence-network
@@ -13,6 +16,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - back:/app
       - /app/node_modules
+      # - ./.git:/app/.git
     restart: always
 
   postgres:
@@ -31,7 +35,9 @@ services:
     restart: always
 
   react:
-    build: front/
+    build:
+      context: ./front
+      dockerfile: ./docker/Dockerfile
     container_name: react
     networks:
       - transcendence-network
@@ -42,6 +48,7 @@ services:
     volumes:
       - front:/app
       - /app/node_modules
+      # - ./.git:/app/.git
     restart: always
 
   pgadmin:
@@ -49,8 +56,8 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:

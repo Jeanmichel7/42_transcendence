@@ -17,11 +17,12 @@ export class ChatController {
   /* ************************************************ */
 
   @Get('createRoom/:userId')
-  @UseGuards(AuthOwnerAdmin)
+  // @UseGuards(AuthOwnerAdmin)
   async createRoom(@Param('userId', ParseIntPipe) userId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomInterface = await this.ChatService.createRoom(userId);
     return room;
   }
+
 
 
 
@@ -33,13 +34,13 @@ export class ChatController {
   /* ************************************************ */
 
   @Post('/from/:userId/to/:roomId')
-  @UseGuards(AuthOwnerAdmin)
+  // @UseGuards(AuthOwnerAdmin)
   @UsePipes(ValidationPipe)
   async createMessage(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('roomId', ParseIntPipe) roomId: bigint,
     @Body() newMessage: ChatCreateMsgDTO
-  ): Promise<ChatMsgInterface> {
+  ): Promise< ChatMsgInterface > {
     const message: ChatMsgInterface = await this.ChatService.createMessage(newMessage, userId, roomId);
     return message;
   }

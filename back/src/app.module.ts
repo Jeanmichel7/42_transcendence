@@ -15,11 +15,13 @@ import { MessageModule }                from './modules/messagerie/messages.modu
 import { WebsocketModule }              from './modules/webSockets/websocket.module';
 
 import { ServeStaticModule }            from '@nestjs/serve-static';
-import { join }                         from 'path';
+import path, { join }                   from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => typeOrmConfig(configService),
@@ -40,10 +42,8 @@ import { join }                         from 'path';
     MessageModule,
     AuthModule,
     ChatModule,
-  ],
+  ]
 })
-
-// /home/jrasser/42_transcendence/back/uploads/users_avatars/420f91c67864248ded86e204aa98be2f.png
 
 
 // export class AppModule {}

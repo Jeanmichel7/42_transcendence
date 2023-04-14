@@ -9,6 +9,4 @@ done
 ip=$(docker inspect postgres | grep IPAddress | grep -oP '(?<="IPAddress": ")[^"]+' | sed -n '1p')
 export DB_HOST=$ip
 
-# exec "$@"
-
-npm run start:dev & tail -f
+exec "$@"

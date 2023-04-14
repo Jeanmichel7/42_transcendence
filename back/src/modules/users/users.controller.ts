@@ -28,7 +28,7 @@ export class UsersController {
 	}
 
 	@Get(':userId')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async findOne(@Param('userId', ParseIntPipe) params: bigint): Promise<UserInterface> {
 		const result: UserInterface = await this.usersService.findUser(params);
 		return result;
@@ -45,7 +45,7 @@ export class UsersController {
 
 	@Patch(':userId')
 	@UseInterceptors(FileInterceptor('avatar'))
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async patchUser(
 		@Param('userId', ParseIntPipe) id: bigint,
@@ -57,7 +57,7 @@ export class UsersController {
 	}
 
 	@Put(':userId')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async updateUser(
 		@Param('userId', ParseIntPipe) id: bigint,
@@ -68,7 +68,7 @@ export class UsersController {
 	}
 
 	@Delete(':userId')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async deleteUser(@Param('userId', ParseIntPipe) id: bigint): Promise<HttpStatus> {
 		await this.usersService.deleteUser(id);
 		return HttpStatus.NO_CONTENT; // 204

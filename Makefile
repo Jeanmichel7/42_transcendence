@@ -10,12 +10,12 @@ build:
 down:
 	printf "Stop configuration ${name}..."
 	docker-compose down
-	docker volume prune
+	docker volume rm $(shell docker volume ls -q | grep -v "^42_transcendence")
 
 fclean:
 	printf "Total clean of all configurations docker"
-	docker system prune -a
 	docker ps -qa | xargs -r docker stop
+	docker system prune -a --force
 	docker volume ls -q | xargs -r docker volume rm
 	docker network prune --force
 

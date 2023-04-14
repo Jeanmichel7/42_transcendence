@@ -26,7 +26,7 @@ export class MessageController {
 	}
 
 	@Get(':messageId')
-	@UseGuards(AuthAdmin)
+	// @UseGuards(AuthAdmin)
 	async findOne(@Param('messageId', ParseIntPipe) id: bigint): Promise<MessageInterface> {
 		const result: MessageInterface = await this.MessageService.findOne(id);
 		return result;
@@ -34,14 +34,14 @@ export class MessageController {
 
 	// get All message of a user
 	@Get('/user/:userId')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async findAllOfUser(@Param('userId', ParseIntPipe) userId: bigint): Promise<MessageInterface[]> {
 		const result: MessageInterface[] = await this.MessageService.getAllMessageOfUser(userId);
 		return result;
 	}
 
 	@Get('/between/:userId/and/:userIdTo')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async getMessages(
 		@Param('userId', ParseIntPipe) userId: bigint,
 		@Param('userIdTo', ParseIntPipe) userIdTo: bigint,
@@ -53,7 +53,7 @@ export class MessageController {
 	}
 
 	@Post('/from/:userId/to/:userIdTo')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	@UsePipes(ValidationPipe)
 	async createMessage(
 		@Param('userId', ParseIntPipe) userId: bigint,
@@ -67,7 +67,7 @@ export class MessageController {
 
 	@Patch(':messageId/user/:userId')
 	// userId dans l'url ou recuperer l'user owner via l;id du message?
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	@UsePipes(new ValidationPipe({ skipMissingProperties: true }))
 	async patchMessage(
 		@Param('messageId', ParseIntPipe) id: bigint,
@@ -78,7 +78,7 @@ export class MessageController {
 	}
 
 	@Delete('/:messageId/user/:userId')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async deleteMessage(@Param('messageId', ParseIntPipe) id: bigint): Promise<HttpStatus> {
 		let isDelete = await this.MessageService.deleteMessage(id);
 		if (isDelete) 

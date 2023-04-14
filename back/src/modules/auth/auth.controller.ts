@@ -48,14 +48,14 @@ export class AuthController {
 	/* ************************************************ */
 
 	@Put(':userId/active2fa')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<string> {
 		const result: string = await this.authService.active2fa(userId);
 		return result;
 	}
 
 	@Put(':userId/desactive2fa')
-	@UseGuards(AuthOwnerAdmin)
+	// @UseGuards(AuthOwnerAdmin)
 	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
 		const result: UserInterface = await this.authService.desactive2fa(userId);
 		return result;
