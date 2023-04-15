@@ -4,8 +4,8 @@ import { ChatRoomInterface } from "./chat.room.interface";
 export interface ChatMsgInterface {
   id: bigint;
   text: string;
-  room?: ChatRoomInterface;
-  user?: UserInterface;
+  room: ChatRoomInterface;
+  user: UserInterface;
   createdAt?: Date;
   updatedAt?: Date;
 }

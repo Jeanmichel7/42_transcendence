@@ -1,15 +1,15 @@
 import { OnEvent } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
 import { MessageCreatedEvent } from 'src/modules/messagerie/event/message.event';
-import { WebsocketService } from 'src/modules/webSockets/websocket.service';
+import { MessagerieWebsocketService } from  'src/modules/messagerie/gateway/message.gateway';
 
 @Injectable()
 export class MessageListener {
-  constructor(private readonly socketEvents: WebsocketService) {}
+  constructor(private readonly socketEvents: MessagerieWebsocketService) {}
 
   @OnEvent('message.created')
   handleMessageCreated(event: MessageCreatedEvent) {
-    // console.log("event message.created recu", event.message.text)
+    console.log("event message.created recu", event.message.text)
     this.socketEvents.emitMessage(event.message);
   }
 }

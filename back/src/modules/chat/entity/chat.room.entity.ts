@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { AfterInsert, BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { ChatMessageEntity } from './chat.message.entity';
 
@@ -15,6 +15,13 @@ export class ChatRoomEntity extends BaseEntity {
 		default: 'public',
 	})
 	status: string;
+
+	// @Column({
+	// 	type: 'text',
+	// 	nullable: true,
+	// 	default: 'room',
+	// })
+	// name: string;
 
 	@Column({
 		type: 'text',
@@ -40,7 +47,7 @@ export class ChatRoomEntity extends BaseEntity {
 	@OneToMany(() => ChatMessageEntity, message => message.room, {
 		 onDelete: 'CASCADE',
 		//  cascade: true,
-		})
+	})
 	messages: ChatMessageEntity[];
 
 	// relation user
@@ -51,7 +58,6 @@ export class ChatRoomEntity extends BaseEntity {
 	@ManyToMany(() => UserEntity, (user) => user.roomUsers)
 	@JoinTable()
 	users: UserEntity[];
-
 
 	@ManyToMany(() => UserEntity, (user) => user.roomAdmins)
 	@JoinTable()
@@ -64,7 +70,4 @@ export class ChatRoomEntity extends BaseEntity {
 	@ManyToMany(() => UserEntity, (user) => user.roomMutedUsers)
 	@JoinTable()
 	mutedUsers: UserEntity[];
-
-
-
 }

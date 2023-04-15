@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, InternalServerError
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { createWriteStream, existsSync, unlinkSync, fstat, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { createWriteStream, existsSync, unlinkSync, access, mkdirSync, constants } from 'fs';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
@@ -21,7 +21,7 @@ export class UsersService {
 	async findUser(id: bigint): Promise<UserInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: id },
-			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "role", "is2FAEnabled"]
+			select: ["id", "firstName", "lastName", "login", "email", "status", "description", "avatar", "role", "is2FAEnabled"]
 		});
 
 		if (!user)
@@ -30,26 +30,15 @@ export class UsersService {
 		return result;
 	}
 
-	async findProfile(id: bigint): Promise<ProfilInterface> {
+	async findProfile(login: string): Promise<ProfilInterface> {
 		const user: UserEntity = await this.userRepository.findOne({
-			where: { id: id },
+			where: { login: login },
 			select: ["id", "firstName", "lastName", "login", "email", "description", "avatar", "status"]
 		});
+		console.error("user : ", user);
 		if (!user)
-			throw new NotFoundException(`User with id ${id} not found`);
+			throw new NotFoundException(`User ${login} not found`);
 		const result: ProfilInterface = { ...user };
-		return result;
-	}
-
-	async findOneByMail(email: string): Promise<UserInterface> {
-		const user: UserEntity = await this.userRepository.findOne({
-			where: { email: email },
-			select: ["id", "firstName", "lastName", "login", "is2FAEnabled"]
-		});
-
-		if (!user)
-			throw new NotFoundException(`User ${email} not found`);
-		const result: UserInterface = { ...user };
 		return result;
 	}
 
@@ -59,7 +48,7 @@ export class UsersService {
 		});
 		if (!users)
 			throw new NotFoundException(`Users not found`);
-		const result: UserInterface[] = { ...users };
+		const result: UserInterface[] = [ ...users ];
 		return result;
 	}
 
@@ -103,9 +92,11 @@ export class UsersService {
 	}
 
 	async patchUser(id: bigint, updateUser: UserPatchDTO, file: Express.Multer.File): Promise<UserInterface> {
+		console.error("updateUser : ", updateUser);
 		let userToUpdate: UserInterface = await this.findUser(id)
 		if (!userToUpdate)
 			throw new NotFoundException(`User ${id} not found`);
+		console.error("user to update : ", userToUpdate)
 
 		const updateData: Partial<UserEntity> = {};
 		if(file) { updateData.avatar = file.filename; this.deleteAvatar(userToUpdate.avatar); }
@@ -123,12 +114,16 @@ export class UsersService {
 				throw new InternalServerErrorException(e);
 			}
 		}
+		console.error("updateData : ", updateData)
+		console.error("id : ", id)
 
 		if (Object.keys(updateData).length > 0) {
-			if((await this.userRepository.update({ id: id }, {
+			const isUpdated = await this.userRepository.update({ id: id }, {
 				...updateData,
 				updatedAt: new Date()
-			})).affected === 0)
+			})
+			console.error("isUpdated : ", isUpdated)
+			if(isUpdated.affected === 0)
 				throw new BadRequestException(`User ${id} has not been updated.`);
 		}
 
@@ -136,28 +131,28 @@ export class UsersService {
 		return result;
 	}
 
-	async updateUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
-		let userToUpdate: UserInterface = await this.findUser(id)
-		if (!userToUpdate)
-			throw new NotFoundException(`User ${id} not found`);
+	// async updateUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
+	// 	let userToUpdate: UserInterface = await this.findUser(id)
+	// 	if (!userToUpdate)
+	// 		throw new NotFoundException(`User ${id} not found`);
 
-		try {
-			const hash: string = await bcrypt.hash(updateUser.password, 10);
-			updateUser.password = hash;
-		} catch(e) {
-			throw new InternalServerErrorException(e);
-		}
+	// 	try {
+	// 		const hash: string = await bcrypt.hash(updateUser.password, 10);
+	// 		updateUser.password = hash;
+	// 	} catch(e) {
+	// 		throw new InternalServerErrorException(e);
+	// 	}
 
-		let res = await this.userRepository.update({ id: id }, {
-			...updateUser,
-			updatedAt: new Date()
-		});
-		if(res.affected === 0)
-			throw new BadRequestException(`User ${id} has not been updated.`);
+	// 	let res = await this.userRepository.update({ id: id }, {
+	// 		...updateUser,
+	// 		updatedAt: new Date()
+	// 	});
+	// 	if(res.affected === 0)
+	// 		throw new BadRequestException(`User ${id} has not been updated.`);
 
-		const result: UserInterface = await this.findUser(id);
-		return result;
-	}
+	// 	const result: UserInterface = await this.findUser(id);
+	// 	return result;
+	// }
 
 	async deleteUser(id: bigint): Promise<void | string> {
 		let userFound = await this.findUser(id);
@@ -231,6 +226,12 @@ export class UsersService {
 
 	private async deleteAvatar(avatarName: string): Promise<void> {
 		const localPath = join(__dirname, '../../../uploads/users_avatars/' + avatarName);
+		try {
+			access(localPath, null);
+		} catch (err) {
+			console.error(`Le fichier "${localPath}" n'existe pas.`);
+			return;
+		}
 		try {
 			unlinkSync(localPath);
 			console.log("Delete File successfully.");

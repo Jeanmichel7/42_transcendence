@@ -27,10 +27,10 @@ import { CryptoService } from '../crypto/crypto.service';
     AuthService, 
     AuthOwner, AuthAdmin,
     CryptoService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
   controllers: [AuthController]
 })

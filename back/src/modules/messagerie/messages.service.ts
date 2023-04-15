@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Equal, Repository } from 'typeorm';
@@ -9,23 +9,17 @@ import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessageInterface } from './interfaces/message.interface';
 import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
 import { MessageCreatedEvent } from './event/message.event';
+import { UserInterface } from '../users/interfaces/users.interface';
 
 @Injectable()
 export class MessageService {
 	constructor(
 		@InjectRepository(MessageEntity) private readonly messageRepository: Repository<MessageEntity>,
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
-		private readonly eventEmitter: EventEmitter2,
-		
+		private readonly eventEmitter: EventEmitter2
 		) { }
 
-	async findAll(): Promise<MessageInterface[]> {
-		const messages: MessageEntity[] = await this.messageRepository.find();
-		if (!messages)
-			throw new NotFoundException(`Messages not found`);
-		const result: MessageInterface[] = { ...messages }
-		return result;
-	}
+
 
 	async findOne(id: bigint): Promise<MessageInterface> {
 		const message: MessageEntity = await this.messageRepository.findOneBy({ id: id });
@@ -34,6 +28,8 @@ export class MessageService {
 		const result: MessageInterface = message;
 		return result;
 	}
+
+
 
 	async getAllMessageOfUser(userId: bigint): Promise<MessageInterface[]> {
 		const messages: MessageEntity[] = await this.messageRepository.createQueryBuilder('message')
@@ -81,7 +77,7 @@ export class MessageService {
 
 		const userSend: UserEntity = await this.userRepository.findOne({
 			where: { id: userIdFrom },
-			select: ["id"],
+			select: ["id", "login"],
 			relations: ["messagesSend"]
 		});
 
@@ -145,37 +141,74 @@ export class MessageService {
 			},
 			where: { id: newMessage.id },
 		});
+		console.error("emet event message.created")
 		this.eventEmitter.emit('message.created', new MessageCreatedEvent(result));
 		return result;
 	}
 
 	async patchMessage(
-		id: bigint,
-		updateMessage: MessageCreateDTO
+		user: UserInterface,
+		messageId: bigint,
+		newMessage: MessageCreateDTO,
 	): Promise<MessageInterface> {
-		let messageToUpdate = await this.findOne(id)
+		let messageToUpdate = await this.findMsgWithRelationOwner(messageId);
 		if (!messageToUpdate)
-			throw new NotFoundException(`Message with id ${id} not found`);
+			throw new NotFoundException(`Message with id ${messageId} not found`);
+		
+		if (messageToUpdate.ownerUser.id !== user.id && user.role !== "admin")
+			throw new ForbiddenException(`You can't update this message`);
 
-		await this.messageRepository.update({ id: id }, {
-				text: updateMessage.text,
+		await this.messageRepository.update({ id: messageId }, {
+				text: newMessage.text,
 				updatedAt: new Date()
 			}
 		);
 
-		const result: MessageInterface = await this.findOne(id);
+		const result: MessageInterface = await this.findOne(messageId);
 		return result;
 	}
 
-	async deleteMessage(messageId: bigint): Promise<boolean> {
-		const message = await this.findOne(messageId);
+	async deleteMessage(
+		user: UserInterface,
+		messageId: bigint
+	): Promise<boolean> {
+		const message = await this.findMsgWithRelationOwner(messageId);
 		if (!message)
 			throw new NotFoundException(`Message with id ${messageId} not found`);
+		
+		if (message.ownerUser.id !== user.id && user.role !== "admin")
+			throw new ForbiddenException(`You can't update this message`);
 
 		let result = await this.messageRepository.delete({ id: messageId });
 		if (result.affected === 0)
 			return false
 		return true;
+	}
+
+
+	/* ------------------ UTILS ------------------ */
+	private async findMsgWithRelationOwner(id: bigint): Promise<MessageInterface> {
+		const message: MessageEntity = await this.messageRepository.createQueryBuilder('message')
+		.leftJoinAndSelect('message.ownerUser', 'ownerUser')
+		.select(['message', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
+		.where('message.id = :id', { id })
+		.getOne();
+
+		if(!message)
+			throw new NotFoundException(`Message with id ${id} not found`);
+		
+		const result: MessageInterface = message;
+		return result;
+	}
+
+	/* ------------------ ADMIN ------------------ */
+
+	async findAll(): Promise<MessageInterface[]> {
+		const messages: MessageEntity[] = await this.messageRepository.find();
+		if (!messages)
+			throw new NotFoundException(`Messages not found`);
+		const result: MessageInterface[] = { ...messages }
+		return result;
 	}
 
 }

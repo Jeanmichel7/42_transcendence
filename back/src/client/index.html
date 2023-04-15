@@ -13,31 +13,75 @@
 </head>
 
 <body onload="getUser()">
-	<h1> Messagerie </h1>
-	<p> Je suis user : <span id="user"></span></p>
 	
 	<main>
+		<p> Je suis user : <span id="user"></span></p>
+		<h2> Messagerie </h2>
 		<div class="wrapper">
 			<div>
-				<h2>Messagerie user 2 - jrasser</h2>
-				<button onclick="joinRoom1()">Ouvrir</button>
+				<h3>Messagerie user id 2 - jrasser</h3>
+				<button onclick="joinRoom1('2')">Join private room</button>	<!-- 2: userId -->
 				<br>
 				<br>
 				<div id="Form1" class="hidden1">
 					<input type="text" id="messageInput1">
-					<button onclick="sendMessage1()">Send</button>
+					<button onclick="sendMessage1('2')">Send</button> <!-- 2: userId -->
 					<ul id="messages1"></ul>
 				</div>
 			</div>
 			<div>
-				<h2>Messagerie user 4 - test</h2>
-				<button onclick="joinRoom2()">Ouvrir</button>
+				<h3>Messagerie user id 3 - test</h3>
+				<button onclick="joinRoom2('3')">Join private room</button> <!-- 3: userId -->
 				<br>
 				<br>
 				<div id="Form2" class="hidden2">
 					<input type="text" id="messageInput2">
-					<button onclick="sendMessage2()">Send</button>
+					<button onclick="sendMessage2('3')">Send</button> <!-- 3: userId -->
 					<ul id="messages2"></ul>
+				</div>
+			</div>
+		</div>
+
+		<h2> Chat </h2>
+		<button onclick="createChatRoom()">Create room</button> <!-- return room.id -->
+		<br>
+		<div class="wrapper">
+			<div>
+				<h3>Room1</h3>
+				<button onclick="joinChatRoom('1')">Join room 1</button> <!-- roomId -->
+				<br>
+				<br>
+				<div id="formChat1" class="hidden-room-1">
+					<input type="text" id="messageRoomInput1">
+					<button onclick="sendChatMessage('1')">Send</button> <!-- roomId -->
+					<ul id="messagesRoom1"></ul>
+					<!-- <button onclick="leaveRoom('1')">Leave</button> roomId -->
+				</div>
+			</div>
+
+			<div>
+				<h3>Room2</h3>
+				<button onclick="joinChatRoom('2')">Join room 2</button> <!-- roomId -->
+				<br>
+				<br>
+				<div id="formChat2" class="hidden-room-2">
+					<input type="text" id="messageRoomInput2">
+					<button onclick="sendChatMessage('2')">Send</button> <!-- roomId -->
+					<ul id="messagesRoom2"></ul>
+					<!-- <button onclick="leaveRoom('2')">Leave</button> roomId -->
+				</div>
+			</div>
+
+			<div>
+				<h3>Room3</h3>
+				<button onclick="joinChatRoom('3')">Join room 3</button> <!-- roomId -->
+				<br>
+				<br>
+				<div id="formChat3" class="hidden-room-3">
+					<input type="text" id="messageRoomInput3">
+					<button onclick="sendChatMessage('3')">Send</button> <!-- roomId -->
+					<ul id="messagesRoom3"></ul>
+					<!-- <button onclick="leaveRoom('3')">Leave</button> roomId -->
 				</div>
 			</div>
 		</div>

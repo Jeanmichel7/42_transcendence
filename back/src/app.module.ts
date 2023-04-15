@@ -12,7 +12,7 @@ import { AuthModule }                   from './modules/auth/auth.module';
 import { UsersModule }                  from './modules/users/users.module';
 import { UsersRelationsModule }         from './modules/users_relations/users_relations.module';
 import { MessageModule }                from './modules/messagerie/messages.module';
-import { WebsocketModule }              from './modules/webSockets/websocket.module';
+// import { WebsocketModule }              from './modules/webSockets/websocket.module';
 
 import { ServeStaticModule }            from '@nestjs/serve-static';
 import path, { join }                   from 'path';
@@ -36,7 +36,7 @@ import path, { join }                   from 'path';
       serveRoot: '/avatars'
     }),
     EventEmitterModule.forRoot(),
-    WebsocketModule,
+    // WebsocketModule,
     UsersModule,
     UsersRelationsModule,
     MessageModule,

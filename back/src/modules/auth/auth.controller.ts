@@ -1,14 +1,15 @@
-import { Query, Controller, Get, Post, Put, UsePipes, ValidationPipe, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Query, Controller, Get, Post, Put, UsePipes, ValidationPipe, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 
 import { UserInterface } from '../users/interfaces/users.interface';
-
 import { AuthInterface } from './interfaces/auth.interface';
+import { RequestWithUser } from '../users/interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
-import { AuthOwnerAdmin } from './guard/authAdminOwner.guard';
 import { AuthDTO } from './dto/user2fa.auth.dto';
+
+import { AuthAdmin } from './guard/authAdmin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -32,12 +33,14 @@ export class AuthController {
 		return result
 	}
 
-	@Post('login-2FA')
+	@Post('login2fa')
 	@Public()
 	async logInOAuth2FA(@Body() body: AuthDTO): Promise<AuthInterface> {
 		const result: AuthInterface = await this.authService.loginOAuth2FA(body.code, body.userId);
 		return result
 	}
+
+
 
 
 
@@ -47,21 +50,36 @@ export class AuthController {
 	/*                                                  */
 	/* ************************************************ */
 
+	@Put('enable2fa')
+	async active2fa(@Req() req: RequestWithUser): Promise<string> {
+		const result: string = await this.authService.active2fa(req.user.id);
+		return result;
+	}
+
+	@Put('disable2fa')
+	async desactive2fa(@Req() req: RequestWithUser): Promise<UserInterface> {
+		const result: UserInterface = await this.authService.desactive2fa(req.user.id);
+		return result;
+	}
+
+
+	/* ************************************************ */
+	/*                      ADMIN                       */
+	/* ************************************************ */
+
 	@Put(':userId/active2fa')
-	// @UseGuards(AuthOwnerAdmin)
-	async active2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<string> {
+	@UseGuards(AuthAdmin)
+	async adminActive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<string> {
 		const result: string = await this.authService.active2fa(userId);
 		return result;
 	}
 
 	@Put(':userId/desactive2fa')
-	// @UseGuards(AuthOwnerAdmin)
-	async desactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
+	@UseGuards(AuthAdmin)
+	async adminDesactive2fa(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
 		const result: UserInterface = await this.authService.desactive2fa(userId);
 		return result;
 	}
-
-
 
 
 }
