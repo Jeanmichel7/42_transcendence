@@ -1,6 +1,6 @@
 import { IsOptional, IsString, Length, } from "class-validator";
 
-export class ChatCreateRoomDTO {
+export class ChatJoinRoomDTO {
   @IsOptional()
   @IsString()
   @Length(1)

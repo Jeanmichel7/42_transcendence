@@ -13,6 +13,8 @@ import { ChatController } from './chat.controller';
 
 import { MessageChatListener } from './event/chat.listener';
 import { ChatGateway } from './gateway/chat.gateway';
+import { AdminRoomGuard } from './guard/room.admin.guard';
+import { OwnerRoomGuard } from './guard/room.owner.guard';
 
 @Module({
   imports: [
@@ -20,7 +22,10 @@ import { ChatGateway } from './gateway/chat.gateway';
     // EventEmitterModule.forRoot(),
     // WebsocketModule,
   ],
-  providers: [ChatService, MessageChatListener, ChatGateway],
+  providers: [
+    ChatService, MessageChatListener, ChatGateway, 
+    AdminRoomGuard, OwnerRoomGuard
+  ],
   controllers: [ChatController],
 
 })

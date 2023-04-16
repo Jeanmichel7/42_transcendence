@@ -1,4 +1,4 @@
-import { AfterInsert, BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { ChatMessageEntity } from './chat.message.entity';
 

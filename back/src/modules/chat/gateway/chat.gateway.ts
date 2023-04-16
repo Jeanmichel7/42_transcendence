@@ -48,7 +48,10 @@ export class ChatGateway {
     console.log("message sent to room" + message.room.id)
   }
 
-
+  emitJoinRoom(roomId: string, userId: string) {
+    this.server.to(roomId).emit("join-room", `${userId} join the room`);
+    console.log("user joined room" + roomId)
+  }
 
 
 

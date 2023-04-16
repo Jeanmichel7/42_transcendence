@@ -141,7 +141,7 @@ function sendMessage2(userIdDest) {
 
 
 async function createChatRoom() {
-  const res = await axios.get("http://localhost:3000/chat/room/add", {
+  const res = await axios.post("http://localhost:3000/chat/rooms/add", {
     headers: {
       Authorization: `Bearer ${token}`
     }}, {
@@ -155,9 +155,9 @@ async function createChatRoom() {
 
 
 /* ***************** ROOMS  ************* */
-function joinChatRoom(roomId) {
-  let form = document.getElementById(`formChat${roomId}`);
-  form.classList.remove(`hidden-room-${roomId}`)
+function webSocketUser(roomId) {
+  // let form = document.getElementById(`formChat${roomId}`);
+  // form.classList.remove(`hidden-room-${roomId}`)
 
   const chatSocket = io(`http://localhost:3000/chat`, {
     reconnectionDelayMax: 10000,
@@ -173,7 +173,6 @@ function joinChatRoom(roomId) {
       credentials: true
     }
   });
-  
 
   chatSocket.on('connect', () => {
     console.log("connected : ", chatSocket.id)
@@ -183,11 +182,13 @@ function joinChatRoom(roomId) {
     console.log('disconnected : ', chatSocket.id);
   });
 
+  // connexion à la room
   chatSocket.emit("joinRoom", {
     roomId: roomId,
     userId: getUser(),
   });
 
+  // ecoute des messages
   chatSocket.on('chat-message', (message, id) => {
     console.log("message : ", message);
     let displayMessage = document.getElementById(`messagesRoom${message.room.id}`);
@@ -195,11 +196,38 @@ function joinChatRoom(roomId) {
   })
 }
 
+async function joinChatRoom(roomId) {
+  let res = await axios.get("http://localhost:3000/chat/rooms/" + roomId + "/join", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }}, {
+
+    }
+  )
+  console.log("res : ", res)
+  if(res.status === 200){
+    console.log("join room, roomId : ", roomId)
+    
+    //connect user to room
+    webSocketUser(roomId)
+    
+    //display form
+    let form = document.getElementById(`formChat${roomId}`);
+    form.classList.remove(`hidden-room-${roomId}`)
+
+    //display messages
+    let displayMessage = document.getElementById(`messagesRoom${res.data.id}`);
+    for(let i=0;i<res.data.messages.length;i++){
+      displayMessage.innerHTML += `<li>${res.data.messages[i].text} by ${res.data.messages[i].user.login}</li>`;
+    }
+  }
+}
+
 
 function sendChatMessage(roomId) {
   let messageChatInput = document.getElementById(`messageRoomInput${roomId}`);
   
-  axios.post("http://localhost:3000/chat/room/" + roomId + "/message/add", {
+  axios.post("http://localhost:3000/chat/rooms/" + roomId + "/messages/add", {
     text: messageChatInput.value,
   }, {
     headers: {
@@ -207,6 +235,7 @@ function sendChatMessage(roomId) {
     }
   })
 }
+
 
 
 
