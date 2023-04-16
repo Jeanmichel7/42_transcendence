@@ -14,17 +14,19 @@ export class AuthAdmin implements CanActivate {
 	async canActivate(context: ExecutionContext,): Promise<boolean> {
 		const request = context.switchToHttp().getRequest();
 		const token = request.headers.authorization?.split(' ')[1];
+		console.error("req admin  : ", request.user)
 
 		if (!token)
-			throw new UnauthorizedException("You are not authorized to access this resource")
+			throw new UnauthorizedException("You are not authorized to access this resource", "No token provided")
 		const payload = this.jwtService.verify(token);
 
 		const user = await this.userRepository.findOneBy({ id: payload.sub });
+		console.error("user : ", user)
 		if (!user)
 			return false;
 		if (user.role === "admin")
 			return true;
 
-		throw new UnauthorizedException("You are not authorized to access this resource")
+		throw new UnauthorizedException("You are not authorized to access this resource", "You are not an admin")
 	}
 }

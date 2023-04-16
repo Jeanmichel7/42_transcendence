@@ -1,9 +1,9 @@
-let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im15bG9naW4iLCJzdWIiOiI1IiwiaWF0IjoxNjgxMDQ0MDM3LCJleHAiOjE2ODEyMTY4Mzd9.gNgfbgg74qd6-RG0e79z6CTY74y0eGmgPC6nA-nz-VY"
+let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJsb2dpbiI6ImpyYXNzZXI4NDMiLCJyb2xlIjoidXNlciIsImlhdCI6MTY4MTU2OTM1MywiZXhwIjoxNjgxNzQyMTUzfQ.IrtZ290PvAJiQe9hK9pq0K71ZmqNswGWwCjr45GlaLI"
 
 // const socketEvent1 = io('http://localhost:3000/messages', {
 // 	reconnectionDelayMax: 10000,
 // 	// auth: {
-  // 	// 	token: token
+// 	// 	token: token
 // 	// },
 // 	query: {
 // 		userId: "5"
@@ -11,36 +11,38 @@ let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im15bG9naW4iLC
 // });
 
 // ne pas utiliser 
-function parseJwt (token) {
+function parseJwt(token) {
   var base64Url = token.split('.')[1];
   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(''));
 
   return JSON.parse(jsonPayload);
 }
 
-function getUser(){
+function getUser() {
   let userdisplay = document.getElementById("user");
   let result = parseJwt(token)
-  userdisplay.innerHTML = result.username + ", id: " + result.sub
-  return result.sub
+  userdisplay.innerHTML = result.login + ", id: " + result.id
+  return result.id
 }
 
 
 
 
 
-// Room 1
-function joinRoom1() {
-  const socketEvent1 = io(`http://localhost:3000/messages`, {
+/* *************** ROOM 1 *************** */
+
+
+function joinRoom1(userIdDest) {
+  const socketEvent1 = io(`http://localhost:3000/messagerie`, {
     reconnectionDelayMax: 10000,
     auth: {
       token: token
     },
     query: {
-      userId: 5
+      userId: getUser()
     },
     cors: {
       origin: "http://localhost:3000",
@@ -50,7 +52,7 @@ function joinRoom1() {
   });
 
   //connect to room
-  socketEvent1.emit("joinPrivateRoom", { user1Id: getUser(), user2Id: "2" });
+  socketEvent1.emit("joinPrivateRoom", { user1Id: getUser(), user2Id: userIdDest });
 
   //display form
   let form1 = document.getElementById("Form1");
@@ -61,7 +63,7 @@ function joinRoom1() {
   })
 
   socketEvent1.on("disconnect", () => {
-    console.log('disconnected : ', socketEvent1.id); // undefined
+    console.log('disconnected : ', socketEvent1.id);
   });
 
   socketEvent1.on('message', (message, id) => {
@@ -73,7 +75,7 @@ function joinRoom1() {
 
 const messageInput1 = document.getElementById("messageInput1");
 function sendMessage1() {
-  axios.post('http://localhost:3000/messages/from/5/to/2', {
+  axios.post('http://localhost:3000/messages/users/' + userIdDest + '/send', {
     text: messageInput1.value,
   }, {
     headers: {
@@ -84,15 +86,15 @@ function sendMessage1() {
 }
 
 
-// Room 2
-function joinRoom2() {
-  const socketEvent2 = io(`http://localhost:3000/messages`, {
+/* *************** ROOM 2 *************** */
+function joinRoom2(userIdDest) {
+  const socketEvent2 = io(`http://localhost:3000/messagerie`, {
     reconnectionDelayMax: 10000,
     auth: {
       token: token
     },
     query: {
-      userId: 5
+      userId: getUser()
     },
     cors: {
       origin: "http://localhost:3000",
@@ -101,7 +103,7 @@ function joinRoom2() {
     }
   });
 
-  socketEvent2.emit("joinPrivateRoom", { user1Id: getUser(), user2Id: "4" });
+  socketEvent2.emit("joinPrivateRoom", { user1Id: getUser(), user2Id: userIdDest });
 
   let form2 = document.getElementById("Form2");
   form2.classList.remove("hidden2")
@@ -111,7 +113,7 @@ function joinRoom2() {
   })
 
   socketEvent2.on("disconnect", () => {
-    console.log('disconnected : ', socketEvent2.id); // undefined
+    console.log('disconnected : ', socketEvent2.id);
   });
 
   socketEvent2.on('message', (message, id) => {
@@ -122,8 +124,8 @@ function joinRoom2() {
 }
 
 const messageInput2 = document.getElementById("messageInput2");
-function sendMessage2() {
-  axios.post('http://localhost:3000/messages/from/5/to/4', {
+function sendMessage2(userIdDest) {
+  axios.post('http://localhost:3000/messages/users/' + userIdDest + '/send', {
     text: messageInput2.value,
   }, {
     headers: {
@@ -132,3 +134,115 @@ function sendMessage2() {
   })
   // socketEvent2.emit('message', messageInput.value);
 }
+
+
+
+/* *************** CHAT *************** */
+
+
+async function createChatRoom() {
+  const res = await axios.post("http://localhost:3000/chat/rooms/add", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }}, {
+      // password: "secret password"
+    }
+  )
+  console.log("res : ", res)
+  if(res)
+    console.log("new room created, roomId : ", res.data.id)
+}
+
+
+/* ***************** ROOMS  ************* */
+function webSocketUser(roomId) {
+  // let form = document.getElementById(`formChat${roomId}`);
+  // form.classList.remove(`hidden-room-${roomId}`)
+
+  const chatSocket = io(`http://localhost:3000/chat`, {
+    reconnectionDelayMax: 10000,
+    auth: {
+      token: token
+    },
+    query: {
+      userId: getUser()
+    },
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+      credentials: true
+    }
+  });
+
+  chatSocket.on('connect', () => {
+    console.log("connected : ", chatSocket.id)
+  })
+
+  chatSocket.on("disconnect", () => {
+    console.log('disconnected : ', chatSocket.id);
+  });
+
+  // connexion à la room
+  chatSocket.emit("joinRoom", {
+    roomId: roomId,
+    userId: getUser(),
+  });
+
+  // ecoute des messages
+  chatSocket.on('chat-message', (message, id) => {
+    console.log("message : ", message);
+    let displayMessage = document.getElementById(`messagesRoom${message.room.id}`);
+    displayMessage.innerHTML += `<li>${message.text} by ${message.user.login}</li>`;
+  })
+}
+
+async function joinChatRoom(roomId) {
+  let res = await axios.get("http://localhost:3000/chat/rooms/" + roomId + "/join", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }}, {
+
+    }
+  )
+  console.log("res : ", res)
+  if(res.status === 200){
+    console.log("join room, roomId : ", roomId)
+    
+    //connect user to room
+    webSocketUser(roomId)
+    
+    //display form
+    let form = document.getElementById(`formChat${roomId}`);
+    form.classList.remove(`hidden-room-${roomId}`)
+
+    //display messages
+    let displayMessage = document.getElementById(`messagesRoom${res.data.id}`);
+    for(let i=0;i<res.data.messages.length;i++){
+      displayMessage.innerHTML += `<li>${res.data.messages[i].text} by ${res.data.messages[i].user.login}</li>`;
+    }
+  }
+}
+
+
+function sendChatMessage(roomId) {
+  let messageChatInput = document.getElementById(`messageRoomInput${roomId}`);
+  
+  axios.post("http://localhost:3000/chat/rooms/" + roomId + "/messages/add", {
+    text: messageChatInput.value,
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
+
+
+
+
+// function leaveRoom(roomId) {
+//   chatSocket.emit("leaveRoom", {
+//     roomId: roomId,
+//     userId: getUser(),
+//   });
+// }

@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule }                       from '@nestjs/common';
+import { ChatController } from './modules/chat/chat.controller';
+import { ChatModule } from './modules/chat/chat.module';
 import { ConfigModule, ConfigService }  from '@nestjs/config';
 import { TypeOrmModule }                from '@nestjs/typeorm';
 import { EventEmitterModule }           from '@nestjs/event-emitter';
@@ -10,14 +12,16 @@ import { AuthModule }                   from './modules/auth/auth.module';
 import { UsersModule }                  from './modules/users/users.module';
 import { UsersRelationsModule }         from './modules/users_relations/users_relations.module';
 import { MessageModule }                from './modules/messagerie/messages.module';
-import { WebsocketModule }              from './modules/webSockets/websocket.module';
+// import { WebsocketModule }              from './modules/webSockets/websocket.module';
 
 import { ServeStaticModule }            from '@nestjs/serve-static';
-import { join }                         from 'path';
+import path, { join }                   from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => typeOrmConfig(configService),
@@ -32,15 +36,14 @@ import { join }                         from 'path';
       serveRoot: '/avatars'
     }),
     EventEmitterModule.forRoot(),
-    WebsocketModule,
+    // WebsocketModule,
     UsersModule,
     UsersRelationsModule,
     MessageModule,
     AuthModule,
-  ],
+    ChatModule,
+  ]
 })
-
-// /home/jrasser/42_transcendence/back/uploads/users_avatars/420f91c67864248ded86e204aa98be2f.png
 
 
 // export class AppModule {}

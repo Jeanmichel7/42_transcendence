@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {useState, useRef, useEffect} from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
@@ -17,9 +18,30 @@ function ButtonNewChannel() {
 
     }, [ref]);
 
+
+    const createRoom = async (userId: number) => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:3000/chat/createRoom/${userId}`, {
+          headers: { 
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error while creating room:', error);
+      }
+    };
+  
+    const handleCreateClick = () => {
+      // Remplacez 'selectedUserId' par la valeur réelle de l'utilisateur sélectionné
+      const selectedUserId = 1;
+      createRoom(selectedUserId);
+    };
+
     return (
           <div >
-              <button className= {` abosulte top-1 m-2 my-5  text-center w-3/12 py-2 border-2 shadow-lg rounded-xl font-mono cursor-pointer
+              <button className= {` absulte top-1 m-2 my-5  text-center w-3/12 py-2 border-2 shadow-lg rounded-xl font-mono cursor-pointer
                 hover:bg-gray-100 transition-all ${ open ? 'bg-gray-100' : '' } `} onClick={() => setOpen(!open)} >
                 New channel
               </button>
@@ -43,7 +65,7 @@ function ButtonNewChannel() {
                   <input className="border rounded text-center m-1 shadow-sm " type="text" />
                 </div>
 
-                <div className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer">
+                <div className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={handleCreateClick}>
                   <p> Create </p>
                 </div>
               </div>

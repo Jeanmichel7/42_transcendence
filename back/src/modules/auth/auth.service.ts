@@ -39,6 +39,7 @@ export class AuthService {
 		this.salt = await bcrypt.genSalt(10);
 	}
 
+	// renvoi tout user mais osef on va te suprimer
 	async login(data: UserLoginDTO): Promise<AuthInterface> {
 		const user: UserEntity = await this.userRepository.findOneBy({ login: data.login });
 		if (!user)
@@ -66,7 +67,7 @@ export class AuthService {
 		let user: UserInterface = null;
 		if (await this.userAlreadyExist(userData42.email)){
 			console.error("User already exist");
-			user = await this.usersService.findOneByMail(userData42.email);
+			user = await this.findUserByMail(userData42.email);
 		}
 		else {
 			console.error("createOAuthUser");
@@ -87,7 +88,7 @@ export class AuthService {
 	async loginOAuth2FA(code: string, userId: bigint) {
 		const user: UserEntity = await this.userRepository.findOne({
 			where: { id: userId },
-			select: ["id", "firstName", "lastName", "login", "secret2FA"]
+			select: ["id", "firstName", "lastName", "login", "secret2FA", "role"]
 		});
 		if (!user)
 			throw new NotFoundException(`User ${userId} not found`);
@@ -179,7 +180,7 @@ export class AuthService {
 
 	/* ************************************************ */
 	/*                                                  */
-	/*                   Utils OAuths                   */
+	/*                      Utils                       */
 	/*                                                  */
 	/* ************************************************ */
 
@@ -224,8 +225,21 @@ export class AuthService {
 		}
 	}
 
+	async findUserByMail(email: string): Promise<UserInterface> {
+		const user: UserEntity = await this.userRepository.findOne({
+			where: { email: email },
+			select: ["id", "firstName", "lastName", "login", "is2FAEnabled", "role"]
+		});
+
+		if (!user)
+			throw new NotFoundException(`User ${email} not found`);
+		const result: UserInterface = { ...user };
+		return result;
+	}
+
 	private async createJWT(user: UserInterface): Promise<string> {
-		const payload = { username: user.login, sub: user.id };
+		console.error("createJWT : ", user)
+		const payload = { id: user.id, login: user.login, role: user.role };
 		const token = await this.jwtService.signAsync(payload);
 		return token
 	}

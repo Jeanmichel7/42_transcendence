@@ -25,12 +25,12 @@ import { CryptoService } from '../crypto/crypto.service';
   ],
   providers: [
     AuthService, 
+    AuthOwner, AuthAdmin,
+    CryptoService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    AuthOwner, AuthAdmin,
-    CryptoService
   ],
   controllers: [AuthController]
 })

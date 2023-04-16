@@ -12,15 +12,11 @@ import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { MessageListener } from 'src/modules/messagerie/event/message.listener';
-import { WebsocketModule } from 'src/modules/webSockets/websocket.module';
+import { MessagerieWebsocketService } from 'src/modules/messagerie/gateway/message.gateway';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MessageEntity, UserEntity]),
-    // EventEmitterModule.forRoot(),
-    WebsocketModule,
-  ],
-  providers: [MessageService, MessageListener, AuthOwner, AuthAdmin],
+  imports: [ TypeOrmModule.forFeature([MessageEntity, UserEntity]) ],
+  providers: [MessageService, MessageListener, MessagerieWebsocketService],
   controllers: [MessageController],
 })
 export class MessageModule {}
