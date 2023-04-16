@@ -22,6 +22,12 @@ export class UsersController {
 		return result;
 	}
 
+	@Get(':userId/alldata')
+	async findUser(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
+		const result: UserInterface = await this.usersService.findUserAllData(userId);
+		return result;
+	}
+
 	//Get public profile of user
 	@Get(':userlogin/profile')
 	async findProfile(@Param('userlogin') params: string): Promise<ProfilInterface> {

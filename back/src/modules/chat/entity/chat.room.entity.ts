@@ -63,7 +63,7 @@ export class ChatRoomEntity extends BaseEntity {
 	@JoinTable()
   admins: UserEntity[];
 
-	@ManyToMany(() => UserEntity, (user) => user.roomBannedUser)
+	@ManyToMany(() => UserEntity, (user) => user.roomBannedUsers)
 	@JoinTable()
 	bannedUsers: UserEntity[];
 

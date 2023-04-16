@@ -23,8 +23,7 @@ import { OwnerRoomGuard } from './guard/room.owner.guard';
     // WebsocketModule,
   ],
   providers: [
-    ChatService, MessageChatListener, ChatGateway, 
-    AdminRoomGuard, OwnerRoomGuard
+    ChatService, MessageChatListener, ChatGateway
   ],
   controllers: [ChatController],
 

@@ -13,6 +13,7 @@ import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RouterModule } from '@nestjs/core';
 import { ChatJoinRoomDTO } from './dto/chat.room.join.dto';
+import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
 
 @Injectable()
 export class ChatService {
@@ -105,6 +106,7 @@ export class ChatService {
 
   // del room
   //retour room delete or all rooms ?
+  // cascade ?
   async deleteRoom( roomId: bigint ): Promise< ChatRoomInterface > {
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
@@ -191,7 +193,7 @@ export class ChatService {
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
       select: ["id", "status"],
-      relations: ["users", "ownerUser", "admins", "bannedUsers", "mutedUsers"]
+      relations: ["users", "ownerUser", "admins"]
     });
     if (!room)
       throw new NotFoundException(`Room ${roomId} not found`);
@@ -201,6 +203,7 @@ export class ChatService {
       throw new ConflictException(`User ${userId} is not in room ${roomId}`);
 
     room.users = room.users.filter(u => u.id !== user.id);
+    room.admins = room.admins.filter(u => u.id !== user.id);
     await room.save();
     user.roomUsers = user.roomUsers.filter(r => r.id !== room.id);
     await user.save();
@@ -394,6 +397,122 @@ export class ChatService {
 
 
 
+  async kickUser(
+    roomId: bigint,
+    userIdToBeKicked: bigint
+  ): Promise<ChatRoomInterface> {
+    const room: ChatRoomEntity = await this.roomRepository.findOne({
+      where: { id: roomId },
+      select: ["id", "status"],
+      relations: ["users", "mutedUsers"]
+    });
+
+    if (!room.users.find(user => user.id === userIdToBeKicked))
+      throw new ConflictException(`User ${userIdToBeKicked} is not in room ${roomId}`);
+
+    const userToBeKicked: UserEntity = await this.userRepository.findOne({
+      where: { id: userIdToBeKicked },
+      select: ["id"],
+      relations: ["roomUsers", "roomMutedUsers"]
+    });
+
+    if (!userToBeKicked)
+      throw new NotFoundException(`User ${userIdToBeKicked} not found`);
+
+    userToBeKicked.roomUsers = userToBeKicked.roomUsers.filter(r => r.id !== room.id);
+    await userToBeKicked.save();
+
+    room.users = room.users.filter(u => u.id !== userToBeKicked.id);
+    await room.save();
+
+    const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat-room')
+      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .select(['chat-room', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
+      .where('chat-room.id = :roomId', { roomId: room.id })
+      .getOne();
+    return resultRoom;
+  }
+
+
+
+
+  async banUser(
+    roomId: bigint,
+    userIdToBeBanned: bigint
+  ): Promise<ChatRoomInterface> {
+    const room: ChatRoomEntity = await this.roomRepository.findOne({
+      where: { id: roomId },
+      select: ["id", "status"],
+      relations: ["users", "bannedUsers"]
+    });
+
+    if (room.bannedUsers.find(banned => banned.id === userIdToBeBanned))
+      throw new ConflictException(`User ${userIdToBeBanned} is already banned in room ${roomId}`);
+
+    const userToBeBanned: UserEntity = await this.userRepository.findOne({
+      where: { id: userIdToBeBanned },
+      select: ["id"],
+      relations: ["roomUsers", "roomBannedUsers"]
+    });
+
+    if (!userToBeBanned)
+      throw new NotFoundException(`User ${userIdToBeBanned} not found`);
+
+    userToBeBanned.roomBannedUsers = [...userToBeBanned.roomBannedUsers, room];
+    await userToBeBanned.save();
+
+    room.bannedUsers = [...room.bannedUsers, userToBeBanned];
+    room.users = room.users.filter(u => u.id !== userToBeBanned.id);
+    await room.save();
+
+    const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat-room')
+      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .select(['chat-room', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
+      .where('chat-room.id = :roomId', { roomId: room.id })
+      .getOne();
+    return resultRoom;
+  }
+
+
+
+
+
+
+  async unbanUser(
+    roomId: bigint,
+    userIdToBeUnbanned: bigint
+  ): Promise<ChatRoomInterface> {
+    const room: ChatRoomEntity = await this.roomRepository.findOne({
+      where: { id: roomId },
+      select: ["id", "status"],
+      relations: ["users", "bannedUsers"]
+    });
+
+    if (!room.bannedUsers.find(banned => banned.id === userIdToBeUnbanned))
+      throw new ConflictException(`User ${userIdToBeUnbanned} is not banned in room ${roomId}`);
+
+    const userToBeUnbanned: UserEntity = await this.userRepository.findOne({
+      where: { id: userIdToBeUnbanned },
+      select: ["id"],
+      relations: ["roomUsers", "roomBannedUsers"]
+    });
+
+    if (!userToBeUnbanned)
+      throw new NotFoundException(`User ${userIdToBeUnbanned} not found`);
+
+    userToBeUnbanned.roomBannedUsers = userToBeUnbanned.roomBannedUsers.filter(r => r.id !== room.id);
+    await userToBeUnbanned.save();
+
+    room.bannedUsers = room.bannedUsers.filter(u => u.id !== userToBeUnbanned.id);
+    await room.save();
+
+    const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat-room')
+      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .select(['chat-room', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
+      .where('chat-room.id = :roomId', { roomId: room.id })
+      .getOne();
+    return resultRoom;
+  }
 
 
 
@@ -466,6 +585,79 @@ export class ChatService {
   }
 
 
+  async editMessage(
+    userId: bigint,
+    messageId: bigint,
+    editMessage: ChatEditMsgDTO
+  ): Promise<ChatMsgInterface> {
+    const message: ChatMessageEntity = await ChatMessageEntity.findOne({
+      where: { id: messageId },
+      select: ["id", "text", "createdAt", "updatedAt"],
+      relations: ["user", "room"]
+    });
+
+    if (!message)
+      throw new NotFoundException(`Message ${messageId} not found`);
+
+    if (message.user.id !== userId)
+      throw new ForbiddenException(`User ${userId} is not owner of message ${messageId}`);
+
+    message.text = editMessage.text;
+    message.updatedAt = new Date();
+    await message.save();
+
+    const resultMessage: ChatMsgInterface = {
+      id: message.id,
+      text: message.text,
+      room: {
+        id: message.room.id,  
+        status: message.room.status
+      },
+      user: {
+        id: message.user.id,
+        firstName: message.user.firstName,
+        lastName: message.user.lastName,
+        login: message.user.login
+      },
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    };
+
+    // this.eventEmitter.emit('chat-message.edited', new ChatMessageEditedEvent(resultMessage));
+
+    return resultMessage;
+  }
+
+
+
+  async deleteMessage(
+    userId: bigint,
+    messageId: bigint
+  ): Promise<any> {
+    const message: ChatMessageEntity = await ChatMessageEntity.findOne({
+      where: { id: messageId },
+      select: ["id", "text", "createdAt", "updatedAt"],
+      relations: ["user", "room"]
+    });
+
+    if (!message)
+      throw new NotFoundException(`Message ${messageId} not found`);
+
+    if (message.user.id !== userId)
+      throw new ForbiddenException(`User ${userId} is not owner of message ${messageId}`);
+
+    const result = await message.remove();
+    if (!result)
+      return 0;
+
+    // this.eventEmitter.emit('chat-message.deleted', new ChatMessageDeletedEvent(messageId));
+    return 1;
+  }
+
+
+
+
+
 
   /* ************************************************ */
   /*                      ADMIN                       */
@@ -509,17 +701,6 @@ export class ChatService {
     const result: ChatRoomInterface = { ...room };
     return result;
   }
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

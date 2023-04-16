@@ -136,7 +136,7 @@ export class UserEntity extends BaseEntity {
 	@ManyToMany(() => ChatRoomEntity, (room) => room.bannedUsers, {
 		cascade: true
 	})
-	roomBannedUser: ChatRoomEntity[];
+	roomBannedUsers: ChatRoomEntity[];
 
 	@ManyToMany(() => ChatRoomEntity, (room) => room.mutedUsers, {
 		cascade: true

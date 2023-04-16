@@ -1,4 +1,4 @@
-import { Body, Get, Controller, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe, Req, Put, Patch, Delete } from '@nestjs/common';
+import { Body, Get, Controller, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe, Req, Put, Patch, Delete, HttpStatus } from '@nestjs/common';
 
 import { ChatCreateMsgDTO } from './dto/chat.createMessage.dto';
 // import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
@@ -16,6 +16,8 @@ import { AdminRoomGuard } from './guard/room.admin.guard';
 import { OwnerRoomGuard } from './guard/room.owner.guard';
 import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 import { UserNotMutedGuard } from './guard/room.isMuted.guard';
+import { UserNotBannedGuard } from './guard/room.isBanned.guard';
+import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -62,6 +64,7 @@ export class ChatController {
 
 
   // join room
+  @UseGuards(UserNotBannedGuard)
   @Post('rooms/:roomId/join')
   async joinRoom(
     @Req() req: RequestWithUser,
@@ -146,11 +149,39 @@ export class ChatController {
   }
 
   // kick user
+  @UseGuards(AdminRoomGuard)
+  @Patch('rooms/:roomId/users/:userIdToBeKicked/kick')
+  async kickUser(
+    @Param('roomId') roomId: bigint,
+    @Param('userIdToBeKicked') userIdToBeKicked: bigint,
+  ) {
+    const result: ChatRoomInterface = await this.ChatService.kickUser(roomId, userIdToBeKicked);
+    return result;
+  }
+
 
   // ban user
+  @UseGuards(AdminRoomGuard)
+  @Patch('rooms/:roomId/users/:userIdToBeBanned/ban')
+  async banUser(
+    @Param('roomId') roomId: bigint,
+    @Param('userIdToBeBanned') userIdToBeBanned: bigint,
+  ) {
+    const result: ChatRoomInterface = await this.ChatService.banUser(roomId, userIdToBeBanned);
+    return result;
+  }
+
 
   // unban user
-
+  @UseGuards(AdminRoomGuard)
+  @Patch('rooms/:roomId/users/:userIdToBeUnbanned/unban')
+  async unbanUser(
+    @Param('roomId') roomId: bigint,
+    @Param('userIdToBeUnbanned') userIdToBeUnbanned: bigint,
+  ) {
+    const result: ChatRoomInterface = await this.ChatService.unbanUser(roomId, userIdToBeUnbanned);
+    return result;
+  }
 
 
 
@@ -158,6 +189,14 @@ export class ChatController {
   /* ************************************************ */
   /*                      MESSAGE                     */
   /* ************************************************ */
+
+  @Get('rooms/:roomId/messages')
+  async getMessages(
+    @Param('roomId') roomId: bigint,
+  ): Promise< ChatRoomInterface > {
+    const messages: ChatRoomInterface = await this.ChatService.getRoomAllMessages(roomId);
+    return messages;
+  }
 
   @UseGuards(UserNotMutedGuard)
   @Post('rooms/:roomId/messages/add')
@@ -172,9 +211,29 @@ export class ChatController {
   }
 
   // edit message
+  @Patch('messages/:messageId/edit')
+  async editMessage(
+    @Req() req: RequestWithUser,
+    @Param('messageId') messageId: bigint,
+    @Body() data: ChatEditMsgDTO
+  ): Promise< ChatMsgInterface > {
+    const message: ChatMsgInterface = await this.ChatService.editMessage(req.user.id, messageId, data);
+    return message;
+  }
+
 
   // delete message
-
+  @Delete('messages/:messageId/delete')
+  async deleteMessage(
+    @Req() req: RequestWithUser,
+    @Param('messageId') messageId: bigint,
+  ): Promise<HttpStatus>  {
+    let isDelete: boolean = await this.ChatService.deleteMessage(req.user.id, messageId);
+		if (isDelete)
+			return HttpStatus.OK; // 200
+		else
+			return HttpStatus.NOT_FOUND; // 404
+	}
 
 
 

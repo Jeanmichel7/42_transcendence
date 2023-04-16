@@ -239,4 +239,23 @@ export class UsersService {
 			throw new BadRequestException(`Avatar ${avatarName} not deleted`);
 		}
 	}
+
+
+
+
+
+
+
+
+
+	/*  ADMIN  */
+	async findUserAllData(id: bigint): Promise<UserInterface> {
+		let user: UserInterface = await this.userRepository.findOne({
+			where: { id: id },
+			relations: ["chatMessages", "roomOwner", "roomAdmins", "roomUsers", "roomBannedUsers", "roomMutedUsers"]
+		});
+		if (!user)
+			throw new NotFoundException(`User ${id} not found`);
+		return user;
+	}
 }
