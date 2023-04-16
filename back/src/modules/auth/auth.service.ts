@@ -24,7 +24,7 @@ import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class AuthService {
-	private salt: string;
+	// private salt: string;
 	constructor(
 		private usersService: UsersService,
 		private jwtService: JwtService,
@@ -32,12 +32,12 @@ export class AuthService {
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
 		// private readonly httpService: HttpService
 	) {
-		this.initSalt()
+		// this.initSalt()
 	}
 
-	private async initSalt() {
-		this.salt = await bcrypt.genSalt(10);
-	}
+	// private async initSalt() {
+	// 	this.salt = await bcrypt.genSalt(10);
+	// }
 
 	// renvoi tout user mais osef on va te suprimer
 	async login(data: UserLoginDTO): Promise<AuthInterface> {

@@ -1,19 +1,19 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ChatMessageEntity } from './entity/chat.message.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ChatCreateMsgDTO } from './dto/chat.createMessage.dto';
-import { ChatCreateRoomDTO } from './dto/chat.createRoom.dto';
-import { ChatUpdateRoomDTO } from './dto/chat.updateRoom.dto';
-
-import { ChatMsgInterface } from './interfaces/chat.message.interface';
-import { Repository } from 'typeorm';
-import { ChatRoomEntity, UserEntity } from 'src/config';
-import { ChatRoomInterface } from './interfaces/chat.room.interface';
-import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { RouterModule } from '@nestjs/core';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
+
+import { ChatRoomEntity, UserEntity, ChatMessageEntity } from 'src/config';
+import { ChatMsgInterface } from './interfaces/chat.message.interface';
+import { ChatRoomInterface } from './interfaces/chat.room.interface';
+import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
+import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
+import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';
 import { ChatJoinRoomDTO } from './dto/chat.room.join.dto';
 import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
+
+import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
 
 @Injectable()
 export class ChatService {
@@ -40,10 +40,13 @@ export class ChatService {
     });
 
     let roomStatus = "public"
+    let hashPassword: string = null;
     if (roomToCreate.password) {
-      // roomToCreate.password = await bcrypt.hash(roomToCreate.password, 10);
+      const salt: string = await bcrypt.genSalt();
+			hashPassword = await bcrypt.hash(roomToCreate.password, salt);
       roomStatus = "protected";
     }
+
     const room: ChatRoomEntity = await ChatRoomEntity.save({
       ownerUser: user,
       users: [user],
@@ -51,7 +54,8 @@ export class ChatService {
       bannedUsers: [],
       mutedUsers: [],
       ...roomToCreate,
-      status: roomStatus
+      status: roomStatus,
+      password: hashPassword
     });
     if (!room)
       throw new Error("Room not created");
@@ -90,9 +94,18 @@ export class ChatService {
     if (room.ownerUser.id !== userId)
       throw new Error("User is not owner of room");
 
-    // const updateData: Partial<ChatRoomEntity> = {};
-    if (roomToUpdate.password) room.password = roomToUpdate.password;
-    if (roomToUpdate.status) room.status = roomToUpdate.status;
+    if (roomToUpdate.password) {
+      const hashPassword: string = await bcrypt.hash(roomToUpdate.password, 10);
+      room.password = hashPassword;
+      room.status = "protected";
+    }
+    if (roomToUpdate.status){
+      if(roomToUpdate.password === null && roomToUpdate.status !== "public")
+        throw new Error("Room is protected but no password");
+      if(roomToUpdate.status === "public")
+        room.password = null;
+      room.status = roomToUpdate.status;
+    }
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat-room')
@@ -127,8 +140,6 @@ export class ChatService {
 
 
 
-
-
   async joinRoom(
     userId: bigint,
     roomId: bigint,
@@ -148,19 +159,17 @@ export class ChatService {
     if (!room)
       throw new NotFoundException(`Room ${roomId} not found`);
 
-    // check si user est deja dans la room
     if (room.users.some(u => u.id === user.id))
       throw new ConflictException(`User ${userId} is already in room ${roomId}`);
 
-
-    // compare les hashs des passwords
-    if (room.status !== 'public') {
+    if (room.status === 'protected') {
       if (!data.password)
         throw new ForbiddenException(`Room ${roomId} is private`);
-      if (room.password !== data.password)
-        throw new ForbiddenException(`Room ${roomId} password is invalid`);
-    }
 
+      const isMatch = await bcrypt.compare(data.password, room.password);
+      if (!isMatch)
+      throw new ForbiddenException(`Room ${roomId} password is invalid`);
+    }
 
     room.users = [...room.users, user];
     await room.save();
@@ -671,7 +680,6 @@ export class ChatService {
     const result: ChatRoomInterface[] = rooms.map((room: ChatRoomEntity) => {
       return { ...room }
     });
-
     return result;
   }
 

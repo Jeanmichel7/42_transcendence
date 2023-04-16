@@ -22,12 +22,6 @@ export class UsersController {
 		return result;
 	}
 
-	@Get(':userId/alldata')
-	async findUser(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
-		const result: UserInterface = await this.usersService.findUserAllData(userId);
-		return result;
-	}
-
 	//Get public profile of user
 	@Get(':userlogin/profile')
 	async findProfile(@Param('userlogin') params: string): Promise<ProfilInterface> {
@@ -110,7 +104,6 @@ export class UsersController {
 		return result;
 	}
 
-
 	@Delete(':userId')
 	// @UseGuards(AuthOwnerAdmin)
 	async adminDeleteUser(@Param('userId', ParseIntPipe) id: bigint): Promise<HttpStatus> {
@@ -118,7 +111,12 @@ export class UsersController {
 		return HttpStatus.NO_CONTENT; // 204
 	}
 
-
+	@Get(':userId/alldata')
+	// @UseGuards(AuthOwnerAdmin)
+	async findUser(@Param('userId', ParseIntPipe) userId: bigint): Promise<UserInterface> {
+		const result: UserInterface = await this.usersService.findUserAllData(userId);
+		return result;
+	}
 
 
 
