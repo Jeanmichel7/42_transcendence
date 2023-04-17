@@ -15,9 +15,8 @@ import { MessageListener } from 'src/modules/messagerie/event/message.listener';
 import { MessagerieWebsocketService } from 'src/modules/messagerie/gateway/message.gateway';
 
 @Module({
-  imports: [ TypeOrmModule.forFeature([MessageEntity, UserEntity]) ],
+  imports: [TypeOrmModule.forFeature([MessageEntity, UserEntity])],
   providers: [MessageService, MessageListener, MessagerieWebsocketService],
   controllers: [MessageController],
 })
 export class MessageModule {}
-

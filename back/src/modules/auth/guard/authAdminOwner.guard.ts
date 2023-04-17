@@ -2,7 +2,6 @@
 // import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 // import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
-
 // @Injectable()
 // export class AuthOwnerAdmin implements CanActivate {
 //   constructor(

@@ -13,13 +13,19 @@ export class CryptoService {
 
   private initKeys() {
     if (!existsSync(this.publicKeyPath) || !existsSync(this.privateKeyPath)) {
-      console.error("create keys")
+      console.error('create keys');
       let { publicKey, privateKey } = generateKeyPairSync('rsa', {
         modulusLength: 2048,
       });
 
-      writeFileSync(this.publicKeyPath, publicKey.export({ type: 'spki', format: 'pem' }));
-      writeFileSync(this.privateKeyPath, privateKey.export({ type: 'pkcs8', format: 'pem' }));
+      writeFileSync(
+        this.publicKeyPath,
+        publicKey.export({ type: 'spki', format: 'pem' }),
+      );
+      writeFileSync(
+        this.privateKeyPath,
+        privateKey.export({ type: 'pkcs8', format: 'pem' }),
+      );
 
       publicKey = null;
       privateKey = null;
@@ -34,4 +40,3 @@ export class CryptoService {
     return readFileSync(this.privateKeyPath);
   }
 }
-

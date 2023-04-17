@@ -11,7 +11,6 @@ import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 import { UserEntity } from './entity/users.entity';
 import { multerConfig } from 'src/config/multer.config';
 
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
@@ -22,6 +21,6 @@ import { multerConfig } from 'src/config/multer.config';
   ],
   providers: [UsersService, AuthOwner, AuthAdmin],
   controllers: [UsersController],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 export class UsersModule {}

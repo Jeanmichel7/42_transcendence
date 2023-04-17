@@ -1,4 +1,19 @@
-import { Body, Get, Controller, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe, Req, Put, Patch, Delete, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Get,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+  Req,
+  Put,
+  Patch,
+  Delete,
+  HttpStatus,
+} from '@nestjs/common';
 
 import { ChatCreateMsgDTO } from './dto/chat.createMessage.dto';
 // import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
@@ -21,9 +36,7 @@ import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
 
 @Controller('chat')
 export class ChatController {
-  constructor(
-    private readonly ChatService: ChatService,
-  ) { }
+  constructor(private readonly ChatService: ChatService) {}
 
   /* ************************************************ */
   /*                       ROOM                       */
@@ -32,9 +45,12 @@ export class ChatController {
   @Post('rooms/add')
   async createRoom(
     @Req() req: RequestWithUser,
-    @Body() room: ChatCreateRoomDTO
+    @Body() room: ChatCreateRoomDTO,
   ): Promise<ChatRoomInterface> {
-    const result: ChatRoomInterface = await this.ChatService.createRoom(req.user.id, room);
+    const result: ChatRoomInterface = await this.ChatService.createRoom(
+      req.user.id,
+      room,
+    );
     return result;
   }
 
@@ -44,24 +60,25 @@ export class ChatController {
   async updateRoom(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-    @Body() room: ChatUpdateRoomDTO
+    @Body() room: ChatUpdateRoomDTO,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.updateRoom(req.user.id, roomId, room);
+    const result: ChatRoomInterface = await this.ChatService.updateRoom(
+      req.user.id,
+      roomId,
+      room,
+    );
     return result;
   }
 
   // delete room
   @UseGuards(OwnerRoomGuard)
   @Delete('rooms/:roomId')
-  async deleteRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
+  async deleteRoom(
+    @Param('roomId') roomId: bigint,
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.deleteRoom(roomId);
     return result;
   }
-
-
-
-
-
 
   // join room
   @UseGuards(UserNotBannedGuard)
@@ -69,9 +86,13 @@ export class ChatController {
   async joinRoom(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-    @Body() data: ChatJoinRoomDTO
+    @Body() data: ChatJoinRoomDTO,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.joinRoom(req.user.id, roomId, data);
+    const result: ChatRoomInterface = await this.ChatService.joinRoom(
+      req.user.id,
+      roomId,
+      data,
+    );
     return result;
   }
 
@@ -81,17 +102,12 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.leaveRoom(req.user.id, roomId);
+    const result: ChatRoomInterface = await this.ChatService.leaveRoom(
+      req.user.id,
+      roomId,
+    );
     return result;
   }
-
-
-
-
-
-
-
-
 
   // add admin
   @UseGuards(OwnerRoomGuard)
@@ -101,7 +117,11 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeAdmin') userIdToBeAdmin: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.addAdminToRoom(req.user.id, roomId, userIdToBeAdmin);
+    const result: ChatRoomInterface = await this.ChatService.addAdminToRoom(
+      req.user.id,
+      roomId,
+      userIdToBeAdmin,
+    );
     return result;
   }
 
@@ -113,10 +133,13 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdAdmin') userIdAdmin: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.removeAdminToRoom(req.user.id, roomId, userIdAdmin);
+    const result: ChatRoomInterface = await this.ChatService.removeAdminToRoom(
+      req.user.id,
+      roomId,
+      userIdAdmin,
+    );
     return result;
   }
-
 
   // mute user
   @UseGuards(AdminRoomGuard)
@@ -124,13 +147,20 @@ export class ChatController {
   async muteUser(
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeMuted') userIdToBeMuted: bigint,
-    @Body() data: ChatMuteUserDTO
+    @Body() data: ChatMuteUserDTO,
   ) {
-    const muteDurationSec = data.muteDurationSec? data.muteDurationSec : '10';
-    const result: ChatRoomInterface = await this.ChatService.muteUser(roomId, userIdToBeMuted);
+    const muteDurationSec = data.muteDurationSec ? data.muteDurationSec : '10';
+    const result: ChatRoomInterface = await this.ChatService.muteUser(
+      roomId,
+      userIdToBeMuted,
+    );
 
-    console.log("user " + userIdToBeMuted + " muted : ", muteDurationSec, "sec")
-    setTimeout( async () => {
+    console.log(
+      'user ' + userIdToBeMuted + ' muted : ',
+      muteDurationSec,
+      'sec',
+    );
+    setTimeout(async () => {
       await this.ChatService.demuteUser(roomId, userIdToBeMuted);
     }, parseInt(muteDurationSec) * 1000);
 
@@ -144,7 +174,10 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeDemuted') userIdToBeDemuted: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.demuteUser(roomId, userIdToBeDemuted);
+    const result: ChatRoomInterface = await this.ChatService.demuteUser(
+      roomId,
+      userIdToBeDemuted,
+    );
     return result;
   }
 
@@ -155,10 +188,12 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeKicked') userIdToBeKicked: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.kickUser(roomId, userIdToBeKicked);
+    const result: ChatRoomInterface = await this.ChatService.kickUser(
+      roomId,
+      userIdToBeKicked,
+    );
     return result;
   }
-
 
   // ban user
   @UseGuards(AdminRoomGuard)
@@ -167,10 +202,12 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeBanned') userIdToBeBanned: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.banUser(roomId, userIdToBeBanned);
+    const result: ChatRoomInterface = await this.ChatService.banUser(
+      roomId,
+      userIdToBeBanned,
+    );
     return result;
   }
-
 
   // unban user
   @UseGuards(AdminRoomGuard)
@@ -179,12 +216,12 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeUnbanned') userIdToBeUnbanned: bigint,
   ) {
-    const result: ChatRoomInterface = await this.ChatService.unbanUser(roomId, userIdToBeUnbanned);
+    const result: ChatRoomInterface = await this.ChatService.unbanUser(
+      roomId,
+      userIdToBeUnbanned,
+    );
     return result;
   }
-
-
-
 
   /* ************************************************ */
   /*                      MESSAGE                     */
@@ -193,8 +230,9 @@ export class ChatController {
   @Get('rooms/:roomId/messages')
   async getMessages(
     @Param('roomId') roomId: bigint,
-  ): Promise< ChatRoomInterface > {
-    const messages: ChatRoomInterface = await this.ChatService.getRoomAllMessages(roomId);
+  ): Promise<ChatRoomInterface> {
+    const messages: ChatRoomInterface =
+      await this.ChatService.getRoomAllMessages(roomId);
     return messages;
   }
 
@@ -204,9 +242,13 @@ export class ChatController {
   async createMessage(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-    @Body() newMessage: ChatCreateMsgDTO
-  ): Promise< ChatMsgInterface > {
-    const message: ChatMsgInterface = await this.ChatService.createMessage(newMessage, req.user.id, roomId);
+    @Body() newMessage: ChatCreateMsgDTO,
+  ): Promise<ChatMsgInterface> {
+    const message: ChatMsgInterface = await this.ChatService.createMessage(
+      newMessage,
+      req.user.id,
+      roomId,
+    );
     return message;
   }
 
@@ -215,27 +257,29 @@ export class ChatController {
   async editMessage(
     @Req() req: RequestWithUser,
     @Param('messageId') messageId: bigint,
-    @Body() data: ChatEditMsgDTO
-  ): Promise< ChatMsgInterface > {
-    const message: ChatMsgInterface = await this.ChatService.editMessage(req.user.id, messageId, data);
+    @Body() data: ChatEditMsgDTO,
+  ): Promise<ChatMsgInterface> {
+    const message: ChatMsgInterface = await this.ChatService.editMessage(
+      req.user.id,
+      messageId,
+      data,
+    );
     return message;
   }
-
 
   // delete message
   @Delete('messages/:messageId/delete')
   async deleteMessage(
     @Req() req: RequestWithUser,
     @Param('messageId') messageId: bigint,
-  ): Promise<HttpStatus>  {
-    let isDelete: boolean = await this.ChatService.deleteMessage(req.user.id, messageId);
-		if (isDelete)
-			return HttpStatus.OK; // 200
-		else
-			return HttpStatus.NOT_FOUND; // 404
-	}
-
-
+  ): Promise<HttpStatus> {
+    const isDelete: boolean = await this.ChatService.deleteMessage(
+      req.user.id,
+      messageId,
+    );
+    if (isDelete) return HttpStatus.OK; // 200
+    else return HttpStatus.NOT_FOUND; // 404
+  }
 
   /* ************************************************ */
   /*                      ADMIN                       */
@@ -250,9 +294,7 @@ export class ChatController {
 
   // @UseGuards(AuthAdmin)
   @Get('rooms/:roomId')
-  async getRoom(
-    @Param('roomId') roomId: bigint
-  ): Promise<ChatRoomInterface> {
+  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
     return room;
   }
@@ -260,19 +302,10 @@ export class ChatController {
   // @UseGuards(AuthAdmin)
   @Get('rooms/:roomId/messages/all')
   async getAllMessages(
-    @Param('roomId') roomId: bigint
+    @Param('roomId') roomId: bigint,
   ): Promise<ChatRoomInterface> {
-    const messages: ChatRoomInterface = await this.ChatService.getRoomAllMessages(roomId);
+    const messages: ChatRoomInterface =
+      await this.ChatService.getRoomAllMessages(roomId);
     return messages;
   }
-
-
-
-
-
-
-
-
-
-
 }

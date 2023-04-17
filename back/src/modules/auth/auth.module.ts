@@ -12,7 +12,6 @@ import { AuthOwner } from './guard/authOwner.guard';
 import { AuthAdmin } from './guard/authAdmin.guard';
 import { CryptoService } from '../crypto/crypto.service';
 
-
 @Module({
   imports: [
     UsersModule,
@@ -21,17 +20,18 @@ import { CryptoService } from '../crypto/crypto.service';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2 days' },
     }),
-    TypeOrmModule.forFeature([UserEntity])
+    TypeOrmModule.forFeature([UserEntity]),
   ],
   providers: [
-    AuthService, 
-    AuthOwner, AuthAdmin,
+    AuthService,
+    AuthOwner,
+    AuthAdmin,
     CryptoService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}
