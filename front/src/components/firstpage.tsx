@@ -1,8 +1,22 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
+import axios from 'axios'
 
 
 function Firstpage() {
+
+  // async function connect() {
+  //   const response = await axios({
+  //     method: 'GET',
+  //     url: '',
+  //     headers: {'Allow': '*'},
+  //   });
+  //   if(response.status == 200){
+  //     console.log(response.data)
+  //   }
+  // }
+
+
   return (
     <div className=" h-screen w-auto flex items-center justify-center bg-[#1e1e4e]">
 
@@ -14,7 +28,7 @@ function Firstpage() {
         </div>
        
         <div className="m-6 text-center text-white font-mono border-double border-4 rounded-xl border-[#f4fa22]" >
-          <Link to="/home">Login as a 42 student</Link>
+          <Link to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">Login as a 42 student</Link>
         </div>
 
       </span>
@@ -24,3 +38,4 @@ function Firstpage() {
 }
 
 export default Firstpage
+

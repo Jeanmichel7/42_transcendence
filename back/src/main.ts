@@ -7,8 +7,6 @@ async function bootstrap() {
 }
 bootstrap();
 
-
-
 /* fastify */
 /*
 import { NestFactory } from '@nestjs/core';

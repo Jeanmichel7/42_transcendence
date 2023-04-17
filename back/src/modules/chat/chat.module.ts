@@ -22,10 +22,7 @@ import { OwnerRoomGuard } from './guard/room.owner.guard';
     // EventEmitterModule.forRoot(),
     // WebsocketModule,
   ],
-  providers: [
-    ChatService, MessageChatListener, ChatGateway
-  ],
+  providers: [ChatService, MessageChatListener, ChatGateway],
   controllers: [ChatController],
-
 })
 export class ChatModule {}
