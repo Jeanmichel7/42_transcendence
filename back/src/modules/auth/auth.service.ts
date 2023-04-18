@@ -1,20 +1,13 @@
 import {
   BadRequestException,
-  HttpException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import { toDataURL } from 'qrcode';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { Observable } from 'rxjs';
-import { AxiosResponse, AxiosError } from 'axios';
-import { catchError, firstValueFrom } from 'rxjs';
 import axios from 'axios';
-
-import { Response, Request } from 'express';
 
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -27,22 +20,19 @@ import { Repository, UpdateResult } from 'typeorm';
 import { authenticator } from 'otplib';
 import { AuthInterface } from './interfaces/auth.interface';
 import { CryptoService } from '../crypto/crypto.service';
+// import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  private salt: string;
   constructor(
+    // private readonly configService: ConfigService,
     private usersService: UsersService,
     private jwtService: JwtService,
     private cryptoService: CryptoService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>, // private readonly httpService: HttpService
   ) {
-    this.initSalt();
-  }
-
-  private async initSalt() {
-    this.salt = await bcrypt.genSalt(10);
+    // console.log('JWT_SECRET:', configService.get<string>('JWT_SECRET'));
   }
 
   // renvoi tout user mais osef on va te suprimer
@@ -89,12 +79,12 @@ export class AuthService {
   }
 
   async loginOAuth2FA(code: string, userId: bigint) {
-    console.log('userId', userId, typeof userId);
+    // console.log('userId', userId, typeof userId);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'firstName', 'lastName', 'login', 'secret2FA', 'role'],
     });
-    console.log('user : ', user);
+    // console.log('user : ', user);
     if (!user) throw new NotFoundException(`User ${userId} not found`);
 
     let decryptedSecret = crypto
@@ -116,15 +106,6 @@ export class AuthService {
       user: user,
     };
   }
-
-  // async getActuelUser(req): Promise<UserInterface> {
-  // 	if (!req.authorization)
-  // 		throw new UnauthorizedException();
-  // 	const token = req.authorization.split(' ')[1];
-  // 	const payload = this.jwtService.verify(token);
-  // 	const user = await this.usersService.findOneByLogin(payload.username);
-  // 	return user;
-  // }
 
   /* ************************************************ */
   /*                                                  */
@@ -268,9 +249,9 @@ export class AuthService {
   }
 
   private async createJWT(user: UserInterface): Promise<string> {
-    console.error('createJWT : ', user);
     const payload = { id: user.id, login: user.login, role: user.role };
     const token = await this.jwtService.signAsync(payload);
+    console.error('createJWT : ', user, token);
     return token;
   }
 

@@ -4,15 +4,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRelationsService } from './users_relations.service';
 import { UsersRelationsController } from './users_relations.controller';
 
-import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
+// import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { UserRelationEntity } from './entities/users_relation.entity';
 import { UserEntity } from '../users/entity/users.entity';
+import { AuthModule } from '../auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, UserRelationEntity])],
-  providers: [UsersRelationsService, AuthOwner, AuthAdmin],
-  controllers: [UsersRelationsController]
+  providers: [UsersRelationsService, AuthAdmin, JwtService],
+  controllers: [UsersRelationsController],
 })
 export class UsersRelationsModule {}
