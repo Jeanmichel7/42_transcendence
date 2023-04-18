@@ -21,9 +21,9 @@ export class ChatRoomEntity extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: 'public',
+    default: 'private',
   })
-  status: string;
+  type: 'public' | 'protected';
 
   // @Column({
   // 	type: 'text',
