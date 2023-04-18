@@ -57,5 +57,3 @@ function ConnectPage() {
 }
 
 export default ConnectPage;
-
-
