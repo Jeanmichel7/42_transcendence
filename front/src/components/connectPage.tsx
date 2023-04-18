@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import Navbar from './navbar';
@@ -37,20 +36,19 @@ function ConnectPage() {
   // }, []);
 
   let is2FAactiv = false;
-  const token = document.cookie.split(";").map(e=> [e.split('=')[0], e.split('=')[1]]).filter(e=> e[0] === ' jwt')[0][1]
-  if (token === "need2FA" ) {
-    is2FAactiv = true;
-  } 
+  const token = document.cookie.split(";").map(e=> [e.split('=')[0], e.split('=')[1]]).filter(e=> e[0] === 'jwt' || e[0] === ' jwt')[0][1]
+  if (token === "need2FA" ) { 
+    is2FAactiv = true;   } 
   else {
-    localStorage.setItem("accessToken", token)
-    window.location.href = "/home";
+    localStorage.setItem("accessToken", token) // c'est lui qui sauvegarde le token
+    window.location.href = "/home";           // et ca redirige
   }
   console.log("token : ", token)
 
 
 
   async function send2FA() {
-    const code2FA = document.getElementById('2fapassword').value;
+    const code2FA:any = document.getElementById('2fapassword').value;
     console.log("code2FA : ", code2FA)
     const response = await axios.post('http://localhost:3000/auth/login2fa', {
       code: code2FA,
@@ -58,7 +56,7 @@ function ConnectPage() {
     });
     if (response.status == 200) {
       localStorage.setItem("accessToken", response.data.accessToken)
-      window.location.href = "/home";
+      window.location.href = "/home";                               
     }
     else {
       console.log(response.data)
