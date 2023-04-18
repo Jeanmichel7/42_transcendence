@@ -1,5 +1,5 @@
-import { UserInterface } from "src/modules/users/interfaces/users.interface";
-import { ChatRoomInterface } from "./chat.room.interface";
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
+import { ChatRoomInterface } from './chat.room.interface';
 
 export interface ChatMsgInterface {
   id: bigint;

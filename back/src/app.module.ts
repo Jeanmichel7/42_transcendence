@@ -45,7 +45,6 @@ import path, { join } from 'path';
     ChatModule,
   ],
 })
-
 export class AppModule {}
 // export class AppModule implements NestModule {
 //   configure(consumer: MiddlewareConsumer) {

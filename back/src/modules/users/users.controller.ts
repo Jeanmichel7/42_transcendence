@@ -39,7 +39,6 @@ export class UsersController {
     return result;
   }
 
-
   @Get(':userId/alldata')
   async findUser(
     @Param('userId', ParseIntPipe) userId: bigint,
@@ -63,7 +62,9 @@ export class UsersController {
   async findProfileById(
     @Param('userId') params: bigint,
   ): Promise<ProfilInterface> {
-    const result: ProfilInterface = await this.usersService.findProfileById(params);
+    const result: ProfilInterface = await this.usersService.findProfileById(
+      params,
+    );
     return result;
   }
 

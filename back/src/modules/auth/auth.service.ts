@@ -89,12 +89,12 @@ export class AuthService {
   }
 
   async loginOAuth2FA(code: string, userId: bigint) {
-    console.log("userId", userId , typeof userId)
+    console.log('userId', userId, typeof userId);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'firstName', 'lastName', 'login', 'secret2FA', 'role'],
     });
-    console.log("user : ", user)
+    console.log('user : ', user);
     if (!user) throw new NotFoundException(`User ${userId} not found`);
 
     let decryptedSecret = crypto

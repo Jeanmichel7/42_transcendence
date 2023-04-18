@@ -55,7 +55,7 @@ export class UsersService {
 
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
-      where: { login: login  },
+      where: { login: login },
       select: [
         'id',
         'firstName',
@@ -75,7 +75,7 @@ export class UsersService {
 
   async findProfileById(userId: bigint): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
-      where: { id: userId  },
+      where: { id: userId },
       select: [
         'id',
         'firstName',

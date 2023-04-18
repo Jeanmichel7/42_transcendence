@@ -19,8 +19,8 @@ export class AuthAdmin implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(' ')[1];
-    console.error('req admin  : ', request.user);
+    const token = request.cookies['jwt'];
+    // console.error('auth admin user : ', request.user);
 
     if (!token)
       throw new UnauthorizedException(
@@ -30,7 +30,7 @@ export class AuthAdmin implements CanActivate {
     const payload = this.jwtService.verify(token);
 
     const user = await this.userRepository.findOneBy({ id: payload.sub });
-    console.error('user : ', user);
+    // console.error('user : ', user);
     if (!user) return false;
     if (user.role === 'admin') return true;
 
