@@ -48,18 +48,34 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<AuthInterface> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
+    res.cookie("jwt", result.accessToken, {
+      // httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      sameSite: "strict"
+    });
     res.redirect(
-      `http://localhost:3006/connection?accessToken=${result.accessToken}`,
+      `http://localhost:3006/connection`,
     );
     return result;
   }
 
   @Post('login2fa')
   @Public()
-  async logInOAuth2FA(@Body() body: AuthDTO): Promise<AuthInterface> {
+  async logInOAuth2FA(
+    @Body() body: AuthDTO,
+    @Res() res: Response,
+  ): Promise<AuthInterface> {
     const result: AuthInterface = await this.authService.loginOAuth2FA(
       body.code,
       body.userId,
+    );
+    res.cookie("jwt", result.accessToken, {
+      // httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      sameSite: "strict"
+    });
+    res.redirect(
+      `http://localhost:3006/home`,
     );
     return result;
   }
