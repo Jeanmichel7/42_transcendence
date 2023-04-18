@@ -14,10 +14,9 @@ import { UsersRelationsService } from './users_relations.service';
 
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationInterface } from './interfaces/users_relations.interface';
-
-// import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
-import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
+
+import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 
 @Controller('relations')
 export class UsersRelationsController {
@@ -79,7 +78,7 @@ export class UsersRelationsController {
   /* ************************************************ */
 
   @Get(':userId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminFindAll(
     @Param('userId', ParseIntPipe) id: bigint,
   ): Promise<UserRelationInterface[]> {
@@ -89,8 +88,7 @@ export class UsersRelationsController {
   }
 
   @Get(':userId/friends')
-  @UseGuards(AuthAdmin)
-  // @UseGuards(AuthOwnerAdmin)
+  // @UseGuards(AuthAdmin)
   async adminAllFriends(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface[]> {
@@ -100,7 +98,7 @@ export class UsersRelationsController {
   }
 
   @Get(':userId/blocked')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminAllBlocked(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface[]> {
@@ -110,7 +108,7 @@ export class UsersRelationsController {
   }
 
   @Put(':userId/add-friend/:friendId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminAddFriend(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('friendId', ParseIntPipe) friendId: bigint,
@@ -121,7 +119,7 @@ export class UsersRelationsController {
   }
 
   @Delete(':userId/delete-relation/:friendId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminRemoveFriend(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('friendId', ParseIntPipe) friendId: bigint,

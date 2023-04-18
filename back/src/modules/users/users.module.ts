@@ -5,11 +5,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
-import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
+// import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { UserEntity } from './entity/users.entity';
-import { multerConfig } from 'src/config/multer.config';
+import { multerConfig } from 'config/multer.config';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { multerConfig } from 'src/config/multer.config';
     //   dest: 'uploads/users_avatars',
     // }),
   ],
-  providers: [UsersService, AuthOwner, AuthAdmin],
+  providers: [UsersService, AuthAdmin, JwtService],
   controllers: [UsersController],
   exports: [UsersService],
 })

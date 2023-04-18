@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MulterModule } from '@nestjs/platform-express';
-import { typeOrmConfig } from 'src/config/typeorm.config';
+import { typeOrmConfig } from 'config/typeorm.config';
 import * as cors from 'cors';
 
 import { AuthModule } from './modules/auth/auth.module';
@@ -21,6 +21,7 @@ import path, { join } from 'path';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: 'config/.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

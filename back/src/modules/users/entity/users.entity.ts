@@ -143,21 +143,25 @@ export class UserEntity extends BaseEntity {
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.admins, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   roomAdmins: ChatRoomEntity[];
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.users, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   roomUsers: ChatRoomEntity[];
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.bannedUsers, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   roomBannedUsers: ChatRoomEntity[];
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.mutedUsers, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   roomMutedUsers: ChatRoomEntity[];
 }

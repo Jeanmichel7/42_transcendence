@@ -23,7 +23,6 @@ import { AuthInterface } from './interfaces/auth.interface';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { AuthDTO } from './dto/user2fa.auth.dto';
-
 import { AuthAdmin } from './guard/authAdmin.guard';
 
 @Controller('auth')
@@ -83,7 +82,7 @@ export class AuthController {
   ): Promise<void> {
     const jwtCookieName = 'jwt'; // Remplacez 'jwt' par le nom de votre cookie JWT
     const jwtCookie = req.cookies[jwtCookieName];
-    console.error('jwt cookie : ', jwtCookie);
+    // console.error('jwt cookie : ', jwtCookie);
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({
@@ -120,7 +119,7 @@ export class AuthController {
   /* ************************************************ */
 
   @Put(':userId/active2fa')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminActive2fa(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<string> {

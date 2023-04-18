@@ -25,10 +25,9 @@ import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.
 import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessagePatchDTO } from './dto/message.patch.dto';
 
-import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
-// import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
 import { Public } from '../auth/decorators/public.decorator';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 @Controller('messages')
 export class MessageController {
@@ -102,14 +101,14 @@ export class MessageController {
   /* ************************************************ */
 
   @Get()
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminFindAll(): Promise<MessageInterface[]> {
     const result: MessageInterface[] = await this.MessageService.findAll();
     return result;
   }
 
   @Get(':messageId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async AdminFindOne(
     @Param('messageId', ParseIntPipe) id: bigint,
   ): Promise<MessageInterface> {

@@ -13,7 +13,6 @@ import {
   unlinkSync,
   access,
   mkdirSync,
-  constants,
 } from 'fs';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
@@ -67,7 +66,6 @@ export class UsersService {
         'status',
       ],
     });
-    console.error('user : ', user);
     if (!user) throw new NotFoundException(`User ${login} not found`);
     const result: ProfilInterface = { ...user };
     return result;
@@ -87,7 +85,6 @@ export class UsersService {
         'status',
       ],
     });
-    console.error('user : ', user);
     if (!user) throw new NotFoundException(`User ${userId} not found`);
     const result: ProfilInterface = { ...user };
     return result;
@@ -155,10 +152,8 @@ export class UsersService {
     updateUser: UserPatchDTO,
     file: Express.Multer.File,
   ): Promise<UserInterface> {
-    console.error('updateUser : ', updateUser);
     const userToUpdate: UserInterface = await this.findUser(id);
     if (!userToUpdate) throw new NotFoundException(`User ${id} not found`);
-    console.error('user to update : ', userToUpdate);
 
     const updateData: Partial<UserEntity> = {};
     if (file) {
@@ -178,8 +173,6 @@ export class UsersService {
         throw new InternalServerErrorException(e);
       }
     }
-    console.error('updateData : ', updateData);
-    console.error('id : ', id);
 
     if (Object.keys(updateData).length > 0) {
       const isUpdated = await this.userRepository.update(
@@ -189,7 +182,6 @@ export class UsersService {
           updatedAt: new Date(),
         },
       );
-      console.error('isUpdated : ', isUpdated);
       if (isUpdated.affected === 0)
         throw new BadRequestException(`User ${id} has not been updated.`);
     }
@@ -258,18 +250,15 @@ export class UsersService {
       'avatar-' + Date.now() + '-' + Math.round(Math.random() * 1e6) + '.jpg';
     const localImagePath: string = join(
       __dirname,
-      '..',
-      '..',
-      '..',
+      '../../../..',
       'uploads',
       'users_avatars',
       avatarName,
     );
+    console.log('path : ', localImagePath);
 
-    if (
-      !existsSync(join(__dirname, '..', '..', '..', 'uploads', 'users_avatars'))
-    )
-      mkdirSync(join(__dirname, '..', '..', '..', 'uploads', 'users_avatars'));
+    if (!existsSync(join(__dirname, '../../../..', 'uploads', 'users_avatars')))
+      mkdirSync(join(__dirname, '../../../..', 'uploads', 'users_avatars'));
 
     try {
       const response = await axios({

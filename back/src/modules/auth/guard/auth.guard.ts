@@ -7,13 +7,18 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 
-import { jwtConstants } from './constants';
+// import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/modules/auth/decorators/public.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+    private readonly configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -25,13 +30,14 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     // const token = this.extractTokenFromHeader(request);
     const token = this.extractTokenFromCookie(request);
-    console.log('token : ', token);
+    // console.log('token : ', token);
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
+      const jwtSecret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
+        secret: jwtSecret,
       });
       // console.error('payload : ', payload);
       request.user = payload;
@@ -49,43 +55,8 @@ export class AuthGuard implements CanActivate {
     return cookies[jwtCookieName];
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
-
-  async getUserByJWT(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
-      });
-      return payload;
-      // request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
-    }
-  }
-
-  // async test(context: ExecutionContext) {
-  //     const request = context.switchToHttp().getRequest();
-  //     const token = this.extractTokenFromHeader(request);
-  //     if (!token) {
-  //         throw new UnauthorizedException();
-  //     }
-  //     try {
-  //         const payload = await this.jwtService.verifyAsync(
-  //             token,
-  //             { secret: jwtConstants.secret }
-  //         );
-  //         // request['user'] = payload;
-  //         return true
-  //     } catch {
-  //         throw new UnauthorizedException();
-  //     }
+  // private extractTokenFromHeader(request: Request): string | undefined {
+  //   const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  //   return type === 'Bearer' ? token : undefined;
   // }
 }

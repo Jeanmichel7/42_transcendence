@@ -113,25 +113,6 @@ http://localhost:5050/
 
 
 
-
-
-
-
-42_transcendence/.env
-VOLUME_DB=/home/jrasser/data
-DB_USERNAME=jrasser
-DB_PASSWORD=jrasser
-DB_NAME=pong_db
-
-42_transcendence/back/.env
-DB_PORT=5432
-DB_USERNAME=jrasser
-DB_PASSWORD=jrasser
-DB_NAME=pong_db
-JWT_SECRET=blablabla
-
-
-
 ## DB SAVE
 sudo su - postgres
 psql

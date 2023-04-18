@@ -12,7 +12,7 @@ import { ChatUpdateRoomDTO } from './dto/chat.updateRoom.dto';
 
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { Repository } from 'typeorm';
-import { ChatRoomEntity, UserEntity } from 'src/config';
+import { ChatRoomEntity, UserEntity } from 'config';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
