@@ -3,7 +3,6 @@ import {useState, useRef, useEffect} from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
 function ButtonNewChannel() {
-
     const [open, setOpen] = useState(false);
     let ref = useRef(document.createElement("div"))
     
@@ -19,11 +18,12 @@ function ButtonNewChannel() {
     }, [ref]);
 
 
+
     const createRoom = async (userId: number) => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(`http://localhost:3000/chat/createRoom/${userId}`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`
           }
         });

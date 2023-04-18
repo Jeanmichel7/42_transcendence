@@ -1,4 +1,4 @@
-import { UserInterface } from "src/modules/users/interfaces/users.interface";
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 export interface MessageBtwTwoUserInterface {
   id: bigint;

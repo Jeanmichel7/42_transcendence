@@ -1,55 +1,89 @@
 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import Navbar from './navbar';
+import SideBar from './sidebar';
+import { Link } from 'react-router-dom';
 
 function ConnectPage() {
-  const [accessToken, setAccessToken] = useState("");
+
+  const [is2FAactiv, setIs2FAactiv] = useState(false);
+  const [userId, setUserId] = useState(0);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('accessToken');
-    if (token) {
-      setAccessToken(token);
-      console.log("token : ", token)
-      localStorage.setItem("accessToken", token);
-      //redirection ailleur
-    }
-  }, []);
-
-  async function getUser() {
-    const userLogin = 'jrasser843';
-    const response = await axios.get(`http://localhost:3000/users/${userLogin}/profile`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        
+    async function fetchAndSetIs2FAactiv() {
+      try {
+        const res = await check2FACookie();
+        if(res.is2FAactived) {
+          console.log("is2FAactived")
+          setIs2FAactiv(res.is2FAactived);
+          setUserId(res.userId);
+        }
+        else {
+          console.log("is2FAactived not activated")
+          window.location.href = "/home";
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
       }
     }
-    )
-    if (response.status == 200) {
+
+    fetchAndSetIs2FAactiv();
+  }, []);
+
+  async function check2FACookie() {
+    console.log("check2FACookie")
+    const res = await axios.get('http://localhost:3000/auth/check-2FA', {
+      withCredentials: true,
+    });
+    // console.log("response : ", res)
+    if (res.status == 200) {
+      return res.data;
+    } else {
+      throw new Error('Failed to fetch user profile');
+    }
+  }
+
+  async function send2FA() {
+    const code2FAElement = document.getElementById('2faCode') as HTMLInputElement | null;
+    if(!code2FAElement)
+      return;
+    const body = {
+      code: code2FAElement.value,
+      userId: userId
+    }
+    // console.log("body : ", body)
+    const response = await axios.post('http://localhost:3000/auth/login2fa', body, {
+      withCredentials: true
+    });
+
+    // console.log("response : ", response)
+    if (response.status === 200) {
+      window.location.href = "/home";
+    }
+    else {
+      // wrong code
       console.log(response.data)
     }
   }
 
+
+
+
   return (
-    <div className=" h-screen w-auto flex items-center justify-center bg-[#1e1e4e]">
+    <div className=" h-screen w-screen bg-[#1e1e4e]">
+      <Navbar />
+      <SideBar />
 
-      <span className="hello">
-        <div className="m-6 text-center font-bold ">
-          <p className="text-[#f84aab] font-Dance text-6xl drop-shadow-2xl " >Welcome to</p>
-          <p className="text-[#09d9f0] font-Bungee text-8xl">PONG</p>
-        </div>
-
-        <div className="m-6 text-center text-white font-mono border-double border-4 rounded-xl border-[#f4fa22]" >
-          <button onClick={getUser}>Test get user</button>
-        </div>
-
-        {accessToken ? (
-          <p>Token d'accès: {accessToken}</p>
-        ) : (
-          <p>Utilisateur non authentifié</p>
-        )}
-
-      </span>
+      <div className=" w-3/4 h-2/3 items-center justify-center flex">
+        {is2FAactiv? (
+          <section>
+            <p>2FA authentification</p>
+            <input type="text" id="2faCode" name="2faCode" placeholder="Code"/>
+            <button onClick={send2FA}>Send</button>
+          </section>
+        ) : ""}
+      </div>
 
     </div>
 

@@ -46,22 +46,53 @@ export class AuthController {
   async logInOAuth(
     @Query('code') code: string,
     @Res() res: Response,
-  ): Promise<AuthInterface> {
+  ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
-    res.redirect(
-      `http://localhost:3006/connection?accessToken=${result.accessToken}`,
-    );
-    return result;
+    res.cookie('jwt', result.accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      sameSite: 'strict',
+    });
+    res.redirect(`http://localhost:3006/connection`);
   }
 
-  @Post('login2fa')
   @Public()
-  async logInOAuth2FA(@Body() body: AuthDTO): Promise<AuthInterface> {
+  @Post('login2fa')
+  async loginOAuth2FA(
+    @Body() body: AuthDTO,
+    @Res() res: Response,
+  ): Promise<void> {
+    console.log('body : ', body);
     const result: AuthInterface = await this.authService.loginOAuth2FA(
       body.code,
       body.userId,
     );
-    return result;
+    res.cookie('jwt', result.accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      sameSite: 'strict',
+    });
+    res.status(200).send();
+  }
+
+  @Public()
+  @Get('check-2FA')
+  async checkJwtCookie(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ): Promise<void> {
+    const jwtCookieName = 'jwt'; // Remplacez 'jwt' par le nom de votre cookie JWT
+    const jwtCookie = req.cookies[jwtCookieName];
+    console.error('jwt cookie : ', jwtCookie);
+    const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
+    if (isNeed2FA) {
+      res.status(200).send({
+        is2FAactived: true,
+        userId: jwtCookie.split(':')[1],
+      });
+    } else {
+      res.status(200).send({ is2FAactived: false });
+    }
   }
 
   /* ************************************************ */

@@ -58,6 +58,16 @@ export class UsersController {
     return result;
   }
 
+  @Get(':userId/profileById')
+  async findProfileById(
+    @Param('userId') params: bigint,
+  ): Promise<ProfilInterface> {
+    const result: ProfilInterface = await this.usersService.findProfileById(
+      params,
+    );
+    return result;
+  }
+
   /* probably useless but I keep it for now */
   @Post('sign-in')
   @Public()

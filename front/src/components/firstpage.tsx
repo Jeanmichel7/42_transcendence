@@ -16,7 +16,6 @@ function Firstpage() {
   //   }
   // }
 
-
   return (
     <div className=" h-screen w-auto flex items-center justify-center bg-[#1e1e4e]">
 
@@ -38,4 +37,3 @@ function Firstpage() {
 }
 
 export default Firstpage
-

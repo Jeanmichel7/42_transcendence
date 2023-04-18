@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class AuthDTO {
   @IsNotEmpty()
@@ -7,6 +7,5 @@ export class AuthDTO {
   readonly code: string;
 
   @IsNotEmpty()
-  @IsString()
   readonly userId: bigint;
 }

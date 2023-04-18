@@ -45,19 +45,18 @@ import path, { join } from 'path';
     ChatModule,
   ],
 })
-
-// export class AppModule {}
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(
-        cors({
-          origin: 'http://localhost:3006',
-          methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-          allowedHeaders: 'Content-Type, Accept, Authorization',
-          credentials: true,
-        }),
-      )
-      .forRoutes('*');
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(
+//         cors({
+//           origin: 'http://localhost:3006',
+//           methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+//           allowedHeaders: 'Content-Type, Accept',
+//           credentials: true,
+//         }),
+//       )
+//       .forRoutes('*');
+//   }
+// }

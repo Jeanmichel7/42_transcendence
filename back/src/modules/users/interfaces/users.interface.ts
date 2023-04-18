@@ -1,4 +1,3 @@
-import { ChatRoomEntity } from 'src/config';
 import { ChatMsgInterface } from 'src/modules/chat/interfaces/chat.message.interface';
 import { ChatRoomInterface } from 'src/modules/chat/interfaces/chat.room.interface';
 import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';

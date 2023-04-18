@@ -73,6 +73,26 @@ export class UsersService {
     return result;
   }
 
+  async findProfileById(userId: bigint): Promise<ProfilInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
+        'email',
+        'description',
+        'avatar',
+        'status',
+      ],
+    });
+    console.error('user : ', user);
+    if (!user) throw new NotFoundException(`User ${userId} not found`);
+    const result: ProfilInterface = { ...user };
+    return result;
+  }
+
   async findAll(): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
