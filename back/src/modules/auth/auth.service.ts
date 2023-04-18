@@ -79,7 +79,7 @@ export class AuthService {
     }
 
     const res: AuthInterface = {
-      accessToken: 'need 2FA',
+      accessToken: 'need2FA',
       user: user,
     };
     if (user.is2FAEnabled) return res;
