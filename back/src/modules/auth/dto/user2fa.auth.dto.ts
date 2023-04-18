@@ -7,6 +7,5 @@ export class AuthDTO {
   readonly code: string;
 
   @IsNotEmpty()
-  @IsString()
   readonly userId: bigint;
 }

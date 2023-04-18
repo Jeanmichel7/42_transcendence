@@ -7,67 +7,70 @@ import { Link } from 'react-router-dom';
 
 function ConnectPage() {
 
-  // async function fetchUserProfile() {
-  //   const response = await fetch('http://localhost:3000/users/1/profile', {
-  //     credentials: 'include', // S'assurer que les cookies sont inclus dans la requête
-  //   });
-  
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     return data;
-  //   } else {
-  //     throw new Error('Failed to fetch user profile');
-  //   }
-  // }
+  const [is2FAactiv, setIs2FAactiv] = useState(false);
+  const [userId, setUserId] = useState(0);
 
-  
-  // const [userProfile, setUserProfile] = useState(null);
+  useEffect(() => {
+    async function fetchAndSetIs2FAactiv() {
+      try {
+        const res = await check2FACookie();
+        if(res.is2FAactived) {
+          console.log("is2FAactived")
+          setIs2FAactiv(res.is2FAactived);
+          setUserId(res.userId);
+        }
+        else {
+          console.log("is2FAactived not activated")
+          window.location.href = "/home";
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    }
 
-  // useEffect(() => {
-  //   async function fetchAndSetUserProfile() {
-  //     try {
-  //       const userProfileData = await fetchUserProfile();
-  //       setUserProfile(userProfileData);
-  //     } catch (error) {
-  //       console.error('Error fetching user profile:', error);
-  //     }
-  //   }
+    fetchAndSetIs2FAactiv();
+  }, []);
 
-  //   fetchAndSetUserProfile();
-  // }, []);
-
-  let is2FAactiv = false;
-  const token = document.cookie.split(";").map(e=> [e.split('=')[0], e.split('=')[1]]).filter(e=> e[0] === ' jwt')[0][1]
-  if (token === "need2FA" ) {
-    is2FAactiv = true;
-  } 
-  else {
-    localStorage.setItem("accessToken", token)
-    window.location.href = "/home";
+  async function check2FACookie() {
+    console.log("check2FACookie")
+    const res = await axios.get('http://localhost:3000/auth/check-2FA', {
+      withCredentials: true,
+    });
+    // console.log("response : ", res)
+    if (res.status == 200) {
+      return res.data;
+    } else {
+      throw new Error('Failed to fetch user profile');
+    }
   }
-  console.log("token : ", token)
-
-
 
   async function send2FA() {
-    const code2FA = document.getElementById('2fapassword').value;
-    console.log("code2FA : ", code2FA)
-    const response = await axios.post('http://localhost:3000/auth/login2fa', {
-      code: code2FA,
-      userId: 1
+    const code2FAElement = document.getElementById('2faCode') as HTMLInputElement | null;
+    if(!code2FAElement)
+      return;
+    const body = {
+      code: code2FAElement.value,
+      userId: userId
+    }
+    // console.log("body : ", body)
+    const response = await axios.post('http://localhost:3000/auth/login2fa', body, {
+      withCredentials: true
     });
-    if (response.status == 200) {
-      localStorage.setItem("accessToken", response.data.accessToken)
+
+    // console.log("response : ", response)
+    if (response.status === 200) {
       window.location.href = "/home";
     }
     else {
+      // wrong code
       console.log(response.data)
     }
   }
 
 
-  return (
 
+
+  return (
     <div className=" h-screen w-screen bg-[#1e1e4e]">
       <Navbar />
       <SideBar />
@@ -76,14 +79,10 @@ function ConnectPage() {
         {is2FAactiv? (
           <section>
             <p>2FA authentification</p>
-            <input type="text" id="2fapassword" name="2fapassword" placeholder="Code"/>
+            <input type="text" id="2faCode" name="2faCode" placeholder="Code"/>
             <button onClick={send2FA}>Send</button>
           </section>
-        ) : (
-          <section>
-            <p> Felicitiation tu es connectes !</p>
-          </section>
-        )}
+        ) : ""}
       </div>
 
     </div>

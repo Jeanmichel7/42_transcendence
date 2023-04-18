@@ -5,22 +5,18 @@ import SideBar from './sidebar'
 import axios from 'axios';
 
 function Home() {
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   async function fetchUserProfile() {
     const userId = 1
     const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`
-      }
+      withCredentials: true,
     });
-
-    if (response) {
-      return response.data
-    }
+    if (response.status === 200)
+      return response.data;
+    else
+      throw new Error('Failed to fetch user profile');
   }
-
-
-  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     async function fetchAndSetUserProfile() {
@@ -31,12 +27,9 @@ function Home() {
         console.error('Error fetching user profile:', error);
       }
     }
-
     fetchAndSetUserProfile();
   }, []);
 
-  const token = document.cookie.split(";").map(e=> [e.split('=')[0], e.split('=')[1]]).filter(e=> e[0] === ' jwt')[0][1]
-  console.log("token : ", token)
 
   return (
 
@@ -46,7 +39,7 @@ function Home() {
 
       <span className=" w-3/4 h-2/3 items-center justify-center flex">
         <div className="  " >
-          <p> user data : 
+          <p> user data : </p>
             {userProfile? 
             <ul>
               <li> { userProfile.login }  </li> 
@@ -54,7 +47,6 @@ function Home() {
               <li> { userProfile.firstName } </li> 
             </ul>
             : "aie probleme"}
-          </p>
           <img src='/pong.png' width='500px' />
         </div>
         <div className="" >
