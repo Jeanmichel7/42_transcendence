@@ -30,7 +30,6 @@ function Home() {
     fetchAndSetUserProfile();
   }, []);
 
-
   return (
 
     <div className=" h-screen w-screen bg-[#1e1e4e]">
@@ -53,9 +52,7 @@ function Home() {
           <Link to="/Game" className="play-button">CLICK TO PLAY !</Link>
         </div>
       </span>
-
     </div>
-
   )
 }
 export default Home
