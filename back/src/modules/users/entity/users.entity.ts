@@ -2,17 +2,17 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
-  JoinTable,
   ManyToMany,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
-import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
-import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
-import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
+
+import {
+  MessageEntity,
+  UserRelationEntity,
+  ChatMessageEntity,
+  ChatRoomEntity,
+} from 'config/index';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {

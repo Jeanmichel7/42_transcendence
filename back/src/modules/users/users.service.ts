@@ -15,7 +15,7 @@ import {
   mkdirSync,
 } from 'fs';
 
-import { UserEntity } from 'src/modules/users/entity/users.entity';
+import { UserEntity } from './entity/users.entity';
 import { UserCreateDTO } from './dto/user.create.dto';
 import { UserInterface } from './interfaces/users.interface';
 import { ProfilInterface } from './interfaces/profil.interface';
@@ -101,6 +101,7 @@ export class UsersService {
         'description',
         'avatar',
         'role',
+        'status',
         'is2FAEnabled',
       ],
     });
