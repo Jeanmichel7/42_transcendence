@@ -8,7 +8,7 @@ function Home() {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   async function fetchUserProfile() {
-    const userId = 1
+    const userId = 4 
     const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
       withCredentials: true,
     });
