@@ -6,6 +6,7 @@ import Friends from './components/friends';
 import Game from './components/game';
 import Home from './components/home';
 import ConnectPage from './components/connectPage';
+import Test from './components/test'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
        <Route path='/friends' element={<Friends />}> </Route> 
        <Route path='/game' element={<Game />}> </Route> 
        <Route path='/connection' element={<ConnectPage />}> </Route> 
+       <Route path='/test' element={<Test />}> </Route> 
 
       </Routes>
     </div>
