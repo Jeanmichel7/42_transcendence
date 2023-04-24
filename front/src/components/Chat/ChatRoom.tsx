@@ -3,7 +3,8 @@ import { useState, useRef, useEffect } from 'react'
 import { BiPaperPlane } from "react-icons/bi";
 import BarAdmin from './barAdmin';
 
-const NewRoom = ({Name}:{Name:string}) => {
+
+export function NewRoom ({Name}:{Name:string}) {
 
   const [open, setOpen] = useState(false);
   const inputRef:any = useRef();
@@ -16,12 +17,10 @@ const NewRoom = ({Name}:{Name:string}) => {
 }
 
   useEffect(() => {
-
     const ClickOutside = (event:any) => {
       if (!ref.current.contains(event.target))
         setOpen(false);
     };
-    
     document.addEventListener('mousedown', ClickOutside);
     return () => {document.removeEventListener('mousedown', ClickOutside)}
   }, [ref]);
@@ -64,5 +63,4 @@ function ChatRoom() {
     </div>
   )
 }
-
 export default ChatRoom;

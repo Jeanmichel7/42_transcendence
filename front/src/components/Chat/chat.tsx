@@ -9,7 +9,7 @@ import axios from 'axios'
 
 function Chat() {
 
-  const [userData, getUserData] = useState<any>();
+  let [userData, setUserData] = useState<any>();
 
   async function getData () {
     const response = await axios.get('http://localhost:3000/users/all', {
@@ -18,31 +18,31 @@ function Chat() {
     return response.data;
   }
 
-  async function fetchData() {
+ async function fetchData() {
     let userProfileData = await getData();
-    getUserData(userProfileData);
-
-    console.log(userData);
+    setUserData(userProfileData);
   }
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  if (!userData || userData.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  // console.log(userData && userData[0] && userData[0].login);
+
   return (
      <div className=" h-screen w-screen bg-[#1e1e4e] ">
         <Navbar />
         <SideBar />
 
-
         <div className=" h-5/6 w-11/12 items-center justify-center flex" >
             <div className='relative h-5/6 w-11/12  border rounded-xl shadow-lg bg-white items-center '>
-              
-              <ButtonNewChannel />
-              <ButtonUser />
+              <ButtonNewChannel userData={userData}/>
+              <ButtonUser userData={userData} />
               <ChatRoom />
-
-              {/* <PopUpKick visible={} /> */}
             </div> 
 
         </div>

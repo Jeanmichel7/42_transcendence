@@ -2,42 +2,30 @@ import axios from 'axios';
 import {useState, useRef, useEffect} from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
-function ButtonNewChannel() {
+function ButtonUser({login}: {login:any}) {
+
+  return (
+    <button className=" m-2 p-2 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer " >{login}</button> 
+  )
+}
+
+function ButtonNewChannel({userData} : {userData:any}) {
+
     const [open, setOpen] = useState(false);
     let ref = useRef(document.createElement("div"))
     
     useEffect(() => {
-
       const ClickOutside = (event:any) => {
        if (!ref.current.contains(event.target))
         setOpen(false);
       }
       document.addEventListener('mousedown', ClickOutside)
       return () => {document.removeEventListener('mousedown', ClickOutside)};
-
     }, [ref]);
 
-
-
-    const createRoom = async (userId: number) => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:3000/chat/createRoom/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error while creating room:', error);
-      }
-    };
-  
-    const handleCreateClick = () => {
-      // Remplacez 'selectedUserId' par la valeur réelle de l'utilisateur sélectionné
-      const selectedUserId = 1;
-      createRoom(selectedUserId);
-    };
+    const addUserList = userData.map((user: any) => (
+      <ButtonUser key={user.id} login={user.login} />
+    ));
 
     return (
           <div >
@@ -48,11 +36,9 @@ function ButtonNewChannel() {
   
               <div ref={ref} className= {`absolute z-50 left-1/4 top-0 mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl bg-white ${ open ? "" : "hidden"} transition-all`}  >
                 
-                <div className="bg-white border rounded shadow-sm">
-                  <h1 className=" m-2 font-bold ">Select user:</h1>
-                  <ul className=" m-2 p-2 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer " >User 1</ul>
-                  <ul className=" m-2 p-2 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer " >User 2</ul>
-                  <ul className=" m-2 p-2 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer " >User 3</ul>
+                <h1 className=" m-2 font-bold ">Select user:</h1>
+                <div className="bg-white flex flex-col overflow-auto h-44 border rounded shadow-sm">
+                  {addUserList}
                 </div>
 
                 <div className=" bg-white border rounded mt-2 shadow-sm ">
@@ -65,9 +51,9 @@ function ButtonNewChannel() {
                   <input className="border rounded text-center m-1 shadow-sm " type="text" />
                 </div>
 
-                <div className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={handleCreateClick}>
+                <button className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" >
                   <p> Create </p>
-                </div>
+                </button>
               </div>
   
             </div>

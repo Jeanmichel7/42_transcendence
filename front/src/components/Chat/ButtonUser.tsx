@@ -1,23 +1,51 @@
 import {useState, useRef, useEffect} from 'react'
 import { ImPencil, ImBlocked } from "react-icons/im";
+import { NewRoom } from './ChatRoom';
 
-function ButtonUser() {
+function AddUser ({login}:{login: any}) {
+
+  return (
+
+    <div className="m-2 p-2 border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left" >
+              <div className=" pl-1 basis-8/12 " >
+                {login}
+              </div>
+              <button onClick={() => NewRoom({ Name: " Hello" })}  className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all" >
+                <ImPencil className="m-1" />
+                <div className="absolute group-hover:block text-center w-44 text-xs bg-slate-800 text-white shadow-sm hidden -left-44 font-mono p-3 rounded-md transition-all">
+                  Send direct message to user.
+                </div>
+              </button>
+
+              <div className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all" >
+                <ImBlocked className="m-1" />
+                <div className="absolute group-hover:block text-center w-40 text-xs bg-slate-800 text-white shadow-sm hidden -left-40 font-mono p-3 rounded-md transition-all">
+                  Block user
+                </div>
+              </div>
+          </div>
+
+  )
+}
+
+function ButtonUser({userData}: {userData: any}) {
 
   const [open, setOpen] = useState(false);
   const [print, setPrint] = useState(false);
-
   let ref = useRef(document.createElement('div'));
 
   useEffect( () => {
-
     const ClickOutside = (event:any) => {
       if (!ref.current.contains(event.target))
         setOpen(false);
     };
     document.addEventListener('mousedown', ClickOutside);
     return () => { document.removeEventListener('mousedown', ClickOutside)};
-
   }, [ref])
+
+  const addUserList = userData.map((user: any) => (
+    <AddUser key={user.id} login={user.login} />
+  ));
 
   return (
     <div>
@@ -25,44 +53,8 @@ function ButtonUser() {
             User 
         </div> 
 
-        <div ref={ref} className= {`absolute left-1/4 top-16 z-40 bg-white mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl ${ open ? "" : " hidden"} transition-all`}  >
-
-          <div className="m-2 p-2 border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left" >
-              <div className=" pl-1 basis-8/12 " >
-                User 1
-              </div>
-              <div className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all" >
-                <ImPencil className="m-1" />
-                <div className="absolute group-hover:block text-center w-80 text-sm bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-                  Send direct message to user.
-                </div>
-              </div>
-              <div className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all" >
-                <ImBlocked className="m-1" />
-                <div className="absolute group-hover:block text-center w-40 text-sm bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-                  Block user
-                </div>
-              </div>
-          </div>
-
-          <div className="m-2 p-2 border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left" >
-              <div className=" pl-1 basis-8/12 " >
-                User 2
-              </div>
-              <div className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all" >
-                <ImPencil className="m-1" />
-                <div className="absolute group-hover:block text-center w-80 bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-                  Send direct message to user.
-                </div>
-              </div>
-              <div className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all" >
-                <ImBlocked className="m-1" />
-                <div className="absolute group-hover:block text-center w-40 bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-                  Block user
-                </div>
-              </div>
-          </div>
-
+        <div ref={ref} className= {`absolute overflow-auto h-1/4 w-5/12 left-1/4 top-16 z-40 bg-white mt-5 m-10 p-2 border shadow-lg text-center rounded-xl ${ open ? "" : " hidden"} transition-all`}  >
+          {addUserList}
         </div>
 
     </div>
