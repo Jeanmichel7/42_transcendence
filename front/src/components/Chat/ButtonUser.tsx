@@ -2,7 +2,7 @@ import {useState, useRef, useEffect} from 'react'
 import { ImPencil, ImBlocked } from "react-icons/im";
 import { NewRoom } from './ChatRoom';
 
-function AddUser ({login}:{login: any}) {
+function AddUser ({id, login}:{id: any, login: any}) {
 
   return (
 
@@ -44,8 +44,9 @@ function ButtonUser({userData}: {userData: any}) {
   }, [ref])
 
   const addUserList = userData.map((user: any) => (
-    <AddUser key={user.id} login={user.login} />
-  ));
+    <AddUser key={user.id} id={user.id} login={user.login} />
+));
+
 
   return (
     <div>

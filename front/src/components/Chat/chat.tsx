@@ -28,10 +28,8 @@ function Chat() {
   }, []);
 
   if (!userData || userData.length === 0) {
-    return <div>Loading...</div>;
+    return <div className=' h-screen flex items-center justify-center'>Loading...</div>;
   }
-
-  // console.log(userData && userData[0] && userData[0].login);
 
   return (
      <div className=" h-screen w-screen bg-[#1e1e4e] ">
