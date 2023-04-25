@@ -10,7 +10,9 @@ function AddUser ({id, login}:{id: any, login: any}) {
               <div className=" pl-1 basis-8/12 " >
                 {login}
               </div>
-              <button onClick={() => NewRoom({ Name: " Hello" })}  className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all" >
+
+              {/* Il faudrait ajouter la fonction " onClick={() =>joinRoom1({id})} " pour creation de socket entre userid et {id} */}
+              <button className="relative group basis-2/12 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all" >
                 <ImPencil className="m-1" />
                 <div className="absolute group-hover:block text-center w-44 text-xs bg-slate-800 text-white shadow-sm hidden -left-44 font-mono p-3 rounded-md transition-all">
                   Send direct message to user.

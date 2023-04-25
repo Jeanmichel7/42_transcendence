@@ -9,6 +9,8 @@ import axios from 'axios'
 
 function Chat() {
 
+// il faudrait certainement ajouter une map ici avec tous les differents chatroom pour ensuite les envoyer a 'ChatRoom' pour les afficher.
+
   let [userData, setUserData] = useState<any>();
 
   async function getData () {
