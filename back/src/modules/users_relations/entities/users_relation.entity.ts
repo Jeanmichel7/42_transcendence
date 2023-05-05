@@ -2,10 +2,10 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
-  ManyToMany,
+  // JoinColumn,
+  // ManyToMany,
   ManyToOne,
-  OneToMany,
+  // OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';

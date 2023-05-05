@@ -28,7 +28,13 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-  ) {}
+  ) {
+    const absentDuration = 15 * 60 * 1000; // 15min
+    setInterval(() => {
+      console.log('check user status');
+      this.checkUserStatus(absentDuration);
+    }, 60000);
+  }
 
   async findUser(id: bigint): Promise<UserInterface> {
     const user: UserEntity = await this.userRepository.findOne({
@@ -129,8 +135,13 @@ export class UsersService {
 
   async createOAuthUser(data: any): Promise<UserInterface> {
     let login: string = data.login;
-    do login = login + Math.floor(Math.random() * 1000);
-    while (!this.isLoginAvailable(login));
+    let isAvailable: boolean = await this.isLoginAvailable(login);
+    if (!isAvailable) {
+      do {
+        login = login + Math.floor(Math.random() * 1000);
+        isAvailable = await this.isLoginAvailable(login);
+      } while (!isAvailable);
+    }
 
     const newUser = new UserEntity();
     newUser.firstName = data.first_name;
@@ -162,10 +173,33 @@ export class UsersService {
     } else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;
     if (updateUser.lastName) updateData.lastName = updateUser.lastName;
-    if (updateUser.login) updateData.login = updateUser.login;
-    if (updateUser.email) updateData.email = updateUser.email;
+    if (updateUser.login) {
+      const isAvailable: boolean = await this.isLoginAvailable(
+        updateUser.login,
+      );
+      if (!isAvailable)
+        throw new BadRequestException(
+          `Login ${updateUser.login} not available`,
+        );
+      updateData.login = updateUser.login;
+    }
+    if (updateUser.email) {
+      const isAvailable: boolean = await this.isEmailAvailable(
+        updateUser.email,
+      );
+      if (!isAvailable)
+        throw new BadRequestException(
+          `Email ${updateUser.email} not available`,
+        );
+      updateData.email = updateUser.email;
+    }
     if (updateUser.description) updateData.description = updateUser.description;
     if (updateUser.password) {
+      const isMatch = await bcrypt.compare(
+        userToUpdate.password,
+        updateUser.oldPassword,
+      );
+      if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
         const hash: string = await bcrypt.hash(updateUser.password, 10);
         updateData.password = hash;
@@ -245,6 +279,15 @@ export class UsersService {
     return false;
   }
 
+  private async isEmailAvailable(email: string): Promise<boolean> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { email: email },
+      select: ['id'],
+    });
+    if (!user) return true;
+    return false;
+  }
+
   private async uploadAndSaveAvatar(url: string): Promise<string> {
     const avatarName: string =
       'avatar-' + Date.now() + '-' + Math.round(Math.random() * 1e6) + '.jpg';
@@ -299,13 +342,36 @@ export class UsersService {
     }
   }
 
+  async checkUserStatus(absentDuration: number): Promise<void> {
+    const users: UserEntity[] = await this.userRepository.find({
+      select: ['id', 'lastActivity', 'status'],
+    });
+    // console.log('users before: ', users);
+    for (const user of users) {
+      if (user.status === 'offline') continue;
+      const inactivityDuration =
+        Date.now() - new Date(user.lastActivity).getTime();
+      if (inactivityDuration > absentDuration) {
+        await this.userRepository.update(
+          { id: user.id },
+          {
+            status: 'absent',
+            updatedAt: new Date(),
+          },
+        );
+      }
+    }
+    // console.log('users after: ', users);
+  }
 
+  /* ************************************************ */
+  /*                                                  */
+  /*                       ADMIN                      */
+  /*                                                  */
+  /* ************************************************ */
 
-
-  
-  /*  ADMIN  */
   async findUserAllData(id: bigint): Promise<UserInterface> {
-    const user: UserInterface = await this.userRepository.findOne({
+    const user: UserEntity = await this.userRepository.findOne({
       where: { id: id },
       relations: [
         'chatMessages',
