@@ -9,7 +9,6 @@ import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { UserRelationEntity } from './entities/users_relation.entity';
 import { UserEntity } from '../users/entity/users.entity';
-import { AuthModule } from '../auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({

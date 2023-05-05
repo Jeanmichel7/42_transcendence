@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromCookie(request);
     // console.log('token : ', token);
     if (!token) {
-      throw new UnauthorizedException("You're not logged in", "No token found");
+      throw new UnauthorizedException("You're not logged in", 'No token found');
     }
     try {
       const jwtSecret = this.configService.get<string>('JWT_SECRET');

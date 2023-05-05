@@ -31,8 +31,7 @@ export class AuthService {
     private jwtService: JwtService,
     private cryptoService: CryptoService,
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    // private readonly httpService: HttpService
+    private readonly userRepository: Repository<UserEntity> /* private readonly httpService: HttpService */,
   ) {
     // console.log('JWT_SECRET:', configService.get<string>('JWT_SECRET'));
   }
@@ -71,7 +70,8 @@ export class AuthService {
         updatedAt: new Date(),
       },
     );
-    if(resultUpdate.affected === 0) throw new BadRequestException(`User ${userId} has not been updated.`);
+    if (resultUpdate.affected === 0)
+      throw new BadRequestException(`User ${userId} has not been updated.`);
   }
 
   async logInOAuth(code: string): Promise<AuthInterface> {
@@ -229,7 +229,7 @@ export class AuthService {
   private async OAuthGetToken(code: string): Promise<string> {
     const clientId =
       'u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171';
-    const clientSecret =this. configService.get<string>('OAUTH_INTRA');
+    const clientSecret = this.configService.get<string>('OAUTH_INTRA');
     try {
       const tokenResponse = await axios.post(
         'https://api.intra.42.fr/oauth/token',
@@ -241,13 +241,13 @@ export class AuthService {
           redirect_uri: 'http://localhost:3000/auth/loginOAuth',
         },
       );
-      if(tokenResponse.status != 200) {
-          throw new HttpException("Invalid code", tokenResponse.status);
+      if (tokenResponse.status != 200) {
+        throw new HttpException('Invalid code', tokenResponse.status);
       }
       return tokenResponse.data.access_token;
     } catch (error) {
       throw new UnauthorizedException(
-        "Intra OAuth: " + error.response.data.message,
+        'Intra OAuth: ' + error.response.data.message,
         error.status,
       );
     }

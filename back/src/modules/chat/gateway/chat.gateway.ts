@@ -1,4 +1,4 @@
-import { Param, Query } from '@nestjs/common';
+// import { Param, Query } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,7 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
+// import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
 import { ChatMsgInterface } from '../interfaces/chat.message.interface';
 
 @WebSocketGateway({

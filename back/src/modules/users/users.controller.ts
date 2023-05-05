@@ -5,13 +5,13 @@ import {
   Body,
   Param,
   Patch,
-  Put,
+  // Put,
   Delete,
   HttpStatus,
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  UseGuards,
+  // UseGuards,
   UseInterceptors,
   UploadedFile,
   Req,
@@ -22,11 +22,10 @@ import { UserInterface } from './interfaces/users.interface';
 import { UserCreateDTO } from './dto/user.create.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
-// import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilInterface } from './interfaces/profil.interface';
 import { RequestWithUser } from './interfaces/request.user.interface';
-import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 import { UserPatchDTO } from './dto/user.patch.dto';
 
 @Controller('users')

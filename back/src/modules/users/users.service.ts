@@ -31,7 +31,7 @@ export class UsersService {
   ) {
     const absentDuration = 15 * 60 * 1000; // 15min
     setInterval(() => {
-      console.log("check user status");
+      console.log('check user status');
       this.checkUserStatus(absentDuration);
     }, 60000);
   }
@@ -136,12 +136,11 @@ export class UsersService {
   async createOAuthUser(data: any): Promise<UserInterface> {
     let login: string = data.login;
     let isAvailable: boolean = await this.isLoginAvailable(login);
-    if(!isAvailable) {
+    if (!isAvailable) {
       do {
         login = login + Math.floor(Math.random() * 1000);
         isAvailable = await this.isLoginAvailable(login);
-      }
-      while (!isAvailable);
+      } while (!isAvailable);
     }
 
     const newUser = new UserEntity();
@@ -175,20 +174,31 @@ export class UsersService {
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;
     if (updateUser.lastName) updateData.lastName = updateUser.lastName;
     if (updateUser.login) {
-      const isAvailable: boolean = await this.isLoginAvailable(updateUser.login);
+      const isAvailable: boolean = await this.isLoginAvailable(
+        updateUser.login,
+      );
       if (!isAvailable)
-        throw new BadRequestException(`Login ${updateUser.login} not available`);
+        throw new BadRequestException(
+          `Login ${updateUser.login} not available`,
+        );
       updateData.login = updateUser.login;
     }
     if (updateUser.email) {
-      const isAvailable: boolean = await this.isEmailAvailable(updateUser.email);
+      const isAvailable: boolean = await this.isEmailAvailable(
+        updateUser.email,
+      );
       if (!isAvailable)
-        throw new BadRequestException(`Email ${updateUser.email} not available`);
+        throw new BadRequestException(
+          `Email ${updateUser.email} not available`,
+        );
       updateData.email = updateUser.email;
     }
     if (updateUser.description) updateData.description = updateUser.description;
     if (updateUser.password) {
-      const isMatch = await bcrypt.compare(userToUpdate.password, updateUser.oldPassword);
+      const isMatch = await bcrypt.compare(
+        userToUpdate.password,
+        updateUser.oldPassword,
+      );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
         const hash: string = await bcrypt.hash(updateUser.password, 10);
@@ -278,7 +288,6 @@ export class UsersService {
     return false;
   }
 
-
   private async uploadAndSaveAvatar(url: string): Promise<string> {
     const avatarName: string =
       'avatar-' + Date.now() + '-' + Math.round(Math.random() * 1e6) + '.jpg';
@@ -340,7 +349,8 @@ export class UsersService {
     // console.log('users before: ', users);
     for (const user of users) {
       if (user.status === 'offline') continue;
-      const inactivityDuration = Date.now() - new Date(user.lastActivity).getTime();
+      const inactivityDuration =
+        Date.now() - new Date(user.lastActivity).getTime();
       if (inactivityDuration > absentDuration) {
         await this.userRepository.update(
           { id: user.id },
@@ -353,11 +363,6 @@ export class UsersService {
     }
     // console.log('users after: ', users);
   }
-
-
-
-
-
 
   /* ************************************************ */
   /*                                                  */
