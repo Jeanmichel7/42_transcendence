@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -20,12 +21,12 @@ import { Repository, UpdateResult } from 'typeorm';
 import { authenticator } from 'otplib';
 import { AuthInterface } from './interfaces/auth.interface';
 import { CryptoService } from '../crypto/crypto.service';
-// import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly configService: ConfigService,
+    private readonly configService: ConfigService,
     private usersService: UsersService,
     private jwtService: JwtService,
     private cryptoService: CryptoService,
@@ -79,12 +80,10 @@ export class AuthService {
   }
 
   async loginOAuth2FA(code: string, userId: bigint) {
-    // console.log('userId', userId, typeof userId);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'firstName', 'lastName', 'login', 'secret2FA', 'role'],
     });
-    // console.log('user : ', user);
     if (!user) throw new NotFoundException(`User ${userId} not found`);
 
     let decryptedSecret = crypto
@@ -190,9 +189,7 @@ export class AuthService {
   private async OAuthGetToken(code: string): Promise<string> {
     const clientId =
       'u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171';
-    const clientSecret =
-      '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';
-
+    const clientSecret =this. configService.get<string>('OAUTH_INTRA');
     try {
       const tokenResponse = await axios.post(
         'https://api.intra.42.fr/oauth/token',
@@ -204,14 +201,13 @@ export class AuthService {
           redirect_uri: 'http://localhost:3000/auth/loginOAuth',
         },
       );
-      // console.log("tokenResponse : ", tokenResponse)
-      // if(tokenResponse.status != 200) {
-      //     throw new HttpException("Invalid code", tokenResponse.status);
-      // }
+      if(tokenResponse.status != 200) {
+          throw new HttpException("Invalid code", tokenResponse.status);
+      }
       return tokenResponse.data.access_token;
     } catch (error) {
       throw new UnauthorizedException(
-        error.response.data.message,
+        "Intra OAuth: " + error.response.data.message,
         error.status,
       );
     }
@@ -251,7 +247,7 @@ export class AuthService {
   private async createJWT(user: UserInterface): Promise<string> {
     const payload = { id: user.id, login: user.login, role: user.role };
     const token = await this.jwtService.signAsync(payload);
-    console.error('createJWT : ', user, token);
+    // console.error('createJWT : ', user, token);
     return token;
   }
 

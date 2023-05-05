@@ -28,10 +28,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     AuthService,
     AuthAdmin,
     CryptoService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
   ],
   controllers: [AuthController],
 })
