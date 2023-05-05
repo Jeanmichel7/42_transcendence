@@ -131,7 +131,7 @@ export class AuthController {
   }
 
   @Put(':userId/desactive2fa')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminDesactive2fa(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface> {

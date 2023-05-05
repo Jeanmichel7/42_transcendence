@@ -115,7 +115,7 @@ export class UsersController {
   /* ************************************************ */
 
   @Get('all')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async findAll(): Promise<UserInterface[]> {
     const result: UserInterface[] = await this.usersService.findAll();
     return result;

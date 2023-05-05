@@ -300,7 +300,7 @@ export class ChatController {
   }
 
   @UseGuards(AuthAdmin)
-  @Get('rooms/:roomId/messages/all')
+  // @Get('rooms/:roomId/messages/all')
   async getAllMessages(
     @Param('roomId') roomId: bigint,
   ): Promise<ChatRoomInterface> {

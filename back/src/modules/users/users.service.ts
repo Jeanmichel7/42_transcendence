@@ -299,6 +299,10 @@ export class UsersService {
     }
   }
 
+
+
+
+  
   /*  ADMIN  */
   async findUserAllData(id: bigint): Promise<UserInterface> {
     const user: UserInterface = await this.userRepository.findOne({

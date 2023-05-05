@@ -129,7 +129,7 @@ export class UsersRelationsController {
   }
 
   @Put(':userId/block-user/:userBlockedId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminBlockFriend(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('userBlockedId', ParseIntPipe) friendId: bigint,

@@ -117,7 +117,7 @@ export class MessageController {
   }
 
   @Get('/between/:userId/and/:userIdTo')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminGetMessages(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('userIdTo', ParseIntPipe) userIdTo: bigint,
