@@ -47,6 +47,8 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
+    console.log("token : ", result.accessToken)
+
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
@@ -61,11 +63,12 @@ export class AuthController {
     @Body() body: AuthDTO,
     @Res() res: Response,
   ): Promise<void> {
-    console.log('body : ', body);
+    // console.log('body : ', body);
     const result: AuthInterface = await this.authService.loginOAuth2FA(
       body.code,
       body.userId,
     );
+    console.log("token : ", result.accessToken)
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
