@@ -79,7 +79,7 @@ export class UserEntity extends BaseEntity {
     default: 'offline',
     nullable: true,
   })
-  status: string;
+  status: 'online' | 'offline' | 'absent';
 
   @Column({
     type: 'text',
@@ -100,6 +100,13 @@ export class UserEntity extends BaseEntity {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @Column({
+    nullable: true,
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  lastActivity: Date;
 
   // messagerie
   @OneToMany(() => MessageEntity, (message) => message.ownerUser, {

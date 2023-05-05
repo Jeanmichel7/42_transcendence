@@ -29,6 +29,7 @@ import { AuthAdmin } from './guard/authAdmin.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // supprimer plus tard
   @Post('login')
   @Public()
   @UsePipes(ValidationPipe)
@@ -48,13 +49,22 @@ export class AuthController {
   ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
     console.log("token : ", result.accessToken)
-
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
       sameSite: 'strict',
     });
     res.redirect(`http://localhost:3006/connection`);
+  }
+
+  @Get('logout')
+  async logOut( 
+    @Req() req: RequestWithUser,
+    @Res() res: Response
+  ): Promise< void > {
+    await this.authService.logout(req.user.id);
+    res.clearCookie('jwt');
+    res.status(200).send({ message: 'Déconnexion réussie'});
   }
 
   @Public()
@@ -74,7 +84,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
       sameSite: 'strict',
     });
-    res.status(200).send();
+    res.status(200).send({ message: 'Connexion réussie'});
   }
 
   @Public()

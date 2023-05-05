@@ -11,6 +11,9 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/modules/auth/decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from 'config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,6 +21,8 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private readonly configService: ConfigService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,7 +37,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromCookie(request);
     // console.log('token : ', token);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("You're not logged in", "No token found");
     }
     try {
       const jwtSecret = this.configService.get<string>('JWT_SECRET');
@@ -44,6 +49,15 @@ export class AuthGuard implements CanActivate {
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
+
+    // update last connection
+    const user: UserEntity = await this.userRepository.findOneBy({
+      id: request.user.id,
+    });
+    if (!user) throw new UnauthorizedException('User not found');
+    user.lastActivity = new Date();
+    await this.userRepository.save(user);
+
     return true;
   }
 

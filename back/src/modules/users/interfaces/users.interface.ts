@@ -8,7 +8,7 @@ export interface UserInterface {
   lastName: string;
   login: string;
   email?: string;
-  status?: string;
+  status?: 'online' | 'offline' | 'absent';
   password?: string;
   description?: string;
   avatar?: string;
@@ -17,6 +17,7 @@ export interface UserInterface {
   secret2FA?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  lastActivity?: Date;
   messagesSend?: MessageInterface[];
   messagesReceive?: MessageInterface[];
   friends?: UserInterface[];

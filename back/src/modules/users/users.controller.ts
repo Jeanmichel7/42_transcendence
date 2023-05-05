@@ -27,6 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilInterface } from './interfaces/profil.interface';
 import { RequestWithUser } from './interfaces/request.user.interface';
 import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+import { UserPatchDTO } from './dto/user.patch.dto';
 
 @Controller('users')
 export class UsersController {
@@ -82,7 +83,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   async patchUser(
     @Req() req: RequestWithUser,
-    @Body() body: UserCreateDTO,
+    @Body() body: UserPatchDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.patchUser(
@@ -136,7 +137,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   async adminPatchUser(
     @Param('userId', ParseIntPipe) id: bigint,
-    @Body() body: UserCreateDTO,
+    @Body() body: UserPatchDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.patchUser(
