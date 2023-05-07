@@ -51,7 +51,7 @@ export class AuthController {
     console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
     res.redirect(`http://localhost:3006/connection`);
@@ -73,7 +73,7 @@ export class AuthController {
     @Body() body: AuthDTO,
     @Res() res: Response,
   ): Promise<void> {
-    // console.log('body : ', body);
+    console.log('body : ', body);
     const result: AuthInterface = await this.authService.loginOAuth2FA(
       body.code,
       body.userId,
@@ -81,7 +81,7 @@ export class AuthController {
     console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
     res.status(200).send({ message: 'Connexion réussie' });
