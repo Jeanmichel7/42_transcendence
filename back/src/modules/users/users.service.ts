@@ -29,7 +29,7 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {
-    const absentDuration = 15 * 60 * 1000; // 15min
+    const absentDuration: number = 15 * 60 * 1000; // 15min
     setInterval(() => {
       // console.log('check user status');
       this.checkUserStatus(absentDuration);

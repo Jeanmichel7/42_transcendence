@@ -11,8 +11,7 @@ import Test from './components/test'
 function App() {
   return (
     <div>
-      <Routes> 
-{/* hiiiiiiiii	 */}
+      <Routes>
        <Route path='/' element={<Firstpage />}> </Route> 
        <Route path='/home' element={<Home />}> </Route> 
        <Route path='/chat' element={<Chat />}> </Route> 
@@ -20,7 +19,6 @@ function App() {
        <Route path='/game' element={<Game />}> </Route> 
        <Route path='/connection' element={<ConnectPage />}> </Route> 
        <Route path='/test' element={<Test />}> </Route> 
-
       </Routes>
     </div>
   )

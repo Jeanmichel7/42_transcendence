@@ -31,13 +31,12 @@ function Test() {
 
   const PrivateChat = () => {
     const [socketEvent1, setSocketEvent1] = useState(null);
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<string[]>([]);
     const [messageInput1, setMessageInput1] = useState('');
 
-    const token = 'YOUR_TOKEN_HERE';
-    const userIdDest = '2';
+    const userIdDest = 2;
 
-    const joinRoom1 = (userIdDest) => {
+    const joinRoom1 = (userIdDest: Number) => {
       const socketEvent1 = io(`http://localhost:3000/messagerie`, {
         reconnectionDelayMax: 10000,
         // auth: {
@@ -61,7 +60,7 @@ function Test() {
       });
     };
 
-    const sendMessage1 = (userIdDest) => {
+    const sendMessage1 = (userIdDest: Number) => {
       axios.post(
         'http://localhost:3000/messages/users/' + userIdDest + '/send',
         {
