@@ -74,7 +74,7 @@ function joinRoom1(userIdDest) {
 }
 
 const messageInput1 = document.getElementById("messageInput1");
-function sendMessage1() {
+function sendMessage1(userIdDest) {
   axios.post('http://localhost:3000/messages/users/' + userIdDest + '/send', {
     text: messageInput1.value,
   }, {

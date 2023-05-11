@@ -8,9 +8,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Request } from 'express';
 import { ChatRoomEntity, UserEntity } from 'config';
-import { IS_PUBLIC_KEY } from 'src/modules/auth/decorators/public.decorator';
+// import { IS_PUBLIC_KEY } from 'src/modules/auth/decorators/public.decorator';
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { Repository } from 'typeorm';
 import { ChatRoomInterface } from '../interfaces/chat.room.interface';

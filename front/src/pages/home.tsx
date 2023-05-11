@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from './navbar'
+import Navbar from '../components/navbar'
 import { Link } from 'react-router-dom'
-import SideBar from './sidebar'
+import SideBar from '../components/sidebar'
 import axios from 'axios';
 
 function Home() {

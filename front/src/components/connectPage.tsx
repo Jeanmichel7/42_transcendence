@@ -36,7 +36,7 @@ function ConnectPage() {
     const res = await axios.get('http://localhost:3000/auth/check-2FA', {
       withCredentials: true,
     });
-    // console.log("response : ", res)
+    console.log("response : ", res)
     if (res.status == 200) {
       return res.data;
     } else {
@@ -52,12 +52,12 @@ function ConnectPage() {
       code: code2FAElement.value,
       userId: userId
     }
-    // console.log("body : ", body)
+    console.log("body : ", body)
     const response = await axios.post('http://localhost:3000/auth/login2fa', body, {
       withCredentials: true
     });
 
-    // console.log("response : ", response)
+    console.log("response : ", response)
     if (response.status === 200) {
       window.location.href = "/home";
     }

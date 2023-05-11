@@ -4,7 +4,7 @@ export interface ProfilInterface {
   lastName: string;
   login: string;
   email: string;
-  status: string;
+  status: 'online' | 'offline' | 'absent';
   description?: string;
   avatar?: string;
   createdAt?: Date;

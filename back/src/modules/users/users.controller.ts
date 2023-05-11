@@ -5,13 +5,13 @@ import {
   Body,
   Param,
   Patch,
-  Put,
+  // Put,
   Delete,
   HttpStatus,
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  UseGuards,
+  // UseGuards,
   UseInterceptors,
   UploadedFile,
   Req,
@@ -22,11 +22,11 @@ import { UserInterface } from './interfaces/users.interface';
 import { UserCreateDTO } from './dto/user.create.dto';
 
 import { Public } from 'src/modules/auth/decorators/public.decorator';
-// import { AuthOwnerAdmin } from 'src/modules/auth/guard/authAdminOwner.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilInterface } from './interfaces/profil.interface';
 import { RequestWithUser } from './interfaces/request.user.interface';
-import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+import { UserPatchDTO } from './dto/user.patch.dto';
 
 @Controller('users')
 export class UsersController {
@@ -82,7 +82,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   async patchUser(
     @Req() req: RequestWithUser,
-    @Body() body: UserCreateDTO,
+    @Body() body: UserPatchDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.patchUser(
@@ -116,7 +116,7 @@ export class UsersController {
 
   /*
   @Get('all')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async findAll(): Promise<UserInterface[]> {
     const result: UserInterface[] = await this.usersService.findAll();
     return result;
@@ -137,7 +137,7 @@ export class UsersController {
   @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   async adminPatchUser(
     @Param('userId', ParseIntPipe) id: bigint,
-    @Body() body: UserCreateDTO,
+    @Body() body: UserPatchDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.patchUser(

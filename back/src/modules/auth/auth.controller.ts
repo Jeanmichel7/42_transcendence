@@ -9,7 +9,7 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  UseGuards,
+  // UseGuards,
   Req,
   Res,
 } from '@nestjs/common';
@@ -23,12 +23,13 @@ import { AuthInterface } from './interfaces/auth.interface';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { AuthDTO } from './dto/user2fa.auth.dto';
-import { AuthAdmin } from './guard/authAdmin.guard';
+// import { AuthAdmin } from './guard/authAdmin.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // supprimer plus tard
   @Post('login')
   @Public()
   @UsePipes(ValidationPipe)
@@ -47,12 +48,23 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
+    console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
     res.redirect(`http://localhost:3006/connection`);
+  }
+
+  @Get('logout')
+  async logOut(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.authService.logout(req.user.id);
+    res.clearCookie('jwt');
+    res.status(200).send({ message: 'Déconnexion réussie' });
   }
 
   @Public()
@@ -66,12 +78,13 @@ export class AuthController {
       body.code,
       body.userId,
     );
+    console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 2, //2 jours
+      maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
-    res.status(200).send();
+    res.status(200).send({ message: 'Connexion réussie' });
   }
 
   @Public()
@@ -128,7 +141,7 @@ export class AuthController {
   }
 
   @Put(':userId/desactive2fa')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminDesactive2fa(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface> {

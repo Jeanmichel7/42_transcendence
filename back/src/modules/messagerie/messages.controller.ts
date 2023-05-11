@@ -5,29 +5,26 @@ import {
   Body,
   Param,
   Patch,
-  Put,
+  // Put,
   Delete,
   HttpStatus,
-  HttpCode,
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  Sse,
-  UseGuards,
-  Header,
+  // UseGuards,
   Req,
 } from '@nestjs/common';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MessageService } from './messages.service';
+
 import { MessageInterface } from './interfaces/message.interface';
 import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
-
+import { RequestWithUser } from '../users/interfaces/request.user.interface';
 import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessagePatchDTO } from './dto/message.patch.dto';
 
-import { Public } from '../auth/decorators/public.decorator';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
-import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
+// import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 @Controller('messages')
 export class MessageController {
@@ -117,7 +114,7 @@ export class MessageController {
   }
 
   @Get('/between/:userId/and/:userIdTo')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminGetMessages(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('userIdTo', ParseIntPipe) userIdTo: bigint,

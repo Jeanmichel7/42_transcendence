@@ -1,7 +1,6 @@
 NAME = transcendence
 OS	= ${shell uname}
 
-
 all:
 	printf "Launch configuration ${NAME}..."
 	docker-compose up
@@ -13,7 +12,12 @@ build:
 down:
 	printf "Stop configuration ${NAME}..."
 	docker-compose down
-	docker volume rm $(shell docker volume ls -q | grep -v "^42_transcendence")
+# docker volume rm $(shell docker volume ls -q | grep -v "^42_transcendence")
+ifeq ($(OS),Linux)
+	docker volume ls -q | grep -v "^42_transcendence" | xargs -r docker volume rm
+else
+	docker volume ls -q | grep -v "^42_transcendence" | xargs docker volume rm
+endif
 
 fclean:
 	printf "Total clean of all configurations docker"
@@ -21,8 +25,7 @@ ifeq ($(OS),Linux)
 	docker ps -qa | xargs -r docker stop
 	docker system prune -a --force
 	docker volume ls -q | xargs -r docker volume rm
-endif
-ifeq ($(OS),Darwin)
+else
 	docker ps -qa | xargs docker stop
 	docker system prune -a --force
 	docker volume ls -q | xargs docker volume rm

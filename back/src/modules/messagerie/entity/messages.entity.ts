@@ -2,7 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
+  // JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';

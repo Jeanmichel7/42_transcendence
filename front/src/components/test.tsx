@@ -7,26 +7,53 @@ import io from 'socket.io-client';
 
 
 function Test() {
+  const [userProfile, setUserProfile] = useState<any>(null);
 
-    const PrivateChat = () => {
-      
+  async function fetchUserProfile() {
+    const userId = 1;
+    const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
+      withCredentials: true,
+    });
+    if (response.status === 200) return response.data;
+    else throw new Error('Failed to fetch user profile');
+  }
+
+  useEffect(() => {
+    async function fetchAndSetUserProfile() {
+      try {
+        const userProfileData = await fetchUserProfile();
+        setUserProfile(userProfileData);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    }
+    // fetchAndSetUserProfile();
+  }, []);
+
+  const PrivateChat = () => {
     const [socketEvent1, setSocketEvent1] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageInput1, setMessageInput1] = useState('');
+
+    const token = 'YOUR_TOKEN_HERE';
     const userIdDest = '2';
 
     const joinRoom1 = (userIdDest) => {
-
-      // Creation socket intance 
       const socketEvent1 = io(`http://localhost:3000/messagerie`, {
         reconnectionDelayMax: 10000,
+        // auth: {
+        //   token: token,
+        // },
+        // cors: {
+        //   origin: 'http://localhost:3000',
+        //   methods: ['GET', 'POST'],
+        //   credentials: true,
+        // },
       });
 
-      // Creation socket event 
-      // Indicate to the server that a user is joining a private chat room with another user.
+      //connect to room
       socketEvent1.emit('joinPrivateRoom', { user1Id: 1, user2Id: userIdDest });
 
-      // Sets up a listener, adds each incoming message to the component's "messages".
       socketEvent1.on('message', (message, id) => {
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -35,7 +62,6 @@ function Test() {
       });
     };
 
-    // Send the content of MessageInput1 to the database
     const sendMessage1 = (userIdDest) => {
       axios.post(
         'http://localhost:3000/messages/users/' + userIdDest + '/send',

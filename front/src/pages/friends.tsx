@@ -1,6 +1,6 @@
 import React from 'react'
-import Navbar from './navbar'
-import SideBar from './sidebar'
+import Navbar from '../components/navbar'
+import SideBar from '../components/sidebar'
 
 function Friends() {
   return (

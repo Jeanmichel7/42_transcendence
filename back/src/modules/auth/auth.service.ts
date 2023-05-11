@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -20,17 +21,17 @@ import { Repository, UpdateResult } from 'typeorm';
 import { authenticator } from 'otplib';
 import { AuthInterface } from './interfaces/auth.interface';
 import { CryptoService } from '../crypto/crypto.service';
-// import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly configService: ConfigService,
+    private readonly configService: ConfigService,
     private usersService: UsersService,
     private jwtService: JwtService,
     private cryptoService: CryptoService,
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>, // private readonly httpService: HttpService
+    private readonly userRepository: Repository<UserEntity> /* private readonly httpService: HttpService */,
   ) {
     // console.log('JWT_SECRET:', configService.get<string>('JWT_SECRET'));
   }
@@ -55,36 +56,64 @@ export class AuthService {
     return res;
   }
 
+  async logout(userId: bigint): Promise<void> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'status', 'updatedAt'],
+    });
+    if (!user) throw new NotFoundException(`User ${userId} not found`);
+
+    const resultUpdate: UpdateResult = await this.userRepository.update(
+      { id: userId },
+      {
+        status: 'offline',
+        updatedAt: new Date(),
+      },
+    );
+    if (resultUpdate.affected === 0)
+      throw new BadRequestException(`User ${userId} has not been updated.`);
+  }
+
   async logInOAuth(code: string): Promise<AuthInterface> {
     const accessToken: string = await this.OAuthGetToken(code);
     const userData42: UserInterface = await this.OAuthGetUserData(accessToken);
 
     let user: UserInterface = null;
     if (await this.userAlreadyExist(userData42.email)) {
-      console.error('User already exist');
+      console.log('User already exist');
       user = await this.findUserByMail(userData42.email);
     } else {
-      console.error('createOAuthUser');
+      console.log('createOAuthUser');
       user = await this.usersService.createOAuthUser(userData42);
     }
 
+    /* check 2FA */
     const res: AuthInterface = {
       accessToken: `need2FA,userId:${user.id}`,
       user: user,
     };
     if (user.is2FAEnabled) return res;
 
+    /* update status user */
+    const resultUpdate: UpdateResult = await this.userRepository.update(
+      { id: user.id },
+      {
+        status: 'online',
+        updatedAt: new Date(),
+      },
+    );
+    if (resultUpdate.affected === 0)
+      throw new BadRequestException(`User ${user.id} has not been updated.`);
+
     res.accessToken = await this.createJWT(user);
     return res;
   }
 
   async loginOAuth2FA(code: string, userId: bigint) {
-    // console.log('userId', userId, typeof userId);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'firstName', 'lastName', 'login', 'secret2FA', 'role'],
     });
-    // console.log('user : ', user);
     if (!user) throw new NotFoundException(`User ${userId} not found`);
 
     let decryptedSecret = crypto
@@ -100,6 +129,16 @@ export class AuthService {
     });
     decryptedSecret = null;
     if (!codeIsValid) throw new BadRequestException(`Wrong code`);
+
+    const resultUpdate: UpdateResult = await this.userRepository.update(
+      { id: userId },
+      {
+        status: 'online',
+        updatedAt: new Date(),
+      },
+    );
+    if (resultUpdate.affected === 0)
+      throw new BadRequestException(`User ${userId} has not been updated.`);
 
     return {
       accessToken: await this.createJWT(user),
@@ -190,9 +229,7 @@ export class AuthService {
   private async OAuthGetToken(code: string): Promise<string> {
     const clientId =
       'u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171';
-    const clientSecret =
-      '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';
-
+    const clientSecret = this.configService.get<string>('OAUTH_INTRA');
     try {
       const tokenResponse = await axios.post(
         'https://api.intra.42.fr/oauth/token',
@@ -204,14 +241,13 @@ export class AuthService {
           redirect_uri: 'http://localhost:3000/auth/loginOAuth',
         },
       );
-      // console.log("tokenResponse : ", tokenResponse)
-      // if(tokenResponse.status != 200) {
-      //     throw new HttpException("Invalid code", tokenResponse.status);
-      // }
+      if (tokenResponse.status != 200) {
+        throw new HttpException('Invalid code', tokenResponse.status);
+      }
       return tokenResponse.data.access_token;
     } catch (error) {
       throw new UnauthorizedException(
-        error.response.data.message,
+        'Intra OAuth: ' + error.response.data.message,
         error.status,
       );
     }
@@ -251,7 +287,7 @@ export class AuthService {
   private async createJWT(user: UserInterface): Promise<string> {
     const payload = { id: user.id, login: user.login, role: user.role };
     const token = await this.jwtService.signAsync(payload);
-    console.error('createJWT : ', user, token);
+    // console.error('createJWT : ', user, token);
     return token;
   }
 

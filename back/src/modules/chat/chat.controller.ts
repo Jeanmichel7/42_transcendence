@@ -3,36 +3,38 @@ import {
   Get,
   Controller,
   Param,
-  ParseIntPipe,
+  // ParseIntPipe,
   Post,
   UseGuards,
   UsePipes,
   ValidationPipe,
   Req,
-  Put,
+  // Put,
   Patch,
   Delete,
   HttpStatus,
 } from '@nestjs/common';
 
-import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ChatService } from './chat.service';
+
 // import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
-import { ChatService } from './chat.service';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
 
 import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
 import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';
 import { ChatJoinRoomDTO } from './dto/chat.room.join.dto';
 import { ChatMuteUserDTO } from './dto/chat.room.mute.dto';
+import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
 import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
 
 import { AdminRoomGuard } from './guard/room.admin.guard';
 import { OwnerRoomGuard } from './guard/room.owner.guard';
 import { UserNotMutedGuard } from './guard/room.isMuted.guard';
 import { UserNotBannedGuard } from './guard/room.isBanned.guard';
-import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 
 @Controller('chat')
 export class ChatController {
@@ -299,7 +301,7 @@ export class ChatController {
     return room;
   }
 
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   @Get('rooms/:roomId/messages/all')
   async getAllMessages(
     @Param('roomId') roomId: bigint,

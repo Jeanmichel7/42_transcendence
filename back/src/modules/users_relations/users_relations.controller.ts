@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Put,
   Req,
-  UseGuards,
+  // UseGuards,
 } from '@nestjs/common';
 
 import { UsersRelationsService } from './users_relations.service';
@@ -16,7 +16,7 @@ import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationInterface } from './interfaces/users_relations.interface';
 import { RequestWithUser } from '../users/interfaces/request.user.interface';
 
-import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 
 @Controller('relations')
 export class UsersRelationsController {
@@ -129,7 +129,7 @@ export class UsersRelationsController {
   }
 
   @Put(':userId/block-user/:userBlockedId')
-  @UseGuards(AuthAdmin)
+  // @UseGuards(AuthAdmin)
   async adminBlockFriend(
     @Param('userId', ParseIntPipe) userId: bigint,
     @Param('userBlockedId', ParseIntPipe) friendId: bigint,
