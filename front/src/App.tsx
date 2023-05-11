@@ -1,10 +1,10 @@
 import React from 'react'
 import {Routes, Route} from 'react-router-dom'
 import Chat from './components/Chat/chat';
-import Firstpage from "./components/firstpage"
-import Friends from './components/friends';
-import Game from './components/game';
-import Home from './components/home';
+import Firstpage from "./pages/loginPage"
+import Friends from './pages/friends';
+import Game from './pages/game';
+import Home from './pages/home';
 import ConnectPage from './components/connectPage';
 import Test from './components/test'
 
