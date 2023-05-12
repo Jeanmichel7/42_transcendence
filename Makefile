@@ -12,7 +12,6 @@ build:
 down:
 	printf "Stop configuration ${NAME}..."
 	docker-compose down
-# docker volume rm $(shell docker volume ls -q | grep -v "^42_transcendence")
 ifeq ($(OS),Linux)
 	docker volume ls -q | grep -v "^42_transcendence" | xargs -r docker volume rm
 else
@@ -37,6 +36,13 @@ clean:
 	docker system prune -a
 
 re:	down build
+
+restart:
+	printf "Restarting configuration ${NAME}..."
+	${MAKE} down
+	docker volume rm 42_transcendence_front
+	docker volume rm 42_transcendence_back
+	${MAKE} build
 
 logs:
 	docker-compose logs -f postgres nestjs

@@ -9,7 +9,7 @@ import './index.css'
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   // <Provider store={store}>
-    <BrowserRouter basename='/'>
+    <BrowserRouter>
       <App />
     </BrowserRouter>
   // </Provider>

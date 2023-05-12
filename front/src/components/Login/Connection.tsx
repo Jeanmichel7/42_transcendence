@@ -1,8 +1,8 @@
 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import Navbar from './navbar';
-import SideBar from './sidebar';
+import Navbar from '../Header/Header';
+import SideBar from '../SideBar';
 import { Link } from 'react-router-dom';
 
 function ConnectPage() {

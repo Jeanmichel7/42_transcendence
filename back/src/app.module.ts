@@ -30,8 +30,12 @@ import { join } from 'path';
       serveRoot: '/static',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads', 'users_avatars'),
+      rootPath: join(__dirname, '..', '..', 'uploads', 'users_avatars'),
       serveRoot: '/avatars',
+      // renderPath: '*./uploads/*',
+      // serveStaticOptions: {
+      //   index: false,
+      // },
     }),
     EventEmitterModule.forRoot(),
     UsersModule,
