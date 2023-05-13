@@ -50,7 +50,7 @@ function Home() {
           <img src='/pong.png' width='500px' />
         </div>
         <div className="" >
-          <Link to="/Game" className="play-button">CLICK TO PLAY !</Link>
+          <Link to="/GamePage" className="play-button">CLICK TO PLAY !</Link>
         </div>
       </span>
 
