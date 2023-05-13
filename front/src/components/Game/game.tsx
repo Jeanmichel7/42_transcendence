@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
+const RACKET_WIDTH = 18;
+const RACKET_HEIGHT = 100;
+const RACKET_LEFT_POS_X = 50;
+const RACKET_RIGHT_POS_X = 730;
+
 const GameWrapper = styled.div`
   width: 800px;
   height: 600px;
@@ -13,15 +18,17 @@ const GameWrapper = styled.div`
 
 const Racket = styled.div.attrs((props) => ({
   style: {
-    left: props.type === 'right' ? '5%' : '93%',
     transform: `translateY(${props.posY}px)`,
   },
 }))`
-  width: 2%;
-  height: 16%;
+  width: ${RACKET_WIDTH}px;
+  height: ${RACKET_HEIGHT}px;
   background-color: blue;
   position: absolute;
-  left: ${(props) => (props.type === 'right' ? '5%' : '93%')};
+  left: ${(props) =>
+    props.type === 'left'
+      ? RACKET_LEFT_POS_X + 'px'
+      : RACKET_RIGHT_POS_X + 'px'};
   top: 42%;
   transform: translateY(${(props) => props.posY}px);
   border-radius: 10px;
@@ -42,7 +49,8 @@ const Ball = styled.div.attrs((props) => ({
 `;
 
 function Game() {
-  const [posRacketLeft, setPosition] = useState(0);
+  const [posRacketLeft, setPositionLeft] = useState(0);
+  const [posRacketRight, setPositionRight] = useState(0);
   const keyStateRef = useRef({} as any);
   const [ball, setBall] = useState({ x: 0, y: 0, vx: 2, vy: 2 });
 
@@ -50,32 +58,30 @@ function Game() {
     let animationFrameId: number;
     function upLoop() {
       if (keyStateRef.current['ArrowDown']) {
-        setPosition((oldPos) => (oldPos < 250 ? oldPos + 5 : oldPos));
+        setPositionLeft((oldPos) => (oldPos < 250 ? oldPos + 5 : oldPos));
       } else if (keyStateRef.current['ArrowUp']) {
-        setPosition((oldPos) => (oldPos > -250 ? oldPos - 5 : oldPos));
+        setPositionLeft((oldPos) => (oldPos > -250 ? oldPos - 5 : oldPos));
       }
       setBall((oldBall) => {
-        if (oldBall.x > 400 || oldBall.x < -400) {
-          return {
-            ...oldBall,
-            x: oldBall.x - oldBall.vx,
-            y: oldBall.y + oldBall.vy,
-            vx: -oldBall.vx,
-          };
+        let newBall = { ...oldBall };
+        if (oldBall.x > 390 || oldBall.x < -400) {
+          newBall.vx = -newBall.vx;
         }
-        if (oldBall.y > 300 || oldBall.y < -300) {
-          return {
-            ...oldBall,
-            x: oldBall.x + oldBall.vx,
-            y: oldBall.y - oldBall.vy,
-            vy: -oldBall.vy,
-          };
+        if (oldBall.y > 290 || oldBall.y < -300) {
+          newBall.vy = -newBall.vy;
         }
-        return {
-          ...oldBall,
-          x: oldBall.x + oldBall.vx,
-          y: oldBall.y + oldBall.vy,
-        };
+        console.log(posRacketRight - 300);
+        if (
+          oldBall.x <= RACKET_LEFT_POS_X - 400 &&
+          oldBall.y >= posRacketRight - 300 &&
+          oldBall.y <= posRacketRight - 300 + RACKET_HEIGHT
+        ) {
+          newBall.vx = -newBall.vx;
+        }
+
+        newBall.x += newBall.vx;
+        newBall.y += newBall.vy;
+        return newBall;
       });
       animationFrameId = requestAnimationFrame(upLoop);
     }
@@ -108,9 +114,9 @@ function Game() {
 
   return (
     <GameWrapper>
-      <Racket posY={posRacketLeft} type="right" />
+      <Racket posY={posRacketLeft} type="left" />
       <Ball posX={ball.x} posY={ball.y} />
-      <Racket type="left" />
+      <Racket posY={posRacketRight} type="right" />
     </GameWrapper>
   );
 }
