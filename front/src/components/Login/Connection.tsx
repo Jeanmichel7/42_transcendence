@@ -1,69 +1,69 @@
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom';
 
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import Navbar from '../Header/Header';
-import SideBar from '../SideBar';
-import { Link } from 'react-router-dom';
+import { check2FACookie, send2FA, getUserData } from '../../api/auth'
+import { setUser, setLogged } from '../../store/userSlice'
 
 function ConnectPage() {
+  let navigate = useNavigate ();
 
   const [is2FAactiv, setIs2FAactiv] = useState(false);
   const [userId, setUserId] = useState(0);
+  const [code2FA, setCode2FA] = useState("");
 
+  const userData: any = useSelector(state => state.user.userData);
+  const dispatch = useDispatch()
+
+  //check if 2FA is activated
   useEffect(() => {
-    async function fetchAndSetIs2FAactiv() {
+    async function fetchAndSetIs2FAactived() {
       try {
         const res = await check2FACookie();
+        console.log("res : ", res)
+
         if(res.is2FAactived) {
           console.log("is2FAactived")
           setIs2FAactiv(res.is2FAactived);
           setUserId(res.userId);
         }
         else {
-          console.log("is2FAactived not activated")
-          window.location.href = "/home";
+          await saveUserData();
+          await new Promise(r => setTimeout(r, 10000));
+          navigate('/home');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
       }
     }
 
-    fetchAndSetIs2FAactiv();
+    fetchAndSetIs2FAactived();
   }, []);
 
-  async function check2FACookie() {
-    console.log("check2FACookie")
-    const res = await axios.get('http://localhost:3000/auth/check-2FA', {
-      withCredentials: true,
-    });
-    console.log("response : ", res)
-    if (res.status == 200) {
-      return res.data;
-    } else {
-      throw new Error('Failed to fetch user profile');
-    }
+
+
+  //save user data in redux
+  async function saveUserData() {
+    const res = await getUserData();
+    console.log("res user data : ", res)
+    dispatch(setUser(res));
+    dispatch(setLogged(true));
   }
 
-  async function send2FA() {
-    const code2FAElement = document.getElementById('2faCode') as HTMLInputElement | null;
-    if(!code2FAElement)
-      return;
-    const body = {
-      code: code2FAElement.value,
-      userId: userId
-    }
-    console.log("body : ", body)
-    const response = await axios.post('http://localhost:3000/auth/login2fa', body, {
-      withCredentials: true
-    });
 
-    console.log("response : ", response)
-    if (response.status === 200) {
-      window.location.href = "/home";
+  //send code to server
+  async function handleSendCode() {
+    const res = await send2FA(code2FA, userId);
+    console.log("response : ", res)
+
+    if (res.status === 200) {
+      await saveUserData();
+      await new Promise(r => setTimeout(r, 20000));
+      navigate('/home');
     }
     else {
       // wrong code
-      console.log(response.data)
+      console.log(res.data)
     }
   }
 
@@ -72,24 +72,22 @@ function ConnectPage() {
 
   return (
     <div className=" h-screen w-screen bg-[#1e1e4e]">
-      <Navbar />
-      <SideBar />
-
       <div className=" w-3/4 h-2/3 items-center justify-center flex">
-        {is2FAactiv? (
+        {is2FAactiv &&
           <section>
             <p>2FA authentification</p>
-            <input type="text" id="2faCode" name="2faCode" placeholder="Code"/>
-            <button onClick={send2FA}>Send</button>
+            <input type="text" value={code2FA} onChange={(e) => setCode2FA(e.target.value)} 
+              placeholder='Code'
+              />
+            <button onClick={handleSendCode}>Send</button>
           </section>
-        ) : ""}
+        }
       </div>
 
+      <p> Test Redux : {userData.login} </p>
+      <div>User data: {JSON.stringify(userData)}</div> {/* Here */}
     </div>
-
   );
 }
 
 export default ConnectPage;
-
-

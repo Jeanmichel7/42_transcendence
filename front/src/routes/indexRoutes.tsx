@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Login from '../scenes/Login';
-import Home from '../scenes/Home';
+import Login from '../pages/Login';
+import Home from '../pages/Home';
 import Chat from '../components/Chat/chat';
-import Friends from '../scenes/Friends';
-import Game from '../scenes/Game';
+import Friends from '../pages/Friends';
+import Game from '../pages/Game';
 import ConnectPage from '../components/Login/Connection';
 import Test from '../components/Chat/test';
-import Profile from '../scenes/Profile';
+import Profile from '../pages/Profile';
 
 const AppRoutes: React.FC = () => (
   <Routes>

@@ -93,14 +93,14 @@ export class AuthController {
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ): Promise<void> {
-    const jwtCookieName = 'jwt'; // Remplacez 'jwt' par le nom de votre cookie JWT
-    const jwtCookie = req.cookies[jwtCookieName];
-    // console.error('jwt cookie : ', jwtCookie);
+    const jwtCookie: string = req.cookies['jwt'];
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({
         is2FAactived: true,
-        userId: jwtCookie.split(':')[1],
+        user: {
+          id: jwtCookie.split(':')[1],
+        },
       });
     } else {
       res.status(200).send({ is2FAactived: false });
