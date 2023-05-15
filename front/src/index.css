@@ -18,4 +18,23 @@
         @apply p-6 text-center text-white font-bold font-mono border-double 
         border-4 rounded-xl border-rose-600 hover:bg-rose-600 transition-all
     }
+
+    .header__link {
+        @apply text-3xl font-bold font-Dance rounded-lg shadow-black p-4 m-2
+        hover:bg-indigo-800 hover:border-white
+        /* active:bg-violet-700  */
+        /* focus:outline-none focus:ring focus:ring-violet-300 */
+    }
+    .header__link--activ {
+        @apply text-3xl font-bold font-Dance rounded-lg shadow-black p-4 m-2
+        bg-indigo-600
+        ring ring-indigo-500
+        active:bg-violet-700
+    }
+    .header__link-avatar:hover {
+        @apply bg-indigo-800
+    }
+    /* .header__link:hover {
+        @apply bg-violet-100
+    } */
 }

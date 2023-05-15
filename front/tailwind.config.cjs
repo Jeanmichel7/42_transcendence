@@ -1,9 +1,8 @@
 module.exports = {
-  // content:["./src/**/*.{js,jsx,ts,tsx}"],
-  darkMode: false, // or 'media' or 'class'
-  purge: {
+  darkMode: 'media', // or 'media' or 'class'
+  content: {
     preserveHtmlElements: false,
-    content: ["./src/**/*.{js,jsx,ts,tsx}"],
+    content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
   },
   theme: {
     extend: {
@@ -12,6 +11,6 @@ module.exports = {
         Bungee: "'Bungee Shade', serif",
       }
     }
-    },
+  },
   plugins: [],
 }

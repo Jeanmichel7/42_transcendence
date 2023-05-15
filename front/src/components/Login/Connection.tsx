@@ -12,7 +12,7 @@ function ConnectPage() {
   const [userId, setUserId] = useState(0);
   const [code2FA, setCode2FA] = useState("");
 
-  const userData: any = useSelector(state => state.user.userData);
+  const userData: any = useSelector((state: any) => state.user.userData);
   const dispatch = useDispatch()
 
   //check if 2FA is activated
@@ -29,7 +29,7 @@ function ConnectPage() {
         }
         else {
           await saveUserData();
-          await new Promise(r => setTimeout(r, 10000));
+          // await new Promise(r => setTimeout(r, 10000)); wait 10s
           navigate('/home');
         }
       } catch (error) {
@@ -58,7 +58,7 @@ function ConnectPage() {
 
     if (res.status === 200) {
       await saveUserData();
-      await new Promise(r => setTimeout(r, 20000));
+      // await new Promise(r => setTimeout(r, 20000)); //wait 20s
       navigate('/home');
     }
     else {

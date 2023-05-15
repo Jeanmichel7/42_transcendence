@@ -10,6 +10,7 @@ export const userSlice = createSlice({
       lastName: '',
       status: '',
       avatar: '',
+      role:'user'
     },
     isLogged: false,
   },
@@ -22,6 +23,7 @@ export const userSlice = createSlice({
       state.userData.lastName = action.payload.lastName;
       state.userData.status = action.payload.status;
       state.userData.avatar = action.payload.avatar;
+      state.userData.role = action.payload.role;
     },
     setLogged: (state, action: PayloadAction<boolean>) => {
       state.isLogged = action.payload;
