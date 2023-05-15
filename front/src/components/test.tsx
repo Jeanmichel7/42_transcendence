@@ -10,7 +10,7 @@ function Test() {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   async function fetchUserProfile() {
-    const userId = 1;
+    const userId = 4;
     const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
       withCredentials: true,
     });
@@ -36,7 +36,7 @@ function Test() {
     const [messageInput1, setMessageInput1] = useState('');
 
     const token = 'YOUR_TOKEN_HERE';
-    const userIdDest = '2';
+    const userIdDest = '1';
 
     const joinRoom1 = (userIdDest) => {
       const socketEvent1 = io(`http://localhost:3000/messagerie`, {
