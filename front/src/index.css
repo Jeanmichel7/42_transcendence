@@ -37,4 +37,9 @@
     /* .header__link:hover {
         @apply bg-violet-100
     } */
+
+    /* .app__body {
+        @apply flex-grow bg-indigo-900
+    } */
+
 }

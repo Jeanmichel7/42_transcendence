@@ -26,7 +26,7 @@ function Header() {
 
 
   return (
-    <div className="top-0 bg-[#1e1e4e] text-white" >
+    <div className=" bg-[#1e1e4e] text-white" >
       <div className="flex justify-between items-center" >
         <Link to="/home" className="flex items-center">
           <img src='/pong-nav.png'className="text-center p-2 rounded-full w-full h-24" />
@@ -50,8 +50,8 @@ function Header() {
               Profil
             </NavLink>
             <NavLink to="/profile" className="header__link-avatar" > 
-            <img src={`http://localhost:3000/avatars/` + userData?.avatar}
-              className="text-center p-2 rounded w-full h-24" />
+              <img src={`http://localhost:3000/avatars/` + userData?.avatar}
+                className="text-center p-2 rounded w-full h-24" />
             </NavLink>
           </>
           }

@@ -3,14 +3,15 @@ import { Routes, Route } from 'react-router-dom';
 
 import Login from '../pages/Login';
 import Home from '../pages/Home';
-import Chat from '../components/Chat/chat';
+import Chat from '../pages/Chat';
 import Friends from '../pages/Friends';
 import Game from '../pages/Game';
 import ConnectPage from '../components/Login/Connection';
-import Test from '../components/Chat/test';
+import Test from '../pages/Test';
 import Profile from '../pages/Profile';
 
 const AppRoutes: React.FC = () => (
+  <div className="w-11/12 h-full text-white">
   <Routes>
      <Route path='/' element={<Login />} />
      <Route path='/home' element={<Home />} />
@@ -21,6 +22,7 @@ const AppRoutes: React.FC = () => (
      <Route path='/test' element={<Test />} />
      <Route path='/profile' element={<Profile />} />
   </Routes>
+  </div>
 );
 
 export default AppRoutes;

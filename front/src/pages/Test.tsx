@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import PrivateChat from './PrivateChat';
+import PrivateChat from '../components/Chat/PrivateChat';
 
 function Test() {
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -27,13 +27,11 @@ function Test() {
     // fetchAndSetUserProfile();
   }, []);
 
-  
+
 
   return (
-    <div className="h-screen w-screen bg-[#1e1e4e]">
-      <span className="w-3/4 h-2/3 items-center justify-center flex">
-        <PrivateChat />
-      </span>
+    <div className="w-3/4 h-2/3 items-center justify-center flex">
+      <PrivateChat />
     </div>
   );
 }

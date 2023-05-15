@@ -6,7 +6,7 @@ import { check2FACookie, send2FA, getUserData } from '../../api/auth'
 import { setUser, setLogged } from '../../store/userSlice'
 
 function ConnectPage() {
-  let navigate = useNavigate ();
+  let navigate = useNavigate();
 
   const [is2FAactiv, setIs2FAactiv] = useState(false);
   const [userId, setUserId] = useState(0);
@@ -22,7 +22,7 @@ function ConnectPage() {
         const res = await check2FACookie();
         console.log("res : ", res)
 
-        if(res.is2FAactived) {
+        if (res.is2FAactived) {
           console.log("is2FAactived")
           setIs2FAactiv(res.is2FAactived);
           setUserId(res.userId);
@@ -71,19 +71,16 @@ function ConnectPage() {
 
 
   return (
-    <div className=" h-screen w-screen bg-[#1e1e4e]">
-      <div className=" w-3/4 h-2/3 items-center justify-center flex">
-        {is2FAactiv &&
-          <section>
-            <p>2FA authentification</p>
-            <input type="text" value={code2FA} onChange={(e) => setCode2FA(e.target.value)} 
-              placeholder='Code'
-              />
-            <button onClick={handleSendCode}>Send</button>
-          </section>
-        }
-      </div>
-
+    <div className=" w-3/4 h-2/3 items-center justify-center flex">
+      {is2FAactiv &&
+        <section>
+          <p>2FA authentification</p>
+          <input type="text" value={code2FA} onChange={(e) => setCode2FA(e.target.value)}
+            placeholder='Code'
+          />
+          <button onClick={handleSendCode}>Send</button>
+        </section>
+      }
       <p> Test Redux : {userData.login} </p>
       <div>User data: {JSON.stringify(userData)}</div> {/* Here */}
     </div>

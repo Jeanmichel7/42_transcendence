@@ -32,7 +32,7 @@ function Profile() {
 
 
   return (
-    <div className=" h-screen w-screen bg-[#1e1e4e]">
+    <div className="w-full bg-[#1e1e4e]">
       <span className=" w-3/4 h-2/3 items-center justify-center flex">
         <div className="  " >
           <p> user data : </p>

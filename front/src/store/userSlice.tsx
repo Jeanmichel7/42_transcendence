@@ -37,6 +37,7 @@ export const userSlice = createSlice({
         lastName: '',
         status: '',
         avatar: '',
+        role:'user'
       };
     },
 

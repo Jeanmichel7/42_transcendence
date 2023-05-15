@@ -9,7 +9,7 @@ import {Link} from 'react-router-dom'
 
 export default function Login() {
   return (
-    <div className=" h-screen w-auto flex items-center justify-center bg-[#1e1e4e]">
+    <div className=" w-auto flex items-center justify-center bg-[#1e1e4e]">
       <span className="hello">
 
         <div className="m-6 text-center font-bold ">

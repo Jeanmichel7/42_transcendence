@@ -1,8 +1,8 @@
 function Friends() {
   return (
-    <div className=" h-screen w-screen  bg-[#1e1e4e]">
-      <div className="h-5/6 w-11/12 items-center justify-center flex" >
-        <div className=" bg-white h-5/6 w-11/12 rounded-xl">
+    <div className="w-full bg-[#1e1e4e]">
+      <div className="items-center justify-center flex" >
+        <div className=" bg-[#F2F2FF] text-indigo-900 w-full rounded-xl">
 
           <p className=" text-lg font-mono p-6 ml-4 "> Search you friends here: </p>
 
