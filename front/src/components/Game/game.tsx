@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import Loose from './Loose';
+import Score from './Score';
 
 const RACKET_WIDTH = 18;
 const RACKET_HEIGHT = 100;
@@ -29,7 +31,7 @@ const Racket = styled.div.attrs((props) => ({
     props.type === 'left'
       ? RACKET_LEFT_POS_X + 'px'
       : RACKET_RIGHT_POS_X + 'px'};
-  top: 42%;
+  top: 0%;
   transform: translateY(${(props) => props.posY}px);
   border-radius: 10px;
 `;
@@ -43,49 +45,72 @@ const Ball = styled.div.attrs((props) => ({
   height: 10px;
   background-color: white;
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 0%;
+  top: 0%;
   border-radius: 50%;
 `;
 
 function Game() {
-  const [posRacketLeft, setPositionLeft] = useState(0);
-  const [posRacketRight, setPositionRight] = useState(0);
+  const [posRacketLeftState, setPositionLeft] = useState(0);
+  const posRacketLeft = useRef(0);
+  const [posRacketRightState, setPositionRight] = useState(0);
   const keyStateRef = useRef({} as any);
-  const [ball, setBall] = useState({ x: 0, y: 0, vx: 2, vy: 2 });
+  const [ball, setBall] = useState({ x: 400, y: 300, vx: 5, vy: 5 });
+  const [scorePlayerLeft, setScorePlayerLeft] = useState(0);
+  const [scorePlayerRight, setScorePlayerRight] = useState(0);
+  const loose = useRef(false);
 
   useEffect(() => {
     let animationFrameId: number;
+    upLoop();
     function upLoop() {
       if (keyStateRef.current['ArrowDown']) {
-        setPositionLeft((oldPos) => (oldPos < 250 ? oldPos + 5 : oldPos));
+        setPositionLeft((oldPos) => (oldPos < 500 ? oldPos + 5 : oldPos));
+        posRacketLeft.current =
+          posRacketLeft.current < 500
+            ? posRacketLeft.current + 5
+            : posRacketLeft.current;
       } else if (keyStateRef.current['ArrowUp']) {
-        setPositionLeft((oldPos) => (oldPos > -250 ? oldPos - 5 : oldPos));
+        setPositionLeft((oldPos) => (oldPos > 0 ? oldPos - 5 : oldPos));
+        posRacketLeft.current =
+          posRacketLeft.current > 0
+            ? posRacketLeft.current - 5
+            : posRacketLeft.current;
       }
       setBall((oldBall) => {
         let newBall = { ...oldBall };
-        if (oldBall.x > 390 || oldBall.x < -400) {
+        if (oldBall.x > 790 || oldBall.x < 0) {
           newBall.vx = -newBall.vx;
         }
-        if (oldBall.y > 290 || oldBall.y < -300) {
+        if (oldBall.y > 590 || oldBall.y < 0) {
           newBall.vy = -newBall.vy;
         }
-        console.log(posRacketRight - 300);
         if (
-          oldBall.x <= RACKET_LEFT_POS_X - 400 &&
-          oldBall.y >= posRacketRight - 300 &&
-          oldBall.y <= posRacketRight - 300 + RACKET_HEIGHT
+          oldBall.x <= RACKET_LEFT_POS_X + RACKET_WIDTH &&
+          oldBall.y >= posRacketLeft.current &&
+          oldBall.y <= posRacketLeft.current + RACKET_HEIGHT
         ) {
           newBall.vx = -newBall.vx;
+          if (keyStateRef.current['ArrowDown']) {
+            newBall.vy += 1;
+            newBall.vx -= 1;
+          } else if (keyStateRef.current['ArrowUp']) {
+            newBall.vy -= 1;
+            newBall.vx += 1;
+          }
         }
-
+        if (oldBall.x <= 0 && !loose.current) {
+          loose.current = true;
+          setScorePlayerLeft((oldScore) => oldScore + 1);
+        }
         newBall.x += newBall.vx;
         newBall.y += newBall.vy;
         return newBall;
       });
-      animationFrameId = requestAnimationFrame(upLoop);
+      if (!loose.current) {
+        animationFrameId = requestAnimationFrame(upLoop);
+      }
     }
-    upLoop();
 
     return () => {
       if (animationFrameId) {
@@ -114,9 +139,14 @@ function Game() {
 
   return (
     <GameWrapper>
-      <Racket posY={posRacketLeft} type="left" />
+      <Score
+        scorePlayerLeft={scorePlayerLeft}
+        scorePlayerRight={scorePlayerRight}
+      />
+      {loose.current ? <Loose /> : null}
+      <Racket posY={posRacketLeftState} type="left" />
       <Ball posX={ball.x} posY={ball.y} />
-      <Racket posY={posRacketRight} type="right" />
+      <Racket posY={posRacketRightState} type="right" />
     </GameWrapper>
   );
 }
