@@ -38,7 +38,7 @@ function ButtonNewChannel() {
 
   return (
     <div className="relative" ref={ref}>
-      <button className={`m-2 text-center w-3/12 py-2 border-2 shadow-lg rounded-xl font-mono cursor-pointer
+      <button className={`text-center p-3 border-2 shadow-lg rounded-xl font-mono cursor-pointer
         hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`} onClick={() => setOpen(!open)}>
         New channel
       </button>

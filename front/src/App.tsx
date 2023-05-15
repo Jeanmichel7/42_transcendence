@@ -6,13 +6,13 @@ import AppRoutes from './routes/indexRoutes';
 
 function App() {
   return (
-    <div className='h-screen bg-[#262652] h-full w-full '>
+    <div className='flex flex-col h-screen'>
       <Header />
-      <div className='flex flex-row min-h-fit'>
-        <div className='w-11/12 p-5'>
+      <div className='relative flex-grow bg-[#262652] w-full'>
+        <div className='mr-12 p-6 min-h-full'>
           <AppRoutes />
         </div>
-        <div className='w-1/12'>
+        <div className="absolute right-0 top-0">
           <SideBar />
         </div>
       </div>

@@ -1,6 +1,6 @@
 function Footer() {
   return (
-    <div className="absolute inset-x-0 bottom-0 bg-[#1e1e4e] text-white">
+    <div className="inset-x-0 bottom-0 bg-[#1e1e4e] text-white">
       <div className="h-1 bg-indigo-700 w-full " ></div>
       <div className="flex flex-row justify-around items-center p-5">
         <div className="flex flex-col justify-center items-center">

@@ -11,7 +11,7 @@ import Test from '../pages/Test';
 import Profile from '../pages/Profile';
 
 const AppRoutes: React.FC = () => (
-  <div className="w-11/12 h-full text-white">
+  <div className="text-white">
   <Routes>
      <Route path='/' element={<Login />} />
      <Route path='/home' element={<Home />} />

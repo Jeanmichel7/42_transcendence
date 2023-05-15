@@ -30,8 +30,9 @@ function Test() {
 
 
   return (
-    <div className="w-3/4 h-2/3 items-center justify-center flex">
+    <div>
       <PrivateChat />
+     
     </div>
   );
 }

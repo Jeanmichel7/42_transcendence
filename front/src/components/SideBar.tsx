@@ -20,11 +20,12 @@ function SideBar() {
   }, [ref])
 
   return (
-    <div ref={ref} className={` border-4 z-50 border-stone-300 shadow-inner shadow-gray-300 right-0 fixed h-screen ${open ? "w-80" : "w-12"} duration-300 bg-slate-50 rounded-lg`} >
+    <div ref={ref} className={` border-4 z-50 border-stone-300 shadow-inner shadow-gray-300 ${open ? "w-80" : "w-12 h-24"} duration-300 bg-slate-50 rounded-lg`} >
 
       <BiChevronLeftCircle className={`text-white text-4xl bg-[#1e1e4e] 
         rounded-full absolute x-left-5 top-9 border-2 cursor-pointer 
-        ${open && "rotate-180"} duration-700`} onClick={() => setOpen(!open)} />
+        ${open && "rotate-180"} duration-700`} onClick={() => setOpen(!open)}
+      />
 
       <div className=" items-center justify-center flex ">
         <img src='/profile.png' width='120px' className="text-center p-2 rounded-full " />

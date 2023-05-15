@@ -9,7 +9,7 @@ function Home() {
 
   return (
     <div className="items-center justify-center flex">
-      <img src='/pong.png' width='500px'/>
+      <img src='/pong.png'/>
       <Link to="/Game" className="play-button">CLICK TO PLAY !</Link>
     </div>
   )
