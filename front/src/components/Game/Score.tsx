@@ -5,11 +5,15 @@ const ScoreWrapper = styled.div`
   color: white;
   position: absolute;
   display: flex;
-  left: 50%;
+  justify-content: center;
+  width: 100%;
 `;
 
 const ScoreValue = styled.h1`
   font-size: 2rem;
+  border: 1px solid white;
+  border-radius: 10%;
+  padding: 0.5rem;
 `;
 
 function Score({ scorePlayerLeft, scorePlayerRight }) {

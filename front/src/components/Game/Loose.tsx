@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
 const LooseWrapper = styled.div`
-  width: 200px;
-  height: 100px;
-  top: 250px;
-  left: 300px;
+  width: 40%;
+  height: 40%;
+  top: 30%;
+  left: 30%;
   border: 10px dashed white;
   border-radius: 25%;
   position: absolute;
@@ -14,6 +14,7 @@ const LooseWrapper = styled.div`
   justify-content: center;
   text-align: center;
   display: flex;
+  flex-direction: column;
 `;
 
 const StyledTitle = styled.h1`
@@ -22,10 +23,26 @@ const StyledTitle = styled.h1`
   font-weight: bold;
 `;
 
+const StyledRetryButton = styled.button`
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  &:hover {
+    background-color: grey;
+  }
+`;
+
 function Loose() {
   return (
     <LooseWrapper>
       <StyledTitle>Perdu</StyledTitle>
+      <StyledRetryButton>Rejouer</StyledRetryButton>
     </LooseWrapper>
   );
 }
