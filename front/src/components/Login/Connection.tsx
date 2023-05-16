@@ -20,8 +20,6 @@ function ConnectPage() {
     async function fetchAndSetIs2FAactived() {
       try {
         const res = await check2FACookie();
-        console.log("res : ", res)
-
         if (res.is2FAactived) {
           console.log("is2FAactived")
           setIs2FAactiv(res.is2FAactived);
@@ -45,7 +43,6 @@ function ConnectPage() {
   //save user data in redux
   async function saveUserData() {
     const res = await getUserData();
-    console.log("res user data : ", res)
     dispatch(setUser(res));
     dispatch(setLogged(true));
   }

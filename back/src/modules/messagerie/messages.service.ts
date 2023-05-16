@@ -148,6 +148,7 @@ export class MessageService {
           firstName: true,
           lastName: true,
           login: true,
+          avatar: true,
         },
         destUser: {
           id: true,

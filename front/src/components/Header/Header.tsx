@@ -50,8 +50,11 @@ function Header() {
               Profil
             </NavLink>
             <NavLink to="/profile" className="header__link-avatar" > 
-              <img src={`http://localhost:3000/avatars/` + userData?.avatar}
-                className="text-center p-2 w-full h-24" />
+              {userData.avatar && 
+              <img 
+                src={`http://localhost:3000/avatars/` + userData.avatar}
+                className="text-center p-2 w-full h-24"
+              />}
             </NavLink>
           </>
           }

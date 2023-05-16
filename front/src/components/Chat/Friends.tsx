@@ -1,30 +1,41 @@
 import { useState, useRef, useEffect } from 'react'
 import { ImPencil, ImBlocked } from "react-icons/im";
 
-import { getFriends } from '../../api/chat'
+import { getFriends, apiBlockUser } from '../../api/relation'
 
 const Friend = (data: any) => {
+  async function blockUser(userToBlock: any) {
+
+    const res = await apiBlockUser(userToBlock);
+    console.log("res bloc user : ", res)
+
+  }
+
   return (
     <div>
-      <div className="m-2 p-2 border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left" >
-        <div className="flex-grow text-black"
+      <div className="border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left">
+        <div className="flex-grow text-black m-2 p-2 "
           onClick={() => {
             if (data.currentChatUser !== data.data.login) {
               data.setCurrentChatUser(data.data)
               data.setOpen(false)
             }
-          }}>
+          }}
+        >
           {data.data.login}
         </div>
-        <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all">
+        {/* <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all">
           <ImPencil className="m-1" />
           <div className="absolute group-hover:block text-center w-80 text-sm bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
             Send direct message to user.
           </div>
-        </div>
-        <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all" >
-          <ImBlocked className="m-1" />
-          <div className="absolute group-hover:block text-center w-40 bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
+        </div> */}
+        <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all m-2"
+          onClick={ () => blockUser(data.data.id)} 
+        >
+          <ImBlocked className="m-1 text-red-600" />
+          <div className="absolute group-hover:block text-center w-40 bg-slate-800 text-white shadow-sm hidden 
+          left-14 font-mono p-3 rounded-md transition-all">
             Block user
           </div>
         </div>
@@ -40,14 +51,9 @@ function Friends({ currentChatUser, setCurrentChatUser }: any) {
   let ref = useRef(document.createElement('div'));
 
   async function fetchFriends() {
-    try {
       const res = await getFriends();
-      console.log("res : ", res)
-
+      // console.log("res : ", res)
       setFriends(res);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
   }
 
   useEffect(() => {

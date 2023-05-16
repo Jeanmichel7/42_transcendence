@@ -1,15 +1,4 @@
-import api from './index';
-
-export async function getFriends() {
-  const res = await api.get('/relations/friends');
-
-  if (res.status === 200) {
-    console.log(res.data)
-    return res.data;
-  } else {
-    throw new Error('Failed to get friends');
-  }
-}
+import api, { apiAvatar } from './index';
 
 export async function sendMessage(message: any, receiverId: any) {
   try {
@@ -35,15 +24,14 @@ export async function getOldMessages(userId: any) {
   }
 }
 
-
-
-// export async function getUserData() {
-//   const response = await api.get('/users');
-
-//   if (response.status === 200) {
-//     return response.data;
-//   }
-//   else {
-//     throw new Error('Failed to get user data');
-//   }
-// }
+export async function imgExist(url: string) {
+  try {
+    const response = await apiAvatar(url);
+    console.log("respons eimage exist : ", response)
+    if (response.status === 200) {
+      return true;
+    }
+  } catch (e: any) {
+    return false;
+  }
+}

@@ -8,4 +8,11 @@ const api = axios.create({
   // },
 });
 
+const apiAvatar = axios.create({
+  baseURL: 'http://localhost:3000/avatars',
+  withCredentials: true,
+  method: 'HEAD'
+});
+
 export default api;
+export { apiAvatar };
