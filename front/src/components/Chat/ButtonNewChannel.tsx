@@ -37,13 +37,15 @@ function ButtonNewChannel() {
   };
 
   return (
-    <div className="relative" ref={ref}>
-      <button className={`text-center p-3 border-2 shadow-lg rounded-xl font-mono cursor-pointer
+    <>
+      <button className={`max-w-sm text-center p-3 border-2 shadow-lg rounded-xl font-mono cursor-pointer
         hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`} onClick={() => setOpen(!open)}>
         New channel
       </button>
 
-      <div className={`absolute z-50 left-0 top-0 mt-12 p-2 border shadow-lg w-3/12 rounded-xl bg-white ${open ? "" : "hidden"} transition-all`}  >
+      <div className={`absolute z-50 left-0 top-0 mt-12 p-2 border shadow-lg w-3/12 rounded-xl bg-white 
+        ${open ? "" : "hidden"} transition-all`}
+      >
         <div className="bg-white border rounded shadow-sm">
           <h1 className="m-2 font-bold">Select user:</h1>
           <ul className="m-2 p-2 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer">User 1</ul>
@@ -65,7 +67,7 @@ function ButtonNewChannel() {
           <p className="text-center">Create</p>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 export default ButtonNewChannel;

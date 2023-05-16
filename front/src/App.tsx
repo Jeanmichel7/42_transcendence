@@ -9,7 +9,7 @@ function App() {
     <div className='flex flex-col h-screen'>
       <Header />
       <div className='relative flex-grow bg-[#262652] w-full'>
-        <div className='mr-12 p-6 min-h-full'>
+        <div className='mr-12 p-6 h-full text-white'>
           <AppRoutes />
         </div>
         <div className="absolute right-0 top-0">

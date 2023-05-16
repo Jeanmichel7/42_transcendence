@@ -71,6 +71,7 @@ export class MessageService {
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
         'destUser.id',
         'destUser.firstName',
         'destUser.lastName',
@@ -80,7 +81,7 @@ export class MessageService {
         '(ownerUser.id = :userIdFrom AND destUser.id = :userIdTo) OR (ownerUser.id = :userIdTo AND destUser.id = :userIdFrom)',
         { userIdFrom, userIdTo },
       )
-      .orderBy('message.createdAt', 'DESC')
+      .orderBy('message.createdAt', 'ASC')
       .getMany();
 
     const result: MessageBtwTwoUserInterface[] = messages;

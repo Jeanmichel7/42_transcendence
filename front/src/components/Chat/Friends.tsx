@@ -7,10 +7,10 @@ const Friend = (data: any) => {
   return (
     <div>
       <div className="m-2 p-2 border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left" >
-        <div className="flex-grow text-black" 
-          onClick={() => { 
-            if( data.currentChatUser !== data.data.login ) {
-              data.setCurrentChatUser(data.data) 
+        <div className="flex-grow text-black"
+          onClick={() => {
+            if (data.currentChatUser !== data.data.login) {
+              data.setCurrentChatUser(data.data)
               data.setOpen(false)
             }
           }}>
@@ -34,7 +34,7 @@ const Friend = (data: any) => {
 }
 
 
-function Friends( {currentChatUser, setCurrentChatUser} : any) {
+function Friends({ currentChatUser, setCurrentChatUser }: any) {
   const [open, setOpen] = useState(false);
   const [friends, setFriends] = useState<any[]>([]);
   let ref = useRef(document.createElement('div'));
@@ -66,26 +66,29 @@ function Friends( {currentChatUser, setCurrentChatUser} : any) {
   }, [open]);
 
   return (
-    <div className="">
-      <div className={`text-center max-w-sm min-w-fit border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
-        hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`} 
-           onClick={() => setOpen(!open)}>
-        Friends
+    <>
+      <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
+        hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`}
+        onClick={() => setOpen(!open)}
+      >
+        <h2>Friends</h2>
+        <div ref={ref} className={`w-full bg-white
+          border shadow-lg text-center rounded-xl mt-5
+          ${open ? "" : "hidden"} transition-all`}
+        >
+          {friends?.length === 0 && <p className="text-center">No friends yet</p>}
+          {friends?.map((friend) => (
+            <Friend
+              key={friend.id}
+              data={friend}
+              currentChatUser={currentChatUser}
+              setCurrentChatUser={setCurrentChatUser}
+              setOpen={setOpen}
+            />
+          ))}
+        </div>
       </div>
-
-      <div ref={ref} className={`absolute left-1/4 max-w-md top-16 z-40 bg-white mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl ${open ? "" : "hidden"} transition-all`}  >
-        {friends?.length === 0 && <p className="text-center">No friends yet</p>}
-        {friends?.map((friend) => (
-          <Friend
-            key={friend.id}
-            data={friend}
-            currentChatUser={currentChatUser}
-            setCurrentChatUser={setCurrentChatUser}
-            setOpen={setOpen}
-          />
-        ))}
-      </div>
-    </div>
+    </>
   )
 }
 

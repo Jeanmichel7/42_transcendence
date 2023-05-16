@@ -37,17 +37,21 @@ function ButtonUser() {
   }, [ref])
 
   return (
-    <div>
-      <div className={`m-2 my-5 text-center w-3/12 border-2 rounded-xl shadow-lg font-mono py-2 cursor-pointer hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`} 
-           onClick={() => setOpen(!open)}>
+    <>
+      <div className={`text-center border-2 rounded-xl shadow-lg font-mono 
+        p-3 cursor-pointer hover:bg-gray-100 transition-all
+        ${open ? 'bg-gray-100' : ''}`} onClick={() => setOpen(!open)}
+      >
         User
       </div>
 
-      <div ref={ref} className={`absolute left-1/4 top-16 z-40 bg-white mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl ${open ? "" : "hidden"} transition-all`}  >
+      <div ref={ref} className={`absolute left-1/4 top-16 z-40 bg-white mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl
+        ${open ? "" : "hidden"} transition-all`}
+      >
         <User name="User 1" />
         <User name="User 2" />
       </div>
-    </div>
+    </>
   )
 }
 
