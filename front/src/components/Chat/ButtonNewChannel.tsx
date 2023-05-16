@@ -40,7 +40,7 @@ function ButtonNewChannel() {
     <>
       <button className={`max-w-sm text-center p-3 border-2 shadow-lg rounded-xl font-mono cursor-pointer
         hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`} onClick={() => setOpen(!open)}>
-        New channel
+        Create group
       </button>
 
       <div className={`absolute z-50 left-0 top-0 mt-12 p-2 border shadow-lg w-3/12 rounded-xl bg-white 

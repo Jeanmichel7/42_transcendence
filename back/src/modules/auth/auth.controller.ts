@@ -40,7 +40,7 @@ export class AuthController {
 
   @Get('isAuthenticated')
   async isAuth(@Req() req: RequestWithUser): Promise<boolean> {
-    console.log('test route isAutheticated : ', req.user);
+    // console.log('test route isAutheticated : ', req.user);
     if (req.user.id != undefined) return true;
     else return false;
   }

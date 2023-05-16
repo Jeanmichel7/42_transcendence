@@ -109,6 +109,26 @@ const Conversation = (userSelected: any) => {
     });
   };
 
+  function getTimeSince(time: Date) {
+    // console.log('time : ', time)
+    const now = new Date();
+    const dataTime = new Date(time);
+    const diff = now.getTime() - dataTime.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+
+    if (hours > 24) {
+      return dataTime.toLocaleDateString();
+    } else if (hours >= 1) {
+      return `${hours}h`;
+    } else if (minutes >= 1) {
+      return `${minutes}m`;
+    } else {
+      return `${seconds}s`;
+    }
+  }
+
 
   return (
     userSelected.user.id == -1 && 
@@ -142,10 +162,11 @@ const Conversation = (userSelected: any) => {
                 }}
                 alt="avatar"
               />
-
               <div className=''>
                 <div className='font-semibold'>{message.ownerUser.login}
-                  <span className='text-xs text-gray-500 font-normal'> {message.createdAt} </span>
+                  <span className='text-xs text-gray-500 font-normal ml-2'> 
+                    { `Il y a `+ getTimeSince(message.createdAt) } 
+                  </span>
                 </div>
                 <div className=''>{message.text}</div>
               </div>
