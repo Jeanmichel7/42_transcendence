@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Loose from './Loose';
 import Score from './Score';
 import { BiWindows } from 'react-icons/bi';
+import { io } from 'socket.io-client';
 
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
@@ -71,34 +72,32 @@ function Game() {
   const loose = useRef(false);
   const [gameDimensions, setGameDimensions] = useState({ width: 0, height: 0 });
   const [fps, setFps] = useState(0);
-  /*
+
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket('ws://your-websocket-url');
-    socket.onopen = () => {
-      console.log('Connected to WebSocket');
-    };
-    socket.onmessage = (event) => {
-      console.log('Received data from WebSocket:', event.data);
-    };
-    socket.onclose = () => {
-      console.log('Disconnected from WebSocket');
-    };
-
+    const socket = io('http://localhost:3000/game');
     setSocket(socket);
 
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket');
+    });
+
+    socket.on('message', (id, data) => {
+      console.log('Received data from WebSocket:', data);
+      const messages = document.getElementById('messages');
+      messages.innerHTML += `<p>  ${id} : ${data} </p>`;
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket');
+    });
+
     return () => {
-      socket.close();
+      socket.disconnect();
     };
   }, []);
 
-  const sendMessage = (message) => {
-    if (socket) {
-      socket.send(message);
-    }
-  };
-*/
   useEffect(() => {
     const handleResize = () => {
       const gameWrapper = document.querySelector('.game-wrapper');
@@ -206,8 +205,34 @@ function Game() {
     };
   }, []);
 
+  function sendMessage(message) {
+    if (socket) {
+      socket.emit('message', message.value); // Emit 'message' event
+    }
+  }
+
   return (
-    <GameWrapper className="game-wrapper">
+    <div>
+      <input
+        id="message"
+        style={{
+          'border-radius': '2px',
+          'border-color': 'black',
+          'background-color': 'grey',
+        }}
+      ></input>
+      <button onClick={() => sendMessage(document.getElementById('message'))}>
+        BUTTON
+      </button>
+      <div id="messages"></div>
+    </div>
+
+    /* <GameWrapper className="game-wrapper">
+      <input type="text" id="message" />
+      <button
+        onClick={() => sendMessage(document.getElementById('message').value)}
+      ></button>
+      <div id="messages"></div>
       <p style={{ color: 'white' }}>{`FPS: ${fps.toFixed(2)}`}</p>
       <Score
         scorePlayerLeft={scorePlayerLeft}
@@ -220,7 +245,13 @@ function Game() {
         posY={ball.y * (gameDimensions.height / 1000)}
       />
       <Racket posY={posRacketRightState} type="right" />
+      <input type="text" id="message" />
+      <button
+        onClick={() => sendMessage(document.getElementById('message').value)}
+      ></button>
+      <div id="messages"></div>
     </GameWrapper>
+  */
   );
 }
 

@@ -6,6 +6,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { typeOrmConfig } from 'config/typeorm.config';
 
 import { AuthModule } from './modules/auth/auth.module';
+import {GameModule } from './modules/game/game.module';
 import { UsersModule } from './modules/users/users.module';
 import { UsersRelationsModule } from './modules/users_relations/users_relations.module';
 import { MessageModule } from './modules/messagerie/messages.module';
@@ -39,6 +40,7 @@ import { join } from 'path';
     MessageModule,
     AuthModule,
     ChatModule,
+    GameModule,
   ],
 })
 export class AppModule {}
