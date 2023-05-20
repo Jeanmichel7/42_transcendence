@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.2 (Debian 15.2-1.pgdg110+1)
--- Dumped by pg_dump version 15.2 (Debian 15.2-1.pgdg110+1)
+-- Dumped from database version 15.3 (Debian 15.3-1.pgdg110+1)
+-- Dumped by pg_dump version 15.3 (Debian 15.3-1.pgdg110+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -63,7 +63,7 @@ ALTER SEQUENCE public."chat-messages_id_seq" OWNED BY public."chat-messages".id;
 
 CREATE TABLE public."chat-rooms" (
     id bigint NOT NULL,
-    status text DEFAULT 'public'::text NOT NULL,
+    type text DEFAULT 'private'::text NOT NULL,
     password text,
     "createdAt" timestamp without time zone DEFAULT now(),
     "updatedAt" timestamp without time zone DEFAULT now(),
@@ -197,7 +197,8 @@ CREATE TABLE public.users (
     status text DEFAULT 'offline'::text,
     "secret2FA" text,
     "createdAt" timestamp without time zone DEFAULT now(),
-    "updatedAt" timestamp without time zone DEFAULT now()
+    "updatedAt" timestamp without time zone DEFAULT now(),
+    "lastActivity" timestamp without time zone DEFAULT now()
 );
 
 
@@ -302,29 +303,6 @@ ALTER TABLE ONLY public."users-relation" ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 COPY public."chat-messages" (id, text, "createdAt", "updatedAt", "userId", "roomId") FROM stdin;
-1	Hello everyone	2023-04-15 15:18:44.969765	2023-04-15 15:18:44.969765	2	2
-2	Hello everyone	2023-04-15 15:21:45.199946	2023-04-15 15:21:45.199946	2	2
-3	Hello everyone	2023-04-15 15:23:16.619574	2023-04-15 15:23:16.619574	2	2
-4	Hello everyone	2023-04-15 15:24:26.268709	2023-04-15 15:24:26.268709	2	2
-5	Hello everyone	2023-04-15 15:24:33.429685	2023-04-15 15:24:33.429685	2	2
-6	Hello everyone	2023-04-15 15:25:35.533427	2023-04-15 15:25:35.533427	2	2
-7	Hello everyone	2023-04-15 15:26:20.766359	2023-04-15 15:26:20.766359	2	2
-8	Hello everyone	2023-04-15 15:26:26.175978	2023-04-15 15:26:26.175978	2	2
-9	Hello everyone	2023-04-15 15:27:35.826356	2023-04-15 15:27:35.826356	2	2
-10	Hello everyone	2023-04-15 15:28:40.010035	2023-04-15 15:28:40.010035	2	2
-11	Hello	2023-04-15 15:30:09.59099	2023-04-15 15:30:09.59099	3	2
-12	Hi	2023-04-15 15:30:15.414073	2023-04-15 15:30:15.414073	1	2
-13	Hello	2023-04-15 15:51:05.825422	2023-04-15 15:51:05.825422	3	2
-14	Hello	2023-04-15 15:51:15.66553	2023-04-15 15:51:15.66553	3	3
-15	Hello everyone	2023-04-15 15:51:28.001907	2023-04-15 15:51:28.001907	2	2
-16	Hello everyone	2023-04-15 15:51:40.855553	2023-04-15 15:51:40.855553	2	1
-17	eeeeee	2023-04-15 15:54:09.867064	2023-04-15 15:54:09.867064	1	1
-18	rrrrrrr	2023-04-15 15:54:13.308524	2023-04-15 15:54:13.308524	1	2
-19	Hello	2023-04-15 18:16:01.702971	2023-04-15 18:16:01.702971	3	3
-20	Hello	2023-04-15 18:17:58.065179	2023-04-15 18:17:58.065179	3	3
-21	Hello	2023-04-15 18:20:57.390281	2023-04-15 18:20:57.390281	3	3
-22	mnbvc	2023-04-15 18:21:26.921816	2023-04-15 18:21:26.921816	1	2
-23	dfsa	2023-04-15 18:33:00.118345	2023-04-15 18:33:00.118345	1	3
 \.
 
 
@@ -332,10 +310,7 @@ COPY public."chat-messages" (id, text, "createdAt", "updatedAt", "userId", "room
 -- Data for Name: chat-rooms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms" (id, status, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
-1	public	\N	2023-04-15 15:13:14.280723	2023-04-15 15:13:14.280723	1
-2	public	\N	2023-04-15 15:15:57.668681	2023-04-15 15:15:57.668681	1
-3	public	pwd	2023-04-15 15:47:23.547194	2023-04-15 15:47:23.547194	3
+COPY public."chat-rooms" (id, type, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
 \.
 
 
@@ -344,9 +319,6 @@ COPY public."chat-rooms" (id, status, password, "createdAt", "updatedAt", "owner
 --
 
 COPY public."chat-rooms_admins_users" ("chatRoomsId", "usersId") FROM stdin;
-1	1
-2	1
-3	3
 \.
 
 
@@ -371,10 +343,6 @@ COPY public."chat-rooms_muted_users_users" ("chatRoomsId", "usersId") FROM stdin
 --
 
 COPY public."chat-rooms_users_users" ("chatRoomsId", "usersId") FROM stdin;
-1	1
-2	1
-3	3
-3	1
 \.
 
 
@@ -383,13 +351,23 @@ COPY public."chat-rooms_users_users" ("chatRoomsId", "usersId") FROM stdin;
 --
 
 COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUserId") FROM stdin;
-1	Hello	2023-04-15 14:51:24.065198	2023-04-15 14:51:24.065198	1	2
-2	Hi! How are you?	2023-04-15 14:52:31.903734	2023-04-15 14:52:31.903734	2	1
-3	Fine and u	2023-04-15 14:52:48.770817	2023-04-15 14:52:48.770817	1	2
-4	Fine	2023-04-15 14:53:07.475761	2023-04-15 14:53:07.475761	2	1
-5	Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.	2023-04-15 14:54:03.049563	2023-04-15 14:54:03.049563	3	1
-6	What ?	2023-04-15 14:58:01.536222	2023-04-15 14:58:01.536222	1	3
-7	Nothing	2023-04-15 14:58:12.326031	2023-04-15 14:58:12.326031	3	1
+8	Hello	2023-05-20 15:49:45.385379	2023-05-20 15:49:45.385379	7	4
+9	Hello la forme ?	2023-05-20 15:49:59.271065	2023-05-20 15:49:59.271065	7	6
+10	1	2023-05-20 15:50:09.893491	2023-05-20 15:50:09.893491	7	6
+11	2	2023-05-20 15:50:11.152618	2023-05-20 15:50:11.152618	7	6
+12	3	2023-05-20 15:50:12.264438	2023-05-20 15:50:12.264438	7	6
+13	4	2023-05-20 15:50:13.509195	2023-05-20 15:50:13.509195	7	6
+14	5	2023-05-20 15:50:14.492224	2023-05-20 15:50:14.492224	7	6
+15	6	2023-05-20 15:50:16.064519	2023-05-20 15:50:16.064519	7	6
+16	Fine and u	2023-05-20 15:51:47.321694	2023-05-20 15:51:47.321694	4	7
+17	Hello	2023-05-20 15:52:04.740202	2023-05-20 15:52:04.740202	4	7
+18	Salut	2023-05-20 15:52:08.765511	2023-05-20 15:52:08.765511	4	7
+19	babla	2023-05-20 15:52:13.43018	2023-05-20 15:52:13.43018	7	6
+20	Hello	2023-05-20 15:54:08.662638	2023-05-20 15:54:08.662638	6	4
+21	Salut toi \n	2023-05-20 15:54:26.316307	2023-05-20 15:54:26.316307	6	4
+22	Hello	2023-05-20 15:54:33.897356	2023-05-20 15:54:33.897356	6	4
+23	Coucou	2023-05-20 15:54:37.730999	2023-05-20 15:54:37.730999	6	4
+24	Hey 	2023-05-20 15:54:58.80025	2023-05-20 15:54:58.80025	6	7
 \.
 
 
@@ -397,10 +375,10 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt") FROM stdin;
-1	Jean-michel	Rasser	jrasser843	jrasser@student.42mulhouse.fr	\N	user	avatar-1681569352834-22313.jpg	\N	f	offline	\N	2023-04-15 14:35:52.983528	2023-04-15 14:35:52.983528
-2	myname	mylastname	mylogin	mymail@student.42.mulhouse.fr	$2b$10$AS6SHG9yawx/Ppi0FgF.1ulkvjl.VPUuQaIlskZtFMvRCcsJuqLfq	user	avatar-1681569879125-524990.jpg	\N	f	offline	\N	2023-04-15 14:36:39.627354	2023-04-15 14:44:39.151
-3	myname2	mylastname2	mylogin2	mymail2@student.42.mulhouse.fr	$2b$10$OcW31nqM8xFvkj3ypkSj.e.1edEvBE6Bg4aU6Dj9yM/o/PAbbGA8S	user	avatar-1681569905226-824669.jpg	\N	f	offline	\N	2023-04-15 14:37:16.641894	2023-04-15 14:45:05.23
+COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity") FROM stdin;
+7	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	avatar-1684597759567-714642.jpg	\N	f	absent	\N	2023-05-20 15:49:19.631682	2023-05-20 16:18:08.972	2023-05-20 15:58:57.918
+4	Yann	Dumaine	ydumaine	ydumaine@student.42mulhouse.fr	\N	user	avatar-1684597161730-676240.jpg	\N	f	offline	\N	2023-05-20 15:39:21.815568	2023-05-20 15:42:29.235	2023-05-20 15:52:08.758
+6	Wilhelm	Fermey	wfermey	wfermey@student.42mulhouse.fr	\N	user	avatar-1684597618569-58366.jpg	\N	f	offline	\N	2023-05-20 15:46:58.634678	2023-05-20 15:58:40.587	2023-05-20 15:58:40.584
 \.
 
 
@@ -409,6 +387,11 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 --
 
 COPY public."users-relation" (id, "relationType", "createdAt", "updatedAt", "userId", "userRelationId") FROM stdin;
+4	friend	2023-05-20 15:49:34.581297	2023-05-20 15:49:34.58	7	7
+5	friend	2023-05-20 15:49:36.954703	2023-05-20 15:49:36.954	7	4
+6	friend	2023-05-20 15:49:37.794761	2023-05-20 15:49:37.794	7	6
+8	friend	2023-05-20 15:53:28.52993	2023-05-20 15:53:28.529	6	4
+7	friend	2023-05-20 15:53:26.774284	2023-05-20 15:54:51.769	6	7
 \.
 
 
@@ -430,21 +413,21 @@ SELECT pg_catalog.setval('public."chat-rooms_id_seq"', 3, true);
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_id_seq', 7, true);
+SELECT pg_catalog.setval('public.messages_id_seq', 24, true);
 
 
 --
 -- Name: users-relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."users-relation_id_seq"', 1, false);
+SELECT pg_catalog.setval('public."users-relation_id_seq"', 8, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 7, true);
 
 
 --
@@ -620,7 +603,7 @@ ALTER TABLE ONLY public."chat-rooms_admins_users"
 --
 
 ALTER TABLE ONLY public."chat-rooms_admins_users"
-    ADD CONSTRAINT "FK_3d8c7d5dc814c801b1075a100d9" FOREIGN KEY ("usersId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_3d8c7d5dc814c801b1075a100d9" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -628,7 +611,7 @@ ALTER TABLE ONLY public."chat-rooms_admins_users"
 --
 
 ALTER TABLE ONLY public."chat-rooms_muted_users_users"
-    ADD CONSTRAINT "FK_512a2d0b091e14e85094b295d78" FOREIGN KEY ("usersId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_512a2d0b091e14e85094b295d78" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -636,7 +619,7 @@ ALTER TABLE ONLY public."chat-rooms_muted_users_users"
 --
 
 ALTER TABLE ONLY public."chat-rooms_banned_users_users"
-    ADD CONSTRAINT "FK_652058acde35292d8d9692a62e5" FOREIGN KEY ("usersId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_652058acde35292d8d9692a62e5" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -660,7 +643,7 @@ ALTER TABLE ONLY public."users-relation"
 --
 
 ALTER TABLE ONLY public."chat-rooms_users_users"
-    ADD CONSTRAINT "FK_7803d418aba8d9cd9466247c7ad" FOREIGN KEY ("usersId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_7803d418aba8d9cd9466247c7ad" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -700,7 +683,7 @@ ALTER TABLE ONLY public."chat-rooms_banned_users_users"
 --
 
 ALTER TABLE ONLY public."chat-rooms"
-    ADD CONSTRAINT "FK_df0593dbc3a47467284bc2fbc3b" FOREIGN KEY ("ownerUserId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_df0593dbc3a47467284bc2fbc3b" FOREIGN KEY ("ownerUserId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

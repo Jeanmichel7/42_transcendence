@@ -115,7 +115,11 @@ http://localhost:5050/
 
 ## DB SAVE
 sudo su - postgres
-psql
+<!-- psql
+\c pong_db -->
+cd /var/lib/postgresql
 pg_dump pong_db > save.sql
-\q
+exit
+exit
+<!-- \q -->
 docker cp postgres:/var/lib/postgresql/save.sql ./db/save.sql
