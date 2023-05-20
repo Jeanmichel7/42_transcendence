@@ -5,11 +5,12 @@ import SideBar from './sidebar';
 import axios from 'axios';
 import io from 'socket.io-client';
 
+
 function Test() {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   async function fetchUserProfile() {
-    const userId = 1;
+    const userId = 4;
     const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
       withCredentials: true,
     });
@@ -35,7 +36,7 @@ function Test() {
     const [messageInput1, setMessageInput1] = useState('');
 
     const token = 'YOUR_TOKEN_HERE';
-    const userIdDest = '2';
+    const userIdDest = '1';
 
     const joinRoom1 = (userIdDest) => {
       const socketEvent1 = io(`http://localhost:3000/messagerie`, {
@@ -76,13 +77,14 @@ function Test() {
     return (
       <div>
         <h3>Messagerie user id 2 - jrasser</h3>
-        <button onClick={() => joinRoom1(userIdDest)}>Join private room</button>
+        <button className=' bg-white rounded-xl boder-2  p-2' onClick={() => joinRoom1(userIdDest)}>Join private room</button>
         <br />
         <br />
         <div id="Form1">
           <input
             type="text"
             value={messageInput1}
+            // set input value into messageinput1
             onChange={(e) => setMessageInput1(e.target.value)}
           />
           <button onClick={() => sendMessage1(userIdDest)}>Send</button>

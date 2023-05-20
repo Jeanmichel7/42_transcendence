@@ -20,7 +20,6 @@ function App() {
        <Route path='/game' element={<Game />}> </Route> 
        <Route path='/connection' element={<ConnectPage />}> </Route> 
        <Route path='/test' element={<Test />}> </Route> 
-
       </Routes>
     </div>
   )

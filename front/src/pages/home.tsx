@@ -8,7 +8,7 @@ function Home() {
   const [userProfile, setUserProfile] = useState<any>(null);
 
   async function fetchUserProfile() {
-    const userId = 1
+    const userId = 4 
     const response = await axios.get(`http://localhost:3000/users/${userId}/profileById`, {
       withCredentials: true,
     });
@@ -29,7 +29,6 @@ function Home() {
     }
     fetchAndSetUserProfile();
   }, []);
-
 
   return (
 
@@ -53,9 +52,7 @@ function Home() {
           <Link to="/Game" className="play-button">CLICK TO PLAY !</Link>
         </div>
       </span>
-
     </div>
-
   )
 }
 export default Home
