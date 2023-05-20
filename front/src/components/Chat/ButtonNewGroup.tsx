@@ -13,6 +13,7 @@ function ButtonNewGroup({userData} : {userData:any}) {
 
     const [open, setOpen] = useState(false);
     const [Public, setPublic] = useState(false);
+    const [roomName, setRoomName] = useState('');
     const [password, setPassword] = useState('');
 
     let ref = useRef(document.createElement("div"))
@@ -30,19 +31,24 @@ function ButtonNewGroup({userData} : {userData:any}) {
       <ButtonUser key={user.id} login={user.login} />
     ));
 
-    /* Create new Room */
+    /* Create new Room without password */
     const addNewRoom = () => {
-      axios.post(`http://localhost:3000/chat/rooms/add`, { 
-          withCredentials: true,
-        });
+      axios.post(`http://localhost:3000/chat/rooms/add`, {
+        type: "public",
+        password: null,
+      }, {
+        withCredentials: true
+      });
     };
 
     /* Create new Room with password */
     const addNewRoomPassword = () => {
       axios.post(`http://localhost:3000/chat/rooms/add`, {
-          password: {password}}, {
-          withCredentials: true,
-        });
+        type: "public",
+        password: password,
+      }, {
+        withCredentials: true
+      });
     };
 
     return (
@@ -74,7 +80,10 @@ function ButtonNewGroup({userData} : {userData:any}) {
 
                 <div className=" bg-white border rounded mt-2 shadow-sm ">
                   <p className=" font-mono">Name: </p>
-                  <input className="border rounded text-center m-1 shadow-sm " type="text" />
+                  <input 
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)} 
+                  className="border rounded text-center m-1 shadow-sm " type="text" />
                 </div>
 
                 <button className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
