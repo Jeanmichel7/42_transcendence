@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import ButtonNewChannel from '../components/Chat/ButtonNewChannel'
-import ButtonUser from '../components/Chat/ButtonUser'
-import ChatRoom from '../components/Chat/ChatRoom'
+import ButtonNewGroup from '../components/Chat/ButtonNewGroup'
+// import ChatRoom from '../components/Chat/ChatRoom'
 import Friends from '../components/Friends/Friends'
 import Conversation from '../components/Chat/Conversation'
 import ButtonAddFriends from '../components/Friends/ButtonAddFriends'
@@ -22,14 +21,13 @@ function Chat() {
         <ButtonAddFriends 
           setServiceToCall={ setServiceToCall }
         />
-        <ButtonNewChannel />
-        <ButtonUser />
+        <ButtonNewGroup  />
         <Friends
           setServiceToCall={ setServiceToCall }
           currentChatUser={currentChatUser}
           setCurrentChatUser={setCurrentChatUser}
         />
-        <ChatRoom />
+        {/* <ChatRoom /> */}
       </div>
 
       <div className="w-3/4 h-full">
@@ -37,7 +35,6 @@ function Chat() {
         serviceToCall === 'chat' &&
         <Conversation user={currentChatUser} />
       }
-
       {
         serviceToCall === 'addFriends' &&
         <AddFriends />

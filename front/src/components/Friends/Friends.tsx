@@ -11,7 +11,7 @@ const Friend = (data: any) => {
     console.log("res bloc user : ", res)
   }
 
-  async function handleRemoveFriend(e) {
+  async function handleRemoveFriend(e: any) {
     e.stopPropagation();
     const res = await deleteFriend(data.data.id);  
     console.log("res remove friend : ", res)

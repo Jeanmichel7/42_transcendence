@@ -5,7 +5,7 @@
 @layer components {
 
   .sidebar {
-    @apply p-4 m-4 text-white text-lg hover: text-[#1e1e4e] hover:bg-slate-50 hover:rounded-full transition-all
+    @apply p-4 m-4 text-white text-lg hover:text-[#1e1e4e] hover:bg-slate-50 hover:rounded-full transition-all
   }
 
   .pong_sidebar {

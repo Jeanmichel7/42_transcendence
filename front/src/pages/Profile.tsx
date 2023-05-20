@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Header/Header'
 import { Link } from 'react-router-dom'
-import SideBar from '../components/SideBar'
 import axios from 'axios';
 
 function Profile() {
@@ -30,7 +29,6 @@ function Profile() {
     fetchAndSetUserProfile();
   }, []);
 
-
   return (
     <div className="w-full bg-[#1e1e4e]">
       <span className=" w-3/4 h-2/3 items-center justify-center flex">
@@ -45,7 +43,6 @@ function Profile() {
             : "aie probleme"}
         </div>
       </span>
-
     </div>
   )
 }

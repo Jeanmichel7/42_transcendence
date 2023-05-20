@@ -107,7 +107,7 @@ export class UsersService {
         'description',
         'avatar',
         'role',
-        'is2FAEnabled',
+        // 'is2FAEnabled',
       ],
     });
     if (!users) throw new NotFoundException(`Users not found`);

@@ -9,8 +9,7 @@ function Header() {
   /* redux */
   const userData: any = useSelector((state: any) => state.user.userData);
   const userIsLogged: any = useSelector((state: any) => state.user.isLogged);
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
   let navigate = useNavigate();
 
   async function handleLogout() {
@@ -34,7 +33,7 @@ function Header() {
         </Link>
 
         <div className="flex justify-between items-center" >
-          <NavLink to="/home" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Play</NavLink>
+          <NavLink to="/game" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Play</NavLink>
           <NavLink to="/chat" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Chat</NavLink>
           <NavLink to="/test" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Test</NavLink>
           <NavLink to="/friends" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Friends</NavLink>

@@ -4,7 +4,6 @@ import SideBar from './components/SideBar';
 
 import AppRoutes from './routes/indexRoutes';
 import { useEffect } from 'react';
-
 import { getUserData, isAuthenticated } from './api/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLogged, setUser } from './store/userSlice';
@@ -13,7 +12,6 @@ function App() {
   const userData: any = useSelector((state: any) => state.user.userData);
 
   const dispatch = useDispatch()
-
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = await isAuthenticated();
@@ -30,7 +28,6 @@ function App() {
   }, []);
 
 
-  
   return (
     <div className='flex flex-col h-screen min-h-md '>
       <Header />
