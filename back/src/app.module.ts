@@ -25,10 +25,10 @@ import { join } from 'path';
         typeOrmConfig(configService),
       inject: [ConfigService],
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'client'),
-      serveRoot: '/static',
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'src', 'client'),
+    //   serveRoot: '/static',
+    // }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'uploads', 'users_avatars'),
       serveRoot: '/avatars',

@@ -34,10 +34,16 @@ function Header() {
         </Link>
 
         <div className="flex justify-between items-center" >
-          <NavLink to="/home" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Play</NavLink>
-          <NavLink to="/chat" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Chat</NavLink>
-          <NavLink to="/test" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Test</NavLink>
-          <NavLink to="/friends" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Friends</NavLink>
+          {userIsLogged &&
+            <>
+              <NavLink to="/home" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Play</NavLink>
+              <NavLink to="/chat" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Chat</NavLink>
+              <NavLink to="/test" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Test</NavLink>
+              <NavLink to="/friends" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Friends</NavLink>
+              {/* <NavLink to="/leaderboard" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Leaderboard</NavLink> */}
+              {/* <NavLink to="/history" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >History</NavLink> */}
+            </>
+          }
         </div>
 
         <div className="flex justify-between items-center" >
