@@ -1,6 +1,6 @@
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import SideBar from './components/SideBar';
+import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from './routes/indexRoutes';
 import { useEffect } from 'react';
