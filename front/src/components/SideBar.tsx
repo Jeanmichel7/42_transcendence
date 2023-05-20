@@ -5,9 +5,11 @@ import { useState, useRef, useEffect } from 'react'
 function SideBar() {
 
   const [open, setOpen] = useState(false);
+
   let ref = useRef(document.createElement('div'));
 
   useEffect(() => {
+
     const ClickOutside = (event: any) => {
       if (!ref.current.contains(event.target))
         setOpen(false);

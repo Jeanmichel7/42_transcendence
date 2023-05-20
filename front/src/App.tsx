@@ -1,26 +1,45 @@
-import React from 'react'
-import {Routes, Route} from 'react-router-dom'
-import Chat from './components/Chat/chat';
-import Firstpage from "./pages/loginPage"
-import Friends from './pages/friends';
-import Game from './pages/game';
-import Home from './pages/home';
-import ConnectPage from './components/connectPage';
-import Test from './components/test'
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import SideBar from './components/SideBar';
+
+import AppRoutes from './routes/indexRoutes';
+import { useEffect } from 'react';
+import { getUserData, isAuthenticated } from './api/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLogged, setUser } from './store/userSlice';
 
 function App() {
+  const userData: any = useSelector((state: any) => state.user.userData);
+
+  const dispatch = useDispatch()
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isAuth = await isAuthenticated();
+      if(isAuth === true) {
+        dispatch(setLogged(true))
+        const data = await getUserData();
+        dispatch(setUser(data));
+      }
+      else {
+        dispatch(setLogged(false))
+      }
+    };
+    checkAuth();
+  }, []);
+
+
   return (
-    <div>
-      <Routes> 
-{/* hiiiiiiiii	 */}
-       <Route path='/' element={<Firstpage />}> </Route> 
-       <Route path='/home' element={<Home />}> </Route> 
-       <Route path='/chat' element={<Chat />}> </Route> 
-       <Route path='/friends' element={<Friends />}> </Route> 
-       <Route path='/game' element={<Game />}> </Route> 
-       <Route path='/connection' element={<ConnectPage />}> </Route> 
-       <Route path='/test' element={<Test />}> </Route> 
-      </Routes>
+    <div className='flex flex-col h-screen min-h-md '>
+      <Header />
+      <div className='relative flex-grow bg-[#262652] w-full'>
+        <div className='mr-12 p-6 h-full text-white'>
+          <AppRoutes />
+        </div>
+        <div className="absolute right-0 top-0">
+          <SideBar />
+        </div>
+      </div>
+      <Footer />
     </div>
   )
 }

@@ -149,7 +149,7 @@ export class UsersRelationsService {
     console.log(relationExist);
     if (relationExist?.relationType == 'friend')
       throw new BadRequestException(
-        `User ${userId} already friend ${friendId}`,
+        `User ${userFriend.login} already your friend`,
       );
 
     const updateRelation: Partial<UserRelationEntity> = {

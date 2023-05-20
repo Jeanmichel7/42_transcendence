@@ -38,6 +38,13 @@ export class AuthController {
     return result;
   }
 
+  @Get('isAuthenticated')
+  async isAuth(@Req() req: RequestWithUser): Promise<boolean> {
+    // console.log('test route isAutheticated : ', req.user);
+    if (req.user.id != undefined) return true;
+    else return false;
+  }
+
   /*
 	https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code
 	*/
@@ -87,20 +94,20 @@ export class AuthController {
     res.status(200).send({ message: 'Connexion réussie' });
   }
 
-  @Public()
+  @Public() // remove ?
   @Get('check-2FA')
   async checkJwtCookie(
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ): Promise<void> {
-    const jwtCookieName = 'jwt'; // Remplacez 'jwt' par le nom de votre cookie JWT
-    const jwtCookie = req.cookies[jwtCookieName];
-    // console.error('jwt cookie : ', jwtCookie);
+    const jwtCookie: string = req.cookies['jwt'];
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({
         is2FAactived: true,
-        userId: jwtCookie.split(':')[1],
+        user: {
+          id: jwtCookie.split(':')[1],
+        },
       });
     } else {
       res.status(200).send({ is2FAactived: false });
