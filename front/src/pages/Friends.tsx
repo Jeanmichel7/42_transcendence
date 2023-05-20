@@ -1,3 +1,5 @@
+import React from 'react'
+
 function Friends() {
   return (
     <div className="w-full bg-[#1e1e4e]">
