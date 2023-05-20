@@ -114,14 +114,13 @@ export class UsersController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
-  /*
   @Get('all')
   // @UseGuards(AuthAdmin)
   async findAll(): Promise<UserInterface[]> {
     const result: UserInterface[] = await this.usersService.findAll();
     return result;
   }
-*/
+
   @Get(':userId')
   // @UseGuards(AuthAdmin)
   async adminFindOne(
