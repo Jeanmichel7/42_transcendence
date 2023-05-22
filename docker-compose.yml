@@ -1,6 +1,5 @@
 version: '3'
 services:
-
   nestjs:
     build:
       context: ./back
@@ -61,7 +60,7 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - '5050:80'
     networks:
       - transcendence-network
 
@@ -81,7 +80,6 @@ volumes:
       type: none
       device: ${BACK_VOLUME}
       o: bind
-
 
 # ------------------------------------------------------------------------- #
 networks:

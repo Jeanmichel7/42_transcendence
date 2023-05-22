@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Loose from './Loose';
-import Score from './Score';
+import Loose from './Game/Loose';
+import Score from './Game/Score';
 import { BiWindows } from 'react-icons/bi';
 import { io } from 'socket.io-client';
 
@@ -11,6 +11,7 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 1;
 const BALL_POS_MAX = 980;
+const INITIAL_BALL_SPEED = 0.4;
 
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
@@ -65,19 +66,31 @@ function Game() {
   const posRacketLeft = useRef(0);
   const [posRacketRightState, setPositionRight] = useState(0);
   const keyStateRef = useRef({} as any);
-  const [ball, setBall] = useState({ x: 500, y: 500, vx: 10, vy: 10 });
+  const [ball, setBall] = useState({
+    x: 500,
+    y: 500,
+    vx: INITIAL_BALL_SPEED,
+    vy: INITIAL_BALL_SPEED,
+  });
   const [scorePlayerLeft, setScorePlayerLeft] = useState(0);
   const [scorePlayerRight, setScorePlayerRight] = useState(0);
   const gameWidth = useRef(0);
   const loose = useRef(false);
   const [gameDimensions, setGameDimensions] = useState({ width: 0, height: 0 });
   const [fps, setFps] = useState(0);
+  const lastDateTime = useRef(0);
 
   const [socket, setSocket] = useState(null);
 
+  console.log('RACKET_FACTOR_1000', RACKET_FACTOR_1000);
   useEffect(() => {
     const socket = io('http://localhost:3000/game');
     setSocket(socket);
+
+    const intervalId = setInterval(() => {
+      socket.emit('paddlePosition', posRacketLeft.current);
+      console.log('emit : paddlePositing', posRacketLeft.current);
+    }, 1000 / 20);
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket');
@@ -87,6 +100,10 @@ function Game() {
       console.log('Received data from WebSocket:', data);
       const messages = document.getElementById('messages');
       messages.innerHTML += `<p>  ${id} : ${data} </p>`;
+    });
+
+    socket.on('message_ack', (data) => {
+      console.log('Received data ACK from WebSocket:', data);
     });
 
     socket.on('disconnect', () => {
@@ -124,7 +141,8 @@ function Game() {
     upLoop();
     function upLoop() {
       const currentTime = performance.now();
-      const deltaTime = currentTime - lastTime;
+      let currentDateTime = Date.now();
+      let deltaTime = currentTime - lastTime;
       if (deltaTime > 0) {
         setFps(1000 / deltaTime);
       }
@@ -154,25 +172,25 @@ function Game() {
           newBall.vy = -newBall.vy;
         }
         if (
-          oldBall.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 &&
-          oldBall.y >= posRacketLeft.current &&
-          oldBall.y <= posRacketLeft.current + RACKET_HEIGHT_10
+          oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 &&
+          oldBall.y > posRacketLeft.current &&
+          oldBall.y < posRacketLeft.current + RACKET_HEIGHT_10
         ) {
           newBall.vx = -newBall.vx;
           if (keyStateRef.current['ArrowDown']) {
-            newBall.vy += 1;
-            newBall.vx -= 1;
+            newBall.vy += 0.06;
+            newBall.vx -= 0.06;
           } else if (keyStateRef.current['ArrowUp']) {
-            newBall.vy -= 1;
-            newBall.vx += 1;
+            newBall.vy -= 0.06;
+            newBall.vx += 0.06;
           }
         }
         if (oldBall.x <= 0 && !loose.current) {
           loose.current = true;
           setScorePlayerLeft((oldScore) => oldScore + 1);
         }
-        newBall.x += newBall.vx;
-        newBall.y += newBall.vy;
+        newBall.x += newBall.vx * deltaTime;
+        newBall.y += newBall.vy * deltaTime;
         return newBall;
       });
       if (!loose.current) {
@@ -207,32 +225,14 @@ function Game() {
 
   function sendMessage(message) {
     if (socket) {
-      socket.emit('message', message.value); // Emit 'message' event
+      socket.emit('message', 'Hello', (response) => {
+        console.log('Received response from server:', response);
+      });
     }
   }
 
   return (
-    <div>
-      <input
-        id="message"
-        style={{
-          'border-radius': '2px',
-          'border-color': 'black',
-          'background-color': 'grey',
-        }}
-      ></input>
-      <button onClick={() => sendMessage(document.getElementById('message'))}>
-        BUTTON
-      </button>
-      <div id="messages"></div>
-    </div>
-
-    /* <GameWrapper className="game-wrapper">
-      <input type="text" id="message" />
-      <button
-        onClick={() => sendMessage(document.getElementById('message').value)}
-      ></button>
-      <div id="messages"></div>
+    <GameWrapper className="game-wrapper">
       <p style={{ color: 'white' }}>{`FPS: ${fps.toFixed(2)}`}</p>
       <Score
         scorePlayerLeft={scorePlayerLeft}
@@ -245,13 +245,7 @@ function Game() {
         posY={ball.y * (gameDimensions.height / 1000)}
       />
       <Racket posY={posRacketRightState} type="right" />
-      <input type="text" id="message" />
-      <button
-        onClick={() => sendMessage(document.getElementById('message').value)}
-      ></button>
-      <div id="messages"></div>
     </GameWrapper>
-  */
   );
 }
 
