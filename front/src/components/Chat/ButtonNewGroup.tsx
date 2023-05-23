@@ -12,33 +12,26 @@ function ButtonUser({ login }: { login: any }) {
   )
 }
 
-function ButtonNewGroup() {
+export function ButtonNewGroup2() {
 
-  const [userData, setUserData] = useState<any[]>([]);
-  const [open, setOpen] = useState(false);
-  const [Public, setPublic] = useState(false);
-  const [roomName, setRoomName] = useState('');
+  let [userData, setUserData] = useState<any>([]);
   const [password, setPassword] = useState('');
+  const [roomName, setRoomName] = useState('');
 
-  let ref = useRef(document.createElement("div"))
-
-  useEffect(() => {
-    async function fetchUsers() {
-      const res = await getAllUsers();
-      setUserData(res);
-      console.log('res : ', res);
-    }
-    fetchUsers();
+  /* requete pour avoir userData */
+  async function getData () {
+    const response = await axios.get('http://localhost:3000/users/all', {
+      withCredentials: true,
+    });
+    return response.data;
+  }
+ async function fetchData() {
+    let userProfileData = await getData();
+    setUserData(userProfileData);
+  }
+ useEffect(() => {
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    const ClickOutside = (event: any) => {
-      if (!ref.current.contains(event.target))
-        setOpen(false);
-    }
-    document.addEventListener('mousedown', ClickOutside)
-    return () => { document.removeEventListener('mousedown', ClickOutside) };
-  }, [ref]);
 
   const addUserList = userData.map((user: any) => (
     <ButtonUser key={user.id} login={user.login} />
@@ -64,46 +57,53 @@ function ButtonNewGroup() {
     });
   };
 
-  return (
-    <div >
-      <button className={` absulte top-1 m-2 my-1  text-center w-3/12 py-2 border-2 shadow-lg rounded-xl font-mono cursor-pointer
-                hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''} `} onClick={() => setOpen(!open)} >
-        New Group
-      </button>
-
-      <div ref={ref} className={`absolute z-50 left-1/4 top-0 mt-5 m-10 p-2 border shadow-lg text-center w-3/12 rounded-xl bg-white ${open ? "" : "hidden"} transition-all`}  >
-
-        <div className={` py-2 border font-bold font-mono rounded mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer ${Public ? 'bg-gray-300' : ''} `} onClick={() => setPublic(!Public)} >
-          Public
+  return(
+      <div className=' h-full m-full' >
+        
+        <div className={` py-2 border font-bold font-mono rounded mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer`}>
+           Public
         </div>
 
         <h1 className=" m-2 ">Or</h1>
         <div className="bg-white flex flex-col overflow-auto h-32 border rounded shadow-sm">
           <h1 className=" m-2i font-mono font-bold ">Selects users</h1>
-          {addUserList}
+            {addUserList}
         </div>
 
         <div className=" bg-white border rounded mt-2 shadow-sm ">
           <p className=" font-mono">Password: </p>
-          <input
+          <input 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border rounded text-center m-1 shadow-sm " type="text" />
-        </div>
+          </div>
 
-        <div className=" bg-white border rounded mt-2 shadow-sm ">
-          <p className=" font-mono">Name: </p>
-          <input
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-            className="border rounded text-center m-1 shadow-sm " type="text" />
-        </div>
+          <div className=" bg-white border rounded mt-2 shadow-sm ">
+            <p className=" font-mono">Name: </p>
+              <input 
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)} 
+                className="border rounded text-center m-1 shadow-sm " type="text" />
+          </div>
 
-        <button className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
-          <p> Create </p>
-        </button>
+          <button className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
+            <p> Create </p>
+          </button>
 
       </div>
+  )
+}
+
+
+function ButtonNewGroup({ setServiceToCall }: { setServiceToCall: Function }) {
+
+  return (
+    <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
+        hover:bg-gray-100`}
+      onClick={() => setServiceToCall('ButtonNewGroup2')}
+    >
+      <h2>Add Groups</h2>
+
     </div>
   )
 }
