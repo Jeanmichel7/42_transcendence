@@ -79,31 +79,29 @@ function Game() {
   const [gameDimensions, setGameDimensions] = useState({ width: 0, height: 0 });
   const [fps, setFps] = useState(0);
   const lastDateTime = useRef(0);
+  const gameData = useRef({} as any);
 
   const [socket, setSocket] = useState(null);
 
-  console.log('RACKET_FACTOR_1000', RACKET_FACTOR_1000);
   useEffect(() => {
     const socket = io('http://localhost:3000/game');
     setSocket(socket);
 
     const intervalId = setInterval(() => {
-      socket.emit('paddlePosition', posRacketLeft.current);
-      console.log('emit : paddlePositing', posRacketLeft.current);
+      socket.emit('clientUpdate', {
+        posRacketLeft: posRacketLeft.current,
+        ArrowDown: keyStateRef.current['ArrowDown'],
+        ArrowUp: keyStateRef.current['ArrowUp'],
+        gameId: gameData.current.gameId,
+      });
     }, 1000 / 20);
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket');
     });
 
-    socket.on('message', (id, data) => {
-      console.log('Received data from WebSocket:', data);
-      const messages = document.getElementById('messages');
-      messages.innerHTML += `<p>  ${id} : ${data} </p>`;
-    });
-
-    socket.on('message_ack', (data) => {
-      console.log('Received data ACK from WebSocket:', data);
+    socket.on('serverUpdate', (data) => {
+      gameData.current = data;
     });
 
     socket.on('disconnect', () => {
@@ -141,11 +139,11 @@ function Game() {
     upLoop();
     function upLoop() {
       const currentTime = performance.now();
-      let currentDateTime = Date.now();
       let deltaTime = currentTime - lastTime;
       if (deltaTime > 0) {
         setFps(1000 / deltaTime);
       }
+      console.log(currentTime);
       lastTime = currentTime;
       if (keyStateRef.current['ArrowDown']) {
         setPositionLeft((oldPos) =>
@@ -167,8 +165,18 @@ function Game() {
 
         if (oldBall.x > BALL_POS_MAX || oldBall.x < 0) {
           newBall.vx = -newBall.vx;
+          if (oldBall.x > BALL_POS_MAX) {
+            newBall.x = BALL_POS_MAX;
+          } else {
+            newBall.x = 0;
+          }
         }
         if (oldBall.y > BALL_POS_MAX || oldBall.y < 0) {
+          if (oldBall.y > BALL_POS_MAX) {
+            newBall.y = BALL_POS_MAX;
+          } else {
+            newBall.y = 0;
+          }
           newBall.vy = -newBall.vy;
         }
         if (
@@ -177,6 +185,7 @@ function Game() {
           oldBall.y < posRacketLeft.current + RACKET_HEIGHT_10
         ) {
           newBall.vx = -newBall.vx;
+          newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10;
           if (keyStateRef.current['ArrowDown']) {
             newBall.vy += 0.06;
             newBall.vx -= 0.06;
@@ -184,8 +193,10 @@ function Game() {
             newBall.vy -= 0.06;
             newBall.vx += 0.06;
           }
-        }
-        if (oldBall.x <= 0 && !loose.current) {
+        } else if (
+          oldBall.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 &&
+          !loose.current
+        ) {
           loose.current = true;
           setScorePlayerLeft((oldScore) => oldScore + 1);
         }

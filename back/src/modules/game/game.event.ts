@@ -8,6 +8,14 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
+import { Game } from './game.service';
+
+interface clientUpdate {
+  posRacketLeft: number;
+  ArrowDown: boolean;
+  ArrowUp: boolean;
+  gameId: string;
+}
 
 @WebSocketGateway({
   namespace: '/game',
@@ -21,18 +29,19 @@ export class GameEvents {
 
   constructor(private gameService: GameService) {
     setInterval(() => {
-      const games = this.gameService.getGames();
-
-      for (const game of games) {
+      const games: Map<string, Game> = this.gameService.getGames();
+      games.forEach((game) => {
+        console.log(game);
         const update = this.gameService.updateGame(game);
-        this.server.to(game.player1Id).emit('gameUpdate', update);
-        this.server.to(game.player2Id).emit('gameUpdate', update);
-      }
-    }, 20);
+        this.server.to(game.player1Id).emit('serverUpdate', update);
+        this.server.to(game.player2Id).emit('serverUpdate', update);
+      });
+    }, 1000 / 20);
   }
 
   //conexion
   handleConnection(client: Socket) {
+    this.gameService.addToQueue(client.id);
     console.log('client connected: ' + client.id);
   }
 
@@ -47,12 +56,12 @@ export class GameEvents {
     @ConnectedSocket() client: Socket,
   ) {}
 
-  @SubscribeMessage('paddlePosition')
+  @SubscribeMessage('clientUpdate')
   handlePaddlePosition(
-    @MessageBody() data: string,
+    @MessageBody() data: clientUpdate,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('paddlePosition: ' + data, client.id);
+    // this.gameService.u(data);
   }
 
   @SubscribeMessage('ballPosition')
