@@ -17,6 +17,7 @@ export function ButtonNewGroup2() {
   let [userData, setUserData] = useState<any>([]);
   const [password, setPassword] = useState('');
   const [roomName, setRoomName] = useState('');
+  const [Public, setPublic] = useState(false);
 
   /* requete pour avoir userData */
   async function getData () {
@@ -58,35 +59,35 @@ export function ButtonNewGroup2() {
   };
 
   return(
-      <div className=' h-full m-full' >
+      <div className=' m-3 p-3 h-full m-full flex items-center text-center flex-col' >
         
-        <div className={` py-2 border font-bold font-mono rounded mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer`}>
+        <div className={` w-4/6 py-2 border font-bold font-mono rounded-xl mt-2 shadow-sm bg-white hover:bg-gray-200 transition-all cursor-pointer ${Public ? 'bg-gray-300' : ''} `} onClick={() => setPublic(!Public)} >
            Public
         </div>
 
         <h1 className=" m-2 ">Or</h1>
-        <div className="bg-white flex flex-col overflow-auto h-32 border rounded shadow-sm">
+        <div className="bg-white flex  w-4/6 flex-col overflow-auto h-32 border rounded-xl shadow-sm">
           <h1 className=" m-2i font-mono font-bold ">Selects users</h1>
             {addUserList}
         </div>
 
-        <div className=" bg-white border rounded mt-2 shadow-sm ">
+        <div className=" bg-white w-4/6 border rounded-xl mt-2 shadow-sm ">
           <p className=" font-mono">Password: </p>
           <input 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border rounded text-center m-1 shadow-sm " type="text" />
+            className="border rounded-xl text-center m-1 shadow-sm " type="text" />
           </div>
 
-          <div className=" bg-white border rounded mt-2 shadow-sm ">
+          <div className=" bg-white w-4/6 border rounded-xl mt-2 shadow-sm ">
             <p className=" font-mono">Name: </p>
               <input 
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)} 
-                className="border rounded text-center m-1 shadow-sm " type="text" />
+                className="border rounded-xl text-center m-1 shadow-sm " type="text" />
           </div>
 
-          <button className=" bg-gray-100 border-2 rounded mt-2 shadow-sm hover:bg-white transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
+          <button className=" bg-white border-2 w-2/6 mt-5 rounded-xl mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
             <p> Create </p>
           </button>
 
