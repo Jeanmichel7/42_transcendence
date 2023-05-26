@@ -53,6 +53,12 @@ function Header() {
               <img 
                 src={`http://localhost:3000/avatars/` + userData.avatar}
                 className="text-center p-2 w-full h-24"
+                alt="avatar"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null; 
+                  target.src="http://localhost:3000/avatars/defaultAvatar.png"
+                }}
               />}
             </NavLink>
           </>

@@ -881,7 +881,6 @@ export class ChatService {
       .where('chat_rooms.id = :roomId', { roomId })
       .orderBy('messages.createdAt', 'DESC')
       .getOne();
-    console.log(room);
     if (!room) throw new NotFoundException(`Room ${roomId} does not exist`);
     const result: ChatRoomInterface = { ...room };
     return result;
