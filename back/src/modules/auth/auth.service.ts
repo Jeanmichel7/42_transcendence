@@ -75,7 +75,18 @@ export class AuthService {
   }
 
   async logInOAuth(code: string): Promise<AuthInterface> {
-    const accessToken: string = await this.OAuthGetToken(code);
+    let accessToken: string;
+    let clientSecret: string;
+    try {
+      clientSecret = this.configService.get<string>('OAUTH_INTRA');
+      accessToken = await this.OAuthGetToken(code, clientSecret);
+    } catch {
+      console.error(
+        'Error OAuthGetToken, first token expired, test second token',
+      );
+      clientSecret = this.configService.get<string>('OAUTH_INTRA_NEXT');
+      accessToken = await this.OAuthGetToken(code, clientSecret);
+    }
     const userData42: UserInterface = await this.OAuthGetUserData(accessToken);
 
     let user: UserInterface = null;
@@ -226,10 +237,11 @@ export class AuthService {
   /*                                                  */
   /* ************************************************ */
 
-  private async OAuthGetToken(code: string): Promise<string> {
-    const clientId =
-      'u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171';
-    const clientSecret = this.configService.get<string>('OAUTH_INTRA');
+  private async OAuthGetToken(
+    code: string,
+    clientSecret: string,
+  ): Promise<string> {
+    const clientId: string = this.configService.get<string>('CLIENT_ID');
     try {
       const tokenResponse = await axios.post(
         'https://api.intra.42.fr/oauth/token',
@@ -247,7 +259,7 @@ export class AuthService {
       return tokenResponse.data.access_token;
     } catch (error) {
       throw new UnauthorizedException(
-        'Intra OAuth: ' + error.response.data.message,
+        'Intra OAuth: ' + error.response,
         error.status,
       );
     }
