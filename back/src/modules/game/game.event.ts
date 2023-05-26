@@ -36,7 +36,7 @@ export class GameEvents {
         update.isPlayerRight = true;
         this.server.to(game.player2Id).emit('serverUpdate', update);
       });
-    }, 1000 / 20);
+    }, 1000 / 60);
   }
 
   //conexion

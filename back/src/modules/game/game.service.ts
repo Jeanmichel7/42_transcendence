@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 const RACKET_WIDTH = 2;
-const RACKET_HEIGHT = 16;
+const RACKET_HEIGHT = 100;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
-const BALL_DIAMETER = 1;
-const BALL_POS_MAX = 980;
+const BALL_DIAMETER = 10;
+const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 5;
 const INITIAL_BALL_SPEED = 0.4;
 const SPEED_INCREASE = 0.06;
 
 // Variable constante for optimisation, don't change
+const BALL_RADIUS = BALL_DIAMETER / 2;
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
 const RACKET_FACTOR_1000 = RACKET_FACTOR / 1000;
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
@@ -61,38 +62,47 @@ export class Game {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
-    if (this.ball.x > BALL_POS_MAX || this.ball.x < 0) {
+    if (
+      this.ball.x + BALL_RADIUS > GROUND_MAX_SIZE ||
+      this.ball.x - BALL_RADIUS < 0
+    ) {
       this.ball.vx = -this.ball.vx;
-      if (this.ball.x > BALL_POS_MAX) {
-        this.ball.x = BALL_POS_MAX;
+      if (this.ball.x + BALL_RADIUS > GROUND_MAX_SIZE) {
+        this.ball.x = GROUND_MAX_SIZE - BALL_RADIUS;
       } else {
-        this.ball.x = 0;
-      }
-    }
-    if (this.ball.y > BALL_POS_MAX || this.ball.y < 0) {
-      this.ball.vy = -this.ball.vy;
-      if (this.ball.y > BALL_POS_MAX) {
-        this.ball.y = BALL_POS_MAX;
-      } else {
-        this.ball.y = 0;
+        this.ball.x = BALL_RADIUS;
       }
     }
     if (
-      this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 &&
+      this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE ||
+      this.ball.y - BALL_RADIUS < 0
+    ) {
+      this.ball.vy = -this.ball.vy;
+      if (this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE) {
+        this.ball.y = GROUND_MAX_SIZE - BALL_RADIUS;
+      } else {
+        this.ball.y = BALL_RADIUS;
+      }
+    }
+    if (
+      this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       this.ball.y >= this.racketLeft &&
       this.ball.y <= this.racketLeft + RACKET_HEIGHT_10
     ) {
       this.ball.vx = -this.ball.vx;
-      this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10;
+      this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
     } else if (
-      this.ball.x >= RACKET_RIGHT_POS_X_10 &&
+      this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
       this.ball.y >= this.racketRight &&
       this.ball.y <= this.racketRight + RACKET_HEIGHT_10
     ) {
       this.ball.vx = -this.ball.vx;
-      this.ball.x = RACKET_RIGHT_POS_X_10;
+      this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
     }
-    if (this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 && !this.isOver) {
+    if (
+      this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 - BALL_RADIUS &&
+      !this.isOver
+    ) {
       if (this.player1Score > SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = 'left';
@@ -113,6 +123,7 @@ export class Game {
         this.player2Score += 1;
       }
     }
+    console.log(this.ball.vx, this.ball.vy);
     this.ball.x += this.ball.vx * deltaTime;
     this.ball.y += this.ball.vy * deltaTime;
   }
@@ -121,6 +132,7 @@ export class Game {
     return {
       ball: this.ball,
       racketRight: this.racketRight,
+      racketLeft: this.racketLeft,
       winner: this.winner,
       player1Score: this.player1Score,
       player2Score: this.player2Score,
