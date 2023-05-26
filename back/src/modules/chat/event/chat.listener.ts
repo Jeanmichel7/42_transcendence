@@ -10,13 +10,13 @@ import { ChatGateway } from 'src/modules/chat/gateway/chat.gateway';
 export class MessageChatListener {
   constructor(private readonly socketEvents: ChatGateway) {}
 
-  @OnEvent('chat-message.created')
+  @OnEvent('chat_message.created')
   handleMessageCreated(event: ChatMessageCreatedEvent) {
     console.log('event message.created recu', event.message.text);
     this.socketEvents.emitMessage(event.message);
   }
 
-  @OnEvent('chat-room.join')
+  @OnEvent('chat_room.join')
   handleRoomJoin(event: ChatJoinRoomEvent, userId: string) {
     console.log('event room.join recu', event);
     this.socketEvents.emitJoinRoom(event.room.id.toString(), userId);

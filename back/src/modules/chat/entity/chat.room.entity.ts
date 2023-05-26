@@ -12,7 +12,7 @@ import {
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { ChatMessageEntity } from './chat.message.entity';
 
-@Entity('chat-rooms')
+@Entity('chat_rooms')
 export class ChatRoomEntity extends BaseEntity {
   @PrimaryGeneratedColumn({
     type: 'bigint',
@@ -21,16 +21,15 @@ export class ChatRoomEntity extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: 'private',
+    default: 'public',
   })
   type: 'public' | 'protected';
 
-  // @Column({
-  // 	type: 'text',
-  // 	nullable: true,
-  // 	default: 'room',
-  // })
-  // name: string;
+  @Column({
+    type: 'text',
+    default: 'room',
+  })
+  name: string;
 
   @Column({
     type: 'text',

@@ -8,6 +8,10 @@ export class ChatCreateRoomDTO {
 
   @IsNotEmpty()
   @IsString()
-  @Length(1)
   type: 'public' | 'protected';
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(1)
+  name: string;
 }

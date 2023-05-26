@@ -68,16 +68,20 @@ export class ChatService {
     await user.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.name',
+        'chat_rooms.type',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -117,16 +121,16 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -188,10 +192,10 @@ export class ChatService {
     user.roomUsers = [...user.roomUsers, room];
     await user.save();
 
-    // const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat-room')
-    //   .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
-    //   .select(['chat-room', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
-    //   .where('chat-room.id = :roomId', { roomId: room.id })
+    // const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat_rooms')
+    //   .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+    //   .select(['chat_rooms', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
+    //   .where('chat_rooms.id = :roomId', { roomId: room.id })
     //   .getOne();
 
     const resultRoom: ChatRoomInterface = await this.getRoomAllMessages(
@@ -199,7 +203,7 @@ export class ChatService {
     );
 
     this.eventEmitter.emit(
-      'chat-room.join',
+      'chat_room.join',
       new ChatJoinRoomEvent(resultRoom, user.id.toString()),
     );
     return resultRoom;
@@ -230,19 +234,19 @@ export class ChatService {
     await user.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
-    // this.eventEmitter.emit('chat-room.leave', new ChatLeaveRoomEvent(resultRoom, user.id.toString()));
+    // this.eventEmitter.emit('chat_rooms.leave', new ChatLeaveRoomEvent(resultRoom, user.id.toString()));
     return resultRoom;
   }
 
@@ -284,16 +288,16 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -337,16 +341,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -382,16 +390,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -431,16 +443,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     console.log('user demuted');
     return resultRoom;
@@ -479,16 +495,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -525,16 +545,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -574,16 +598,20 @@ export class ChatService {
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat-room',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
       ])
-      .where('chat-room.id = :roomId', { roomId: room.id })
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
     return resultRoom;
   }
@@ -631,7 +659,7 @@ export class ChatService {
       room: {
         id: room.id,
         type: room.type,
-        // name: room.name
+        name: room.name,
       },
       user: {
         id: userSend.id,
@@ -644,7 +672,7 @@ export class ChatService {
     };
 
     this.eventEmitter.emit(
-      'chat-message.created',
+      'chat_message.created',
       new ChatMessageCreatedEvent(messageToSave),
     );
 
@@ -679,6 +707,7 @@ export class ChatService {
       room: {
         id: message.room.id,
         type: message.room.type,
+        name: message.room.name,
       },
       user: {
         id: message.user.id,
@@ -690,7 +719,7 @@ export class ChatService {
       updatedAt: message.updatedAt,
     };
 
-    // this.eventEmitter.emit('chat-message.edited', new ChatMessageEditedEvent(resultMessage));
+    // this.eventEmitter.emit('chat_message.edited', new ChatMessageEditedEvent(resultMessage));
 
     return resultMessage;
   }
@@ -712,8 +741,57 @@ export class ChatService {
     const result = await message.remove();
     if (!result) return 0;
 
-    // this.eventEmitter.emit('chat-message.deleted', new ChatMessageDeletedEvent(messageId));
+    // this.eventEmitter.emit('chat_message.deleted', new ChatMessageDeletedEvent(messageId));
     return 1;
+  }
+
+  async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
+    const rooms: ChatRoomEntity[] = await ChatRoomEntity.createQueryBuilder(
+      'chat_rooms',
+    )
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'users')
+      .leftJoinAndSelect('chat_rooms.admins', 'admins')
+      .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
+      .select([
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'admins.id',
+        'admins.firstName',
+        'admins.lastName',
+        'admins.login',
+        'admins.avatar',
+        'bannedUsers.id',
+        'bannedUsers.firstName',
+        'bannedUsers.lastName',
+        'bannedUsers.login',
+        'bannedUsers.avatar',
+        'mutedUsers.id',
+        'mutedUsers.firstName',
+        'mutedUsers.lastName',
+        'mutedUsers.login',
+        'mutedUsers.avatar',
+      ])
+      .getMany();
+
+    const result: ChatRoomInterface[] = rooms.map((room: ChatRoomEntity) => {
+      return { ...room };
+    });
+    return result;
   }
 
   /* ************************************************ */
@@ -735,22 +813,21 @@ export class ChatService {
     const result: ChatRoomInterface[] = rooms.map((room: ChatRoomEntity) => {
       return { ...room };
     });
-
     return result;
   }
 
   async getRoom(roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomInterface = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.ownerUser', 'ownerUser')
-      .leftJoinAndSelect('chat-room.users', 'users')
-      .leftJoinAndSelect('chat-room.admins', 'admins')
-      .leftJoinAndSelect('chat-room.bannedUsers', 'bannedUsers')
-      .leftJoinAndSelect('chat-room.mutedUsers', 'mutedUsers')
-      .leftJoinAndSelect('chat-room.messages', 'messages')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'users')
+      .leftJoinAndSelect('chat_rooms.admins', 'admins')
+      .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
+      .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('messages.user', 'ownerMessage')
       .select([
-        'chat-room',
+        'chat_rooms',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
@@ -779,19 +856,20 @@ export class ChatService {
         'ownerMessage.lastName',
         'ownerMessage.login',
       ])
-      .where('chat-room.id = :roomId', { roomId })
+      .where('chat_rooms.id = :roomId', { roomId })
       .getOne();
     return room;
   }
 
   async getRoomAllMessages(roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomEntity = await this.roomRepository
-      .createQueryBuilder('chat-room')
-      .leftJoinAndSelect('chat-room.messages', 'messages')
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('messages.user', 'ownerMessage')
       .select([
-        'chat-room.id',
-        'chat-room.status',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
         'messages.id',
         'messages.text',
         'messages.createdAt',
@@ -800,9 +878,11 @@ export class ChatService {
         'ownerMessage.lastName',
         'ownerMessage.login',
       ])
-      .where('chat-room.id = :roomId', { roomId })
+      .where('chat_rooms.id = :roomId', { roomId })
       .orderBy('messages.createdAt', 'DESC')
       .getOne();
+    console.log(room);
+    if (!room) throw new NotFoundException(`Room ${roomId} does not exist`);
     const result: ChatRoomInterface = { ...room };
     return result;
   }

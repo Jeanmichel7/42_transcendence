@@ -21,10 +21,10 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: chat-messages; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_messages; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-messages" (
+CREATE TABLE public."chat_messages" (
     id bigint NOT NULL,
     text text NOT NULL,
     "createdAt" timestamp without time zone DEFAULT now(),
@@ -34,13 +34,13 @@ CREATE TABLE public."chat-messages" (
 );
 
 
-ALTER TABLE public."chat-messages" OWNER TO postgres;
+ALTER TABLE public."chat_messages" OWNER TO postgres;
 
 --
--- Name: chat-messages_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: chat_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public."chat-messages_id_seq"
+CREATE SEQUENCE public."chat_messages_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -48,20 +48,20 @@ CREATE SEQUENCE public."chat-messages_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."chat-messages_id_seq" OWNER TO postgres;
+ALTER TABLE public."chat_messages_id_seq" OWNER TO postgres;
 
 --
--- Name: chat-messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: chat_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public."chat-messages_id_seq" OWNED BY public."chat-messages".id;
+ALTER SEQUENCE public."chat_messages_id_seq" OWNED BY public."chat_messages".id;
 
 
 --
--- Name: chat-rooms; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_rooms; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-rooms" (
+CREATE TABLE public."chat_rooms" (
     id bigint NOT NULL,
     type text DEFAULT 'private'::text NOT NULL,
     password text,
@@ -71,37 +71,37 @@ CREATE TABLE public."chat-rooms" (
 );
 
 
-ALTER TABLE public."chat-rooms" OWNER TO postgres;
+ALTER TABLE public."chat_rooms" OWNER TO postgres;
 
 --
--- Name: chat-rooms_admins_users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_rooms_admins_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-rooms_admins_users" (
+CREATE TABLE public."chat_rooms_admins_users" (
     "chatRoomsId" bigint NOT NULL,
     "usersId" bigint NOT NULL
 );
 
 
-ALTER TABLE public."chat-rooms_admins_users" OWNER TO postgres;
+ALTER TABLE public."chat_rooms_admins_users" OWNER TO postgres;
 
 --
--- Name: chat-rooms_banned_users_users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_rooms_banned_users_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-rooms_banned_users_users" (
+CREATE TABLE public."chat_rooms_banned_users_users" (
     "chatRoomsId" bigint NOT NULL,
     "usersId" bigint NOT NULL
 );
 
 
-ALTER TABLE public."chat-rooms_banned_users_users" OWNER TO postgres;
+ALTER TABLE public."chat_rooms_banned_users_users" OWNER TO postgres;
 
 --
--- Name: chat-rooms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: chat_rooms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public."chat-rooms_id_seq"
+CREATE SEQUENCE public."chat_rooms_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -109,38 +109,38 @@ CREATE SEQUENCE public."chat-rooms_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."chat-rooms_id_seq" OWNER TO postgres;
+ALTER TABLE public."chat_rooms_id_seq" OWNER TO postgres;
 
 --
--- Name: chat-rooms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: chat_rooms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public."chat-rooms_id_seq" OWNED BY public."chat-rooms".id;
+ALTER SEQUENCE public."chat_rooms_id_seq" OWNED BY public."chat_rooms".id;
 
 
 --
--- Name: chat-rooms_muted_users_users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_rooms_muted_users_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-rooms_muted_users_users" (
+CREATE TABLE public."chat_rooms_muted_users_users" (
     "chatRoomsId" bigint NOT NULL,
     "usersId" bigint NOT NULL
 );
 
 
-ALTER TABLE public."chat-rooms_muted_users_users" OWNER TO postgres;
+ALTER TABLE public."chat_rooms_muted_users_users" OWNER TO postgres;
 
 --
--- Name: chat-rooms_users_users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: chat_rooms_users_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."chat-rooms_users_users" (
+CREATE TABLE public."chat_rooms_users_users" (
     "chatRoomsId" bigint NOT NULL,
     "usersId" bigint NOT NULL
 );
 
 
-ALTER TABLE public."chat-rooms_users_users" OWNER TO postgres;
+ALTER TABLE public."chat_rooms_users_users" OWNER TO postgres;
 
 --
 -- Name: messages; Type: TABLE; Schema: public; Owner: postgres
@@ -264,17 +264,17 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: chat-messages id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: chat_messages id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-messages" ALTER COLUMN id SET DEFAULT nextval('public."chat-messages_id_seq"'::regclass);
+ALTER TABLE ONLY public."chat_messages" ALTER COLUMN id SET DEFAULT nextval('public."chat_messages_id_seq"'::regclass);
 
 
 --
--- Name: chat-rooms id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: chat_rooms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms" ALTER COLUMN id SET DEFAULT nextval('public."chat-rooms_id_seq"'::regclass);
+ALTER TABLE ONLY public."chat_rooms" ALTER COLUMN id SET DEFAULT nextval('public."chat_rooms_id_seq"'::regclass);
 
 
 --
@@ -299,50 +299,50 @@ ALTER TABLE ONLY public."users-relation" ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Data for Name: chat-messages; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-messages" (id, text, "createdAt", "updatedAt", "userId", "roomId") FROM stdin;
+COPY public."chat_messages" (id, text, "createdAt", "updatedAt", "userId", "roomId") FROM stdin;
 \.
 
 
 --
--- Data for Name: chat-rooms; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_rooms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms" (id, type, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
+COPY public."chat_rooms" (id, type, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
 \.
 
 
 --
--- Data for Name: chat-rooms_admins_users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_rooms_admins_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms_admins_users" ("chatRoomsId", "usersId") FROM stdin;
+COPY public."chat_rooms_admins_users" ("chatRoomsId", "usersId") FROM stdin;
 \.
 
 
 --
--- Data for Name: chat-rooms_banned_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_rooms_banned_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms_banned_users_users" ("chatRoomsId", "usersId") FROM stdin;
+COPY public."chat_rooms_banned_users_users" ("chatRoomsId", "usersId") FROM stdin;
 \.
 
 
 --
--- Data for Name: chat-rooms_muted_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_rooms_muted_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms_muted_users_users" ("chatRoomsId", "usersId") FROM stdin;
+COPY public."chat_rooms_muted_users_users" ("chatRoomsId", "usersId") FROM stdin;
 \.
 
 
 --
--- Data for Name: chat-rooms_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: chat_rooms_users_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."chat-rooms_users_users" ("chatRoomsId", "usersId") FROM stdin;
+COPY public."chat_rooms_users_users" ("chatRoomsId", "usersId") FROM stdin;
 \.
 
 
@@ -396,17 +396,17 @@ COPY public."users-relation" (id, "relationType", "createdAt", "updatedAt", "use
 
 
 --
--- Name: chat-messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: chat_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."chat-messages_id_seq"', 23, true);
+SELECT pg_catalog.setval('public."chat_messages_id_seq"', 23, true);
 
 
 --
--- Name: chat-rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: chat_rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."chat-rooms_id_seq"', 3, true);
+SELECT pg_catalog.setval('public."chat_rooms_id_seq"', 3, true);
 
 
 --
@@ -447,10 +447,10 @@ ALTER TABLE ONLY public."users-relation"
 
 
 --
--- Name: chat-rooms_users_users PK_874e232358b5cf723660782b829; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_users_users PK_874e232358b5cf723660782b829; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_users_users"
+ALTER TABLE ONLY public."chat_rooms_users_users"
     ADD CONSTRAINT "PK_874e232358b5cf723660782b829" PRIMARY KEY ("chatRoomsId", "usersId");
 
 
@@ -463,42 +463,42 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: chat-rooms_muted_users_users PK_d09fcf2a5c71305cbd055896b83; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_muted_users_users PK_d09fcf2a5c71305cbd055896b83; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_muted_users_users"
+ALTER TABLE ONLY public."chat_rooms_muted_users_users"
     ADD CONSTRAINT "PK_d09fcf2a5c71305cbd055896b83" PRIMARY KEY ("chatRoomsId", "usersId");
 
 
 --
--- Name: chat-rooms_admins_users PK_d72b5303fca5f97ffd7ba7f47b7; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_admins_users PK_d72b5303fca5f97ffd7ba7f47b7; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_admins_users"
+ALTER TABLE ONLY public."chat_rooms_admins_users"
     ADD CONSTRAINT "PK_d72b5303fca5f97ffd7ba7f47b7" PRIMARY KEY ("chatRoomsId", "usersId");
 
 
 --
--- Name: chat-rooms_banned_users_users PK_d84d3a37a15042dcd2a10c0d6e9; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_banned_users_users PK_d84d3a37a15042dcd2a10c0d6e9; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_banned_users_users"
+ALTER TABLE ONLY public."chat_rooms_banned_users_users"
     ADD CONSTRAINT "PK_d84d3a37a15042dcd2a10c0d6e9" PRIMARY KEY ("chatRoomsId", "usersId");
 
 
 --
--- Name: chat-rooms PK_e4005b2d7c7fcdb9560f72979a3; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms PK_e4005b2d7c7fcdb9560f72979a3; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms"
+ALTER TABLE ONLY public."chat_rooms"
     ADD CONSTRAINT "PK_e4005b2d7c7fcdb9560f72979a3" PRIMARY KEY (id);
 
 
 --
--- Name: chat-messages PK_fa087ba26131bc9415a4d4fbc45; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_messages PK_fa087ba26131bc9415a4d4fbc45; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-messages"
+ALTER TABLE ONLY public."chat_messages"
     ADD CONSTRAINT "PK_fa087ba26131bc9415a4d4fbc45" PRIMARY KEY (id);
 
 
@@ -522,56 +522,56 @@ ALTER TABLE ONLY public.users
 -- Name: IDX_2562e296712bff664e6927a9ad; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_2562e296712bff664e6927a9ad" ON public."chat-rooms_admins_users" USING btree ("chatRoomsId");
+CREATE INDEX "IDX_2562e296712bff664e6927a9ad" ON public."chat_rooms_admins_users" USING btree ("chatRoomsId");
 
 
 --
 -- Name: IDX_3d8c7d5dc814c801b1075a100d; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_3d8c7d5dc814c801b1075a100d" ON public."chat-rooms_admins_users" USING btree ("usersId");
+CREATE INDEX "IDX_3d8c7d5dc814c801b1075a100d" ON public."chat_rooms_admins_users" USING btree ("usersId");
 
 
 --
 -- Name: IDX_512a2d0b091e14e85094b295d7; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_512a2d0b091e14e85094b295d7" ON public."chat-rooms_muted_users_users" USING btree ("usersId");
+CREATE INDEX "IDX_512a2d0b091e14e85094b295d7" ON public."chat_rooms_muted_users_users" USING btree ("usersId");
 
 
 --
 -- Name: IDX_652058acde35292d8d9692a62e; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_652058acde35292d8d9692a62e" ON public."chat-rooms_banned_users_users" USING btree ("usersId");
+CREATE INDEX "IDX_652058acde35292d8d9692a62e" ON public."chat_rooms_banned_users_users" USING btree ("usersId");
 
 
 --
 -- Name: IDX_6cc4059a8e8a95f7147a26cb59; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_6cc4059a8e8a95f7147a26cb59" ON public."chat-rooms_users_users" USING btree ("chatRoomsId");
+CREATE INDEX "IDX_6cc4059a8e8a95f7147a26cb59" ON public."chat_rooms_users_users" USING btree ("chatRoomsId");
 
 
 --
 -- Name: IDX_7803d418aba8d9cd9466247c7a; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_7803d418aba8d9cd9466247c7a" ON public."chat-rooms_users_users" USING btree ("usersId");
+CREATE INDEX "IDX_7803d418aba8d9cd9466247c7a" ON public."chat_rooms_users_users" USING btree ("usersId");
 
 
 --
 -- Name: IDX_aa155ba4ecaae555c8cb4ba1fb; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_aa155ba4ecaae555c8cb4ba1fb" ON public."chat-rooms_banned_users_users" USING btree ("chatRoomsId");
+CREATE INDEX "IDX_aa155ba4ecaae555c8cb4ba1fb" ON public."chat_rooms_banned_users_users" USING btree ("chatRoomsId");
 
 
 --
 -- Name: IDX_e17666d5d6493f5969339abb1f; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX "IDX_e17666d5d6493f5969339abb1f" ON public."chat-rooms_muted_users_users" USING btree ("chatRoomsId");
+CREATE INDEX "IDX_e17666d5d6493f5969339abb1f" ON public."chat_rooms_muted_users_users" USING btree ("chatRoomsId");
 
 
 --
@@ -583,51 +583,51 @@ ALTER TABLE ONLY public.messages
 
 
 --
--- Name: chat-messages FK_249982c5f0a72ab6dd09a31c23c; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_messages FK_249982c5f0a72ab6dd09a31c23c; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-messages"
+ALTER TABLE ONLY public."chat_messages"
     ADD CONSTRAINT "FK_249982c5f0a72ab6dd09a31c23c" FOREIGN KEY ("userId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_admins_users FK_2562e296712bff664e6927a9ad6; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_admins_users FK_2562e296712bff664e6927a9ad6; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_admins_users"
-    ADD CONSTRAINT "FK_2562e296712bff664e6927a9ad6" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat-rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."chat_rooms_admins_users"
+    ADD CONSTRAINT "FK_2562e296712bff664e6927a9ad6" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat_rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_admins_users FK_3d8c7d5dc814c801b1075a100d9; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_admins_users FK_3d8c7d5dc814c801b1075a100d9; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_admins_users"
+ALTER TABLE ONLY public."chat_rooms_admins_users"
     ADD CONSTRAINT "FK_3d8c7d5dc814c801b1075a100d9" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_muted_users_users FK_512a2d0b091e14e85094b295d78; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_muted_users_users FK_512a2d0b091e14e85094b295d78; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_muted_users_users"
+ALTER TABLE ONLY public."chat_rooms_muted_users_users"
     ADD CONSTRAINT "FK_512a2d0b091e14e85094b295d78" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_banned_users_users FK_652058acde35292d8d9692a62e5; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_banned_users_users FK_652058acde35292d8d9692a62e5; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_banned_users_users"
+ALTER TABLE ONLY public."chat_rooms_banned_users_users"
     ADD CONSTRAINT "FK_652058acde35292d8d9692a62e5" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_users_users FK_6cc4059a8e8a95f7147a26cb59c; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_users_users FK_6cc4059a8e8a95f7147a26cb59c; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_users_users"
-    ADD CONSTRAINT "FK_6cc4059a8e8a95f7147a26cb59c" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat-rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."chat_rooms_users_users"
+    ADD CONSTRAINT "FK_6cc4059a8e8a95f7147a26cb59c" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat_rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -639,10 +639,10 @@ ALTER TABLE ONLY public."users-relation"
 
 
 --
--- Name: chat-rooms_users_users FK_7803d418aba8d9cd9466247c7ad; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_users_users FK_7803d418aba8d9cd9466247c7ad; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_users_users"
+ALTER TABLE ONLY public."chat_rooms_users_users"
     ADD CONSTRAINT "FK_7803d418aba8d9cd9466247c7ad" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -655,11 +655,11 @@ ALTER TABLE ONLY public."users-relation"
 
 
 --
--- Name: chat-messages FK_9a952a3345b5554f1f04bb066d2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_messages FK_9a952a3345b5554f1f04bb066d2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-messages"
-    ADD CONSTRAINT "FK_9a952a3345b5554f1f04bb066d2" FOREIGN KEY ("roomId") REFERENCES public."chat-rooms"(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public."chat_messages"
+    ADD CONSTRAINT "FK_9a952a3345b5554f1f04bb066d2" FOREIGN KEY ("roomId") REFERENCES public."chat_rooms"(id) ON DELETE CASCADE;
 
 
 --
@@ -671,27 +671,27 @@ ALTER TABLE ONLY public.messages
 
 
 --
--- Name: chat-rooms_banned_users_users FK_aa155ba4ecaae555c8cb4ba1fb2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_banned_users_users FK_aa155ba4ecaae555c8cb4ba1fb2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_banned_users_users"
-    ADD CONSTRAINT "FK_aa155ba4ecaae555c8cb4ba1fb2" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat-rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."chat_rooms_banned_users_users"
+    ADD CONSTRAINT "FK_aa155ba4ecaae555c8cb4ba1fb2" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat_rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms FK_df0593dbc3a47467284bc2fbc3b; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms FK_df0593dbc3a47467284bc2fbc3b; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms"
+ALTER TABLE ONLY public."chat_rooms"
     ADD CONSTRAINT "FK_df0593dbc3a47467284bc2fbc3b" FOREIGN KEY ("ownerUserId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
--- Name: chat-rooms_muted_users_users FK_e17666d5d6493f5969339abb1f4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: chat_rooms_muted_users_users FK_e17666d5d6493f5969339abb1f4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."chat-rooms_muted_users_users"
-    ADD CONSTRAINT "FK_e17666d5d6493f5969339abb1f4" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat-rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY public."chat_rooms_muted_users_users"
+    ADD CONSTRAINT "FK_e17666d5d6493f5969339abb1f4" FOREIGN KEY ("chatRoomsId") REFERENCES public."chat_rooms"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

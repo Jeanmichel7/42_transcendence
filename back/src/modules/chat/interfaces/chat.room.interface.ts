@@ -3,7 +3,7 @@ import { ChatMsgInterface } from './chat.message.interface';
 
 export interface ChatRoomInterface {
   id: bigint;
-  // name: string;
+  name: string;
   type: 'public' | 'protected';
   password?: string;
   createdAt?: Date;

@@ -189,7 +189,7 @@ function webSocketUser(roomId) {
   });
 
   // ecoute des messages
-  chatSocket.on('chat-message', (message, id) => {
+  chatSocket.on('chat_message', (message, id) => {
     console.log("message : ", message);
     let displayMessage = document.getElementById(`messagesRoom${message.room.id}`);
     displayMessage.innerHTML += `<li>${message.text} by ${message.user.login}</li>`;

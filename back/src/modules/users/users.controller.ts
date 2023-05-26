@@ -27,6 +27,7 @@ import { ProfilInterface } from './interfaces/profil.interface';
 import { RequestWithUser } from './interfaces/request.user.interface';
 // import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 import { UserPatchDTO } from './dto/user.patch.dto';
+import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 
 @Controller('users')
 export class UsersController {
@@ -108,6 +109,14 @@ export class UsersController {
   async deleteUser(@Req() req: RequestWithUser): Promise<HttpStatus> {
     await this.usersService.deleteUser(req.user.id);
     return HttpStatus.NO_CONTENT; // 204
+  }
+
+  @Get('getRooms')
+  async getRooms(@Req() req: RequestWithUser): Promise<ChatRoomInterface[]> {
+    const result: ChatRoomInterface[] = await this.usersService.getRooms(
+      req.user.id,
+    );
+    return result;
   }
 
   /* ************************************************ */

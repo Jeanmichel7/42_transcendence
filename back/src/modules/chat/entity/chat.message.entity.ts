@@ -8,7 +8,7 @@ import {
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { ChatRoomEntity } from './chat.room.entity';
 
-@Entity('chat-messages')
+@Entity('chat_messages')
 export class ChatMessageEntity extends BaseEntity {
   @PrimaryGeneratedColumn({
     type: 'bigint',

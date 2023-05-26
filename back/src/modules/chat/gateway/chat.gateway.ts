@@ -46,7 +46,7 @@ export class ChatGateway {
   }
 
   emitMessage(message: ChatMsgInterface) {
-    this.server.to(message.room.id.toString()).emit('chat-message', message);
+    this.server.to(message.room.id.toString()).emit('chat_message', message);
     console.log('message sent to room' + message.room.id);
   }
 

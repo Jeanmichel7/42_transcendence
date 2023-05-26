@@ -44,6 +44,13 @@ export class ChatController {
   /*                       ROOM                       */
   /* ************************************************ */
 
+  @Get('rooms/allRoomsToDisplay')
+  async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
+    const rooms: ChatRoomInterface[] =
+      await this.ChatService.getAllRoomsToDisplay();
+    return rooms;
+  }
+
   @Post('rooms/add')
   async createRoom(
     @Req() req: RequestWithUser,
@@ -287,7 +294,6 @@ export class ChatController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
-  // @UseGuards(AuthAdmin)
   @Get('rooms/all')
   async getAllRooms(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] = await this.ChatService.getAllRooms();

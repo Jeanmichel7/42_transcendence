@@ -16,12 +16,15 @@ import {
 } from 'fs';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
-import { UserCreateDTO } from './dto/user.create.dto';
+
 import { UserInterface } from './interfaces/users.interface';
 import { ProfilInterface } from './interfaces/profil.interface';
+
 import { UserPatchDTO } from './dto/user.patch.dto';
+import { UserCreateDTO } from './dto/user.create.dto';
 import axios from 'axios';
 import { join } from 'path';
+import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 
 @Injectable()
 export class UsersService {
@@ -362,6 +365,20 @@ export class UsersService {
       }
     }
     // console.log('users after: ', users);
+  }
+
+  async getRooms(id: bigint): Promise<ChatRoomInterface[]> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['roomOwner', 'roomAdmins', 'roomUsers'],
+    });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+    const rooms: ChatRoomInterface[] = [
+      ...user.roomOwner,
+      ...user.roomAdmins,
+      ...user.roomUsers,
+    ];
+    return rooms;
   }
 
   /* ************************************************ */
