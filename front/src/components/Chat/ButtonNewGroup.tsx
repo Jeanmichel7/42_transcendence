@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState, useRef, useEffect } from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
-import { getAllUsers } from "../../api/searchFriends";
+import { getAllUsers } from "../../api/user";
 
 
 function ButtonUser({ login }: { login: any }) {

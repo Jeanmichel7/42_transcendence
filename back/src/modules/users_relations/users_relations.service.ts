@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -103,10 +104,8 @@ export class UsersRelationsService {
     userId: bigint,
     friendId: bigint,
   ): Promise<UserRelationInterface> {
-    if (userId === friendId)
-      throw new BadRequestException(
-        `User ${userId} can't add himself as friend`,
-      );
+    if (userId == friendId)
+      throw new ConflictException(`You can't add yourself as friend`);
 
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
@@ -148,9 +147,7 @@ export class UsersRelationsService {
       });
     console.log(relationExist);
     if (relationExist?.relationType == 'friend')
-      throw new BadRequestException(
-        `User ${userFriend.login} already your friend`,
-      );
+      throw new ConflictException(`${userFriend.login} is already your friend`);
 
     const updateRelation: Partial<UserRelationEntity> = {
       ...relationExist,

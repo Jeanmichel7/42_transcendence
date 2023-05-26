@@ -69,12 +69,12 @@ export class ChatController {
   async updateRoom(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-    @Body() room: ChatUpdateRoomDTO,
+    @Body() roomData: ChatUpdateRoomDTO,
   ) {
     const result: ChatRoomInterface = await this.ChatService.updateRoom(
       req.user.id,
       roomId,
-      room,
+      roomData,
     );
     return result;
   }

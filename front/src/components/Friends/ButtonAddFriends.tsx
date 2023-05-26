@@ -1,6 +1,6 @@
 import { Alert, Autocomplete, Button, Modal, TextField } from "@mui/material"
 import React from "react";
-import { getAllUsers } from "../../api/searchFriends";
+import { getAllUsers } from "../../api/user";
 import { useState } from "react";
 import { addFriend } from "../../api/relation";
 

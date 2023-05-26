@@ -34,7 +34,7 @@ export class OwnerRoomGuard implements CanActivate {
     // 	return true;
 
     const request = context.switchToHttp().getRequest();
-    // console.log("request admin guard: ", request.user)
+    // console.log("request admin guard: ", request.user);
     // console.log("request params: ", request.params)
     // request params:  { roomId: '1', userIdToBeAdmin: '2' }
     if (!request.user)
