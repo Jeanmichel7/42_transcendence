@@ -1,7 +1,7 @@
 # TODO
 
 
-if admin rom leave room ?
+if admin room leave room ?
 
 
 

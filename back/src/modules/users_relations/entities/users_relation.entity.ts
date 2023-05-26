@@ -35,12 +35,18 @@ export class UserRelationEntity extends BaseEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user)
+  @ManyToOne(() => UserEntity, (user) => user, {
+    onDelete: 'CASCADE',
+  })
   user: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.friends)
+  @ManyToOne(() => UserEntity, (user) => user.friends, {
+    onDelete: 'CASCADE',
+  })
   userRelation: UserEntity;
 
-  // @ManyToOne(() => UserEntity, (user) => user.blocked)
-  // userBlocked: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.blocked, {
+    onDelete: 'CASCADE',
+  })
+  userBlocked: UserEntity;
 }
