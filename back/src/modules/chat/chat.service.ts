@@ -873,6 +873,7 @@ export class ChatService {
         'messages.id',
         'messages.text',
         'messages.createdAt',
+        'messages.updatedAt',
         'ownerMessage.id',
         'ownerMessage.firstName',
         'ownerMessage.lastName',

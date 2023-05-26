@@ -99,7 +99,7 @@ export class UsersService {
     return result;
   }
 
-  async findAll(): Promise<UserInterface[]> {
+  async findAllUsers(): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
         'id',
@@ -107,15 +107,32 @@ export class UsersService {
         'lastName',
         'login',
         'email',
+        'status',
         'description',
         'avatar',
-        'role',
-        // 'is2FAEnabled',
       ],
     });
-    if (!users) throw new NotFoundException(`Users not found`);
-    const result: UserInterface[] = [...users];
+    if (!users) throw new NotFoundException(`No users found`);
+    const result: UserInterface[] = users.map((user) => ({ ...user }));
     return result;
+  }
+
+  async findAllData(id: bigint): Promise<UserInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: id },
+      relations: [
+        'chatMessages',
+        'friends',
+        'blocked',
+        'roomOwner',
+        'roomAdmins',
+        'roomUsers',
+        'roomBannedUsers',
+        'roomMutedUsers',
+      ],
+    });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+    return user;
   }
 
   /* probably useless but I keep it for now */
@@ -387,7 +404,11 @@ export class UsersService {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: id },
       relations: [
+        'messagesSend',
+        'messagesReceive',
         'chatMessages',
+        'friends',
+        'blocked',
         'roomOwner',
         'roomAdmins',
         'roomUsers',

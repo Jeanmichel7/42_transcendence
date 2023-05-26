@@ -33,20 +33,23 @@ import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // get user data
   @Get()
-  async findOne(@Req() req: RequestWithUser): Promise<UserInterface> {
+  async findUser(@Req() req: RequestWithUser): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.findUser(req.user.id);
     return result;
   }
 
-  @Get(':userId/alldata')
-  async findUser(
-    @Param('userId', ParseIntPipe) userId: bigint,
-  ): Promise<UserInterface> {
+  @Get('allDatas')
+  async findAllData(@Req() req: RequestWithUser): Promise<UserInterface> {
     const result: UserInterface = await this.usersService.findUserAllData(
-      userId,
+      req.user.id,
     );
+    return result;
+  }
+
+  @Get('all')
+  async findAllUsers(): Promise<UserInterface[]> {
+    const result: UserInterface[] = await this.usersService.findAllUsers();
     return result;
   }
 
@@ -59,7 +62,7 @@ export class UsersController {
     return result;
   }
 
-  @Get(':userId/profileById')
+  @Get(':userId/profileId')
   async findProfileById(
     @Param('userId') params: bigint,
   ): Promise<ProfilInterface> {
@@ -123,21 +126,25 @@ export class UsersController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
-  @Get('all')
+  @Get(':userId/allDatas')
   // @UseGuards(AuthAdmin)
-  async findAll(): Promise<UserInterface[]> {
-    const result: UserInterface[] = await this.usersService.findAll();
+  async findUserAllData(
+    @Param('userId', ParseIntPipe) userId: bigint,
+  ): Promise<UserInterface> {
+    const result: UserInterface = await this.usersService.findUserAllData(
+      userId,
+    );
     return result;
   }
 
-  @Get(':userId')
-  // @UseGuards(AuthAdmin)
-  async adminFindOne(
-    @Param('userId', ParseIntPipe) params: bigint,
-  ): Promise<UserInterface> {
-    const result: UserInterface = await this.usersService.findUser(params);
-    return result;
-  }
+  // @Get(':userId')
+  // // @UseGuards(AuthAdmin)
+  // async adminFindOne(
+  //   @Param('userId', ParseIntPipe) params: bigint,
+  // ): Promise<UserInterface> {
+  //   const result: UserInterface = await this.usersService.findUser(params);
+  //   return result;
+  // }
 
   @Patch(':userId')
   // @UseGuards(AuthAdmin)
