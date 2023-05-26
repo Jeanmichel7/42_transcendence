@@ -370,14 +370,10 @@ export class UsersService {
   async getRooms(id: bigint): Promise<ChatRoomInterface[]> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: id },
-      relations: ['roomOwner', 'roomAdmins', 'roomUsers'],
+      relations: ['roomUsers'],
     });
     if (!user) throw new NotFoundException(`User ${id} not found`);
-    const rooms: ChatRoomInterface[] = [
-      ...user.roomOwner,
-      ...user.roomAdmins,
-      ...user.roomUsers,
-    ];
+    const rooms: ChatRoomInterface[] = [...user.roomUsers];
     return rooms;
   }
 
