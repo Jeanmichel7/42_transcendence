@@ -37,12 +37,18 @@ const StyledRetryButton = styled.button`
     background-color: grey;
   }
 `;
+interface LooseProps {
+  setLoose: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-function Loose() {
+function Loose({ setLoose }: LooseProps) {
+  function handleClick() {
+    setLoose(false);
+  }
   return (
     <LooseWrapper>
       <StyledTitle>Perdu</StyledTitle>
-      <StyledRetryButton>Rejouer</StyledRetryButton>
+      <StyledRetryButton onClick={handleClick}>Rejouer</StyledRetryButton>
     </LooseWrapper>
   );
 }

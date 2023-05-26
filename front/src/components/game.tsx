@@ -9,9 +9,13 @@ const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
-const BALL_DIAMETER = 1;
-const BALL_POS_MAX = 980;
-const INITIAL_BALL_SPEED = 0.4;
+const BALL_DIAMETER = 200;
+// max position of ball on X axis for compensate ball radius
+const BALL_POS_MAX = 800;
+const INITIAL_BALL_SPEED = 0.1;
+// threshold value for correction of ball position with server state
+const THRESHOLD = 400;
+const SPEED_INCREASE = 0.06;
 
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
@@ -52,8 +56,8 @@ const Ball = styled.div.attrs((props) => {
     },
   };
 })`
-  width: ${BALL_DIAMETER}vh;
-  height: ${BALL_DIAMETER}vh;
+  width: ${BALL_DIAMETER}px;
+  height: ${BALL_DIAMETER}px;
   background-color: white;
   position: absolute;
   left: 0%;
@@ -75,7 +79,7 @@ function Game() {
   const [scorePlayerLeft, setScorePlayerLeft] = useState(0);
   const [scorePlayerRight, setScorePlayerRight] = useState(0);
   const gameWidth = useRef(0);
-  const loose = useRef(false);
+  const loose = useRef();
   const [gameDimensions, setGameDimensions] = useState({ width: 0, height: 0 });
   const [fps, setFps] = useState(0);
   const lastDateTime = useRef(0);
@@ -83,13 +87,21 @@ function Game() {
 
   const [socket, setSocket] = useState(null);
 
+  function normalizeGameData(data: any) {
+    if (data.isPlayerRight === true) {
+      data.ball.x = -data.ball.x;
+      data.ball.y = -data.ball.y;
+    }
+    return data;
+  }
+
   useEffect(() => {
     const socket = io('http://localhost:3000/game');
     setSocket(socket);
 
     const intervalId = setInterval(() => {
       socket.emit('clientUpdate', {
-        posRacketLeft: posRacketLeft.current,
+        posRacket: posRacketLeft.current,
         ArrowDown: keyStateRef.current['ArrowDown'],
         ArrowUp: keyStateRef.current['ArrowUp'],
         gameId: gameData.current.gameId,
@@ -101,7 +113,7 @@ function Game() {
     });
 
     socket.on('serverUpdate', (data) => {
-      gameData.current = data;
+      gameData.current = normalizeGameData(data);
     });
 
     socket.on('disconnect', () => {
@@ -143,7 +155,6 @@ function Game() {
       if (deltaTime > 0) {
         setFps(1000 / deltaTime);
       }
-      console.log(currentTime);
       lastTime = currentTime;
       if (keyStateRef.current['ArrowDown']) {
         setPositionLeft((oldPos) =>
@@ -186,22 +197,28 @@ function Game() {
         ) {
           newBall.vx = -newBall.vx;
           newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10;
+
           if (keyStateRef.current['ArrowDown']) {
-            newBall.vy += 0.06;
-            newBall.vx -= 0.06;
-          } else if (keyStateRef.current['ArrowUp']) {
-            newBall.vy -= 0.06;
-            newBall.vx += 0.06;
+            newBall.vy += SPEED_INCREASE;
           }
-        } else if (
-          oldBall.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 &&
-          !loose.current
-        ) {
-          loose.current = true;
-          setScorePlayerLeft((oldScore) => oldScore + 1);
+          if (keyStateRef.current['ArrowUp']) {
+            newBall.vy -= SPEED_INCREASE;
+          }
         }
         newBall.x += newBall.vx * deltaTime;
         newBall.y += newBall.vy * deltaTime;
+        console.log(Math.abs(newBall.x - gameData.current.ball?.x));
+        /*
+        if (
+          Math.abs(newBall.x - gameData.current.ball?.x) > THRESHOLD ||
+          Math.abs(newBall.y - gameData.current.ball?.y) > THRESHOLD
+        ) {
+          console.log('correction with state server');
+          newBall.x = gameData.current.ball?.x;
+          newBall.y = gameData.current.ball?.y;
+          newBall.vx = gameData.current.ball?.vx;
+          newBall.vy = gameData.current.ball?.vy;
+        }*/
         return newBall;
       });
       if (!loose.current) {
@@ -249,7 +266,7 @@ function Game() {
         scorePlayerLeft={scorePlayerLeft}
         scorePlayerRight={scorePlayerRight}
       />
-      {loose.current && <Loose />}
+      {loose && <Loose loose={loose} />}
       <Racket posY={posRacketLeftState} type="left" />
       <Ball
         posX={ball.x * (gameDimensions.width / 1000)}

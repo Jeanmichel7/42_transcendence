@@ -7,6 +7,8 @@ const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 1;
 const BALL_POS_MAX = 980;
 const SCORE_FOR_WIN = 5;
+const INITIAL_BALL_SPEED = 0.4;
+const SPEED_INCREASE = 0.06;
 
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
@@ -15,6 +17,13 @@ const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
+
+interface clientUpdate {
+  posRacket: number;
+  ArrowDown: boolean;
+  ArrowUp: boolean;
+  gameId: string;
+}
 
 export class Game {
   ball: { x: number; y: number; vx: number; vy: number };
@@ -26,12 +35,21 @@ export class Game {
   player2Id: string;
   player1Score: number;
   player2Score: number;
+  player1ArrowUp: boolean;
+  player1ArrowDown: boolean;
+  player2ArrowUp: boolean;
+  player2ArrowDown: boolean;
   lastTime: number;
   id: string;
 
   constructor(player1Id: string, player2Id: string) {
     this.isOver = false;
-    this.ball = { x: 0, y: 0, vx: 0, vy: 0 };
+    this.ball = {
+      x: 500,
+      y: 500,
+      vx: INITIAL_BALL_SPEED,
+      vy: INITIAL_BALL_SPEED,
+    };
     this.player1Id = player1Id;
     this.player2Id = player2Id;
     this.winner = '';
@@ -52,7 +70,7 @@ export class Game {
       }
     }
     if (this.ball.y > BALL_POS_MAX || this.ball.y < 0) {
-      this.ball.vy = this.ball.vy;
+      this.ball.vy = -this.ball.vy;
       if (this.ball.y > BALL_POS_MAX) {
         this.ball.y = BALL_POS_MAX;
       } else {
@@ -81,6 +99,12 @@ export class Game {
       } else {
         this.player1Score += 1;
       }
+      if (this.player1ArrowDown) {
+        this.ball.vy += SPEED_INCREASE;
+      }
+      if (this.player1ArrowUp) {
+        this.ball.vy -= SPEED_INCREASE;
+      }
     } else if (this.ball.x >= RACKET_RIGHT_POS_X_10 && !this.isOver) {
       if (this.player2Score > SCORE_FOR_WIN) {
         this.isOver = true;
@@ -101,7 +125,20 @@ export class Game {
       player1Score: this.player1Score,
       player2Score: this.player2Score,
       gameId: this.id,
+      isPlayerRight: false,
     };
+  }
+
+  updateGameData(clientData: clientUpdate, clientId: string) {
+    if (clientId === this.player1Id) {
+      this.racketLeft = clientData.posRacket;
+      this.player1ArrowDown = clientData.ArrowDown;
+      this.player1ArrowUp = clientData.ArrowUp;
+    } else if (clientId === this.player2Id) {
+      this.racketRight = clientData.posRacket;
+      this.player2ArrowDown = clientData.ArrowDown;
+      this.player2ArrowUp = clientData.ArrowUp;
+    }
   }
 }
 
@@ -125,13 +162,21 @@ export class GameService {
   addToQueue(playerId: string) {
     if (this.playerWaiting1 === undefined) {
       this.playerWaiting1 = playerId;
-    } else {
+    } else if (
+      this.playerWaiting2 === undefined &&
+      this.playerWaiting1 !== playerId
+    ) {
       this.playerWaiting2 = playerId;
       const game = new Game(this.playerWaiting1, this.playerWaiting2);
       this.games.set(game.id, game);
       this.playerWaiting1 = undefined;
       this.playerWaiting2 = undefined;
     }
+  }
+
+  updateClientData(clientData: clientUpdate, clientId: string) {
+    if (clientData.gameId)
+      this.games.get(clientData.gameId)?.updateGameData(clientData, clientId);
   }
 
   test() {

@@ -11,7 +11,7 @@ import { GameService } from './game.service';
 import { Game } from './game.service';
 
 interface clientUpdate {
-  posRacketLeft: number;
+  posRacket: number;
   ArrowDown: boolean;
   ArrowUp: boolean;
   gameId: string;
@@ -31,9 +31,9 @@ export class GameEvents {
     setInterval(() => {
       const games: Map<string, Game> = this.gameService.getGames();
       games.forEach((game) => {
-        console.log(game);
         const update = this.gameService.updateGame(game);
         this.server.to(game.player1Id).emit('serverUpdate', update);
+        update.isPlayerRight = true;
         this.server.to(game.player2Id).emit('serverUpdate', update);
       });
     }, 1000 / 20);
@@ -61,7 +61,7 @@ export class GameEvents {
     @MessageBody() data: clientUpdate,
     @ConnectedSocket() client: Socket,
   ) {
-    // this.gameService.u(data);
+    this.gameService.updateClientData(data, client.id);
   }
 
   @SubscribeMessage('ballPosition')
@@ -79,7 +79,6 @@ export class GameEvents {
   @SubscribeMessage('message')
   handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
     //this.server.emit('message', client.id, data)
-    console.log('message: ' + data);
     const rt_data = {
       message: 'hello',
       timestamp: Date.now(),
