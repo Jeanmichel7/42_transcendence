@@ -11,6 +11,7 @@ export interface AccountProps {
   description: string;
   is2FAEnabled: boolean;
   avatar: string;
+  status: string;
 }
 
 export default function Account() {
@@ -22,6 +23,7 @@ export default function Account() {
     description: '',
     is2FAEnabled: false,
     avatar: '',
+    status: '',
   });
 
   async function fetchAndSetUserProfile() {
@@ -104,6 +106,12 @@ export default function Account() {
               value={user.is2FAEnabled}
               setUserProfile={setUserProfile}
             />
+
+            {/* <AccountItem
+              keyName="Status"
+              value={user.status}
+              setUserProfile={setUserProfile}
+            /> */}
 
           </div>
         </div>

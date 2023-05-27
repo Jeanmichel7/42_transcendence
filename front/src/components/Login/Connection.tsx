@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 
-import { check2FACookie, send2FA, getUserData } from '../../api/auth'
+import { check2FACookie, send2FA } from '../../api/auth'
+import { getUserData } from '../../api/user';
 import { setUser, setLogged } from '../../store/userSlice'
 
 function ConnectPage() {

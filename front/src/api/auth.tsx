@@ -56,15 +56,30 @@ export async function logout() {
   }
 }
 
-export async function getUserData() {
+
+
+export async function Active2FA() {
   try {
-    const response = await api.get('/users');
+    const response = await api.put('auth/enable2FA');
     if (response.status === 200) {
       return response.data;
     }
   }
   catch (e: any) {
     return e.response.data
-    // throw new Error('Failed to get user');
+    // throw new Error('Failed to check auth');
+  }
+}
+
+export async function Desactive2FA() {
+  try {
+    const response = await api.put('auth/disable2fa');
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to check auth');
   }
 }

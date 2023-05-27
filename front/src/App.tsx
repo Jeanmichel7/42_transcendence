@@ -4,7 +4,8 @@ import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from './routes/indexRoutes';
 import { useEffect } from 'react';
-import { getUserData, isAuthenticated } from './api/auth';
+import { isAuthenticated } from './api/auth';
+import { getUserData } from './api/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLogged, setUser } from './store/userSlice';
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FormControl, FormHelperText, InputLabel, TextField } from '@mui/material';
+import { Button, Dialog, FormControl, FormHelperText, InputLabel, Switch, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Input from '@mui/material/Input';
@@ -7,7 +7,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
 
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import { TransitionProps } from '@mui/material/transitions';
 import { patchUserAccount } from '../../api/user';
+import { Active2FA, Desactive2FA } from '../../api/auth';
+import Slide from '@mui/material/Slide';
 import { AccountProps } from '../../pages/Account';
 
 interface ItemProps {
@@ -16,13 +24,22 @@ interface ItemProps {
   setUserProfile: (user: any) => any;
 }
 
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function AccountItem({ keyName, value, setUserProfile }: ItemProps) {
-
+  console.log(keyName, value)
   const [edit, setEdit] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number | boolean>(value);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [QRCode, setQRCode] = useState<string>('');
 
   async function handleForm() {
     setLoading(true)
@@ -35,7 +52,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
       setInputValue(value)
     }
     else {
-      setUserProfile((prevUser: AccountProps ) => ({
+      setUserProfile((prevUser: AccountProps) => ({
         ...prevUser,
         [keyName]: inputValue,
       }));
@@ -53,8 +70,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   function parseKeyName(value: string | number | boolean) {
     if (typeof value === 'string') {
       let tmp = value.substring(0, 1).toUpperCase() + value.substring(1)
-      return tmp
-
+      return tmp.replace(/([A-Z])/g, ' $1').replace(/2 F A/, '2FA')
     }
     if (typeof value === 'number') {
       return value
@@ -68,6 +84,37 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   useEffect(() => {
     setInputValue(value)
   }, [value])
+
+
+  async function handleChange2FA() {
+    if (inputValue) {
+      // disable 2FA
+      setInputValue(false)
+      const res = await Desactive2FA()
+      if (res.error) {
+        console.log("error : ", res)
+      }
+      else {
+        setInputValue(false)
+      }
+
+    }
+    else {
+      // enable 2FA
+      const res = await Active2FA()
+      if (res.error) {
+        console.log("error : ", res)
+      }
+      else {
+        setQRCode(res)
+        setInputValue(true)
+      }
+    }
+
+
+
+
+  }
 
   return (
     <div className="flex items-center w-full pb-3">
@@ -90,10 +137,11 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             className="w-full"
             defaultValue={value}
             onChange={(e) => { setInputValue(e.target.value) }}
+            autoFocus
           />
-          <FormHelperText 
+          <FormHelperText
             id="component-helper-text"
-            color="error" 
+            color="error"
             sx={{ color: 'red' }}
             error={error ? true : false}
           >
@@ -104,9 +152,17 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
 
       {/* Buttons */}
       <div className="w-auto ml-auto"> {!edit ?
-        <Button variant="outlined" onClick={() => { setEdit(true) }} >
-          <EditOutlinedIcon />
-        </Button>
+        // Class button or Switch
+        keyName == 'Active 2FA' ?
+          <Switch
+            checked={inputValue}
+            onChange={handleChange2FA}
+            inputProps={{ 'aria-label': 'controlled' }}
+          />
+          :
+          <Button variant="outlined" onClick={() => { setEdit(true) }} >
+            <EditOutlinedIcon />
+          </Button>
         :
         <span className='flex'>
           <LoadingButton
@@ -118,10 +174,31 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             Modifier
           </LoadingButton>
           <Button variant="outlined" onClick={handleClose} >
-            <CloseIcon htmlColor='red' /> 
+            <CloseIcon htmlColor='red' />
           </Button>
         </span>
       } </div>
+
+      <Dialog 
+        TransitionComponent={Transition}
+        keepMounted
+        open={QRCode ? true : false}
+        onClose={() => { setQRCode('') }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        {/* <DialogTitle id="alert-dialog-title">{"Scan GoogleAuthentificator"}</DialogTitle> */}
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <img src={QRCode} alt="QRCode" />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setQRCode('') }} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 
