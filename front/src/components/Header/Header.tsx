@@ -35,8 +35,8 @@ function Header() {
         <div className="flex justify-between items-center" >
           <NavLink to="/game" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Play</NavLink>
           <NavLink to="/chat" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Chat</NavLink>
-          <NavLink to="/test" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Test</NavLink>
           <NavLink to="/friends" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Friends</NavLink>
+          <NavLink to="/profile" className={({isActive}) => isActive? "header__link--activ" : "header__link"} >Profile</NavLink>
         </div>
 
         <div className="flex justify-between items-center" >
@@ -45,11 +45,11 @@ function Header() {
             <button onClick={handleLogout} className="header__link">
               Logout
             </button>
-            <NavLink to="/profile" className={({isActive}) => isActive? "header__link--activ" : "header__link"} > 
-              Profil
+            <NavLink to="/account" className={({isActive}) => isActive? "header__link--activ" : "header__link"} > 
+              Account
             </NavLink>
-            <NavLink to="/profile" className="header__link-avatar" > 
-              {userData.avatar && 
+            <NavLink to="/account" className="header__link-avatar" > 
+              { userData.avatar && 
               <img 
                 src={`http://localhost:3000/avatars/` + userData.avatar}
                 className="text-center p-2 w-full h-24"
@@ -59,7 +59,7 @@ function Header() {
                   target.onerror = null; 
                   target.src="http://localhost:3000/avatars/defaultAvatar.png"
                 }}
-              />}
+              /> }
             </NavLink>
           </>
           }

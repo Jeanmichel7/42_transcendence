@@ -31,8 +31,8 @@ function App() {
   return (
     <div className='flex flex-col h-screen min-h-md '>
       <Header />
-      <div className='relative flex-grow bg-[#262652] w-full'>
-        <div className='mr-12 p-6 h-full text-white'>
+      <div className='relative flex-grow bg-[#eaeaff] w-full'>
+        <div className='mr-12 p-6 h-full'>
           <AppRoutes />
         </div>
         <div className="absolute right-0 top-0">

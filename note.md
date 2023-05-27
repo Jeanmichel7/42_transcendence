@@ -5,19 +5,6 @@ if admin room leave room ?
 
 
 
-postgres  | 2023-05-26 21:11:37.821 UTC [137] STATEMENT:  DELETE FROM "users" WHERE "id" = $1
-nestjs    | [Nest] 131  - 05/26/2023, 9:11:37 PM   ERROR [ExceptionsHandler] update or delete on table "users" violates foreign key constraint "FK_718040c5303bad75d9908ee7fc0" on table "users-relation"
-nestjs    | QueryFailedError: update or delete on table "users" violates foreign key constraint "FK_718040c5303bad75d9908ee7fc0" on table "users-relation"
-nestjs    |     at PostgresQueryRunner.query (/app/src/driver/postgres/PostgresQueryRunner.ts:299:19)
-nestjs    |     at processTicksAndRejections (node:internal/process/task_queues:95:5)
-nestjs    |     at DeleteQueryBuilder.execute (/app/src/query-builder/DeleteQueryBuilder.ts:77:33)
-nestjs    |     at UsersService.deleteUser (/app/src/modules/users/users.service.ts:274:20)
-nestjs    |     at UsersController.adminDeleteUser (/app/src/modules/users/users.controller.ts:165:5)
-nestjs    |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:46:28
-nestjs    |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17
-
-
-
 
 
 
