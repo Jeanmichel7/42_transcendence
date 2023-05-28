@@ -27,7 +27,6 @@ function ConnectPage() {
         }
         else {
           await saveUserData();
-          // await new Promise(r => setTimeout(r, 10000)); wait 10s
           navigate('/home');
         }
       } catch (error) {
@@ -51,37 +50,32 @@ function ConnectPage() {
   //send code to server
   async function handleSendCode() {
     const res = await send2FA(code2FA, userId);
-    console.log("response : ", res)
 
     if (res.status === 200) {
       await saveUserData();
-      // await new Promise(r => setTimeout(r, 20000)); //wait 20s
       navigate('/home');
     }
     else {
-      // wrong code
       console.log(res.data)
     }
   }
 
-
-
-
   return (
-    <div className=" w-3/4 h-2/3 items-center justify-center flex">
+    <div className=" w-3/4 h-2/3 items-center justify-center flex" style={{ backgroundColor: '#1B262C' }}>
       {is2FAactiv &&
-        <section>
-          <p>2FA authentification</p>
+        <section style={{ color: '#FDFFFC' }}>
+          <p>2FA authentication</p>
           <input type="text" value={code2FA} onChange={(e) => setCode2FA(e.target.value)}
-            placeholder='Code'
+            placeholder='Code' style={{ backgroundColor: '#22D3EE', color: '#FDFFFC' }}
           />
-          <button onClick={handleSendCode}>Send</button>
+          <button onClick={handleSendCode} style={{ backgroundColor: '#FF6B00', color: '#FDFFFC' }}>Send</button>
         </section>
       }
-      <p> Test Redux : {userData.login} </p>
-      <div>User data: {JSON.stringify(userData)}</div> {/* Here */}
+      <p style={{ color: '#FDFFFC' }}> Test Redux : {userData.login} </p>
+      <div style={{ color: '#FDFFFC' }}>User data: {JSON.stringify(userData)}</div>
     </div>
   );
 }
 
 export default ConnectPage;
+

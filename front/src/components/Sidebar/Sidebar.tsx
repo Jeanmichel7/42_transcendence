@@ -18,27 +18,27 @@ function SideBar() {
   }, [ref])
 
   return (
-    <div ref={ref} className={` border-4 z-50 border-stone-300 shadow-inner shadow-gray-300 ${open ? "w-80" : "w-12 h-24"} duration-300 bg-slate-50 rounded-lg`} >
+    <div ref={ref} className={`border-4 z-50 border-[#0F4C75] shadow-inner shadow-gray-300 ${open ? "w-80" : "w-12 h-24"} duration-300 bg-[#1B262C] rounded-lg`} >
 
-      <BiChevronLeftCircle className={`text-white text-4xl bg-[#1e1e4e] 
-        rounded-full absolute x-left-5 top-9 border-2 cursor-pointer 
+      <BiChevronLeftCircle className={`text-white text-4xl bg-black
+        rounded-full absolute x-left-5 top-11 border-2 cursor-pointer
         ${open && "rotate-180"} duration-700`} onClick={() => setOpen(!open)}
       />
 
-      <div className=" items-center justify-center flex ">
-        <img src='/profile.png' width='120px' className="text-center p-2 rounded-full " />
+      <div className="items-center justify-center flex">
+        <img src='/profile.png' width='120px' className="text-center p-2 rounded-full" />
       </div>
 
-      <p className={` ${!open && "scale-0"} bg-white shadow rounded-lg shadow-gray-300 font-Dance text-3xl p-2 m-2 text-center font-bold `} >Name</p>
+      <p className={` ${!open && "scale-0"} bg-[#3282B8] shadow rounded-lg shadow-gray-300 text-[#FDFFFC] font-Dance text-3xl p-2 m-2 text-center font-bold `} >Name</p>
 
-      <div className={`${!open && "scale-0"} bg-white m-2 p-2 font-mono shadow rounded-lg shadow-gray-300 `} >
+      <div className={`${!open && "scale-0"} bg-[#3282B8] m-2 p-2 font-mono shadow rounded-lg shadow-gray-300 text-[#FDFFFC]`} >
         <p>Matchs played : </p>
         <p>Victories     : </p>
         <p>Victorie rate : </p>
       </div>
 
-      <div className={`${!open && "scale-0"} m-8 text-center `} >
-        <p className="font-bold font underline" >Match history</p>
+      <div className={`${!open && "scale-0"} m-8 text-center text-[#FDFFFC]`} >
+        <p className="font-bold underline" >Match history</p>
       </div>
 
 
@@ -48,3 +48,4 @@ function SideBar() {
 }
 
 export default SideBar
+
