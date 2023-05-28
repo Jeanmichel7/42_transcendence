@@ -26,22 +26,22 @@ export async function check2FACookie() {
   }
 }
 
-export async function send2FA(code: any, userId: any) {
-  const body = {
-    code,
-    userId,
-  };
-  try {
-    const response = await api.post('/auth/2FA', body);
-    if (response.status === 200) {
-      return response.data;
-    }
-  }
-  catch (e: any) {
-    return e.response.data
-    // throw new Error('Failed to send 2FA code');
-  }
-}
+// export async function send2FA(code: any, userId: any) {
+//   const body = {
+//     code,
+//     userId,
+//   };
+//   try {
+//     const response = await api.post('/auth/2FA', body);
+//     if (response.status === 200) {
+//       return response.data;
+//     }
+//   }
+//   catch (e: any) {
+//     return e.response.data
+//     // throw new Error('Failed to send 2FA code');
+//   }
+// }
 
 export async function logout() {
   try {
@@ -56,15 +56,45 @@ export async function logout() {
   }
 }
 
-export async function getUserData() {
+export async function Active2FA() {
   try {
-    const response = await api.get('/users');
+    const response = await api.put('auth/enable2FA');
     if (response.status === 200) {
       return response.data;
     }
   }
   catch (e: any) {
     return e.response.data
-    // throw new Error('Failed to get user');
+    // throw new Error('Failed to check auth');
+  }
+}
+
+export async function Desactive2FA() {
+  try {
+    const response = await api.put('auth/disable2fa');
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to check auth');
+  }
+}
+
+export async function check2FACode (code: string, userId: number) {
+  console.log(code, userId)
+  try {
+    const response = await api.post('/auth/login2fa', { 
+      code: code,
+      userId: userId
+     });
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data;
+    // throw new Error('Failed to check auth');
   }
 }

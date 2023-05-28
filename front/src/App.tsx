@@ -4,7 +4,8 @@ import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from './routes/indexRoutes';
 import { useEffect } from 'react';
-import { getUserData, isAuthenticated } from './api/auth';
+import { isAuthenticated } from './api/auth';
+import { getUserData } from './api/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLogged, setUser } from './store/userSlice';
 
@@ -31,8 +32,8 @@ function App() {
   return (
     <div className='flex flex-col h-screen min-h-md '>
       <Header />
-      <div className='relative flex-grow bg-[#262652] w-full'>
-        <div className='mr-12 p-6 h-full text-white'>
+      <div className='relative flex-grow bg-[#eaeaff] w-full'>
+        <div className='mr-12 p-6 h-full'>
           <AppRoutes />
         </div>
         <div className="absolute right-0 top-0">
