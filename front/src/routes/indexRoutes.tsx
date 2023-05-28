@@ -6,7 +6,7 @@ import Home from '../pages/Home';
 import Chat from '../pages/Chat';
 import Account from '../pages/Account'
 // import Game from '../pages/game';
-import ConnectPage from '../components/Login/Connection';
+import ConnectPage from '../pages/Connection';
 import Profile from '../pages/Profile';
 
 const AppRoutes: React.FC = () => (

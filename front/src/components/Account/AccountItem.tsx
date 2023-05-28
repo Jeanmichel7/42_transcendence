@@ -14,9 +14,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { TransitionProps } from '@mui/material/transitions';
 import { patchUserAccount } from '../../api/user';
-import { Active2FA, Desactive2FA } from '../../api/auth';
+import { Active2FA, Desactive2FA, check2FACode } from '../../api/auth';
 import Slide from '@mui/material/Slide';
-import { AccountProps } from '../../pages/Account';
+import { AccountProps } from './AccountProfile';
+import { useSelector } from 'react-redux';
 
 interface ItemProps {
   keyName: string;
@@ -34,12 +35,30 @@ const Transition = React.forwardRef(function Transition(
 });
 
 export default function AccountItem({ keyName, value, setUserProfile }: ItemProps) {
-  console.log(keyName, value)
+  // console.log(keyName, value)
   const [edit, setEdit] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number | boolean>(value);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [QRCode, setQRCode] = useState<string>('');
+  // const [validCode, setValidCode] = useState<boolean>(false);
+  const [userCode, setUserCode] = useState<string>('');
+  const [error2FA, setError2FA] = useState<boolean>(false);
+
+  const userData: any = useSelector((state: any) => state.user.userData);
+
+
+  async function handleClose2FA() {
+    const res = await check2FACode(userCode, userData.id)
+    if (res.error) {
+      setError2FA(true)
+    } else {
+      setError2FA(false)
+      setQRCode('');
+      setUserCode('');
+      // setValidCode(false);
+    }
+  }
 
   async function handleForm() {
     setLoading(true)
@@ -81,10 +100,6 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   }
 
 
-  useEffect(() => {
-    setInputValue(value)
-  }, [value])
-
 
   async function handleChange2FA() {
     if (inputValue) {
@@ -96,8 +111,8 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
       }
       else {
         setInputValue(false)
+        setQRCode('')
       }
-
     }
     else {
       // enable 2FA
@@ -110,11 +125,12 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         setInputValue(true)
       }
     }
-
-
-
-
   }
+
+
+  useEffect(() => {
+    setInputValue(value)
+  }, [value])
 
   return (
     <div className="flex items-center w-full pb-3">
@@ -128,7 +144,8 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
           {typeof value === 'string' && <p> {inputValue} </p>}
           {typeof value === 'number' && <p> {inputValue} </p>}
           {typeof value === 'boolean' && <p> {inputValue ? 'true' : 'false'} </p>}
-        </> :
+        </> 
+        :
         <FormControl variant="standard">
           {/* <InputLabel htmlFor="component-helper">Name</InputLabel> */}
           <Input
@@ -155,7 +172,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         // Class button or Switch
         keyName == 'Active 2FA' ?
           <Switch
-            checked={inputValue}
+            checked={typeof inputValue === 'boolean' ? inputValue : false}
             onChange={handleChange2FA}
             inputProps={{ 'aria-label': 'controlled' }}
           />
@@ -183,19 +200,36 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         TransitionComponent={Transition}
         keepMounted
         open={QRCode ? true : false}
-        onClose={() => { setQRCode('') }}
+        // onClose={() => { handleClose2FA }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        {/* <DialogTitle id="alert-dialog-title">{"Scan GoogleAuthentificator"}</DialogTitle> */}
+        <DialogTitle id="alert-dialog-title">{"Scan GoogleAuthentificator"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <img src={QRCode} alt="QRCode" />
           </DialogContentText>
+          <TextField
+            label="Enter the code"
+            value={userCode}
+            onChange={(e) => setUserCode(e.target.value)}
+            onKeyDown={(e) => {e.key === 'Enter' ? handleClose2FA() : null}}
+          />
+          <FormHelperText
+            id="component-helper-text"
+            color="error"
+            sx={{ color: 'red' }}
+            error={error2FA ? true : false}
+          >
+            {error2FA? "Code invalide" : null}
+          </FormHelperText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setQRCode('') }} autoFocus>
-            Close
+          <Button onClick={ handleChange2FA }>
+            Cancel
+          </Button>
+          <Button onClick={ handleClose2FA } autoFocus>
+            Activate
           </Button>
         </DialogActions>
       </Dialog>
