@@ -26,6 +26,19 @@ export async function fetchUserAccount() {
   }
 }
 
+export async function getProfileByPseudo(pseudo: string) {
+  try {
+    const response = await api.get('users/' + pseudo + '/profile');
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to check auth');
+  }
+}
+
 export async function patchUserAccount(data: any) {
   try {
     const response = await api.patch('users', data);
