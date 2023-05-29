@@ -18,10 +18,10 @@ function Chat() {
       text-indigo-900 p-5"
     >
       <div className="w-1/4 flex flex-col h-full">
+        <ButtonNewGroup  />
         <ButtonAddFriends 
           setServiceToCall={ setServiceToCall }
         />
-        <ButtonNewGroup  />
         <Friends
           setServiceToCall={ setServiceToCall }
           currentChatUser={currentChatUser}
@@ -38,7 +38,6 @@ function Chat() {
       {
         serviceToCall === 'addFriends' &&
         <AddFriends />
-
       }
       </div>
 

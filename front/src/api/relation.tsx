@@ -52,6 +52,19 @@ export async function addFriend(userIdToAdd: number) {
   }
 }
 
+export async function getBlockedUsers() {
+  try {
+    const response = await api.get('/relations/blocked');
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to get blocked users');
+  }
+}
+
 export async function apiBlockUser(userIdToBlock: number) {
   try {
     const response = await api.put('relations/friends/' + userIdToBlock + '/block');

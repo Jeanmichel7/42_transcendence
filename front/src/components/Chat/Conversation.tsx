@@ -177,7 +177,7 @@ const Conversation = (userSelected: any) => {
         {/* display form message */}
         <form
           onSubmit={HandleSubmit}
-          className="bg-gray-100 border rounded-xl shadow-md flex border-2 border-zinc-400 mx-2"
+          className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2"
         >
           <textarea
             ref={textareaRef}

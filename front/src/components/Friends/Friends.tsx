@@ -4,34 +4,63 @@ import { ImPencil, ImBlocked } from "react-icons/im";
 import { getFriends, apiBlockUser, deleteFriend } from '../../api/relation'
 import { Fade, IconButton, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, setLogged, reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice'
 
-const Friend = (data: any) => {
-  async function blockUser(userToBlock: any) {
+
+const Friend = ({
+  userFriend,
+  currentChatUser,
+  setCurrentChatUser,
+  setOpen,
+  setServiceToCall
+  }: {
+    userFriend: any,
+    currentChatUser: any,
+    setCurrentChatUser: any,
+    setOpen: any,
+    setServiceToCall: any
+  }) => {
+  const dispatch = useDispatch()
+
+
+  async function handleBlockUser(userToBlock: any) {
     const res = await apiBlockUser(userToBlock);
+    if(res.error)
+      console.log("error bloc user : ", res.error)
+    else {
+      dispatch(reduxAddUserBlocked(userFriend))
+    }
     console.log("res bloc user : ", res)
   }
 
   async function handleRemoveFriend(e: any) {
     e.stopPropagation();
-    const res = await deleteFriend(data.data.id);  
+    const res = await deleteFriend(userFriend.id);
+    if(res.error)
+      console.log("error remove friend : ", res.error)
+    else {
+      dispatch(reduxRemoveFriends(userFriend.id))
+    }
     console.log("res remove friend : ", res)
   }
 
   return (
     <div>
-      <div className="border rounded-xl hover:bg-gray-100 transition-all cursor-pointer flex flex-row items-center text-left">
+      <div className="border rounded-xl hover:bg-gray-100 transition-all 
+      cursor-pointer flex flex-row items-center text-left">
         <div className="flex-grow text-black m-2 p-2 flex items-center "
           onClick={() => {
-            if (data.currentChatUser !== data.data.login) {
-              data.setCurrentChatUser(data.data)
-              data.setOpen(false)
-              data.setServiceToCall('chat')
+            if (currentChatUser !== userFriend.login) {
+              setCurrentChatUser(userFriend)
+              setOpen(false)
+              setServiceToCall('chat')
             }
           }}
         >
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
-            src={`http://localhost:3000/avatars/` + data.data.avatar}
+            src={`http://localhost:3000/avatars/` + userFriend.avatar}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
@@ -39,15 +68,9 @@ const Friend = (data: any) => {
             }}
             alt="avatar"
           />
-          {data.data.login}
-
+          {userFriend.login}
         </div>
-        {/* <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all">
-          <ImPencil className="m-1" />
-          <div className="absolute group-hover:block text-center w-80 text-sm bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-            Send direct message to user.
-          </div>
-        </div> */}
+
         <Tooltip 
           title="Remove Friend" arrow
           TransitionComponent={Zoom}
@@ -57,15 +80,17 @@ const Friend = (data: any) => {
             <CloseIcon />
           </IconButton>
         </Tooltip>
-        <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 hover:bg-white transition-all m-2"
-          onClick={() => blockUser(data.data.id)}
+
+        <Tooltip
+          title="Block User" arrow
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 600 }}
         >
-          <ImBlocked className="m-1 text-red-600" />
-          <div className="absolute group-hover:block text-center w-40 bg-slate-800 text-white shadow-sm hidden 
-          left-14 font-mono p-3 rounded-md transition-all">
-            Block user
-          </div>
-        </div>
+          <IconButton onClick={() => handleBlockUser(userFriend.id)} color='error'>
+            <ImBlocked />
+          </IconButton>
+        </Tooltip>
+
       </div>
     </div>
   )
@@ -74,14 +99,8 @@ const Friend = (data: any) => {
 
 function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any) {
   const [open, setOpen] = useState(false);
-  const [friends, setFriends] = useState<any[]>([]);
+  const userData: any = useSelector((state: any) => state.user.userData);
   let ref = useRef(document.createElement('div'));
-
-  async function fetchFriends() {
-    const res = await getFriends();
-    // console.log("res : ", res)
-    setFriends(res);
-  }
 
   useEffect(() => {
     const ClickOutside = (event: any) => {
@@ -91,12 +110,6 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
     document.addEventListener('mousedown', ClickOutside);
     return () => { document.removeEventListener('mousedown', ClickOutside) };
   }, [ref])
-
-  useEffect(() => {
-    if (open) {
-      fetchFriends();
-    }
-  }, [open]);
 
   return (
     <>
@@ -109,17 +122,20 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
           border shadow-lg text-center rounded-xl mt-5
           ${open ? "" : "hidden"} transition-all`}
         >
-          {friends?.length === 0 && <p className="text-center">No friends yet</p>}
-          {friends?.map((friend) => (
-            <Friend
-              key={friend.id}
-              data={friend}
-              currentChatUser={currentChatUser}
-              setCurrentChatUser={setCurrentChatUser}
-              setOpen={setOpen}
-              setServiceToCall={setServiceToCall}
-            />
-          ))}
+          {userData.friends?.length === 0 ? <p className="text-center">No friends yet</p>
+          :
+          userData.friends.map((friend: { id: number; }) => {
+            if (userData.id !== friend.id )
+              return (
+                <Friend
+                  key={friend.id}
+                  userFriend={friend}
+                  currentChatUser={currentChatUser}
+                  setCurrentChatUser={setCurrentChatUser}
+                  setOpen={setOpen}
+                  setServiceToCall={setServiceToCall}
+                />
+          ) })}
         </div>
       </div>
     </>

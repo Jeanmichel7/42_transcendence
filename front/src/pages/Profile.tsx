@@ -29,7 +29,7 @@ function Profile() {
     avatar: '',
     status: '',
   });
-  const [friends, setFriends] = useState<AccountProps[]>([]);
+  // const [friends, setFriends] = useState<AccountProps[]>([]);
 
   async function fetchAndSetUserProfile() {
     if (typeof pseudo === 'undefined')
@@ -62,10 +62,7 @@ function Profile() {
               target.src = "http://localhost:3000/avatars/defaultAvatar.png"
             }}
           />
-          <p>
-            {user.description ? user.description : "No description"}
-
-          </p>
+          <p> {user.description ? user.description : "No description"} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -87,7 +84,6 @@ function Profile() {
       </Box>
 
       <Box className="w-full">
-        <h2 className="text-3xl text-center mb-5">Friends</h2>
         <ProfileFriends user={user}/>
       </Box>
 
