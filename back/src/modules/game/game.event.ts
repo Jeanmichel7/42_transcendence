@@ -32,17 +32,17 @@ export class GameEvents {
       const games: Map<string, Game> = this.gameService.getGames();
       games.forEach((game) => {
         const update = this.gameService.updateGame(game);
-        this.server.to(game.player1Id).emit('serverUpdate', update);
+        this.server.to(game.player1Id).emit('gameUpdate', update);
         update.isPlayerRight = true;
-        this.server.to(game.player2Id).emit('serverUpdate', update);
+        this.server.to(game.player2Id).emit('gameUpdate', update);
       });
     }, 1000 / 60);
   }
 
   //conexion
   handleConnection(client: Socket) {
-    this.gameService.addToQueue(client.id);
     console.log('client connected: ' + client.id);
+    //this.gameService.checkAlreadyInGame(client.id);
   }
 
   //desconexion
@@ -50,11 +50,24 @@ export class GameEvents {
     console.log('client disconnected: ' + client.id);
   }
 
-  @SubscribeMessage('SearchOpponent')
+  @SubscribeMessage('searchOpponent')
   handleSearchOpponent(
-    @MessageBody() data: string,
+    @MessageBody() message: string,
     @ConnectedSocket() client: Socket,
-  ) {}
+  ) {
+    if (message === 'cancel') {
+      this.gameService.removeFromQueue(client.id);
+      return;
+    } else {
+      const opponent = this.gameService.addToQueue(client.id);
+      console.log('searching opponent for: ' + client.id);
+      if (opponent) {
+        console.log('opponent found: ' + opponent);
+        this.server.to(client.id).emit('searchOpponent', opponent);
+        this.server.to(opponent).emit('searchOpponent', client.id);
+      }
+    }
+  }
 
   @SubscribeMessage('clientUpdate')
   handlePaddlePosition(

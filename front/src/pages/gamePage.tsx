@@ -1,15 +1,15 @@
 import React from 'react';
 import Navbar from '../components/navbar';
-import Game from '../components/game';
+import Pong from '../components/pong';
 
-function GamePage() {
+function PongPage() {
   return (
     <div>
       <Navbar />
-      <Game />
+      <Pong />
       <h1 className="text-center m-10">Here is the game room</h1>
     </div>
   );
 }
 
-export default GamePage;
+export default PongPage;

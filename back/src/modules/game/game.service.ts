@@ -84,6 +84,7 @@ export class Game {
         this.ball.y = BALL_RADIUS;
       }
     }
+    console.log(this.racketRight);
     if (
       this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       this.ball.y >= this.racketLeft &&
@@ -91,6 +92,12 @@ export class Game {
     ) {
       this.ball.vx = -this.ball.vx;
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
+      if (this.player1ArrowDown) {
+        this.ball.vy += SPEED_INCREASE;
+      }
+      if (this.player1ArrowUp) {
+        this.ball.vy -= SPEED_INCREASE;
+      }
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
       this.ball.y >= this.racketRight &&
@@ -98,6 +105,12 @@ export class Game {
     ) {
       this.ball.vx = -this.ball.vx;
       this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
+      if (this.player2ArrowDown) {
+        this.ball.vy += SPEED_INCREASE;
+      }
+      if (this.player2ArrowUp) {
+        this.ball.vy -= SPEED_INCREASE;
+      }
     }
     if (
       this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 - BALL_RADIUS &&
@@ -109,12 +122,6 @@ export class Game {
       } else {
         this.player1Score += 1;
       }
-      if (this.player1ArrowDown) {
-        this.ball.vy += SPEED_INCREASE;
-      }
-      if (this.player1ArrowUp) {
-        this.ball.vy -= SPEED_INCREASE;
-      }
     } else if (this.ball.x >= RACKET_RIGHT_POS_X_10 && !this.isOver) {
       if (this.player2Score > SCORE_FOR_WIN) {
         this.isOver = true;
@@ -123,7 +130,6 @@ export class Game {
         this.player2Score += 1;
       }
     }
-    console.log(this.ball.vx, this.ball.vy);
     this.ball.x += this.ball.vx * deltaTime;
     this.ball.y += this.ball.vy * deltaTime;
   }
@@ -183,6 +189,13 @@ export class GameService {
       this.games.set(game.id, game);
       this.playerWaiting1 = undefined;
       this.playerWaiting2 = undefined;
+      return game.player1Id;
+    }
+  }
+
+  removeToQueue(playerId: string) {
+    if (this.playerWaiting1 === playerId) {
+      this.playerWaiting1 = undefined;
     }
   }
 

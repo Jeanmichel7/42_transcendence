@@ -20,7 +20,7 @@ function Score({ scorePlayerLeft, scorePlayerRight }) {
   return (
     <ScoreWrapper>
       <ScoreValue>{scorePlayerLeft}</ScoreValue>
-      <ScoreValue>5</ScoreValue>
+      <ScoreValue>{scorePlayerRight}</ScoreValue>
     </ScoreWrapper>
   );
 }
