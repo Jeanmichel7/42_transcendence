@@ -39,15 +39,12 @@ const Friend = (data: any) => {
             }}
             alt="avatar"
           />
-          {data.data.login}
+
+          {console.log('ICI', data )}
+          Hello
 
         </div>
-        {/* <div className="relative group flex-shrink-0 flex items-center justify-center border-2 rounded-full p-1 mx-1 hover:bg-white transition-all">
-          <ImPencil className="m-1" />
-          <div className="absolute group-hover:block text-center w-80 text-sm bg-slate-800 text-white shadow-sm hidden -top-14 font-mono p-3 rounded-md transition-all">
-            Send direct message to user.
-          </div>
-        </div> */}
+
         <Tooltip 
           title="Remove Friend" arrow
           TransitionComponent={Zoom}
@@ -113,12 +110,11 @@ function Chats({ setServiceToCall, currentChatUser, setCurrentChatUser }: any) {
           ${open ? "" : "hidden"} transition-all`}
         >
 
-          {console.log('ICI', chat)}
           {chat?.length === 0 && <p className="text-center">No chat yet</p>}
           {chat?.map((friend: any) => (
             <Friend
-              key={friend.id}
-              data={friend}
+              key={chat.id}
+              data={chat}
               currentChatUser={currentChatUser}
               setCurrentChatUser={setCurrentChatUser}
               setOpen={setOpen}

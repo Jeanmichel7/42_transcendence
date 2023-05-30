@@ -4,21 +4,29 @@ import { useDetectClickOutside } from 'react-detect-click-outside';
 
 import { getAllUsers } from "../../api/user";
 
+function ButtonUser({ login, selectedLogins }: { login: any, selectedLogins: any[] }) {
+  const [isSet, setIsSet] = useState(false);
 
-function ButtonUser({ login }: { login: any }) {
+  // Add login to the selectedLogins array when isSet is true
+  useEffect(() => {
+    if (isSet) {
+      selectedLogins.push(login);
+    }
+  }, [isSet, login, selectedLogins]);
 
   return (
-    <button className=" m-1 p-1 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer " >{login}</button>
+    <button className={` m-1 p-1 border border-gray-200 rounded text-left hover:bg-gray-100 transition-all cursor-pointer ${isSet?'bg-gray-100':'bg-white'} `} onClick={ () => { setIsSet(!isSet)}} >{login}</button>
   )
 }
 
 export function ButtonNewGroup2() {
 
-  let [userData, setUserData] = useState<any>([]);
+  let [userData, setUserData] = useState<any>([])
   const [password, setPassword] = useState('');
   const [roomName, setRoomName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedLogins, setSelectedLogins] = useState<any[]>([]);
 
   /* requete pour avoir userData */
   async function getData () {
@@ -36,12 +44,13 @@ export function ButtonNewGroup2() {
   }, []);
 
   const addUserList = userData.map((user: any) => (
-    <ButtonUser key={user.id} login={user.login} />
+    <ButtonUser key={user.id} login={user.login} selectedLogins={selectedLogins} />
   ));
 
   /* Create new Room without password */
   const addNewRoom = () => {
     axios.post(`http://localhost:3000/chat/rooms/add`, {
+      name: roomName,
       type: "public",
       password: null,
     }, {
@@ -53,6 +62,7 @@ export function ButtonNewGroup2() {
   const addNewRoomPassword = () => {
     axios.post(`http://localhost:3000/chat/rooms/add`, {
       type: "public",
+      name: roomName,
       password: password,
     }, {
       withCredentials: true
@@ -98,6 +108,8 @@ export function ButtonNewGroup2() {
                 onChange={(e) => setRoomName(e.target.value)} 
                 className="border rounded-xl text-center m-1 shadow-sm " type="text" />
           </div>
+
+          {console.log('selectedLogins : ',selectedLogins)}
 
           <button className="bg-white border-2 w-2/6 mt-5 rounded-xl mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer" onClick={() => { password === '' ? (addNewRoom(), setPassword(''), setRoomName('')) : (addNewRoomPassword(), setPassword(''), setRoomName('')); }}>
             <p>Create</p>
