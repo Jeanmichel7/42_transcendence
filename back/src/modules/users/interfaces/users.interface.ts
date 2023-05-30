@@ -28,4 +28,5 @@ export interface UserInterface {
   roomUsers?: ChatRoomInterface[];
   roomBannedUsers?: ChatRoomInterface[];
   roomMutedUsers?: ChatRoomInterface[];
+  roomAccepted?: ChatRoomInterface[];
 }

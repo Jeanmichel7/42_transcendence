@@ -23,7 +23,13 @@ export class ChatRoomEntity extends BaseEntity {
     type: 'text',
     default: 'public',
   })
-  type: 'public' | 'protected';
+  type: 'public' | 'private';
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isProtected: boolean;
 
   @Column({
     type: 'text',
@@ -70,6 +76,12 @@ export class ChatRoomEntity extends BaseEntity {
   })
   @JoinTable()
   users: UserEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.roomAccepted, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable()
+  acceptedUsers: UserEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.roomAdmins, {
     onDelete: 'CASCADE',
