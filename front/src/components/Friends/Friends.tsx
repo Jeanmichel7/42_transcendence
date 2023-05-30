@@ -79,7 +79,7 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
 
   async function fetchFriends() {
     const res = await getFriends();
-    // console.log("res : ", res)
+     console.log("currentChatUser", currentChatUser)
     setFriends(res);
   }
 

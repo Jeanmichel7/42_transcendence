@@ -2,10 +2,12 @@ import { useState } from 'react'
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup'
 // import ChatRoom from '../components/Chat/ChatRoom'
 import Friends from '../components/Friends/Friends'
+import Chats from '../components/Chat/DisplayChat'
 import Conversation from '../components/Chat/Conversation'
 import ButtonAddFriends from '../components/Friends/ButtonAddFriends'
 import { AddFriends } from '../components/Friends/ButtonAddFriends'
 import { ButtonNewGroup2 } from '../components/Chat/ButtonNewGroup'
+
 
 function Chat() {
   const [currentChatUser, setCurrentChatUser] = useState({ id: -1 });
@@ -30,7 +32,11 @@ function Chat() {
           currentChatUser={currentChatUser}
           setCurrentChatUser={setCurrentChatUser}
         />
-        {/* <ChatRoom /> */}
+        <Chats
+         setServiceToCall={ setServiceToCall }
+         currentChatUser={currentChatUser}
+         setCurrentChatUser={setCurrentChatUser} 
+        />
       </div>
 
       <div className="w-3/4 h-full">
