@@ -39,28 +39,72 @@ export class ChatService {
     userId: bigint,
     roomToCreate: ChatCreateRoomDTO,
   ): Promise<ChatRoomInterface> {
+    console.log('data room creation : ', roomToCreate);
+
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id'],
       relations: ['roomUsers'],
     });
 
-    let roomStatus: 'protected' | 'public' = roomToCreate.type;
     let hashPassword: string = null;
     if (roomToCreate.password) {
       const salt: string = await bcrypt.genSalt();
       hashPassword = await bcrypt.hash(roomToCreate.password, salt);
-      roomStatus = 'protected';
+    }
+
+    // si private et accepted users[] => checher chaque user dans la bdd et ajouter dans la room
+    let allUsersAccepted: UserEntity[] = [];
+    if (roomToCreate.type === 'private' && roomToCreate.acceptedUsers) {
+      allUsersAccepted = await Promise.all(
+        roomToCreate.acceptedUsers.map(async (userLogin) => {
+          const userAccepted: UserEntity = await this.userRepository.findOne({
+            where: { login: userLogin },
+            select: ['id'],
+            relations: ['roomUsers'],
+          });
+          if (!userAccepted)
+            throw new NotFoundException(`User ${userLogin} not found`);
+          return userAccepted;
+        }),
+      );
+      console.log('allUsersAccepted', allUsersAccepted);
+    }
+    let usersInRoom: UserEntity[] = [user];
+    if (roomToCreate.acceptedUsers) {
+      usersInRoom = [...usersInRoom, ...allUsersAccepted];
+    } else {
+      //get all users
+      const users: UserEntity[] = await this.userRepository.find({
+        select: [
+          'id',
+          'firstName',
+          'lastName',
+          'login',
+          'email',
+          'status',
+          'description',
+          'avatar',
+        ],
+      });
+
+      //ajoute tout les users...
+      usersInRoom = [...usersInRoom, ...users];
+
+      //sauf l'user qui a cree la room
+      usersInRoom = usersInRoom.filter((u) => u.id !== user.id);
     }
     const room: ChatRoomEntity = await ChatRoomEntity.save({
       ownerUser: user,
-      users: [user],
+      users: usersInRoom,
       admins: [user],
       bannedUsers: [],
       mutedUsers: [],
       ...roomToCreate,
-      type: roomStatus,
+      type: roomToCreate.type,
+      isProtected: roomToCreate.password ? true : false,
       password: hashPassword,
+      acceptedUsers: allUsersAccepted,
     });
     if (!room) throw new Error('Room not created');
 
@@ -100,24 +144,55 @@ export class ChatService {
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
       select: ['id', 'type'],
-      relations: ['users', 'ownerUser', 'admins', 'bannedUsers', 'mutedUsers'],
+      relations: [
+        'users',
+        'ownerUser',
+        'admins',
+        'bannedUsers',
+        'mutedUsers',
+        'acceptedUsers',
+      ],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     if (room.ownerUser.id !== userId)
       throw new Error('User is not owner of room');
 
-    // const updateData: Partial<ChatRoomEntity> = {};
+    if (roomToUpdate.isProtected != null) {
+      if (roomToUpdate.isProtected === true) {
+        if (roomToUpdate.password === null)
+          throw new Error('Room is protected but no password');
+        room.isProtected = true;
+      }
+      if (roomToUpdate.isProtected === false) {
+        room.password = null;
+        room.isProtected = false;
+      }
+    }
+
     if (roomToUpdate.password) {
       const hashPassword: string = await bcrypt.hash(roomToUpdate.password, 10);
       room.password = hashPassword;
+      room.isProtected = true;
     }
-    if (roomToUpdate.type) {
-      if (roomToUpdate.password === null && roomToUpdate.type !== 'public')
-        throw new Error('Room is protected but no password');
-      if (roomToUpdate.type === 'public') room.password = null;
-      room.type = roomToUpdate.type;
+    if (roomToUpdate.type) room.type = roomToUpdate.type;
+    if (roomToUpdate.name) room.name = roomToUpdate.name;
+    if (roomToUpdate.acceptedUsers) {
+      const allUsersAccepted: UserEntity[] = await Promise.all(
+        roomToUpdate.acceptedUsers.map(async (userLogin) => {
+          const userAccepted: UserEntity = await this.userRepository.findOne({
+            where: { login: userLogin },
+            select: ['id'],
+            relations: ['roomUsers'],
+          });
+          if (!userAccepted)
+            throw new NotFoundException(`User ${userLogin} not found`);
+          return userAccepted;
+        }),
+      );
+      room.acceptedUsers = allUsersAccepted;
     }
+
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -165,8 +240,14 @@ export class ChatService {
 
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
-      select: ['id', 'type', 'password'],
-      relations: ['users', 'ownerUser', 'admins', 'bannedUsers', 'mutedUsers'],
+      select: ['id', 'type', 'password', 'isProtected'],
+      relations: [
+        'users',
+        'ownerUser',
+        'admins',
+        'bannedUsers',
+        'acceptedUsers',
+      ],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
@@ -176,8 +257,18 @@ export class ChatService {
         `User ${userId} is already in room ${roomId}`,
       );
 
+    //verifie si user est banned
+    if (room.bannedUsers.some((u) => u.id === user.id))
+      throw new ForbiddenException(`User ${userId} is banned from room`);
+
+    //verifie sur room est private et si accepte user
+    if (room.type === 'private' && room.acceptedUsers.length > 0) {
+      if (!room.acceptedUsers.some((u) => u.id === user.id))
+        throw new ForbiddenException(`User ${userId} is not accepted in room`);
+    }
+
     // compare les hashs des passwords
-    if (room.type === 'protected') {
+    if (room.isProtected) {
       if (!data.password)
         throw new ForbiddenException(`Room ${roomId} is private`);
 
@@ -660,6 +751,7 @@ export class ChatService {
         id: room.id,
         type: room.type,
         name: room.name,
+        isProtected: room.isProtected,
       },
       user: {
         id: userSend.id,
@@ -708,6 +800,7 @@ export class ChatService {
         id: message.room.id,
         type: message.room.type,
         name: message.room.name,
+        isProtected: message.room.isProtected,
       },
       user: {
         id: message.user.id,
@@ -788,9 +881,11 @@ export class ChatService {
       ])
       .getMany();
 
-    const result: ChatRoomInterface[] = rooms.map((room: ChatRoomEntity) => {
-      return { ...room };
-    });
+    const result: ChatRoomInterface[] = rooms
+      .map((room: ChatRoomEntity) => {
+        return { ...room };
+      })
+      .filter((room) => room.type === 'public');
     return result;
   }
 
@@ -825,6 +920,7 @@ export class ChatService {
       .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
       .leftJoinAndSelect('chat_rooms.messages', 'messages')
+      .leftJoinAndSelect('chat_rooms.acceptedUsers', 'acceptedUsers')
       .leftJoinAndSelect('messages.user', 'ownerMessage')
       .select([
         'chat_rooms',
@@ -855,6 +951,10 @@ export class ChatService {
         'ownerMessage.firstName',
         'ownerMessage.lastName',
         'ownerMessage.login',
+        'acceptedUsers.id',
+        'acceptedUsers.firstName',
+        'acceptedUsers.lastName',
+        'acceptedUsers.login',
       ])
       .where('chat_rooms.id = :roomId', { roomId })
       .getOne();

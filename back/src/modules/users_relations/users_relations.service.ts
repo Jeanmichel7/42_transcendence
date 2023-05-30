@@ -58,6 +58,27 @@ export class UsersRelationsService {
     return userRelations;
   }
 
+  async getAllFriendsofUserByLogin(login: string): Promise<UserInterface[]> {
+    const userRelations: UserRelationEntity[] =
+      await this.userRelationRepository.find({
+        where: { user: { login }, relationType: 'friend' },
+        relations: ['userRelation'],
+      });
+    const allFriends: UserInterface[] = userRelations.map((relation) => {
+      return {
+        id: relation.userRelation.id,
+        firstName: relation.userRelation.firstName,
+        lastName: relation.userRelation.lastName,
+        login: relation.userRelation.login,
+        email: relation.userRelation.email,
+        description: relation.userRelation.description,
+        avatar: relation.userRelation.avatar,
+        status: relation.userRelation.status,
+      };
+    });
+    return allFriends;
+  }
+
   async getAllFriendsofUser(userId: bigint): Promise<UserInterface[]> {
     const userRelations: UserRelationEntity[] =
       await this.userRelationRepository.find({

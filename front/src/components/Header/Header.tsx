@@ -133,7 +133,7 @@ function Header() {
                   Friends
                 </MenuItem>
               </NavLink>
-              <NavLink to="/profile">
+              <NavLink to={`/profile/` + userData.login}>
                 <MenuItem onClick={handleCloseNavMenu}>
                   Profile
                 </MenuItem>
@@ -191,7 +191,7 @@ function Header() {
               </Button>
             </NavLink>
 
-            <NavLink to="/profile">
+            <NavLink to={`/profile/` + userData.login}>
               <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
                 Profile
               </Button>

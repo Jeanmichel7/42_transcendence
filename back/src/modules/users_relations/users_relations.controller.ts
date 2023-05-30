@@ -29,6 +29,13 @@ export class UsersRelationsController {
     return result;
   }
 
+  @Get('profilefriends/:login')
+  async findFriends(@Param('login') login: string): Promise<UserInterface[]> {
+    const result: UserInterface[] =
+      await this.usersRelationsService.getAllFriendsofUserByLogin(login);
+    return result;
+  }
+
   @Get('friends')
   async allFriends(@Req() req: RequestWithUser): Promise<UserInterface[]> {
     const result: UserInterface[] =

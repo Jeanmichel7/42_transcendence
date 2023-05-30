@@ -15,40 +15,9 @@ export interface AccountProps {
   status: string;
 }
 
-export default function AccountProfile() {
-  const [user, setUserProfile] = useState<AccountProps>({
-    login: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    description: '',
-    is2FAEnabled: false,
-    avatar: '',
-    status: '',
-  });
-
-  async function fetchAndSetUserProfile() {
-    try {
-      const res: any = await fetchUserAccount();
-      if (res.error) {
-        console.log(res);
-      }
-      setUserProfile(res);
-      // console.log(user)
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
-  }
-
-  useEffect(() => {
-    fetchAndSetUserProfile();
-  }, []);
-
-  useEffect(() => {
-    console.log(user)
-  }, [user]);
-
-
+export default function AccountProfile(
+  {user, setUserProfile}: {user: AccountProps, setUserProfile: (user: AccountProps) => any}
+) {
   return (
     <>
       <h2 className="text-3xl text-center">Account</h2>
@@ -57,7 +26,7 @@ export default function AccountProfile() {
         <div className="w-1/4">
           <img
             src={`http://localhost:3000/avatars/` + user.avatar}
-            className="text-center mb-2 w-full rounded-[16px]"
+            className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -65,10 +34,7 @@ export default function AccountProfile() {
               target.src = "http://localhost:3000/avatars/defaultAvatar.png"
             }}
           />
-          <p>
-            {user.description ? user.description : "No description"}
-
-          </p>
+          <p> {user.description ? user.description : "No description"} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">

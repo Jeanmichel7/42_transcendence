@@ -7,7 +7,8 @@ import { useEffect } from 'react';
 import { isAuthenticated } from './api/auth';
 import { getUserData } from './api/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLogged, setUser } from './store/userSlice';
+import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from './store/userSlice';
+import { getBlockedUsers, getFriends } from './api/relation';
 
 function App() {
   const userData: any = useSelector((state: any) => state.user.userData);
@@ -17,9 +18,13 @@ function App() {
     const checkAuth = async () => {
       const isAuth = await isAuthenticated();
       if(isAuth === true) {
-        dispatch(setLogged(true))
         const data = await getUserData();
+        const friends = await getFriends();
+        const userBlocked = await getBlockedUsers();
+        dispatch(setLogged(true))
         dispatch(setUser(data));
+        dispatch(reduxSetFriends(friends));
+        dispatch(reduxSetUserBlocked(userBlocked));
       }
       else {
         dispatch(setLogged(false))

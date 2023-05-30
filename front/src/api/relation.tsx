@@ -13,6 +13,19 @@ export async function getFriends() {
   }
 }
 
+export async function getFriendProfile(login: string) {
+  try {
+    const response = await api.get('/relations/profilefriends/' + login );
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to get friend profile');
+  }
+}
+
 export async function deleteFriend(userIdToRemove: number) {
   try {
     const response = await api.delete('relations/friends/' + userIdToRemove + '/delete');
@@ -36,6 +49,19 @@ export async function addFriend(userIdToAdd: number) {
   catch (e: any) {
     return e.response.data
     // throw new Error('Failed to add friend');
+  }
+}
+
+export async function getBlockedUsers() {
+  try {
+    const response = await api.get('/relations/blocked');
+    if (response.status === 200) {
+      return response.data;
+    }
+  }
+  catch (e: any) {
+    return e.response.data
+    // throw new Error('Failed to get blocked users');
   }
 }
 

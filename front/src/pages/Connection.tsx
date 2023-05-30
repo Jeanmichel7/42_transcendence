@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { check2FACookie, check2FACode } from '../api/auth'
 import { getUserData } from '../api/user';
-import { setUser, setLogged } from '../store/userSlice'
+import { getBlockedUsers, getFriends } from '../api/relation';
+
+import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice'
 import { FormControl, InputLabel, Input, FormHelperText, Box, TextField, OutlinedInput, Button, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
@@ -18,7 +20,7 @@ function ConnectPage() {
   const [errorMsg, setErrorMsg] = useState("Wrong code");
   const [loading, setLoading] = useState(false);
 
-  const userData: any = useSelector((state: any) => state.user.userData);
+  // const userData: any = useSelector((state: any) => state.user.userData);
   const dispatch = useDispatch()
 
   //check if 2FA is activated
@@ -45,8 +47,12 @@ function ConnectPage() {
   //save user data in redux
   async function saveUserData() {
     const res = await getUserData();
+    const friends = await getFriends();
+    const userBlocked = await getBlockedUsers();
     dispatch(setUser(res));
     dispatch(setLogged(true));
+    dispatch(reduxSetFriends(friends));
+    dispatch(reduxSetUserBlocked(userBlocked));
   }
 
   //send code to server

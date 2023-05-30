@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class ChatCreateRoomDTO {
   @IsOptional()
@@ -6,12 +13,21 @@ export class ChatCreateRoomDTO {
   @Length(1)
   password: string;
 
+  @IsOptional()
+  @IsBoolean()
+  isProtected: boolean;
+
   @IsNotEmpty()
   @IsString()
-  type: 'public' | 'protected';
+  type: 'public' | 'private';
 
   @IsNotEmpty()
   @IsString()
   @Length(1)
   name: string;
+
+  @IsOptional()
+  @IsArray()
+  @Length(1)
+  acceptedUsers: string[];
 }
