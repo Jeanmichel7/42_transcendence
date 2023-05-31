@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { fetchUserAccount } from '../../api/user';
+import React, { useState } from 'react';
+import {  patchUserAccount } from '../../api/user';
 import AccountItem from './AccountItem';
 import Box from '@mui/material/Box';
-
+import { Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice'
 
 export interface AccountProps {
   login: string;
@@ -16,8 +18,37 @@ export interface AccountProps {
 }
 
 export default function AccountProfile(
-  {user, setUserProfile}: {user: AccountProps, setUserProfile: (user: AccountProps) => any}
+  { user, setUserProfile }: { user: AccountProps, setUserProfile: (user: AccountProps) => any }
 ) {
+  const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
+  const fileInputRef = React.createRef<HTMLInputElement>();
+  const dispatch = useDispatch();
+
+  const handleFileUpload = async () => {
+    let fileInput: any = fileInputRef.current;
+    const formData = new FormData();
+    formData.append('avatar', fileInput.files[0]);
+
+
+    const res = await patchUserAccount(formData);
+    console.log("res images : ", res);
+    if (res.error) {
+      console.log("res error : ", res)
+    }
+    else {
+      console.log("res ok : ", res)
+      dispatch(setUser(res))
+      setUserProfile({ ...user, avatar: res.avatar })
+      setOpenInputAvatar(false)
+    }
+  };
+
+  const handleFileChange = (event: any) => {
+    let file = event.target.files[0];
+    console.log(file); // log file object pour vérifier
+  };
+
+
   return (
     <>
       <h2 className="text-3xl text-center">Account</h2>
@@ -34,7 +65,44 @@ export default function AccountProfile(
               target.src = "http://localhost:3000/avatars/defaultAvatar.png"
             }}
           />
-          <p> {user.description ? user.description : "No description"} </p>
+          <div className='flex justify-center' >
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => setOpenInputAvatar(!openInputAvatar)}
+              sx={{ display: openInputAvatar ? 'none' : 'block' }}
+            >
+              Change avatar
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => setOpenInputAvatar(!openInputAvatar)}
+              sx={{ display: openInputAvatar ? 'block' : 'none' }}
+            >
+              Annuler
+            </Button>
+          </div>
+          {openInputAvatar &&
+            <div className="mt-5">
+              <div className='flex justify-center' >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  // style={{ display: 'none' }} 
+                  onChange={handleFileChange}
+                />
+              </div>
+              <div className='flex justify-center mt-2' >
+                <Button variant="contained" color="primary" onClick={handleFileUpload}>
+                  Upload File
+                </Button>
+              </div>
+            </div>
+          }
+
+          <p className='mt-5 font-bold'> Description : </p>
+          <p className='mt-1'> {user.description ? user.description : "No description"} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -71,16 +139,17 @@ export default function AccountProfile(
             />
 
             <AccountItem
+              keyName="description"
+              value={user.description}
+              setUserProfile={setUserProfile}
+            />
+
+            <AccountItem
               keyName="Active 2FA"
               value={user.is2FAEnabled}
               setUserProfile={setUserProfile}
             />
 
-            {/* <AccountItem
-              keyName="Status"
-              value={user.status}
-              setUserProfile={setUserProfile}
-            /> */}
 
           </div>
         </div>
@@ -89,3 +158,4 @@ export default function AccountProfile(
 
   )
 }
+

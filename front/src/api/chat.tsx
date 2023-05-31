@@ -9,7 +9,7 @@ export async function sendMessage(message: any, receiverId: any) {
       return response.data;
     }
   } catch(e: any) {
-    return e.response.data
+    return e.response
   }
 }
 
@@ -20,7 +20,7 @@ export async function getOldMessages(userId: any) {
       return response.data;
     }
   } catch (e: any) {
-    return e.response.data
+    return e.response
   }
 }
 

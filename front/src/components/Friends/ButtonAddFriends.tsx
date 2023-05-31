@@ -61,8 +61,7 @@ function AddFriends() {
   React.useEffect(() => {
     async function fetchUsers() {
       const res = await getAllUsers();
-      setUsers(res);
-      console.log('res : ', res);
+      setUsers(res.filter((e: any) => e.id != userData.id));
     }
     fetchUsers();
   }, []);
@@ -78,7 +77,9 @@ function AddFriends() {
     if (res.statusCode)
       setSnackBarMsg("Error add friend: " + res.message)
     else{
-      dispatch(reduxAddFriends(user));
+      await new Promise(() => {
+        dispatch(reduxAddFriends(user));
+      }) 
       setSnackBarMsg("Friend added")
     }
   }
@@ -90,18 +91,20 @@ function AddFriends() {
     setStateSnackBar(false)
   };
 
-
-
   return (
     <div className="m-5 p-5">
-      {users && 
+      {users &&
       <Autocomplete
-        options={ users.filter((e: {id: number}) => e.id != userData.id && !isMyFriend(e.id) ) }
-        getOptionLabel={(user: { login: string; }) => user.login}
-        onChange={(event, newValue: any) => {
+        id="searchFriends"
+        options={users}
+        getOptionLabel={(option: any) => option.login}
+        style={{  }}
+        onChange={(event: any, newValue: any) => {
+          event.preventDefault();
+          event.stopPropagation();
           setSelectedUser(newValue);
         }}
-        renderInput={(params) => <TextField {...params} label="Search" />}
+        renderInput={(params) => <TextField {...params} label="Search Friends" variant="outlined" />}
       />
       }
 
@@ -110,12 +113,6 @@ function AddFriends() {
           onClick={() => handleAdd(selectedUser)} 
           variant="contained" 
         > Add </Button>
-        {/* <span className="text-red-600 ml-2">
-        {
-          statuses[selectedUser] == 'Friend added' ? <Alert severity="success">{statuses[selectedUser]}</Alert> :
-          statuses[selectedUser] != null ? <Alert severity="error">{statuses[selectedUser]}</Alert> : ''
-        }
-        </span> */}
       </div>
 
       <div>
@@ -148,10 +145,6 @@ function AddFriends() {
   );
 };
 export { AddFriends };
-
-
-
-
 
 
 

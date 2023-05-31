@@ -53,7 +53,7 @@ const Conversation = (userSelected: any) => {
         setRows(
           Math.floor(text.length / (textareaRef.current.offsetWidth / 7))
           + text.split('\n').length
-          + 1);
+          );
       } else {
         setRows(1);
       }
@@ -78,12 +78,11 @@ const Conversation = (userSelected: any) => {
       text,
       userSelected.user.id,
     );
-    if (res.status !== 201) {
-      console.log('Error while sending message:', res)
-      setStatusSendMsg(res.message)
-    }
-    // inputRef.current.value = "";
-    setStatusSendMsg('')
+    console.log('res big data: ', res)
+    if(!res.status)
+      setStatusSendMsg('')
+    else
+      setStatusSendMsg(res.data.message)
     setText('')
   }
 
@@ -176,7 +175,6 @@ const Conversation = (userSelected: any) => {
 
         {/* display form message */}
         <form
-          onSubmit={HandleSubmit}
           className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2"
         >
           <textarea
@@ -185,30 +183,32 @@ const Conversation = (userSelected: any) => {
             rows={rows}
             value={text}
             onChange={e => setText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { HandleSubmit(e) } }}
             placeholder="Enter your text here..."
             className=" w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
           ></textarea>
-          <button className='flex justify-center items-center'>
+          <button className='flex justify-center items-center'
+            onClick={HandleSubmit}
+          >
             <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
           </button>
+          {/* display status send message */}
+          {statusSendMsg !== '' &&
+            <span className={`
+                ${statusSendMsg == 'pending' ? `bg-yellow-500` : `bg-red-500`}
+                bottom-16 
+                text-white
+                p-2
+                rounded-xl
+                shadow-lg`}
+              onClick={() => setStatusSendMsg('')}
+            >
+              {statusSendMsg}
+              <button className="absolute right-2 top-1" >X</button>
+            </span>
+          }
         </form>
 
-        {/* display status send message */}
-        {statusSendMsg !== '' &&
-          <div className={`
-              ${statusSendMsg == 'pending' ? `bg-yellow-500` : `bg-red-500`}
-              absolute
-              bottom-16 
-              text-white
-              p-2
-              rounded-xl
-              shadow-lg`}
-            onClick={() => setStatusSendMsg('')}
-          >
-            {statusSendMsg}
-            <button className="absolute right-2 top-1" >X</button>
-          </div>
-        }
       </div>
     </div>
   )
