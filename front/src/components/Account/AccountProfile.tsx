@@ -4,7 +4,7 @@ import AccountItem from './AccountItem';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/userSlice'
+import { setUser } from '../../store/userSlice';
 
 export interface AccountProps {
   login: string;
@@ -18,33 +18,32 @@ export interface AccountProps {
 }
 
 export default function AccountProfile(
-  { user, setUserProfile }: { user: AccountProps, setUserProfile: (user: AccountProps) => any }
+  { user, setUserProfile }: { user: AccountProps, setUserProfile: (user: AccountProps) => any },
 ) {
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
   const fileInputRef = React.createRef<HTMLInputElement>();
   const dispatch = useDispatch();
 
   const handleFileUpload = async () => {
-    let fileInput: any = fileInputRef.current;
+    const fileInput: any = fileInputRef.current;
     const formData = new FormData();
     formData.append('avatar', fileInput.files[0]);
 
 
     const res = await patchUserAccount(formData);
-    console.log("res images : ", res);
+    console.log('res images : ', res);
     if (res.error) {
-      console.log("res error : ", res)
-    }
-    else {
-      console.log("res ok : ", res)
-      dispatch(setUser(res))
-      setUserProfile({ ...user, avatar: res.avatar })
-      setOpenInputAvatar(false)
+      console.log('res error : ', res);
+    } else {
+      console.log('res ok : ', res);
+      dispatch(setUser(res));
+      setUserProfile({ ...user, avatar: res.avatar });
+      setOpenInputAvatar(false);
     }
   };
 
   const handleFileChange = (event: any) => {
-    let file = event.target.files[0];
+    const file = event.target.files[0];
     console.log(file); // log file object pour vérifier
   };
 
@@ -56,13 +55,13 @@ export default function AccountProfile(
       <Box className="flex justify-between" >
         <div className="w-1/4">
           <img
-            src={`http://localhost:3000/avatars/` + user.avatar}
+            src={'http://localhost:3000/avatars/' + user.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = "http://localhost:3000/avatars/defaultAvatar.png"
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
           />
           <div className='flex justify-center' >
@@ -102,7 +101,7 @@ export default function AccountProfile(
           }
 
           <p className='mt-5 font-bold'> Description : </p>
-          <p className='mt-1'> {user.description ? user.description : "No description"} </p>
+          <p className='mt-1'> {user.description ? user.description : 'No description'} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -156,6 +155,6 @@ export default function AccountProfile(
       </Box>
     </>
 
-  )
+  );
 }
 

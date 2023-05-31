@@ -6,9 +6,8 @@ export async function getUserData() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to get user');
   }
 }
@@ -19,9 +18,8 @@ export async function fetchUserAccount() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
@@ -32,9 +30,8 @@ export async function getProfileByPseudo(pseudo: string) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
@@ -45,9 +42,8 @@ export async function patchUserAccount(data: any) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
@@ -59,9 +55,8 @@ export async function getAllUsers() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }

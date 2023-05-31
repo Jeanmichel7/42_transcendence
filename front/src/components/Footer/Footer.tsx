@@ -17,8 +17,7 @@ function Footer() {
       </div>
       <div className="bg-indigo-700 w-full text-center" >Copyright truc machin</div>
     </div>
-
-  )
+  );
 }
 
 export default Footer;

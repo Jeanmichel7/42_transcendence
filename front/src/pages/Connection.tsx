@@ -1,48 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { check2FACookie, check2FACode } from '../api/auth'
+import { check2FACookie, check2FACode } from '../api/auth';
 import { getUserData } from '../api/user';
 import { getBlockedUsers, getFriends } from '../api/relation';
 
-import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice'
-import { FormControl, InputLabel, Input, FormHelperText, Box, TextField, OutlinedInput, Button, CircularProgress } from '@mui/material';
+import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice';
+import { FormControl, InputLabel, FormHelperText, Box, OutlinedInput, Button, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
 function ConnectPage() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [is2FAactiv, setIs2FAactiv] = useState(false);
   const [userId, setUserId] = useState(0);
-  const [code2FA, setCode2FA] = useState("");
+  const [code2FA, setCode2FA] = useState('');
   const [error, setError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("Wrong code");
+  const [errorMsg, setErrorMsg] = useState('Wrong code');
   const [loading, setLoading] = useState(false);
 
   // const userData: any = useSelector((state: any) => state.user.userData);
-  const dispatch = useDispatch()
-
-  //check if 2FA is activated
-  useEffect(() => {
-    async function fetchAndSetIs2FAactived() {
-      try {
-        const res = await check2FACookie();
-        if (res.is2FAactived) {
-          setIs2FAactiv(res.is2FAactived);
-          setUserId(res.user.id);
-        }
-        else {
-          await saveUserData();
-          // await new Promise(r => setTimeout(r, 10000)); wait 10s
-          navigate('/home');
-        }
-      } catch (error) {
-        console.log('Error fetching user profile:', error);
-      }
-    }
-    fetchAndSetIs2FAactived();
-  }, []);
+  const dispatch = useDispatch();
 
   //save user data in redux
   async function saveUserData() {
@@ -55,6 +34,26 @@ function ConnectPage() {
     dispatch(reduxSetUserBlocked(userBlocked));
   }
 
+  //check if 2FA is activated
+  useEffect(() => {
+    async function fetchAndSetIs2FAactived() {
+      try {
+        const res = await check2FACookie();
+        if (res.is2FAactived) {
+          setIs2FAactiv(res.is2FAactived);
+          setUserId(res.user.id);
+        } else {
+          await saveUserData();
+          // await new Promise(r => setTimeout(r, 10000)); wait 10s
+          navigate('/home');
+        }
+      } catch (e) {
+        console.log('Error fetching user profile:', e);
+      }
+    }
+    fetchAndSetIs2FAactived();
+  }, []);
+
   //send code to server
   async function handleSendCode() {
     if (!loading) {
@@ -62,25 +61,23 @@ function ConnectPage() {
       await new Promise(r => setTimeout(r, 300));
     }
 
-    //check code
-    code2FA.length !== 6 ? setErrorMsg('Code must be 6 digits') :
-    !(/^[0-9]{6}$/).test(code2FA) ? setErrorMsg('Code must be digits') :
-    setErrorMsg('Wrong Code');
+    //set error code
+    setErrorMsg(
+      code2FA.length !== 6 ? 'Code must be 6 digits' :
+        !(/^[0-9]{6}$/).test(code2FA) ? 'Code must be digits' : 'Wrong Code',
+    );
 
     const res = await check2FACode(code2FA, userId);
     setLoading(false);
     if (res.error) {
       setError(true);
-    }
-    else {
+    } else {
       setError(false);
       await saveUserData();
       // await new Promise(r => setTimeout(r, 20000)); //wait 20s
       navigate('/home');
     }
   }
-
-
 
 
   return (
@@ -99,7 +96,7 @@ function ConnectPage() {
                 placeholder="123456"
                 label="Name"
                 onChange={(e) => setCode2FA(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { handleSendCode() } }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { handleSendCode(); } }}
               />
               <FormHelperText id="component-error-text">
                 {error && errorMsg}

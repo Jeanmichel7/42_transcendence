@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getFriendProfile } from '../../api/relation';
-import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, Button, ButtonGroup, IconButton, Tooltip, Zoom, Badge, Box, Snackbar, Alert } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice';
 import { Link } from 'react-router-dom';
+
+import { getFriendProfile, deleteFriend, apiBlockUser, addFriend } from '../../api/relation';
+
+import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Badge, Snackbar, Alert } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import { red } from '@mui/material/colors';
-
-
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setLogged, reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice'
-
-import { deleteFriend, apiBlockUser, addFriend } from '../../api/relation';
 
 export interface AccountProps {
   id: number;
@@ -26,7 +23,6 @@ export interface AccountProps {
   avatar: string;
   status: string;
 }
-
 
 export function FriendCard({
   actualUserLogin,
@@ -41,30 +37,26 @@ export function FriendCard({
   description,
   avatar,
   status,
-  email
+  email,
 }: AccountProps & { actualUserLogin: string } & { setFriends: any } & { state: any } & { setState: any } & { setSnackBarMsg: any }) {
 
-  const userData: any = useSelector((state: any) => state.user.userData);
-  const descriptionParsed = description ? description.substring(0, 50) + "..." : "No description"
-  let badgeColor: "success" | "warning" | "error"
-    = status === "online" ? "success" : status === "absent" ? "warning" : "error";
+  const userData: any = useSelector((dataState: any) => dataState.user.userData);
+  const descriptionParsed = description ? description.substring(0, 50) + '...' : 'No description';
+  const badgeColor: 'success' | 'warning' | 'error'
+    = status === 'online' ? 'success' : status === 'absent' ? 'warning' : 'error';
 
-  const dispatch = useDispatch()
-
-
-
+  const dispatch = useDispatch();
   const handleDefi = (userIdToDefi: number) => async () => {
-    console.log(userIdToDefi)
-  }
+    console.log(userIdToDefi);
+  };
 
   const handleAddFriend = async (userIdToAdd: number) => {
-    const res = await addFriend(userIdToAdd)
+    const res = await addFriend(userIdToAdd);
     // console.log("res to add at redux userData : ", res)
     setState({ ...state, open: true });
     if (res.error) {
-      setSnackBarMsg("Error add friend: " + res.error)
-    }
-    else {
+      setSnackBarMsg('Error add friend: ' + res.error);
+    } else {
       dispatch(reduxAddFriends({
         id: id,
         login: login,
@@ -74,35 +66,33 @@ export function FriendCard({
         status: status,
         avatar: avatar,
         description: description,
-      }))
-      if(userData.login == actualUserLogin) setFriends((prev: any) => [...prev, res])
-      setSnackBarMsg("Friend added")
+      }));
+      if (userData.login == actualUserLogin) setFriends((prev: any) => [...prev, res]);
+      setSnackBarMsg('Friend added');
     }
-  }
+  };
   
   const handleRemoveFriend = async (userIdToRemove: number) => {
-    const res = await deleteFriend(userIdToRemove)
+    const res = await deleteFriend(userIdToRemove);
     setState({ ...state, open: true });
     if (res.error) {
-      setSnackBarMsg("Error delete friends: " + res.error)
+      setSnackBarMsg('Error delete friends: ' + res.error);
+    } else {
+      dispatch(reduxRemoveFriends(userIdToRemove));
+      setSnackBarMsg('Friend deleted');
+      if (userData.login == actualUserLogin)
+        setFriends((prev: any) => prev.filter((friend: any) => friend.id !== userIdToRemove));
     }
-    else {
-      dispatch(reduxRemoveFriends(userIdToRemove))
-      setSnackBarMsg("Friend deleted")
-      if(userData.login == actualUserLogin)
-        setFriends((prev: any) => prev.filter((friend: any) => friend.id !== userIdToRemove))
-    }
-  }
+  };
 
 
   const handleBlockUser = async (userIdToBlock: number) => {
-    const res = await apiBlockUser(userIdToBlock)
+    const res = await apiBlockUser(userIdToBlock);
     setState({ ...state, open: true });
     if (res.error) {
-      setSnackBarMsg("Error block user: " + res.error)
-    }
-    else {
-      setSnackBarMsg("User blocked")
+      setSnackBarMsg('Error block user: ' + res.error);
+    } else {
+      setSnackBarMsg('User blocked');
       dispatch(reduxAddUserBlocked({
         id: id,
         login: login,
@@ -112,19 +102,19 @@ export function FriendCard({
         status: status,
         avatar: avatar,
         description: description,
-      }))
+      }));
       if (userData.login == actualUserLogin)
-        setFriends((prev: any) => prev.filter((friend: any) => friend.id !== userIdToBlock))
+        setFriends((prev: any) => prev.filter((friend: any) => friend.id !== userIdToBlock));
     }
-  }
+  };
 
 
  
 
 
   function isMyFriend() {
-    console.log("mes friends : ", userData.friends)
-    return userData.friends.find((friend: any) => friend.id === id)
+    console.log('mes friends : ', userData.friends);
+    return userData.friends.find((friend: any) => friend.id === id);
   }
 
 
@@ -140,12 +130,12 @@ export function FriendCard({
             <CardMedia
               component="img"
               height="140"
-              image={`http://localhost:3000/avatars/` + avatar}
+              image={'http://localhost:3000/avatars/' + avatar}
               alt={login}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = "http://localhost:3000/avatars/defaultAvatar.png"
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
               }}
             />
           </Badge>
@@ -154,7 +144,7 @@ export function FriendCard({
               {firstName} {lastName}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ height: 42 }}>
-              {description ? descriptionParsed : "No description"}
+              {description ? descriptionParsed : 'No description'}
             </Typography>
           </CardContent>
         </CardActionArea>
@@ -224,7 +214,7 @@ export function FriendCard({
         }
       </CardActions>
     </Card>
-  )
+  );
 }
 
 
@@ -238,17 +228,17 @@ export function FriendCard({
 export default function ProfileFriends({ user }: any) {
   // const actuelUser: any = useSelector((state: any) => state.user.userData);
   const [friends, setFriends] = useState<AccountProps[]>([]);
-  const [snackBarMsg, setSnackBarMsg] = React.useState("Friend deleted");
+  const [snackBarMsg, setSnackBarMsg] = React.useState('Friend deleted');
   const [state, setState] = React.useState({
     open: false,
     vertical: 'bottom' as 'top' | 'bottom',
     horizontal: 'right' as 'center' | 'left' | 'right',
   });
-  const userData: any = useSelector((state: any) => state.user.userData);
+  const userData: any = useSelector((dataState: any) => dataState.user.userData);
 
   useEffect(() => {
-    console.log("userData update : ", userData)
-  }, [userData])
+    console.log('userData update : ', userData);
+  }, [userData]);
 
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -261,12 +251,11 @@ export default function ProfileFriends({ user }: any) {
     // if (typeof user === 'undefined')
     //   return;
     async function fetchAndSetFriendsProfile() {
-      const res = await getFriendProfile(user.login)
-      console.log("res get friends profile : ", res)
+      const res = await getFriendProfile(user.login);
+      console.log('res get friends profile : ', res);
       if (res.error) {
         console.log(res);
-      }
-      else {
+      } else {
         setFriends(res);
       }
     }
@@ -289,7 +278,7 @@ export default function ProfileFriends({ user }: any) {
                 setState={setState}
                 setSnackBarMsg={setSnackBarMsg}
                 {...friend}
-              />)
+              />);
         })}
         <Snackbar
           anchorOrigin={{ vertical: state.vertical, horizontal: state.horizontal }}
@@ -303,5 +292,5 @@ export default function ProfileFriends({ user }: any) {
         </Snackbar>
       </div>
     </>
-  )
+  );
 }

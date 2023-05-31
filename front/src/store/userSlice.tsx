@@ -56,7 +56,7 @@ export const userSlice = createSlice({
     reduxAddFriends: (state, action: PayloadAction<any>) => {
       state.userData.friends = [...state.userData.friends, action.payload];
       state.userData.userBlocked = state.userData.userBlocked
-      .filter((userBlocked: any) => userBlocked.id !== action.payload.id);
+        .filter((userBlocked: any) => userBlocked.id !== action.payload.id);
 
     },
     reduxRemoveFriends: (state, action: PayloadAction<any>) => {
@@ -71,7 +71,7 @@ export const userSlice = createSlice({
     reduxAddUserBlocked: (state, action: PayloadAction<any>) => {
       state.userData.userBlocked = [...state.userData.userBlocked, action.payload];
       state.userData.friends = state.userData.friends
-      .filter((friend: any) => friend.id !== action.payload.id);
+        .filter((friend: any) => friend.id !== action.payload.id);
     },
     // reduxRemoveUserBlocked: (state, action: PayloadAction<any>) => {
     //   state.userData.userBlocked = state.userData.userBlocked.filter((userBlocked: any) => userBlocked.id !== action.payload);
@@ -82,7 +82,7 @@ export const userSlice = createSlice({
 export const { 
   setUser, setLogged, setLogout,
   reduxSetFriends, reduxAddFriends, reduxRemoveFriends,
-  reduxSetUserBlocked, reduxAddUserBlocked
+  reduxSetUserBlocked, reduxAddUserBlocked,
 } = userSlice.actions;
 
 export default userSlice.reducer;

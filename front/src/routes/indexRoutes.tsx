@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import Login from '../pages/Login';
 import Home from '../pages/Home';
 import Chat from '../pages/Chat';
-import Account from '../pages/Account'
+import Account from '../pages/Account';
 // import Game from '../pages/game';
 import ConnectPage from '../pages/Connection';
 import Profile from '../pages/Profile';

@@ -4,5 +4,5 @@ export default function AccountGameHistory() {
       <h2 className="text-3xl text-center">History game</h2>
 
     </>
-  )
+  );
 }

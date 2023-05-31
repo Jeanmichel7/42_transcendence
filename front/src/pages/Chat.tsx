@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import ButtonNewGroup from '../components/Chat/ButtonNewGroup'
-// import ChatRoom from '../components/Chat/ChatRoom'
-import Friends from '../components/Friends/Friends'
-import Conversation from '../components/Chat/Conversation'
-import ButtonAddFriends from '../components/Friends/ButtonAddFriends'
-import { AddFriends } from '../components/Friends/ButtonAddFriends'
+import { useState } from 'react';
+import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
+// import ChatRoom from '../components/Chat/ChatRoom';
+import Friends from '../components/Friends/Friends';
+import Conversation from '../components/Chat/Conversation';
+import ButtonAddFriends, { AddFriends } from '../components/Friends/ButtonAddFriends';
 
 function Chat() {
   const [currentChatUser, setCurrentChatUser] = useState({ id: -1 });
@@ -42,6 +41,6 @@ function Chat() {
       </div>
 
     </div>
-  )
+  );
 }
-export default Chat
+export default Chat;

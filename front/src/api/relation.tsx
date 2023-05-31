@@ -6,9 +6,8 @@ export async function getFriends() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to get friends');
   }
 }
@@ -19,9 +18,8 @@ export async function getFriendProfile(login: string) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to get friend profile');
   }
 }
@@ -32,9 +30,8 @@ export async function deleteFriend(userIdToRemove: number) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to remove friend');
   }
 }
@@ -45,9 +42,8 @@ export async function addFriend(userIdToAdd: number) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to add friend');
   }
 }
@@ -58,9 +54,8 @@ export async function getBlockedUsers() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to get blocked users');
   }
 }
@@ -71,9 +66,8 @@ export async function apiBlockUser(userIdToBlock: number) {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to block user');
   }
 }

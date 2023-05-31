@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
 function Home() {
   return (
@@ -13,6 +12,6 @@ function Home() {
         </div>
       </span>
     </div>
-  )
+  );
 }
-export default Home
+export default Home;

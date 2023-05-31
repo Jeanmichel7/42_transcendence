@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Header/Header'
+import { useEffect, useState } from 'react';
 import { getProfileByPseudo } from '../api/user';
-import { getFriendProfile } from '../api/relation';
+// import { getFriendProfile } from '../api/relation';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
 import ProfileFriends from '../components/Profile/ProfileFriends';
@@ -37,10 +36,9 @@ function Profile() {
     const res: any = await getProfileByPseudo(pseudo);
     if (res.error) {
       console.log(res);
-    }
-    else
+    } else
       setUserProfile(res);
-    console.log(res)
+    console.log(res);
   }
 
   useEffect(() => {
@@ -53,16 +51,16 @@ function Profile() {
       <Box className="flex justify-between " >
         <div className="w-1/4">
           <img
-            src={`http://localhost:3000/avatars/` + user.avatar}
+            src={'http://localhost:3000/avatars/' + user.avatar}
             className="text-center mb-2 w-full rounded-[16px]"
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = "http://localhost:3000/avatars/defaultAvatar.png"
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
           />
-          <p> {user.description ? user.description : "No description"} </p>
+          <p> {user.description ? user.description : 'No description'} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -94,6 +92,6 @@ function Profile() {
       </Box>
     </>
 
-  )
+  );
 }
-export default Profile
+export default Profile;

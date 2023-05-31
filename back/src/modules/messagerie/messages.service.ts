@@ -102,8 +102,15 @@ export class MessageService {
     const userReceive: UserEntity = await this.userRepository.findOne({
       where: { id: userIdTo },
       select: ['id'],
-      relations: ['messagesReceive'],
+      relations: ['messagesReceive', 'blocked'],
     });
+
+    // test if userSend is blocked by userReceive
+    if (userReceive.blocked.map((user) => user.id).includes(userSend.id)) {
+      throw new ForbiddenException(
+        `You can't send a message to ${userReceive.login}, you are blocked`,
+      );
+    }
 
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);
@@ -116,9 +123,6 @@ export class MessageService {
       text: messageToSave.text,
     });
     if (!newMessage) throw new NotFoundException(`Message not created`);
-    // newMessage.ownerUser = userSend;
-    // newMessage.destUser = userReceive;
-    // await newMessage.save();
     userSend.messagesSend = [...userSend.messagesSend, newMessage];
     await userSend.save();
     userReceive.messagesReceive = [...userReceive.messagesReceive, newMessage];

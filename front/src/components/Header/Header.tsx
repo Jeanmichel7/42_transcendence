@@ -1,4 +1,10 @@
 import * as React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setLogout } from '../../store/userSlice';
+
+import { logout } from '../../api/auth';
+
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -11,13 +17,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 
-import { Link, NavLink, useNavigate } from "react-router-dom"
-import { useSelector, useDispatch } from 'react-redux'
-
-import { logout } from '../../api/auth'
-import { setLogout } from '../../store/userSlice'
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -27,7 +27,7 @@ function Header() {
   const userData: any = useSelector((state: any) => state.user.userData);
   const userIsLogged: any = useSelector((state: any) => state.user.isLogged);
   const dispatch = useDispatch();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -45,14 +45,13 @@ function Header() {
   };
 
   async function handleLogout() {
-    try {
-      const res = await logout();
-      // console.log("res : ", res)
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
+    const res = await logout();
+    if (res.error) {
+      console.log(res);
+    } else {
+      dispatch(setLogout());
+      navigate('/');
     }
-    dispatch(setLogout());
-    navigate('/');
   }
 
   return (
@@ -133,7 +132,7 @@ function Header() {
                   Friends
                 </MenuItem>
               </NavLink>
-              <NavLink to={`/profile/` + userData.login}>
+              <NavLink to={'/profile/' + userData.login}>
                 <MenuItem onClick={handleCloseNavMenu}>
                   Profile
                 </MenuItem>
@@ -191,7 +190,7 @@ function Header() {
               </Button>
             </NavLink>
 
-            <NavLink to={`/profile/` + userData.login}>
+            <NavLink to={'/profile/' + userData.login}>
               <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
                 Profile
               </Button>
@@ -214,11 +213,11 @@ function Header() {
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="avatar" src={`http://localhost:3000/avatars/` + userData.avatar}
+                    <Avatar alt="avatar" src={'http://localhost:3000/avatars/' + userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = "http://localhost:3000/avatars/defaultAvatar.png"
+                        target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
                       }}
                     />
                   </IconButton>
@@ -255,65 +254,10 @@ function Header() {
             }
           </Box>
 
-
-
-
-
-          {/* 
-          <div className=" bg-[#1e1e4e] text-white" >
-            <div className="flex justify-between items-center" >
-              <Link to="/home" className="flex items-center">
-                <img src='/pong-nav.png' className="text-center p-2 rounded-full w-full h-24" />
-                <span className="text-4xl font-bold font-Dance ml-4">Pong</span>
-              </Link>
-
-              <div className="flex justify-between items-center" >
-                <NavLink to="/game" className={({ isActive }) => isActive ? "header__link--activ" : "header__link"} >Play</NavLink>
-                <NavLink to="/chat" className={({ isActive }) => isActive ? "header__link--activ" : "header__link"} >Chat</NavLink>
-                <NavLink to="/friends" className={({ isActive }) => isActive ? "header__link--activ" : "header__link"} >Friends</NavLink>
-                <NavLink to="/profile" className={({ isActive }) => isActive ? "header__link--activ" : "header__link"} >Profile</NavLink>
-              </div>
-
-              <div className="flex justify-between items-center" >
-                {userIsLogged && userData &&
-                  <>
-                    <button onClick={handleLogout} className="header__link">
-                      Logout
-                    </button>
-                    <NavLink to="/account" className={({ isActive }) => isActive ? "header__link--activ" : "header__link"} >
-                      Account
-                    </NavLink>
-                    <NavLink to="/account" className="header__link-avatar" >
-                      {userData.avatar &&
-                        <img
-                          src={`http://localhost:3000/avatars/` + userData.avatar}
-                          className="text-center p-2 w-full h-24"
-                          alt="avatar"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = "http://localhost:3000/avatars/defaultAvatar.png"
-                          }}
-                        />}
-                    </NavLink>
-                  </>
-                }
-                {!userIsLogged &&
-                  <p className="header__link" >
-                    <Link to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
-                      Login
-                    </Link>
-                  </p>
-                }
-              </div>
-            </div>
-            <div className="h-1 bg-indigo-700 w-full shadow-lg shadow-cyan-500/50" > </div>
-          </div> */}
-
         </Toolbar>
       </Container>
     </AppBar>
-  )
+  );
 }
 
-export default Header
+export default Header;

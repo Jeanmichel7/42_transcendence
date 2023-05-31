@@ -8,8 +8,8 @@ export async function sendMessage(message: any, receiverId: any) {
     if (response.status === 200 || response.status === 201) {
       return response.data;
     }
-  } catch(e: any) {
-    return e.response
+  } catch (e: any) {
+    return e.response;
   }
 }
 
@@ -20,14 +20,14 @@ export async function getOldMessages(userId: any) {
       return response.data;
     }
   } catch (e: any) {
-    return e.response
+    return e.response;
   }
 }
 
 export async function imgExist(url: string) {
   try {
     const response = await apiAvatar(url);
-    console.log("respons eimage exist : ", response)
+    console.log('respons eimage exist : ', response);
     if (response.status === 200) {
       return true;
     }

@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react'
-import { ImPencil, ImBlocked } from "react-icons/im";
-
-import { getFriends, apiBlockUser, deleteFriend } from '../../api/relation'
-import { Fade, IconButton, Tooltip, Zoom } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setLogged, reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice'
+import { reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice';
+import { apiBlockUser, deleteFriend } from '../../api/relation';
+
+import { ImBlocked } from 'react-icons/im';
+import { IconButton, Tooltip, Zoom } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const Friend = ({
@@ -13,25 +13,25 @@ const Friend = ({
   currentChatUser,
   setCurrentChatUser,
   setOpen,
-  setServiceToCall
-  }: {
-    userFriend: any,
-    currentChatUser: any,
-    setCurrentChatUser: any,
-    setOpen: any,
-    setServiceToCall: any
-  }) => {
-  const dispatch = useDispatch()
+  setServiceToCall,
+}: {
+  userFriend: any,
+  currentChatUser: any,
+  setCurrentChatUser: any,
+  setOpen: any,
+  setServiceToCall: any
+}) => {
+  const dispatch = useDispatch();
 
   async function handleBlockUser(userToBlock: any, e: any) {
     e.stopPropagation();
     const res = await apiBlockUser(userToBlock);
-    if(res.error)
-      console.log("error bloc user : ", res.error)
+    if (res.error)
+      console.log('error bloc user : ', res.error);
     else {
-      dispatch(reduxAddUserBlocked(userFriend))
+      dispatch(reduxAddUserBlocked(userFriend));
     }
-    console.log("res bloc user : ", res)
+    console.log('res bloc user : ', res);
   }
 
 
@@ -39,18 +39,18 @@ const Friend = ({
   async function handleRemoveFriend(e: any) {
     e.stopPropagation();
     const res = await deleteFriend(userFriend.id);
-    if(res.error)
-      console.log("error remove friend : ", res.error)
+    if (res.error)
+      console.log('error remove friend : ', res.error);
     else {
-      dispatch(reduxRemoveFriends(userFriend.id))
-      console.log("currentChatUser : ", currentChatUser)
-      console.log("userFriend.login : ", userFriend.login)
+      dispatch(reduxRemoveFriends(userFriend.id));
+      console.log('currentChatUser : ', currentChatUser);
+      console.log('userFriend.login : ', userFriend.login);
       if (currentChatUser.login === userFriend.login) {
-        setCurrentChatUser("")
-        setServiceToCall('home')
+        setCurrentChatUser('');
+        setServiceToCall('home');
       }
     }
-    console.log("res remove friend : ", res)
+    console.log('res remove friend : ', res);
   }
 
   return (
@@ -60,19 +60,19 @@ const Friend = ({
         <div className="flex-grow text-black m-2 p-2 flex items-center "
           onClick={() => {
             if (currentChatUser !== userFriend.login) {
-              setCurrentChatUser(userFriend)
-              setOpen(false)
-              setServiceToCall('chat')
+              setCurrentChatUser(userFriend);
+              setOpen(false);
+              setServiceToCall('chat');
             }
           }}
         >
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
-            src={`http://localhost:3000/avatars/` + userFriend.avatar}
+            src={'http://localhost:3000/avatars/' + userFriend.avatar}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = "http://localhost:3000/avatars/defaultAvatar.png"
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -101,14 +101,14 @@ const Friend = ({
 
       </div>
     </div>
-  )
-}
+  );
+};
 
 
 function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any) {
   const [open, setOpen] = useState(false);
   const userData: any = useSelector((state: any) => state.user.userData);
-  let ref = useRef(document.createElement('div'));
+  const ref = useRef(document.createElement('div'));
 
 
   useEffect(() => {
@@ -117,8 +117,8 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
         setOpen(false);
     };
     document.addEventListener('mousedown', ClickOutside);
-    return () => { document.removeEventListener('mousedown', ClickOutside) };
-  }, [ref])
+    return () => { document.removeEventListener('mousedown', ClickOutside); };
+  }, [ref]);
 
   return (
     <>
@@ -129,13 +129,13 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
         <h2>Friends</h2>
         <div ref={ref} className={`w-full bg-white
           border shadow-lg text-center rounded-xl mt-5
-          ${open ? "" : "hidden"} transition-all`}
+          ${open ? '' : 'hidden'} transition-all`}
         >
           {userData.friends.length === 0 ? <p className="text-center">No friends yet</p>
-          :
-          userData.friends.map((friend: { id: number; }) => {
-            if (userData.id !== friend.id )
-              return (
+            :
+            userData.friends.map((friend: { id: number; }) => {
+              if (userData.id !== friend.id )
+                return (
                 <Friend
                   key={friend.id}
                   userFriend={friend}
@@ -144,11 +144,12 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
                   setOpen={setOpen}
                   setServiceToCall={setServiceToCall}
                 />
-          ) })}
+                ); 
+            })}
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Friends
+export default Friends;

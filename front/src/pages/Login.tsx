@@ -1,11 +1,4 @@
-// import React from 'react'
-import {Link} from 'react-router-dom'
-// import axios from 'axios'
-
-// import LoginBtn from '../components/Login/LoginBtn'
-// import Register from './register'
-
-// import './login.css'
+import { Link } from 'react-router-dom';
 
 export default function Login() {
   return (
@@ -23,5 +16,5 @@ export default function Login() {
 
       </span>
     </div>
-  )
+  );
 }

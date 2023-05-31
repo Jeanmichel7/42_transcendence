@@ -1,8 +1,7 @@
-import { Alert, Autocomplete, Button, Modal, Snackbar, TextField } from "@mui/material"
-import React, { useEffect } from "react";
-import { getAllUsers } from "../../api/user";
-import { useState } from "react";
-import { addFriend } from "../../api/relation";
+import { Alert, Autocomplete, Button, Snackbar, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import { getAllUsers } from '../../api/user';
+import { addFriend } from '../../api/relation';
 
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -10,8 +9,8 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 
-import { useDispatch, useSelector } from "react-redux";
-import { setUser, setLogged, reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice'
+import { useDispatch, useSelector } from 'react-redux';
+import { reduxAddFriends } from '../../store/userSlice';
 
 
 function UserCard({ user, handleAdd }: any) {
@@ -20,7 +19,7 @@ function UserCard({ user, handleAdd }: any) {
     <Card sx={{ width: 220, margin: 1 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image={"http://localhost:3000/avatars/" + user.avatar}
+        image={'http://localhost:3000/avatars/' + user.avatar}
         title="green iguana"
       />
       <CardContent>
@@ -54,9 +53,9 @@ function AddFriends() {
   const [users, setUsers] = React.useState([]);
   const [selectedUser, setSelectedUser] = useState({});
   const [stateSnackBar, setStateSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = React.useState("Friend deleted");
+  const [snackBarMsg, setSnackBarMsg] = React.useState('Friend deleted');
   const userData: any = useSelector((state: any) => state.user.userData);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     async function fetchUsers() {
@@ -68,27 +67,27 @@ function AddFriends() {
 
   function isMyFriend(userId: number): boolean {
     // console.log("mes friends : ", userData.friends)
-    return !!userData.friends.find((friend: any) => friend.id === userId)
+    return !!userData.friends.find((friend: any) => friend.id === userId);
   }
 
   const handleAdd = async (user: any) => {
-    setStateSnackBar(true)
+    setStateSnackBar(true);
     const res = await addFriend(user.id);
     if (res.statusCode)
-      setSnackBarMsg("Error add friend: " + res.message)
-    else{
+      setSnackBarMsg('Error add friend: ' + res.message);
+    else {
       await new Promise(() => {
         dispatch(reduxAddFriends(user));
-      }) 
-      setSnackBarMsg("Friend added")
+      }); 
+      setSnackBarMsg('Friend added');
     }
-  }
+  };
 
   const handleCloseSnackBar = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    setStateSnackBar(false)
+    setStateSnackBar(false);
   };
 
   return (
@@ -126,7 +125,7 @@ function AddFriends() {
                   user={user}
                   handleAdd={handleAdd}
                 />
-              )
+              );
           })}
           <Snackbar
             open={ stateSnackBar }
@@ -143,7 +142,7 @@ function AddFriends() {
 
     </div>
   );
-};
+}
 export { AddFriends };
 
 
@@ -152,7 +151,7 @@ export { AddFriends };
 
 
 
-function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: Function }) {
+function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: (service: string) => any }) {
   return (
     <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
         hover:bg-gray-100`}
@@ -160,6 +159,6 @@ function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: Function }) 
     >
       <h2>Add Friends</h2>
     </div>
-  )
+  );
 }
-export default ButtonAddFriends
+export default ButtonAddFriends;

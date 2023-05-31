@@ -1,20 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { sendMessage, getOldMessages, imgExist } from '../../api/chat';
-import { BiPaperPlane } from "react-icons/bi";
+import { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { sendMessage, getOldMessages } from '../../api/chat';
+import { BiPaperPlane } from 'react-icons/bi';
 import io from 'socket.io-client';
-
-import { useSelector, useDispatch } from 'react-redux'
-
-
 
 
 const Conversation = (userSelected: any) => {
-  // console.log('userSelected : ', userSelected);
-
   const userData: any = useSelector((state: any) => state.user.userData);
 
   const [statusSendMsg, setStatusSendMsg] = useState('');
-  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState('');
   const [rows, setRows] = useState(1);
@@ -22,21 +16,33 @@ const Conversation = (userSelected: any) => {
   const textareaRef = useRef<any>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  let ref = useRef(document.createElement('div'));
+  const ref = useRef(document.createElement('div'));
 
-  useEffect(() => {
-    const ClickOutside = (event: any) => {
-      if (!ref.current.contains(event.target))
-        setOpen(false);
-    };
-    document.addEventListener('mousedown', ClickOutside);
-    return () => { document.removeEventListener('mousedown', ClickOutside) }
-  }, [ref]);
+  const joinRoom = () => {
+    console.log('join room : ', userData);
+    const socket = io('http://localhost:3000/messagerie', {
+      reconnectionDelayMax: 10000,
+      withCredentials: true,
+    });
 
+    //connect to room
+    socket.emit('joinPrivateRoom', { 
+      user1Id: userData.id,
+      user2Id: userSelected.user.id,
+    });
+
+    //listen on /message
+    socket.on('message', (message) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        message,
+      ]);
+    });
+  };
 
   // get old messages en fct de l'user selectionne
   useEffect(() => {
-    if(userSelected.user.id == -1) return;
+    if (userSelected.user.id == -1) return;
     joinRoom();
     async function fetchOldMessages() {
       const res = await getOldMessages(userSelected.user.id);
@@ -52,8 +58,8 @@ const Conversation = (userSelected: any) => {
       if (text.length > 0) {
         setRows(
           Math.floor(text.length / (textareaRef.current.offsetWidth / 7))
-          + text.split('\n').length
-          );
+          + text.split('\n').length,
+        );
       } else {
         setRows(1);
       }
@@ -69,44 +75,22 @@ const Conversation = (userSelected: any) => {
   }, [messages]);
 
 
-
   // send message
   const HandleSubmit = async (e: any) => {
     e.preventDefault();
-    setStatusSendMsg('pending')
-    let res = await sendMessage(
+    setStatusSendMsg('pending');
+    const res = await sendMessage(
       text,
       userSelected.user.id,
     );
-    console.log('res big data: ', res)
-    if(!res.status)
-      setStatusSendMsg('')
+    console.log('res big data: ', res);
+    if (!res.status)
+      setStatusSendMsg('');
     else
-      setStatusSendMsg(res.data.message)
-    setText('')
-  }
-
-  const joinRoom = () => {
-    console.log("join room : ", userData)
-    const socket = io(`http://localhost:3000/messagerie`, {
-      reconnectionDelayMax: 10000,
-      withCredentials: true,
-    });
-
-    //connect to room
-    socket.emit('joinPrivateRoom', { 
-      user1Id: userData.id,
-      user2Id: userSelected.user.id
-    });
-
-    //listen on /message
-    socket.on('message', (message, id) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        message
-      ]);
-    });
+      setStatusSendMsg(res.data.message);
+    setText('');
   };
+
 
   function getTimeSince(time: Date) {
     // console.log('time : ', time)
@@ -153,18 +137,18 @@ const Conversation = (userSelected: any) => {
             >
               <img
                 className="w-10 h-10 rounded-full m-2 object-cover "
-                src={`http://localhost:3000/avatars/` + message.ownerUser.avatar}
+                src={'http://localhost:3000/avatars/' + message.ownerUser.avatar}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null; 
-                  target.src="http://localhost:3000/avatars/defaultAvatar.png"
+                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />
               <div className=''>
                 <div className='font-semibold'>{message.ownerUser.login}
                   <span className='text-xs text-gray-500 font-normal ml-2'> 
-                    { `Il y a `+ getTimeSince(message.createdAt) } 
+                    { 'Il y a ' + getTimeSince(message.createdAt) } 
                   </span>
                 </div>
                 <div className=''>{message.text}</div>
@@ -183,7 +167,7 @@ const Conversation = (userSelected: any) => {
             rows={rows}
             value={text}
             onChange={e => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { HandleSubmit(e) } }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { HandleSubmit(e); } }}
             placeholder="Enter your text here..."
             className=" w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
           ></textarea>
@@ -195,7 +179,7 @@ const Conversation = (userSelected: any) => {
           {/* display status send message */}
           {statusSendMsg !== '' &&
             <span className={`
-                ${statusSendMsg == 'pending' ? `bg-yellow-500` : `bg-red-500`}
+                ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
                 bottom-16 
                 text-white
                 p-2
@@ -211,7 +195,7 @@ const Conversation = (userSelected: any) => {
 
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Conversation
+export default Conversation;

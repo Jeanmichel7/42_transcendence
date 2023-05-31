@@ -4,5 +4,5 @@ export default function AccountRelation() {
       <h2 className="text-3xl text-center">Friends</h2>
 
     </>
-  )
+  );
 }

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchUserAccount } from '../api/user';
 import AccountProfile from '../components/Account/AccountProfile';
-import AccountRelation from '../components/Account/AccountRelation';
 import AccountGameHistory from '../components/Account/AccountGameHistory';
 import ProfileFriends from '../components/Profile/ProfileFriends';
 
@@ -50,5 +49,5 @@ export default function Account() {
       <ProfileFriends user={user}/>
       <AccountGameHistory />
     </>
-  )
+  );
 }

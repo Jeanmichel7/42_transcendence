@@ -6,9 +6,8 @@ export async function isAuthenticated() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
@@ -19,9 +18,8 @@ export async function check2FACookie() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check  2FA ');
   }
 }
@@ -49,9 +47,8 @@ export async function logout() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to logout');
   }
 }
@@ -62,9 +59,8 @@ export async function Active2FA() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
@@ -75,25 +71,23 @@ export async function Desactive2FA() {
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
-    return e.response.data
+  } catch (e: any) {
+    return e.response.data;
     // throw new Error('Failed to check auth');
   }
 }
 
-export async function check2FACode (code: string, userId: number) {
-  console.log(code, userId)
+export async function check2FACode(code: string, userId: number) {
+  console.log(code, userId);
   try {
     const response = await api.post('/auth/login2fa', { 
       code: code,
-      userId: userId
-     });
+      userId: userId,
+    });
     if (response.status === 200) {
       return response.data;
     }
-  }
-  catch (e: any) {
+  } catch (e: any) {
     return e.response.data;
     // throw new Error('Failed to check auth');
   }

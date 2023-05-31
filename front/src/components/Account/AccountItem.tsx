@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dialog, FormControl, FormHelperText, InputLabel, Switch, TextField } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { useSelector } from 'react-redux';
+import { AccountProps } from './AccountProfile';
+
+import { Active2FA, Desactive2FA, check2FACode } from '../../api/auth';
+import { patchUserAccount } from '../../api/user';
+
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Input from '@mui/material/Input';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
-
+import { Button, Dialog, FormControl, FormHelperText, Switch, TextField } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
 import { TransitionProps } from '@mui/material/transitions';
-import { patchUserAccount } from '../../api/user';
-import { Active2FA, Desactive2FA, check2FACode } from '../../api/auth';
 import Slide from '@mui/material/Slide';
-import { AccountProps } from './AccountProfile';
-import { useSelector } from 'react-redux';
+
 
 interface ItemProps {
   keyName: string;
@@ -49,11 +49,11 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
 
 
   async function handleClose2FA() {
-    const res = await check2FACode(userCode, userData.id)
+    const res = await check2FACode(userCode, userData.id);
     if (res.error) {
-      setError2FA(true)
+      setError2FA(true);
     } else {
-      setError2FA(false)
+      setError2FA(false);
       setQRCode('');
       setUserCode('');
       // setValidCode(false);
@@ -61,41 +61,40 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   }
 
   async function handleForm() {
-    setLoading(true)
+    setLoading(true);
     await new Promise((r) => setTimeout(r, 300));
     const res = await patchUserAccount({
-      [keyName]: inputValue
-    })
+      [keyName]: inputValue,
+    });
     if (res.error) {
-      setError(res.message)
-      setInputValue(value)
-    }
-    else {
+      setError(res.message);
+      setInputValue(value);
+    } else {
       setUserProfile((prevUser: AccountProps) => ({
         ...prevUser,
         [keyName]: inputValue,
       }));
-      setError(false)
-      setEdit(false)
+      setError(false);
+      setEdit(false);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   function handleClose() {
-    setEdit(false)
-    setInputValue(value)
+    setEdit(false);
+    setInputValue(value);
   }
 
-  function parseKeyName(value: string | number | boolean) {
-    if (typeof value === 'string') {
-      let tmp = value.substring(0, 1).toUpperCase() + value.substring(1)
-      return tmp.replace(/([A-Z])/g, ' $1').replace(/2 F A/, '2FA')
+  function parseKeyName(valueKeyname: string | number | boolean) {
+    if (typeof valueKeyname === 'string') {
+      const tmp = valueKeyname.substring(0, 1).toUpperCase() + valueKeyname.substring(1);
+      return tmp.replace(/([A-Z])/g, ' $1').replace(/2 F A/, '2FA');
     }
-    if (typeof value === 'number') {
-      return value
+    if (typeof valueKeyname === 'number') {
+      return valueKeyname;
     }
-    if (typeof value === 'boolean') {
-      return value ? 'true' : 'false'
+    if (typeof valueKeyname === 'boolean') {
+      return valueKeyname ? 'true' : 'false';
     }
   }
 
@@ -104,33 +103,30 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   async function handleChange2FA() {
     if (inputValue) {
       // disable 2FA
-      setInputValue(false)
-      const res = await Desactive2FA()
+      setInputValue(false);
+      const res = await Desactive2FA();
       if (res.error) {
-        console.log("error : ", res)
+        console.log('error : ', res);
+      } else {
+        setInputValue(false);
+        setQRCode('');
       }
-      else {
-        setInputValue(false)
-        setQRCode('')
-      }
-    }
-    else {
+    } else {
       // enable 2FA
-      const res = await Active2FA()
+      const res = await Active2FA();
       if (res.error) {
-        console.log("error : ", res)
-      }
-      else {
-        setQRCode(res)
-        setInputValue(true)
+        console.log('error : ', res);
+      } else {
+        setQRCode(res);
+        setInputValue(true);
       }
     }
   }
 
 
   useEffect(() => {
-    setInputValue(value)
-  }, [value])
+    setInputValue(value);
+  }, [value]);
 
   return (
     <div className="flex items-center w-full pb-3">
@@ -153,7 +149,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             aria-describedby="component-helper-text"
             className="w-full"
             defaultValue={value}
-            onChange={(e) => { setInputValue(e.target.value) }}
+            onChange={(e) => { setInputValue(e.target.value); }}
             autoFocus
           />
           <FormHelperText
@@ -177,7 +173,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             inputProps={{ 'aria-label': 'controlled' }}
           />
           :
-          <Button variant="outlined" onClick={() => { setEdit(true) }} >
+          <Button variant="outlined" onClick={() => { setEdit(true); }} >
             <EditOutlinedIcon />
           </Button>
         :
@@ -186,7 +182,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             endIcon={<SendIcon />}
             variant="outlined"
             loading={loading}
-            onClick={() => { handleForm() }}
+            onClick={() => { handleForm(); }}
           >
             Modifier
           </LoadingButton>
@@ -204,7 +200,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Scan GoogleAuthentificator"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{'Scan GoogleAuthentificator'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <img src={QRCode} alt="QRCode" />
@@ -213,7 +209,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             label="Enter the code"
             value={userCode}
             onChange={(e) => setUserCode(e.target.value)}
-            onKeyDown={(e) => {e.key === 'Enter' ? handleClose2FA() : null}}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleClose2FA(); }}
           />
           <FormHelperText
             id="component-helper-text"
@@ -221,7 +217,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
             sx={{ color: 'red' }}
             error={error2FA ? true : false}
           >
-            {error2FA? "Code invalide" : null}
+            {error2FA ? 'Code invalide' : null}
           </FormHelperText>
         </DialogContent>
         <DialogActions>
@@ -234,6 +230,6 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         </DialogActions>
       </Dialog>
     </div>
-  )
+  );
 
 }
