@@ -28,9 +28,9 @@ export default function Account() {
   
   async function fetchAndSetUserProfile() {
     const res: any = await fetchUserAccount();
-    if (res.error)
-      console.log(res);
-    else
+    if (res.error) {
+      // console.log(res);
+    } else
       setUserProfile(res);
   }
 

@@ -106,7 +106,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
       setInputValue(false);
       const res = await Desactive2FA();
       if (res.error) {
-        console.log('error : ', res);
+        // console.log('error : ', res);
       } else {
         setInputValue(false);
         setQRCode('');
@@ -115,7 +115,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
       // enable 2FA
       const res = await Active2FA();
       if (res.error) {
-        console.log('error : ', res);
+        // console.log('error : ', res);
       } else {
         setQRCode(res);
         setInputValue(true);

@@ -26,7 +26,7 @@ function ButtonNewGroup() {
     async function fetchUsers() {
       const res = await getAllUsers();
       setUserData(res);
-      console.log('res : ', res);
+      // console.log('res : ', res);
     }
     fetchUsers();
   }, []);

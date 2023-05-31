@@ -19,7 +19,7 @@ const Conversation = (userSelected: any) => {
   const ref = useRef(document.createElement('div'));
 
   const joinRoom = () => {
-    console.log('join room : ', userData);
+    // console.log('join room : ', userData);
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -83,7 +83,7 @@ const Conversation = (userSelected: any) => {
       text,
       userSelected.user.id,
     );
-    console.log('res big data: ', res);
+    // console.log('res big data: ', res);
     if (!res.status)
       setStatusSendMsg('');
     else

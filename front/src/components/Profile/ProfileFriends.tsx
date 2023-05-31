@@ -113,7 +113,7 @@ export function FriendCard({
 
 
   function isMyFriend() {
-    console.log('mes friends : ', userData.friends);
+    // console.log('mes friends : ', userData.friends);
     return userData.friends.find((friend: any) => friend.id === id);
   }
 
@@ -234,11 +234,11 @@ export default function ProfileFriends({ user }: any) {
     vertical: 'bottom' as 'top' | 'bottom',
     horizontal: 'right' as 'center' | 'left' | 'right',
   });
-  const userData: any = useSelector((dataState: any) => dataState.user.userData);
+  // const userData: any = useSelector((dataState: any) => dataState.user.userData);
 
-  useEffect(() => {
-    console.log('userData update : ', userData);
-  }, [userData]);
+  // useEffect(() => {
+  //   console.log('userData update : ', userData);
+  // }, [userData]);
 
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -248,13 +248,13 @@ export default function ProfileFriends({ user }: any) {
   };
 
   useEffect(() => {
-    // if (typeof user === 'undefined')
-    //   return;
+    if (typeof user === 'undefined' || !user.login)
+      return;
     async function fetchAndSetFriendsProfile() {
       const res = await getFriendProfile(user.login);
-      console.log('res get friends profile : ', res);
+      // console.log('res get friends profile : ', res);
       if (res.error) {
-        console.log(res);
+        // console.log(res);
       } else {
         setFriends(res);
       }

@@ -47,7 +47,7 @@ function Header() {
   async function handleLogout() {
     const res = await logout();
     if (res.error) {
-      console.log(res);
+      // console.log(res);
     } else {
       dispatch(setLogout());
       navigate('/');

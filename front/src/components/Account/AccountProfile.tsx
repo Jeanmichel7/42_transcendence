@@ -31,21 +31,21 @@ export default function AccountProfile(
 
 
     const res = await patchUserAccount(formData);
-    console.log('res images : ', res);
+    // console.log('res images : ', res);
     if (res.error) {
-      console.log('res error : ', res);
+      // console.log('res error : ', res);
     } else {
-      console.log('res ok : ', res);
+      // console.log('res ok : ', res);
       dispatch(setUser(res));
       setUserProfile({ ...user, avatar: res.avatar });
       setOpenInputAvatar(false);
     }
   };
 
-  const handleFileChange = (event: any) => {
-    const file = event.target.files[0];
-    console.log(file); // log file object pour vérifier
-  };
+  // const handleFileChange = (event: any) => {
+  //   const file = event.target.files[0];
+  //   console.log(file); // log file object pour vérifier
+  // };
 
 
   return (
@@ -54,6 +54,7 @@ export default function AccountProfile(
 
       <Box className="flex justify-between" >
         <div className="w-1/4">
+          { user.avatar && 
           <img
             src={'http://localhost:3000/avatars/' + user.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
@@ -64,6 +65,7 @@ export default function AccountProfile(
               target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
           />
+          }
           <div className='flex justify-center' >
             <Button 
               variant="contained" 
@@ -89,7 +91,7 @@ export default function AccountProfile(
                   type="file"
                   ref={fileInputRef}
                   // style={{ display: 'none' }} 
-                  onChange={handleFileChange}
+                  // onChange={handleFileChange}
                 />
               </div>
               <div className='flex justify-center mt-2' >

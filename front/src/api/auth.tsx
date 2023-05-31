@@ -78,7 +78,6 @@ export async function Desactive2FA() {
 }
 
 export async function check2FACode(code: string, userId: number) {
-  console.log(code, userId);
   try {
     const response = await api.post('/auth/login2fa', { 
       code: code,

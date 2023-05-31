@@ -26,12 +26,12 @@ const Friend = ({
   async function handleBlockUser(userToBlock: any, e: any) {
     e.stopPropagation();
     const res = await apiBlockUser(userToBlock);
-    if (res.error)
-      console.log('error bloc user : ', res.error);
-    else {
+    if (res.error) {
+      // console.log('error bloc user : ', res.error);
+    } else {
       dispatch(reduxAddUserBlocked(userFriend));
     }
-    console.log('res bloc user : ', res);
+    // console.log('res bloc user : ', res);
   }
 
 
@@ -39,18 +39,18 @@ const Friend = ({
   async function handleRemoveFriend(e: any) {
     e.stopPropagation();
     const res = await deleteFriend(userFriend.id);
-    if (res.error)
-      console.log('error remove friend : ', res.error);
-    else {
+    if (res.error) {
+      // console.log('error remove friend : ', res.error);
+    } else {
       dispatch(reduxRemoveFriends(userFriend.id));
-      console.log('currentChatUser : ', currentChatUser);
-      console.log('userFriend.login : ', userFriend.login);
+      // console.log('currentChatUser : ', currentChatUser);
+      // console.log('userFriend.login : ', userFriend.login);
       if (currentChatUser.login === userFriend.login) {
         setCurrentChatUser('');
         setServiceToCall('home');
       }
     }
-    console.log('res remove friend : ', res);
+    // console.log('res remove friend : ', res);
   }
 
   return (

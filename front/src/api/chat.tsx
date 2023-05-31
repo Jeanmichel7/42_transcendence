@@ -27,7 +27,7 @@ export async function getOldMessages(userId: any) {
 export async function imgExist(url: string) {
   try {
     const response = await apiAvatar(url);
-    console.log('respons eimage exist : ', response);
+    // console.log('respons eimage exist : ', response);
     if (response.status === 200) {
       return true;
     }

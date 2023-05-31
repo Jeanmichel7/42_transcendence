@@ -35,10 +35,10 @@ function Profile() {
       return;
     const res: any = await getProfileByPseudo(pseudo);
     if (res.error) {
-      console.log(res);
+      // console.log(res);
     } else
       setUserProfile(res);
-    console.log(res);
+    // console.log(res);
   }
 
   useEffect(() => {
@@ -47,19 +47,22 @@ function Profile() {
 
 
   return (
+
     <>
-      <Box className="flex justify-between " >
+      <Box className="flex justify-between">
         <div className="w-1/4">
-          <img
-            src={'http://localhost:3000/avatars/' + user.avatar}
-            className="text-center mb-2 w-full rounded-[16px]"
-            alt="avatar"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-            }}
-          />
+          {user.avatar &&
+            <img
+              src={'http://localhost:3000/avatars/' + user.avatar}
+              className="text-center mb-2 w-full rounded-[16px]"
+              alt="avatar"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              }}
+            />
+          }
           <p> {user.description ? user.description : 'No description'} </p>
         </div>
 
@@ -82,7 +85,7 @@ function Profile() {
       </Box>
 
       <Box className="w-full">
-        <ProfileFriends user={user}/>
+        <ProfileFriends user={user} />
       </Box>
 
       <Box className="w-full">

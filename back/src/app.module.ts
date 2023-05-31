@@ -26,16 +26,12 @@ import { join } from 'path';
       inject: [ConfigService],
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'client'),
-      serveRoot: '/static',
-    }),
-    ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'uploads', 'users_avatars'),
       serveRoot: '/avatars',
-      // renderPath: '*./uploads/*',
-      // serveStaticOptions: {
-      //   index: false,
-      // },
+      renderPath: '*./uploads/*',
+      serveStaticOptions: {
+        index: false,
+      },
     }),
     EventEmitterModule.forRoot(),
     UsersModule,

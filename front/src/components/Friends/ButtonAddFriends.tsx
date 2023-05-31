@@ -19,9 +19,19 @@ function UserCard({ user, handleAdd }: any) {
     <Card sx={{ width: 220, margin: 1 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image={'http://localhost:3000/avatars/' + user.avatar}
-        title="green iguana"
-      />
+        title={`${user.login} avatar`}
+      >
+        <img
+          src={'http://localhost:3000/avatars/' + user.avatar}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null; 
+            target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+          }}
+          className="w-40 h-40 rounded-full object-cover mx-auto "
+          alt="avatar"
+        />
+      </CardMedia>
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {user.login}
