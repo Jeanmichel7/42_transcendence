@@ -37,17 +37,27 @@ const StyledRetryButton = styled.button`
     background-color: grey;
   }
 `;
-interface LooseProps {
-  setLoose: React.Dispatch<React.SetStateAction<boolean>>;
+interface setCurrentPage {
+  setLoose: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function Loose({ setLoose }: LooseProps) {
+function Loose({
+  setCurrentPage,
+  lastGameInfo,
+}: {
+  setCurrentPage: setCurrentPage;
+  lastGameInfo: any;
+}) {
   function handleClick() {
-    setLoose(false);
+    setCurrentPage('searchOpponent');
   }
   return (
     <LooseWrapper>
-      <StyledTitle>Perdu</StyledTitle>
+      {lastGameInfo.current.win ? (
+        <StyledTitle>Gagne</StyledTitle>
+      ) : (
+        <StyledTitle>Perdu</StyledTitle>
+      )}
       <StyledRetryButton onClick={handleClick}>Rejouer</StyledRetryButton>
     </LooseWrapper>
   );

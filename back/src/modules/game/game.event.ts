@@ -48,6 +48,7 @@ export class GameEvents {
   //desconexion
   handleDisconnect(client: Socket) {
     console.log('client disconnected: ' + client.id);
+    this.gameService.removeFromQueue(client.id);
   }
 
   @SubscribeMessage('searchOpponent')
@@ -55,6 +56,7 @@ export class GameEvents {
     @MessageBody() message: string,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log('searchOpponent: ' + message);
     if (message === 'cancel') {
       this.gameService.removeFromQueue(client.id);
       return;

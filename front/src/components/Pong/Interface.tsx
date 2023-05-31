@@ -9,6 +9,6 @@ export interface ClientToServerEvents {
   hello: () => void;
 }
 
-export interface SearchingOpponentProps {
+export interface SocketInterface {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }

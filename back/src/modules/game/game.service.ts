@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 const RACKET_WIDTH = 2;
-const RACKET_HEIGHT = 100;
+const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
@@ -49,13 +49,17 @@ export class Game {
       x: 500,
       y: 500,
       vx: INITIAL_BALL_SPEED,
-      vy: INITIAL_BALL_SPEED,
+      vy: 0,
     };
     this.player1Id = player1Id;
     this.player2Id = player2Id;
-    this.winner = '';
+    this.winner = null;
     this.lastTime = performance.now();
     this.id = Math.random().toString(36).substr(2, 9);
+    this.player1Score = 0;
+    this.player2Score = 0;
+    this.racketLeft = 500 - RACKET_HEIGHT_10 / 2;
+    this.racketRight = 500 - RACKET_HEIGHT_10 / 2;
   }
 
   updateBallPosition() {
@@ -84,7 +88,6 @@ export class Game {
         this.ball.y = BALL_RADIUS;
       }
     }
-    console.log(this.racketRight);
     if (
       this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       this.ball.y >= this.racketLeft &&
@@ -113,21 +116,33 @@ export class Game {
       }
     }
     if (
-      this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 - BALL_RADIUS &&
+      this.ball.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       !this.isOver
     ) {
       if (this.player1Score > SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = 'left';
+        this.winner = this.player1Id;
       } else {
         this.player1Score += 1;
+        console.log(this.player1Score);
+        this.ball.x = 500;
+        this.ball.y = 500;
+        this.ball.vx = INITIAL_BALL_SPEED;
+        this.ball.vy = 0;
       }
-    } else if (this.ball.x >= RACKET_RIGHT_POS_X_10 && !this.isOver) {
+    } else if (
+      this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
+      !this.isOver
+    ) {
       if (this.player2Score > SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = 'right';
+        this.winner = this.player2Id;
       } else {
         this.player2Score += 1;
+        this.ball.x = 500;
+        this.ball.y = 500;
+        this.ball.vy = 0;
+        this.ball.vx = -INITIAL_BALL_SPEED;
       }
     }
     this.ball.x += this.ball.vx * deltaTime;
@@ -144,6 +159,8 @@ export class Game {
       player2Score: this.player2Score,
       gameId: this.id,
       isPlayerRight: false,
+      player1Id: this.player1Id,
+      player2Id: this.player2Id,
     };
   }
 
@@ -193,9 +210,10 @@ export class GameService {
     }
   }
 
-  removeToQueue(playerId: string) {
+  removeFromQueue(playerId: string) {
     if (this.playerWaiting1 === playerId) {
       this.playerWaiting1 = undefined;
+      console.log('player1 removed from queue');
     }
   }
 

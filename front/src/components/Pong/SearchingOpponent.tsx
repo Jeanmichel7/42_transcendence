@@ -1,7 +1,11 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { io, Socket } from 'socket.io-client';
-import { SearchingOpponentProps } from './Interface';
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  SocketInterface,
+} from './Interface';
 import { StyledButton } from './Lobby';
 const dotAnimation = keyframes`
   0%, 80%, 100% { 
@@ -53,11 +57,12 @@ const Dot2 = styled(Dot)`
   animation-delay: -0.16s;
 `;
 
-function SearchingOpponent(
-  { socket }: React.FC<SearchingOpponentProps>,
-  { setCurrentPage }: React.Dispatch<React.SetStateAction<string>>
-) {
-  socket.emit('searchOpponent');
+function SearchingOpponent({
+  socket,
+  setCurrentPage,
+}: Socket<ServerToClientEvents, ClientToServerEvents> &
+  React.Dispatch<React.SetStateAction<string>>) {
+  socket.emit('searchOpponent', 84, 'sa');
   return (
     <SearchingWrapper>
       <DotWrapper>
@@ -67,7 +72,7 @@ function SearchingOpponent(
       </DotWrapper>
       <StyledButton
         onClick={() => {
-          socket.emit('SearchOpponent', 'cancel');
+          socket.emit('searchOpponent', 'cancel');
           setCurrentPage('lobby');
         }}
       >

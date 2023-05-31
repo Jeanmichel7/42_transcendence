@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import EndGame from './Pong/EndGame';
 import Score from './Pong/Score';
@@ -7,9 +7,14 @@ import { io } from 'socket.io-client';
 import useSocketConnection from './Pong/useSocketConnection';
 import Lobby from './Pong/Lobby';
 import SearchingOpponent from './Pong/SearchingOpponent';
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  SocketInterface,
+} from './Pong/Interface';
 
 const RACKET_WIDTH = 2;
-const RACKET_HEIGHT = 100;
+const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
@@ -17,8 +22,9 @@ const BALL_RADIUS = BALL_DIAMETER / 2;
 // max position of ball on X axis for compensate ball radius
 export const GROUND_MAX_SIZE = 1000;
 const INITIAL_BALL_SPEED = 0.4;
-// threshold value for correction of ball position with server state
-const THRESHOLD = 100;
+// POSITION_THRESHOLD value for correction of ball position with server state
+const POSITION_THRESHOLD = 100;
+const SPEED_THRESHOLD = 1;
 
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
@@ -71,32 +77,38 @@ const Ball = styled.div.attrs((props) => {
   border-radius: 50%;
 `;
 
-function Game(socket: object) {
-  const posRacket = useRef({ left: 0, right: 0 });
+function Game({
+  socket,
+  lastGameInfo,
+  setCurrentPage,
+}: {
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  lastGameInfo: any;
+  setCurrentPage: any;
+}) {
+  const posRacket = useRef({
+    left: 500 - RACKET_HEIGHT_10 / 2,
+    right: 500 - RACKET_HEIGHT_10 / 2,
+  });
   const keyStateRef = useRef({} as any);
   const [ball, setBall] = useState({
     x: 500,
     y: 500,
     vx: INITIAL_BALL_SPEED,
-    vy: INITIAL_BALL_SPEED,
+    vy: 0,
   });
   const gameWidth = useRef(0);
-  const [scorePlayerLeft, setScorePlayerLeft] = useState(0);
-  const [scorePlayerRight, setScorePlayerRight] = useState(0);
+  const scorePlayers = useRef({ left: 0, right: 0 });
   const gameDimensions = useRef({ width: 0, height: 0 });
   const [fps, setFps] = useState(0);
   const lastDateTime = useRef(0);
   const gameId = useRef(0);
   const { gameData } = useSocketConnection(
     socket,
-    {
-      posRacket: posRacket.current.left,
-      ArrowDown: keyStateRef.current['ArrowDown'],
-      ArrowUp: keyStateRef.current['ArrowUp'],
-      gameId: gameId.current,
-    },
+    keyStateRef,
     posRacket,
-    gameId.current
+    gameId,
+    scorePlayers
   );
   const correctionFactor = useRef(0);
 
@@ -180,34 +192,59 @@ function Game(socket: object) {
           newBall.vx = -newBall.vx;
           newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
         }
-        console.log(posRacket.current.right);
         newBall.x += newBall.vx * deltaTime;
         newBall.y += newBall.vy * deltaTime;
+        //console.log(gameData.current.ball);
+        //console.log(newBall);
 
         if (
-          correctionFactor.current !== 0 ||
-          Math.abs(newBall.x - gameData.current.ball?.x) > THRESHOLD ||
-          Math.abs(newBall.y - gameData.current.ball?.y) > THRESHOLD
+          Math.sign(newBall.vx) === Math.sign(gameData.current.ball?.vx) ||
+          newBall.vx === 0
         ) {
-          correctionFactor.current += 0.05;
-          newBall.x +=
-            (gameData.current.ball?.x - newBall.x) * correctionFactor.current;
-          newBall.y +=
-            (gameData.current.ball?.y - newBall.y) * correctionFactor.current;
-          if (correctionFactor.current >= 1) correctionFactor.current = 0;
+          newBall.vx = gameData.current.ball?.vx;
+        }
+
+        if (
+          Math.sign(newBall.vy) === Math.sign(gameData.current.ball?.vy) ||
+          newBall.vy === 0
+        ) {
+          newBall.vy = gameData.current.ball?.vy;
         }
         if (
-          Math.abs(newBall.vx - gameData.current.ball?.vx) > THRESHOLD ||
-          Math.abs(newBall.vy - gameData.current.ball?.vy) > THRESHOLD
+          Math.abs(newBall.x - gameData.current.ball?.x) > POSITION_THRESHOLD ||
+          Math.abs(newBall.y - gameData.current.ball?.y) > POSITION_THRESHOLD
         ) {
+          console.log('correction');
+          newBall.x = gameData.current.ball?.x;
+          newBall.y = gameData.current.ball?.y;
           newBall.vx = gameData.current.ball?.vx;
           newBall.vy = gameData.current.ball?.vy;
         }
-        console.log('gameData.current.ball?.vx', gameData.current.ball?.vx);
 
         return newBall;
       });
-      animationFrameId = requestAnimationFrame(upLoop);
+      if (gameData.current.winner == null) {
+        animationFrameId = requestAnimationFrame(upLoop);
+      } else {
+        lastGameInfo.current.winnerName = gameData.current.winner;
+        console.log(gameData.current.winner);
+        console.log(gameData.current.player1Id);
+        console.log(gameData.current.isPlayerRight === true);
+        if (gameData.current.isPlayerRight === true) {
+          if (gameData.current.winner === gameData.current.player1Id) {
+            lastGameInfo.current.win = true;
+          } else {
+            lastGameInfo.current.win = false;
+          }
+        } else {
+          if (gameData.current.winner === gameData.current.player1Id) {
+            lastGameInfo.current.win = false;
+          } else {
+            lastGameInfo.current.win = true;
+          }
+        }
+        setCurrentPage('finished');
+      }
     }
 
     return () => {
@@ -239,8 +276,8 @@ function Game(socket: object) {
       {' '}
       <p style={{ color: 'white' }}>{`FPS: ${fps.toFixed(2)}`}</p>
       <Score
-        scorePlayerLeft={scorePlayerLeft}
-        scorePlayerRight={scorePlayerRight}
+        scorePlayerLeft={scorePlayers.current.left}
+        scorePlayerRight={scorePlayers.current.right}
       />
       <Racket posY={posRacket.current.left} type="left" />
       <Ball
@@ -256,8 +293,7 @@ function Pong() {
   const [socket, setSocket] = useState({});
   const [connectStatus, setConnectStatus] = useState('connecting');
   const [currentPage, setCurrentPage] = useState('lobby');
-  const [gameStatus, setGameStatus] = useState('waiting');
-  console.log(socket);
+  const lastGameInfo = useRef({} as any);
   useEffect(() => {
     const socket = io('http://localhost:3000/game');
     setSocket(socket);
@@ -269,11 +305,11 @@ function Pong() {
 
     socket.on('disconnect', () => {
       setConnectStatus('disconnected');
+      console.log('ERROR SOCKET DISCONNECTED');
     });
 
     socket.on('searchOpponent', (message) => {
       setCurrentPage('game');
-      setGameStatus('inGame');
     });
     return () => {
       socket.disconnect();
@@ -289,10 +325,18 @@ function Pong() {
   let pageContent;
   if (currentPage === 'lobby') {
     pageContent = <Lobby setCurrentPage={setCurrentPage} />;
+  } else if (currentPage === 'finished') {
+    pageContent = (
+      <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
+    );
   } else if (currentPage === 'game') {
-    pageContent = <Game socket={socket} />;
-  } else if (currentPage === 'loose') {
-    pageContent = <EndGame />;
+    pageContent = (
+      <Game
+        socket={socket}
+        lastGameInfo={lastGameInfo}
+        setCurrentPage={setCurrentPage}
+      />
+    );
   } else if (currentPage === 'searchOpponent') {
     pageContent = (
       <SearchingOpponent socket={socket} setCurrentPage={setCurrentPage} />
