@@ -135,7 +135,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
   return (
     <div className="flex items-center w-full pb-3">
       <div className="w-1/4">
-        <h2> {parseKeyName(keyName)} </h2>
+        <h2 className='font-bold'> {parseKeyName(keyName)} </h2>
       </div>
 
       {/* Display or Input */}
@@ -146,7 +146,7 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
           {typeof value === 'boolean' && <p> {inputValue ? 'true' : 'false'} </p>}
         </> 
         :
-        <FormControl variant="standard">
+        <FormControl variant="standard" className='w-full'>
           {/* <InputLabel htmlFor="component-helper">Name</InputLabel> */}
           <Input
             id="component-helper"

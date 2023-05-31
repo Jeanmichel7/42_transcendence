@@ -23,8 +23,8 @@ const Friend = ({
   }) => {
   const dispatch = useDispatch()
 
-
-  async function handleBlockUser(userToBlock: any) {
+  async function handleBlockUser(userToBlock: any, e: any) {
+    e.stopPropagation();
     const res = await apiBlockUser(userToBlock);
     if(res.error)
       console.log("error bloc user : ", res.error)
@@ -34,6 +34,8 @@ const Friend = ({
     console.log("res bloc user : ", res)
   }
 
+
+  // si c'est l'user actif, revenr à la page d'accueil
   async function handleRemoveFriend(e: any) {
     e.stopPropagation();
     const res = await deleteFriend(userFriend.id);
@@ -41,6 +43,12 @@ const Friend = ({
       console.log("error remove friend : ", res.error)
     else {
       dispatch(reduxRemoveFriends(userFriend.id))
+      console.log("currentChatUser : ", currentChatUser)
+      console.log("userFriend.login : ", userFriend.login)
+      if (currentChatUser.login === userFriend.login) {
+        setCurrentChatUser("")
+        setServiceToCall('home')
+      }
     }
     console.log("res remove friend : ", res)
   }
@@ -86,7 +94,7 @@ const Friend = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton onClick={() => handleBlockUser(userFriend.id)} color='error'>
+          <IconButton onClick={(e) => handleBlockUser(userFriend.id, e)} color='error'>
             <ImBlocked />
           </IconButton>
         </Tooltip>
@@ -101,6 +109,7 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
   const [open, setOpen] = useState(false);
   const userData: any = useSelector((state: any) => state.user.userData);
   let ref = useRef(document.createElement('div'));
+
 
   useEffect(() => {
     const ClickOutside = (event: any) => {
@@ -122,7 +131,7 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
           border shadow-lg text-center rounded-xl mt-5
           ${open ? "" : "hidden"} transition-all`}
         >
-          {userData.friends?.length === 0 ? <p className="text-center">No friends yet</p>
+          {userData.friends.length === 0 ? <p className="text-center">No friends yet</p>
           :
           userData.friends.map((friend: { id: number; }) => {
             if (userData.id !== friend.id )
