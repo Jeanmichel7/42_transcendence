@@ -5,7 +5,7 @@ import Login from '../pages/Login';
 import Home from '../pages/Home';
 import Chat from '../pages/Chat';
 import Account from '../pages/Account';
-// import Game from '../pages/game';
+import Pong from '../pages/Pong';
 import ConnectPage from '../pages/Connection';
 import Profile from '../pages/Profile';
 import Error404 from '../pages/Error404';
@@ -13,6 +13,7 @@ import Error404 from '../pages/Error404';
 const AppRoutes: React.FC = () => (
   <Routes>
     <Route path='/' element={<Login />} />
+    <Route path='/game' element={<Pong />} />
     <Route path='/home' element={<Home />} />
     <Route path='/chat' element={<Chat />} />
     <Route path='/connection' element={<ConnectPage />} />
