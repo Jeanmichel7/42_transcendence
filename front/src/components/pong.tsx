@@ -344,6 +344,7 @@ function Pong() {
   }
   return (
     <GameWrapper className="game-wrapper">
+      {connectStatus === 'disconnected' && <Overlay />}
       {statusComponent}
       {pageContent}
     </GameWrapper>

@@ -8,7 +8,7 @@ const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 5;
 const INITIAL_BALL_SPEED = 0.4;
-const SPEED_INCREASE = 0.06;
+const SPEED_INCREASE = 0.1;
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -192,9 +192,26 @@ export class GameService {
   }
   updateGame(game: Game) {
     game.updateBallPosition();
+    if (game.isOver) {
+      this.games.delete(game.id);
+    }
     return game.getState();
   }
+  checkAlreadyInGame(playerId: string): boolean {
+    try {
+      this.games.forEach((game) => {
+        if (game.player1Id === playerId || game.player2Id === playerId) {
+          throw new Error('Already in game');
+        }
+      });
+    } catch (e) {
+      return true;
+    }
+    return false;
+  }
+
   addToQueue(playerId: string) {
+    if (this.checkAlreadyInGame(playerId)) return;
     if (this.playerWaiting1 === undefined) {
       this.playerWaiting1 = playerId;
     } else if (
