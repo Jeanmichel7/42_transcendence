@@ -72,8 +72,9 @@ function AddFriends() {
       const res = await getAllUsers();
       setUsers(res.filter((e: any) => e.id != userData.id));
     }
+    if (!userData.id) return;
     fetchUsers();
-  }, []);
+  }, [userData.id]);
 
   function isMyFriend(userId: number): boolean {
     // console.log("mes friends : ", userData.friends)

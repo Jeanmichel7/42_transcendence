@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { sendMessage, getOldMessages } from '../../api/chat';
 import { BiPaperPlane } from 'react-icons/bi';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 
 const Conversation = (userSelected: any) => {

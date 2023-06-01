@@ -28,26 +28,23 @@ function Profile() {
     avatar: '',
     status: '',
   });
-  // const [friends, setFriends] = useState<AccountProps[]>([]);
-
-  async function fetchAndSetUserProfile() {
-    if (typeof pseudo === 'undefined')
-      return;
-    const res: any = await getProfileByPseudo(pseudo);
-    if (res.error) {
-      // console.log(res);
-    } else
-      setUserProfile(res);
-    // console.log(res);
-  }
 
   useEffect(() => {
+    async function fetchAndSetUserProfile() {
+      if (typeof pseudo === 'undefined')
+        return;
+      const res: any = await getProfileByPseudo(pseudo);
+      if (res.error) {
+        // console.log(res);
+      } else
+        setUserProfile(res);
+      // console.log(res);
+    }
     fetchAndSetUserProfile();
   }, [pseudo]);
 
 
   return (
-
     <>
       <Box className="flex justify-between">
         <div className="w-1/4">
