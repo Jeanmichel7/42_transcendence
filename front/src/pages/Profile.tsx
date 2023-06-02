@@ -4,6 +4,7 @@ import { getProfileByPseudo } from '../api/user';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
 import ProfileFriends from '../components/Profile/ProfileFriends';
+import HistoryGame from '../components/Profile/HistoryGame';
 
 export interface AccountProps {
   login: string;
@@ -89,9 +90,7 @@ function Profile() {
       </Box>
 
       <Box className="w-full">
-        <h2 className="text-3xl text-center mb-5">Games</h2>
-
-
+        <HistoryGame user={user} />
       </Box>
     </>
 
