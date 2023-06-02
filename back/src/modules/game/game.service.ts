@@ -177,15 +177,43 @@ export class Game {
   }
 }
 
+/**
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ */
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { GameEntity } from './entity/game.entity';
+import { UserEntity } from '../users/entity/users.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { GameInterface } from './interfaces/game.interface';
+
 @Injectable()
 export class GameService {
   games: Map<string, Game>;
   playerWaiting1: string;
   playerWaiting2: string;
 
-  constructor() {
+  constructor(
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
+  ) {
     this.games = new Map<string, Game>();
   }
+
+  /** **********************
+   *        YANN PART
+   *********************** */
 
   getGames(): Map<string, Game> {
     return this.games;
@@ -245,5 +273,80 @@ export class GameService {
 
   test2() {
     return { message: 'test2' };
+  }
+
+  /** **********************
+   *         JM PART
+   *********************** */
+
+  // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+  async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+    const newGame = new GameEntity();
+    newGame.player1 = await this.userRepository.findOne({
+      where: { id: userId1 },
+    });
+    newGame.player2 = await this.userRepository.findOne({
+      where: { id: userId2 },
+    });
+    newGame.status = 'playing';
+    newGame.createdAt = new Date();
+    await this.gameRepository.save(newGame);
+
+    const result: GameInterface = newGame;
+    console.log('result create game : ', result);
+    return result;
+  }
+
+  async saveEndGame(
+    gameId: bigint,
+    winnerId: bigint,
+    scorePlayer1: number,
+    scorePlayer2: number,
+  ): Promise<GameInterface> {
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: gameId },
+    });
+    game.status = 'finished';
+    game.finishAt = new Date();
+    game.scorePlayer1 = scorePlayer1;
+    game.scorePlayer2 = scorePlayer2;
+    game.winner = await this.userRepository.findOne({
+      where: { id: winnerId },
+    });
+    await this.gameRepository.save(game);
+
+    const result: GameInterface = game;
+    console.log('result end game : ', result);
+    return result;
+  }
+
+  async getAllUserGames(userId: bigint): Promise<GameInterface[]> {
+    const games: GameEntity[] = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.player1', 'player1')
+      .leftJoinAndSelect('game.player2', 'player2')
+      .leftJoinAndSelect('game.winner', 'winner')
+      .select([
+        'game',
+        'player1.id',
+        'player1.firstName',
+        'player1.lastName',
+        'player1.login',
+        'player2.id',
+        'player2.firstName',
+        'player2.lastName',
+        'player2.login',
+        'winner.id',
+        'winner.firstName',
+        'winner.lastName',
+        'winner.login',
+      ])
+      .where('(player1.id = :userId OR player2.id = :userId)', { userId })
+      .orderBy('game.createdAt', 'DESC')
+      .getMany();
+
+    const result: GameInterface[] = games;
+    console.log('result get all game : ', result);
+    return result;
   }
 }
