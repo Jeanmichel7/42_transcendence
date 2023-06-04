@@ -45,6 +45,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
               <FriendCard
                 key={friend.id}
                 actualUserLogin={user.login}
+                friend={friend}
                 setFriends={setFriends}
                 setSnackBar={setSnackBar}
                 {...friend}

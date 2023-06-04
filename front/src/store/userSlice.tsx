@@ -106,9 +106,6 @@ export const userSlice = createSlice({
     setError: (state, action: PayloadAction<ApiErrorResponse>) => {
       state.error = action.payload;
     },
-
-
-
   },
 
   // extraReducers: (builder) => {

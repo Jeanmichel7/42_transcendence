@@ -2,16 +2,23 @@ import { AxiosError } from 'axios';
 import api, { networkErrorResponse } from './index';
 import { ApiErrorResponse, Api2FAResponse, UserInterface, ApiLogin2FACode } from '../types';
 
-export async function isAuthenticated() {
+export async function isAuthenticated(): Promise< boolean | ApiErrorResponse > {
   try {
-    const response = await api.get('/auth/isAuthenticated');
+    const response = await api.get< boolean >('/auth/isAuthenticated');
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to check authentication: ' + e);
   }
+  throw new Error('Unexpected error');
 }
 
 export async function check2FACookie(): Promise< Api2FAResponse | ApiErrorResponse > {

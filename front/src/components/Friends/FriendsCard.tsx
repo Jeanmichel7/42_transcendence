@@ -3,7 +3,7 @@ import { reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../
 import { Link } from 'react-router-dom';
 
 import { deleteFriend, apiBlockUser, addFriend } from '../../api/relation';
-import { UserInterface } from '../../types';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
 
 import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Badge } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -16,6 +16,7 @@ import { SnackbarInterface } from '../../types/utilsTypes';
 
 export default function FriendCard({
   actualUserLogin,
+  friend,
   setFriends,
   setSnackBar,
   id,
@@ -29,6 +30,7 @@ export default function FriendCard({
   is2FAEnabled,
 }: UserInterface 
 & { actualUserLogin: string }
+& { friend: UserInterface }
 & { setFriends: React.Dispatch<React.SetStateAction<UserInterface[]>> }
 & { setSnackBar: React.Dispatch<React.SetStateAction<SnackbarInterface>> },
 ) {
@@ -45,10 +47,10 @@ export default function FriendCard({
     console.log(userIdToDefi);
   };
 
+
   const handleAddFriend = async (userIdToAdd: number) => {
-    const res = await addFriend(userIdToAdd);
-    setSnackBar( (prev) => ({ ...prev, open: true }) );
-    if (res.error) {
+    const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
+    if ('error' in res) {
       setSnackBar((prev) => ({ ...prev, message: 'Error add friend: ' + res.error }));
     } else {
       dispatch(reduxAddFriends({
@@ -63,51 +65,53 @@ export default function FriendCard({
         is2FAEnabled: is2FAEnabled,
       }));
       if (userData.login == actualUserLogin)
-        setFriends((prev: UserInterface[]) => [...prev, res]);
+        setFriends((prev: UserInterface[]) => [...prev, {
+          id: id,
+          login: login,
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          status: status,
+          avatar: avatar,
+          description: description,
+          is2FAEnabled: is2FAEnabled,
+        }]);
       setSnackBar((prev) => ({ ...prev, message: 'Friend added' }));
     }
+    setSnackBar( (prev) => ({ ...prev, open: true }) );
   };
   
   const handleRemoveFriend = async (userIdToRemove: number) => {
-    const res = await deleteFriend(userIdToRemove);
-    setSnackBar( (prev) => ({ ...prev, open: true }));
-    if (res.error) {
+    const res: void | ApiErrorResponse = await deleteFriend(userIdToRemove);
+    if (typeof res === 'object' && 'error' in res) {
       setSnackBar((prev) => ({ ...prev, message: 'Error delete friends: ' + res.error }));
     } else {
       dispatch(reduxRemoveFriends(userIdToRemove));
       setSnackBar((prev) => ({ ...prev, message: 'Friend deleted' }));
       if (userData.login == actualUserLogin)
-        setFriends((prev: UserInterface[]) => prev.filter((friend: UserInterface) => friend.id !== userIdToRemove));
+        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
     }
+    setSnackBar( (prev) => ({ ...prev, open: true }));
   };
 
-  const handleBlockUser = async (userIdToBlock: number) => {
-    const res = await apiBlockUser(userIdToBlock);
-    setSnackBar((prev) => ({ ...prev, open: true }));
-    if (res.error) {
+  const handleBlockUser = async (userToBlock: UserInterface) => {
+    const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
+    if ('error' in res) {
       setSnackBar((prev) => ({ ...prev, message: 'Error block user: ' + res.error }));
     } else {
       setSnackBar((prev) => ({ ...prev, message: 'User blocked' }));
-      dispatch(reduxAddUserBlocked({
-        id: id,
-        login: login,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        status: status,
-        avatar: avatar,
-        description: description,
-        is2FAEnabled: is2FAEnabled,
-      }));
+      dispatch(reduxAddUserBlocked(userToBlock));
       if (userData.login == actualUserLogin)
-        setFriends((prev: UserInterface[]) => prev.filter((friend: UserInterface) => friend.id !== userIdToBlock));
+        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userToBlock.id));
     }
+    setSnackBar((prev) => ({ ...prev, open: true }));
   };
 
 
   function isMyFriend() {
-    // console.log('mes friends : ', userData.friends);
-    return userData.friends?.find((friend: UserInterface) => friend.id === id);
+    if (userData.login == login) // if it's own profile
+      return true;
+    return userData.friends?.find((f: UserInterface) => f.id === id);
   }
 
 
@@ -156,7 +160,7 @@ export default function FriendCard({
           TransitionProps={{ timeout: 600 }}
         >
           <IconButton aria-label="delete friend"
-            onClick={handleDefi(id)}
+            onClick={() => handleDefi(id)}
           >
             <SportsTennisIcon color='info' />
           </IconButton>
@@ -198,7 +202,7 @@ export default function FriendCard({
               TransitionProps={{ timeout: 600 }}
             >
               <IconButton aria-label="delete friend"
-                onClick={() => handleBlockUser(id)}
+                onClick={() => handleBlockUser(friend)}
               >
                 <RemoveCircleIcon sx={{ color: red[800] }} />
               </IconButton>

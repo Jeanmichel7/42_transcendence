@@ -14,3 +14,11 @@ export interface UserInterface {
   is2FAEnabled: boolean,
 }
 
+export interface UserRelation {
+  id: number;
+  // userId: bigint,
+  relationType: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userRelation: UserInterface;
+}

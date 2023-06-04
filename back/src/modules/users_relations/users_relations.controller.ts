@@ -66,7 +66,7 @@ export class UsersRelationsController {
     @Param('friendId', ParseIntPipe) friendId: bigint,
   ): Promise<HttpStatus> {
     await this.usersRelationsService.deleteRelation(req.user.id, friendId);
-    return HttpStatus.NO_CONTENT; // 204
+    return HttpStatus.NO_CONTENT;
   }
 
   @Put('friends/:userBlockedId/block')

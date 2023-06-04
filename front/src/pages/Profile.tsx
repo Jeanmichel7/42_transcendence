@@ -1,25 +1,18 @@
 import { useEffect, useState } from 'react';
-import { getProfileByPseudo } from '../api/user';
-// import { getFriendProfile } from '../api/relation';
-import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
+import { getProfileByPseudo } from '../api/user';
+
 import ProfileFriends from '../components/Profile/ProfileFriends';
 import HistoryGame from '../components/Profile/HistoryGame';
 
-export interface AccountProps {
-  login: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  description: string;
-  is2FAEnabled: boolean;
-  avatar: string;
-  status: string;
-}
+import { ApiErrorResponse, UserInterface } from '../types';
+
+import Box from '@mui/material/Box';
 
 function Profile() {
   const { pseudo } = useParams();
-  const [user, setUserProfile] = useState<AccountProps>({
+  const [user, setUserProfile] = useState<UserInterface>({
+    id: -1,
     login: '',
     email: '',
     firstName: '',
@@ -27,28 +20,24 @@ function Profile() {
     description: '',
     is2FAEnabled: false,
     avatar: '',
-    status: '',
+    status: 'offline',
   });
-  // const [friends, setFriends] = useState<AccountProps[]>([]);
-
-  async function fetchAndSetUserProfile() {
-    if (typeof pseudo === 'undefined')
-      return;
-    const res: any = await getProfileByPseudo(pseudo);
-    if (res.error) {
-      // console.log(res);
-    } else
-      setUserProfile(res);
-    // console.log(res);
-  }
 
   useEffect(() => {
+    async function fetchAndSetUserProfile() {
+      if (typeof pseudo === 'undefined')
+        return;
+      const profilesFetched: UserInterface | ApiErrorResponse = await getProfileByPseudo(pseudo);
+      if ('error' in profilesFetched) {
+        console.log(profilesFetched);
+      } else
+        setUserProfile(profilesFetched);
+    }
     fetchAndSetUserProfile();
   }, [pseudo]);
 
 
   return (
-
     <>
       <Box className="flex justify-between">
         <div className="w-1/4">
@@ -67,7 +56,7 @@ function Profile() {
           <p> {user.description ? user.description : 'No description'} </p>
         </div>
 
-        <div className="w-3/4 m-5 border-2px ">
+        <div className="w-3/4 m-5 border-2px">
           <h2 className="text-3xl text-center mb-5">{user.firstName + ' ' + user.lastName}</h2>
           <div className="flex justify-between">
             <div className="w-1/4">

@@ -24,7 +24,6 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
     fetchAndSetFriendsProfile();
   }, [user]);
 
-
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,

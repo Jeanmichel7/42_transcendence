@@ -4,10 +4,23 @@ import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 import Friends from '../components/Friends/Friends';
 import Conversation from '../components/Chat/Conversation';
 import ButtonAddFriends, { AddFriends } from '../components/Friends/ButtonAddFriends';
+import { UserInterface } from '../types';
 
 function Chat() {
-  const [currentChatUser, setCurrentChatUser] = useState({ id: -1 });
-  const [serviceToCall, setServiceToCall] = useState('chat');
+  const [serviceToCall, setServiceToCall] = useState<string>('chat');
+  const [currentChatUser, setCurrentChatUser] = useState<UserInterface>({
+    id: -1,
+    login: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    status: 'offline',
+    avatar: '',
+    description: '',
+    is2FAEnabled: false,
+    friends: [],
+    userBlocked: [],
+  });
 
   return (
     <div className="
@@ -32,7 +45,7 @@ function Chat() {
       <div className="w-3/4 h-full">
       {
         serviceToCall === 'chat' &&
-        <Conversation user={currentChatUser} />
+        <Conversation {...currentChatUser} />
       }
       {
         serviceToCall === 'addFriends' &&

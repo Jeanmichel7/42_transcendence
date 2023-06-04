@@ -9,22 +9,39 @@ import { isAuthenticated } from './api/auth';
 import { getUserData } from './api/user';
 import { getBlockedUsers, getFriends } from './api/relation';
 import {
-  reduxSetFriends, reduxSetUserBlocked, setLogged, setUser,
+  reduxSetFriends,
+  reduxSetUserBlocked,
+  setLogged,
+  setUser,
 } from './store/userSlice';
+import { ApiErrorResponse, UserInterface } from './types';
 
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = await isAuthenticated();
+      const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
       if (isAuth === true) {
-        const data = await getUserData();
-        const friends = await getFriends();
-        const userBlocked = await getBlockedUsers();
         dispatch(setLogged(true));
-        dispatch(setUser(data));
-        dispatch(reduxSetFriends(friends));
-        dispatch(reduxSetUserBlocked(userBlocked));
+
+        const data: UserInterface | ApiErrorResponse = await getUserData();
+        if ('error' in data)
+          console.log('data : ', data);
+        else
+          dispatch(setUser(data));
+        
+        const friends: UserInterface[] | ApiErrorResponse = await getFriends();
+        if ('error' in friends)
+          console.log('friends : ', friends);
+        else
+          dispatch(reduxSetFriends(friends));
+        
+        const userBlocked: UserInterface[] | ApiErrorResponse = await getBlockedUsers();
+        if ('error' in userBlocked)
+          console.log('userBlocked : ', userBlocked);
+        else
+          dispatch(reduxSetUserBlocked(userBlocked));
+
       } else {
         dispatch(setLogged(false));
       }

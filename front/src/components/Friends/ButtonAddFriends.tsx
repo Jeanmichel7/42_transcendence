@@ -1,5 +1,5 @@
 import { Alert, Autocomplete, Button, Snackbar, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getAllUsers } from '../../api/user';
 import { addFriend } from '../../api/relation';
 
@@ -11,9 +11,14 @@ import Typography from '@mui/material/Typography';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxAddFriends } from '../../store/userSlice';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+import { RootState } from '../../store';
 
 
-function UserCard({ user, handleAdd }: any) {
+function UserCard({ user, handleAdd }: {
+  user: UserInterface,
+  handleAdd: (user: UserInterface | null) => void
+}) {
   return (
     // <div className="m-2">
     <Card sx={{ width: 220, margin: 1 }}>
@@ -60,43 +65,55 @@ function UserCard({ user, handleAdd }: any) {
 
 
 function AddFriends() {
-  const [users, setUsers] = React.useState([]);
-  const [selectedUser, setSelectedUser] = useState({});
+  const [users, setUsers] = React.useState< UserInterface[] >([]);
+  const [selectedUser, setSelectedUser] = useState< UserInterface | null >(null);
   const [stateSnackBar, setStateSnackBar] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = React.useState('Friend deleted');
-  const userData: any = useSelector((state: any) => state.user.userData);
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+
+
+  useEffect(() => {
     async function fetchUsers() {
-      const res = await getAllUsers();
-      setUsers(res.filter((e: any) => e.id != userData.id));
+      const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers();
+      if ('error' in allUsers)
+        console.log(allUsers);
+      else {
+        console.log('allUsers : ', allUsers);
+        console.log('userData friends : ', userData.friends);
+        const resFiltered = allUsers.filter((u: UserInterface) =>
+          u.id != userData.id && !userData.friends?.find((f: UserInterface) => f.id === u.id));
+        
+        setUsers(resFiltered);
+      }
+      setSelectedUser(null);
     }
     fetchUsers();
-  }, []);
+  }, [userData.id, userData.friends]);
+
 
   function isMyFriend(userId: number): boolean {
-    // console.log("mes friends : ", userData.friends)
-    return !!userData.friends.find((friend: any) => friend.id === userId);
+    return !!userData.friends?.find((friend: UserInterface) => friend.id === userId);
   }
 
-  const handleAdd = async (user: any) => {
+  const handleAdd = async (user: UserInterface | null) => {
+    if (!user)
+      return;
     setStateSnackBar(true);
-    const res = await addFriend(user.id);
-    if (res.statusCode)
+    const res: UserRelation | ApiErrorResponse = await addFriend(user.id);
+    if ('error' in res)
       setSnackBarMsg('Error add friend: ' + res.message);
     else {
-      await new Promise(() => {
-        dispatch(reduxAddFriends(user));
-      }); 
+      // await new Promise(() => { dispatch(reduxAddFriends(user)); }); 
+      dispatch(reduxAddFriends(user));
       setSnackBarMsg('Friend added');
+      setSelectedUser(null);
     }
   };
 
-  const handleCloseSnackBar = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+  const handleCloseSnackBar = (_event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') { return; }
     setStateSnackBar(false);
   };
 
@@ -106,28 +123,28 @@ function AddFriends() {
       <Autocomplete
         id="searchFriends"
         options={users}
-        getOptionLabel={(option: any) => option.login}
+        getOptionLabel={(option: UserInterface) => option.login}
         style={{  }}
-        onChange={(event: any, newValue: any) => {
-          event.preventDefault();
+        onChange={(event: React.ChangeEvent<object>, newValue: UserInterface | null) => {
           event.stopPropagation();
           setSelectedUser(newValue);
         }}
+        value={selectedUser}
         renderInput={(params) => <TextField {...params} label="Search Friends" variant="outlined" />}
       />
       }
 
       <div className="flex">
         <Button 
-          onClick={() => handleAdd(selectedUser)} 
-          variant="contained" 
+          onClick={() => handleAdd(selectedUser)}
+          variant="contained"
         > Add </Button>
       </div>
 
       <div>
         <h2 className="text-2xl font-bold">Users</h2>
         <div className="flex">
-          {users.map((user: any) => {
+          {users.map((user: UserInterface) => {
             if (user.id != userData.id && !isMyFriend(user.id))
               return (
                 <UserCard
@@ -142,7 +159,7 @@ function AddFriends() {
             autoHideDuration={6000}
             onClose={handleCloseSnackBar}
           >
-            <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }}>
+            <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }} >
               {snackBarMsg}
             </Alert>
           </Snackbar>
@@ -161,7 +178,7 @@ export { AddFriends };
 
 
 
-function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: (service: string) => any }) {
+function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: (service: string) => void }) {
   return (
     <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
         hover:bg-gray-100`}

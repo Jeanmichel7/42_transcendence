@@ -2,16 +2,23 @@ import api, { networkErrorResponse } from './index';
 import { UserInterface, ApiErrorResponse } from '../types';
 import { AxiosError } from 'axios';
 
-export async function getUserData() {
+export async function getUserData(): Promise< UserInterface | ApiErrorResponse > {
   try {
-    const response = await api.get('/users');
+    const response = await api.get< UserInterface >('/users');
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get user');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to get user data: ' + e);
   }
+  throw new Error('Unexpected error');
 }
 
 // export async function fetchUserAccount(): Promise< UserInterface | ApiErrorResponse> {
@@ -49,16 +56,23 @@ export async function fetchUserAccount(): Promise< UserInterface | ApiErrorRespo
   throw new Error('Unexpected error');
 }
 
-export async function getProfileByPseudo(pseudo: string) {
+export async function getProfileByPseudo(pseudo: string): Promise< UserInterface | ApiErrorResponse > {
   try {
-    const response = await api.get('users/' + pseudo + '/profile');
+    const response = await api.get< UserInterface >('users/' + pseudo + '/profile');
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to get profile \'' + pseudo + '\' : ' + e);
   }
+  throw new Error('Unexpected error');
 }
 
 export async function patchUserAccount(data: FormData) {
@@ -81,15 +95,22 @@ export async function patchUserAccount(data: FormData) {
 }
 
 
-export async function getAllUsers() {
+export async function getAllUsers(): Promise< UserInterface[] | ApiErrorResponse > {
   try {
-    const response = await api.get('users/all');
+    const response = await api.get<UserInterface[]>('users/all');
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to get all users: ' + e);
   }
+  throw new Error('Unexpected error');
 }
 

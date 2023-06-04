@@ -15,7 +15,7 @@ export interface ApiLogin2FACode {
 }
 
 export interface ApiErrorResponse {
-  status: number | undefined | null;
-  error: string | undefined | null;
+  status: number;
+  error: string;
   message: string;
 }

@@ -6,51 +6,56 @@ import { apiBlockUser, deleteFriend } from '../../api/relation';
 import { ImBlocked } from 'react-icons/im';
 import { IconButton, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { RootState } from '../../store';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
 
 
-const Friend = ({
+export function FriendRow({
   userFriend,
   currentChatUser,
   setCurrentChatUser,
   setOpen,
   setServiceToCall,
 }: {
-  userFriend: any,
-  currentChatUser: any,
-  setCurrentChatUser: any,
-  setOpen: any,
-  setServiceToCall: any
-}) => {
+  userFriend: UserInterface,
+  currentChatUser: UserInterface,
+  setCurrentChatUser: React.Dispatch<React.SetStateAction<UserInterface>>,
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  setServiceToCall: React.Dispatch<React.SetStateAction<string>>
+}) {
   const dispatch = useDispatch();
 
-  async function handleBlockUser(userToBlock: any, e: any) {
+  async function handleBlockUser(
+    userToBlock: UserInterface,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) {
     e.stopPropagation();
-    const res = await apiBlockUser(userToBlock);
-    if (res.error) {
+    const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
+    if ('error' in res) {
       // console.log('error bloc user : ', res.error);
     } else {
-      dispatch(reduxAddUserBlocked(userFriend));
+      dispatch(reduxAddUserBlocked(userToBlock));
     }
-    // console.log('res bloc user : ', res);
   }
 
 
-  // si c'est l'user actif, revenr à la page d'accueil
-  async function handleRemoveFriend(e: any) {
+  async function handleRemoveFriend(
+    userToRemove: UserInterface,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) {
     e.stopPropagation();
-    const res = await deleteFriend(userFriend.id);
-    if (res.error) {
-      // console.log('error remove friend : ', res.error);
+    const res: void | ApiErrorResponse = await deleteFriend(userToRemove.id);
+    if (typeof res === 'object' && 'error' in res) {
+      console.log('error remove friend : ', res.error);
     } else {
-      dispatch(reduxRemoveFriends(userFriend.id));
-      // console.log('currentChatUser : ', currentChatUser);
-      // console.log('userFriend.login : ', userFriend.login);
-      if (currentChatUser.login === userFriend.login) {
-        setCurrentChatUser('');
+      dispatch(reduxRemoveFriends(userToRemove.id));
+
+      //return home if currentChatUser is the user removed
+      if (currentChatUser.login === userToRemove.login) {
+        setCurrentChatUser({} as UserInterface);
         setServiceToCall('home');
       }
     }
-    // console.log('res remove friend : ', res);
   }
 
   return (
@@ -59,7 +64,7 @@ const Friend = ({
       cursor-pointer flex flex-row items-center text-left">
         <div className="flex-grow text-black m-2 p-2 flex items-center "
           onClick={() => {
-            if (currentChatUser !== userFriend.login) {
+            if (currentChatUser.login !== userFriend.login) {
               setCurrentChatUser(userFriend);
               setOpen(false);
               setServiceToCall('chat');
@@ -79,12 +84,12 @@ const Friend = ({
           {userFriend.login}
         </div>
 
-        <Tooltip 
+        <Tooltip
           title="Remove Friend" arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton onClick={(e) => handleRemoveFriend(e)} color='error'>
+          <IconButton onClick={(e) => handleRemoveFriend(userFriend, e)} color='error'>
             <CloseIcon />
           </IconButton>
         </Tooltip>
@@ -94,7 +99,7 @@ const Friend = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton onClick={(e) => handleBlockUser(userFriend.id, e)} color='error'>
+          <IconButton onClick={(e) => handleBlockUser(userFriend, e)} color='error'>
             <ImBlocked />
           </IconButton>
         </Tooltip>
@@ -102,18 +107,33 @@ const Friend = ({
       </div>
     </div>
   );
-};
+}
 
 
-function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any) {
-  const [open, setOpen] = useState(false);
-  const userData: any = useSelector((state: any) => state.user.userData);
+
+
+
+
+
+
+
+
+
+
+
+function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
+{ setServiceToCall: React.Dispatch<React.SetStateAction<string>> } &
+{ currentChatUser: UserInterface } &
+{ setCurrentChatUser: React.Dispatch<React.SetStateAction<UserInterface>> },
+) {
+  const { userData } = useSelector((state: RootState) => state.user);
+  const [open, setOpen] = useState<boolean>(false);
   const ref = useRef(document.createElement('div'));
 
-
   useEffect(() => {
-    const ClickOutside = (event: any) => {
-      if (!ref.current.contains(event.target))
+    const ClickOutside = (event: MouseEvent) => {
+      // event.stopPropagation();
+      if (!ref.current.contains(event.target as Node))
         setOpen(false);
     };
     document.addEventListener('mousedown', ClickOutside);
@@ -122,32 +142,34 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }: any)
 
   return (
     <>
-      <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
-        hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`}
-        onClick={() => setOpen(!open)}
-      >
-        <h2>Friends</h2>
-        <div ref={ref} className={`w-full bg-white
+      {userData && userData.friends &&
+        <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
+      hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`}
+          onClick={() => setOpen(!open)}
+        >
+          <h2>Friends</h2>
+          <div ref={ref} className={`w-full bg-white
           border shadow-lg text-center rounded-xl mt-5
           ${open ? '' : 'hidden'} transition-all`}
-        >
-          {userData.friends.length === 0 ? <p className="text-center">No friends yet</p>
-            :
-            userData.friends.map((friend: { id: number; }) => {
-              if (userData.id !== friend.id )
-                return (
-                <Friend
-                  key={friend.id}
-                  userFriend={friend}
-                  currentChatUser={currentChatUser}
-                  setCurrentChatUser={setCurrentChatUser}
-                  setOpen={setOpen}
-                  setServiceToCall={setServiceToCall}
-                />
-                ); 
-            })}
+          >
+            {userData.friends.length === 0 ? <p className="text-center">No friends yet</p>
+              :
+              userData.friends.map((friend: UserInterface) => {
+                if (userData.id !== friend.id)
+                  return (
+                    <FriendRow
+                      key={friend.id}
+                      userFriend={friend}
+                      currentChatUser={currentChatUser}
+                      setCurrentChatUser={setCurrentChatUser}
+                      setOpen={setOpen}
+                      setServiceToCall={setServiceToCall}
+                    />
+                  );
+              })}
+          </div>
         </div>
-      </div>
+      }
     </>
   );
 }
