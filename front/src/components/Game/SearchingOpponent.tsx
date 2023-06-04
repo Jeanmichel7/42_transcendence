@@ -10,12 +10,13 @@ import { StyledButton } from './Lobby';
 import { DotWaitings } from './Utils';
 
 const SearchingWrapper = styled.div`
-  left: 50%;
-  top: 50%;
   position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 `;
 
 function SearchingOpponent({
@@ -23,13 +24,17 @@ function SearchingOpponent({
   setCurrentPage,
 }: Socket<ServerToClientEvents, ClientToServerEvents> &
   React.Dispatch<React.SetStateAction<string>>) {
-  socket.emit('searchOpponent', 84, 'sa');
+  socket.emit('userGameStatus', 'search',  (response) => {
+    if (response === 'error')
+    {
+      setCurrentPage('lobby');;
+       };})
   return (
     <SearchingWrapper>
       <DotWaitings />
       <StyledButton
         onClick={() => {
-          socket.emit('searchOpponent', 'cancel');
+          socket.emit('searchOpponent', 'cancel',);
           setCurrentPage('lobby');
         }}
       >

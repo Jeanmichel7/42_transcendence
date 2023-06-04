@@ -8,7 +8,8 @@ const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 5;
 const INITIAL_BALL_SPEED = 0.4;
-const SPEED_INCREASE = 0.1;
+const SPEED_INCREASE = 0.3;
+const BALL_DIRECTION_FACTOR = 0.02;
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -32,8 +33,10 @@ export class Game {
   racketRight: number;
   isOver: boolean;
   winner: string;
-  player1Id: string;
-  player2Id: string;
+  socketPlayer1Id: string;
+  socketPlayer2Id: string;
+  player1Username: string;
+  player2Username: string;
   player1Score: number;
   player2Score: number;
   player1ArrowUp: boolean;
@@ -43,7 +46,12 @@ export class Game {
   lastTime: number;
   id: string;
 
-  constructor(player1Id: string, player2Id: string) {
+  constructor(
+    socketPlayer1Id: string,
+    player1Username: string,
+    socketPlayer2Id: string,
+    player2Username: string,
+  ) {
     this.isOver = false;
     this.ball = {
       x: 500,
@@ -51,8 +59,10 @@ export class Game {
       vx: INITIAL_BALL_SPEED,
       vy: 0,
     };
-    this.player1Id = player1Id;
-    this.player2Id = player2Id;
+    this.socketPlayer1Id = socketPlayer1Id;
+    this.socketPlayer2Id = socketPlayer2Id;
+    this.player1Username = player1Username;
+    this.player2Username = player2Username;
     this.winner = null;
     this.lastTime = performance.now();
     this.id = Math.random().toString(36).substr(2, 9);
@@ -97,9 +107,21 @@ export class Game {
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
       if (this.player1ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
-      }
-      if (this.player1ArrowUp) {
+      } else if (this.player1ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
+      } else {
+        if (this.ball.y > this.racketLeft + RACKET_HEIGHT_10 / 2) {
+          console.log('p1 >', this.ball.vy);
+          this.ball.vy += SPEED_INCREASE / 2;
+        } else if (this.ball.y < this.racketLeft + RACKET_HEIGHT_10 / 2) {
+          console.log('p1 <', this.ball.vy);
+          this.ball.vy -= SPEED_INCREASE / 2;
+          console.log('p1 <', this.ball.vy);
+        } else if (this.ball.y === this.racketLeft + RACKET_HEIGHT_10 / 2) {
+          console.log('p1 ===', this.ball.vy);
+
+          this.ball.vy += SPEED_INCREASE / 4;
+        }
       }
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
@@ -110,9 +132,18 @@ export class Game {
       this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
       if (this.player2ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
-      }
-      if (this.player2ArrowUp) {
+      } else if (this.player2ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
+      } else {
+        if (this.ball.y > this.racketRight + RACKET_HEIGHT_10 / 2) {
+          this.ball.vy += SPEED_INCREASE / 2;
+        } else if (this.ball.y < this.racketRight + RACKET_HEIGHT_10 / 2) {
+          console.log('p2 <', this.ball.vy);
+          this.ball.vy -= SPEED_INCREASE / 2;
+          console.log('p2 <', this.ball.vy);
+        } else if (this.ball.y === this.racketRight + RACKET_HEIGHT_10 / 2) {
+          this.ball.vy += SPEED_INCREASE / 4;
+        }
       }
     }
     if (
@@ -121,7 +152,9 @@ export class Game {
     ) {
       if (this.player1Score > SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = this.player1Id;
+        this.winner = this.player1Username;
+        console.log('game over');
+        console.log(this.winner);
       } else {
         this.player1Score += 1;
         console.log(this.player1Score);
@@ -136,7 +169,9 @@ export class Game {
     ) {
       if (this.player2Score > SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = this.player2Id;
+        this.winner = this.player2Username;
+        console.log('game over');
+        console.log(this.winner);
       } else {
         this.player2Score += 1;
         this.ball.x = 500;
@@ -159,17 +194,17 @@ export class Game {
       player2Score: this.player2Score,
       gameId: this.id,
       isPlayerRight: false,
-      player1Id: this.player1Id,
-      player2Id: this.player2Id,
+      player1Username: this.player1Username,
+      player2Username: this.player2Username,
     };
   }
 
   updateGameData(clientData: clientUpdate, clientId: string) {
-    if (clientId === this.player1Id) {
+    if (clientId === this.socketPlayer1Id) {
       this.racketLeft = clientData.posRacket;
       this.player1ArrowDown = clientData.ArrowDown;
       this.player1ArrowUp = clientData.ArrowUp;
-    } else if (clientId === this.player2Id) {
+    } else if (clientId === this.socketPlayer2Id) {
       this.racketRight = clientData.posRacket;
       this.player2ArrowDown = clientData.ArrowDown;
       this.player2ArrowUp = clientData.ArrowUp;
@@ -180,8 +215,8 @@ export class Game {
 @Injectable()
 export class GameService {
   games: Map<string, Game>;
-  playerWaiting1: string;
-  playerWaiting2: string;
+  playerWaiting1: any;
+  playerWaiting2: any;
 
   constructor() {
     this.games = new Map<string, Game>();
@@ -197,10 +232,13 @@ export class GameService {
     }
     return game.getState();
   }
-  checkAlreadyInGame(playerId: string): boolean {
+  checkAlreadyInGame(username: string): boolean {
     try {
       this.games.forEach((game) => {
-        if (game.player1Id === playerId || game.player2Id === playerId) {
+        if (
+          game.player1Username === username ||
+          game.player2Username === username
+        ) {
           throw new Error('Already in game');
         }
       });
@@ -210,25 +248,38 @@ export class GameService {
     return false;
   }
 
-  addToQueue(playerId: string) {
-    if (this.checkAlreadyInGame(playerId)) return;
+  addToQueue(socketId: string, username: string) {
+    if (this.checkAlreadyInGame(username)) return;
+    console.log('add to queue username : ', username);
     if (this.playerWaiting1 === undefined) {
-      this.playerWaiting1 = playerId;
+      this.playerWaiting1 = {
+        socketId: socketId,
+        username: username,
+      };
     } else if (
-      this.playerWaiting2 === undefined &&
-      this.playerWaiting1 !== playerId
+      this.playerWaiting2 === undefined // &&
+      // this.playerWaiting1.username !== username
     ) {
-      this.playerWaiting2 = playerId;
-      const game = new Game(this.playerWaiting1, this.playerWaiting2);
+      this.playerWaiting2 = {
+        socketId: socketId,
+        username: username,
+      };
+      console.log('Game created');
+      const game = new Game(
+        this.playerWaiting1.socketId,
+        this.playerWaiting1.username,
+        this.playerWaiting2.socketId,
+        this.playerWaiting2.username,
+      );
       this.games.set(game.id, game);
       this.playerWaiting1 = undefined;
       this.playerWaiting2 = undefined;
-      return game.player1Id;
+      return game.socketPlayer1Id;
     }
   }
 
-  removeFromQueue(playerId: string) {
-    if (this.playerWaiting1 === playerId) {
+  removeFromQueue(SocketId: string) {
+    if (this.playerWaiting1 === SocketId) {
       this.playerWaiting1 = undefined;
       console.log('player1 removed from queue');
     }

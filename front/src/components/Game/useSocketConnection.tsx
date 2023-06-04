@@ -21,6 +21,7 @@ const useSocketConnection = (
       posRacket.current.right = serverData.racketLeft;
       scorePlayers.current.left = serverData.player1Score;
       scorePlayers.current.right = serverData.player2Score;
+
     } else {
       scorePlayers.current.left = serverData.player2Score;
       scorePlayers.current.right = serverData.player1Score;
@@ -42,7 +43,6 @@ const useSocketConnection = (
     }, 1000 / 60);
 
     socket.on('gameUpdate', (serverData) => {
-      console.log(data.current.winner);
       data.current = normalizeGameData(serverData);
     });
 

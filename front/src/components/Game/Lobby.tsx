@@ -12,12 +12,14 @@ export const StyledButton = styled.button`
   &:hover {
     background-color: grey;
   }
-  transform: translate(-50%, -50%);
 `;
 
 const ButtonWrapper = styled.div`
-  left: 50%;
-  top: 50%;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
 `;
 

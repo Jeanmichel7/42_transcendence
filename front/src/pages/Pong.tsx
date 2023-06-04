@@ -13,7 +13,7 @@ import {
   SocketInterface,
 } from '../components/Game/Interface';
 import { useSelector, useDispatch } from 'react-redux'
-
+import {Overlay} from '../components/Game/Overlay';
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
@@ -25,7 +25,9 @@ export const GROUND_MAX_SIZE = 1000;
 const INITIAL_BALL_SPEED = 0.4;
 // POSITION_THRESHOLD value for correction of ball position with server state
 const POSITION_THRESHOLD = 100;
-const SPEED_THRESHOLD = 1;
+const SPEED_INCREASE = 0.3;
+const BALL_DIRECTION_FACTOR = 0.02;
+
 
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
@@ -145,12 +147,12 @@ function Game({
       if (keyStateRef.current['ArrowDown']) {
         posRacket.current.left =
           posRacket.current.left < 1000 - RACKET_HEIGHT_10
-            ? posRacket.current.left + 10
+            ? posRacket.current.left + 20
             : posRacket.current.left;
       } else if (keyStateRef.current['ArrowUp']) {
         posRacket.current.left =
           posRacket.current.left > 0
-            ? posRacket.current.left - 10
+            ? posRacket.current.left - 20
             : posRacket.current.left;
       }
       setBall((oldBall) => {
@@ -185,6 +187,27 @@ function Game({
         ) {
           newBall.vx = -newBall.vx;
           newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
+          if (keyStateRef.current.ArrowDown) {
+           newBall.vy += SPEED_INCREASE; 
+          }
+          else if (keyStateRef.current.ArrowUp) {
+            newBall.vy -= SPEED_INCREASE;
+          } else {
+            if (newBall.y > posRacket.current.left + RACKET_HEIGHT_10 / 2) {
+              newBall.vy += SPEED_INCREASE / 2;
+            } else if  (newBall.y < posRacket.current.left + RACKET_HEIGHT_10 / 2)
+              {
+                console.log('test');
+                console.log('newBall.vy:', newBall.vy);
+                console.log('RACKET_HEIGHT_10:', RACKET_HEIGHT_10);
+                console.log('posRacket.current.left:', posRacket.current.left);
+                newBall.vy -= SPEED_INCREASE / 2;
+                console.log('newBall.vy2:', newBall.vy);
+              }
+              else if (newBall.y === posRacket.current.left + RACKET_HEIGHT_10 / 2) {
+                newBall.vy += SPEED_INCREASE / 4;
+            }
+          }
         } else if (
           oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
           oldBall.y > posRacket.current.right &&
@@ -192,7 +215,24 @@ function Game({
         ) {
           newBall.vx = -newBall.vx;
           newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
+          if (keyStateRef.current.ArrowDown) {
+            newBall.vy += SPEED_INCREASE; 
+           }
+            else if (keyStateRef.current.ArrowUp) {
+              newBall.vy -= SPEED_INCREASE;
+            } else {
+              if (newBall.y > posRacket.current.right + RACKET_HEIGHT_10 / 2) {
+                newBall.vy += SPEED_INCREASE / 2;
+              }
+              else if (newBall.y < posRacket.current.right + RACKET_HEIGHT_10 / 2) {
+                newBall.vy -= SPEED_INCREASE / 2;
+              }
+              else if (newBall.y === posRacket.current.right + RACKET_HEIGHT_10 / 2) {
+                newBall.vy += SPEED_INCREASE / 4;
+
+            }
         }
+      }
         newBall.x += newBall.vx * deltaTime;
         newBall.y += newBall.vy * deltaTime;
         //console.log(gameData.current.ball);
@@ -200,14 +240,14 @@ function Game({
 
         if (
           Math.sign(newBall.vx) === Math.sign(gameData.current.ball?.vx) ||
-          newBall.vx === 0
+          newBall.vx === 0 || gameData.current.ball?.vx === 0
         ) {
           newBall.vx = gameData.current.ball?.vx;
         }
 
         if (
           Math.sign(newBall.vy) === Math.sign(gameData.current.ball?.vy) ||
-          newBall.vy === 0
+          newBall.vy === 0 || gameData.current.ball?.vy === 0
         ) {
           newBall.vy = gameData.current.ball?.vy;
         }
@@ -228,17 +268,14 @@ function Game({
         animationFrameId = requestAnimationFrame(upLoop);
       } else {
         lastGameInfo.current.winnerName = gameData.current.winner;
-        console.log(gameData.current.winner);
-        console.log(gameData.current.player1Id);
-        console.log(gameData.current.isPlayerRight === true);
         if (gameData.current.isPlayerRight === true) {
-          if (gameData.current.winner === gameData.current.player1Id) {
+          if (gameData.current.winner === gameData.current.player1Username) {
             lastGameInfo.current.win = true;
           } else {
             lastGameInfo.current.win = false;
           }
         } else {
-          if (gameData.current.winner === gameData.current.player1Id) {
+          if (gameData.current.winner === gameData.current.player1Username) {
             lastGameInfo.current.win = false;
           } else {
             lastGameInfo.current.win = true;
@@ -292,12 +329,14 @@ function Game({
 
 function Pong() {
   const [socket, setSocket] = useState({});
-  const [connectStatus, setConnectStatus] = useState('connecting');
+  const [connectStatus, setConnectStatus] = useState('disconnected');
   const [currentPage, setCurrentPage] = useState('lobby');
   const userData: any = useSelector((state: any) => state.user.userData);
   const lastGameInfo = useRef({} as any);
   useEffect(() => {
-    const socket = io('http://localhost:3000/game');
+    const socket = io('http://localhost:3000/game', {
+      withCredentials: true,
+    });
     setSocket(socket);
 
     socket.on('connect', () => {
@@ -310,8 +349,13 @@ function Pong() {
       console.log('ERROR SOCKET DISCONNECTED');
     });
 
-    socket.on('searchOpponent', (message) => {
-      setCurrentPage('game');
+    socket.on('userGameStatus', (message) => {
+      if (message === 'found') {
+        setCurrentPage('game');
+      }
+      if (message === 'alreadyInGame') {
+        setCurrentPage('game');
+      }
     });
     return () => {
       socket.disconnect();
