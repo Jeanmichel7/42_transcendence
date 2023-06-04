@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { AccountProps } from './AccountProfile';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../store/userSlice';
+import { ApiErrorResponse, ApiLogin2FACode, UserInterface } from '../../types';
 
 import { Active2FA, Desactive2FA, check2FACode } from '../../api/auth';
 import { patchUserAccount } from '../../api/user';
@@ -10,72 +11,83 @@ import Input from '@mui/material/Input';
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 import SendIcon from '@mui/icons-material/Send';
-import { Button, Dialog, FormControl, FormHelperText, Switch, TextField } from '@mui/material';
+import { Button, Dialog, DialogProps, FormControl, FormHelperText, Switch, TextField } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TransitionProps } from '@mui/material/transitions';
 import Slide from '@mui/material/Slide';
+import { RootState } from '../../store';
 
 
 interface ItemProps {
   keyName: string;
   value: string | number | boolean;
-  setUserProfile: (user: any) => any;
+  setStateSnackBar: (state: boolean) => void;
+  setSnackBarMsg: (msg: string) => void;
+  // setUserProfile: (user: any) => any;
 }
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement<DialogProps, typeof Dialog>;
   },
   ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AccountItem({ keyName, value, setUserProfile }: ItemProps) {
+
+
+
+
+
+export default function AccountItem({ keyName, value, setStateSnackBar, setSnackBarMsg }: ItemProps) {
+  const dispatch = useDispatch();
+
   // console.log(keyName, value)
   const [edit, setEdit] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number | boolean>(value);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-  const [QRCode, setQRCode] = useState<string>('');
+  const [error, setError] = useState<string>();
+  const [QRCode, setQRCode] = useState<string>();
   // const [validCode, setValidCode] = useState<boolean>(false);
   const [userCode, setUserCode] = useState<string>('');
   const [error2FA, setError2FA] = useState<boolean>(false);
 
-  const userData: any = useSelector((state: any) => state.user.userData);
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
 
-
-  async function handleClose2FA() {
-    const res = await check2FACode(userCode, userData.id);
-    if (res.error) {
+  async function handleClose2FA(): Promise<void> {
+    const res: ApiLogin2FACode | ApiErrorResponse = await check2FACode(userCode, userData.id);
+    if ('error' in res) {
       setError2FA(true);
     } else {
       setError2FA(false);
       setQRCode('');
       setUserCode('');
+      setSnackBarMsg('2FA actived!');
       // setValidCode(false);
     }
   }
 
-  async function handleForm() {
+  async function handleForm(): Promise<void> {
     setLoading(true);
+    setStateSnackBar(true);
     await new Promise((r) => setTimeout(r, 300));
-    const res = await patchUserAccount({
-      [keyName]: inputValue,
-    });
-    if (res.error) {
-      setError(res.message);
+
+    const formData: FormData = new FormData();
+    formData.append(keyName, inputValue as string);
+    const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
+    if ('error' in updatedUser) {
+      setError(updatedUser.message);
       setInputValue(value);
+      setSnackBarMsg('Error update: ' + updatedUser.message);
     } else {
-      setUserProfile((prevUser: AccountProps) => ({
-        ...prevUser,
-        [keyName]: inputValue,
-      }));
-      setError(false);
+      dispatch(setUser({ ...userData, [keyName]: inputValue }));
+      setError('');
       setEdit(false);
+      setSnackBarMsg('Updated!');
     }
     setLoading(false);
   }
@@ -101,21 +113,22 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
 
 
   async function handleChange2FA() {
+    setStateSnackBar(true);
     if (inputValue) {
       // disable 2FA
       setInputValue(false);
-      const res = await Desactive2FA();
-      if (res.error) {
-        // console.log('error : ', res);
+      const res: UserInterface | ApiErrorResponse = await Desactive2FA();
+      if ('error' in res) {
+        setSnackBarMsg('Error update: ' + res.message);
       } else {
         setInputValue(false);
         setQRCode('');
       }
     } else {
       // enable 2FA
-      const res = await Active2FA();
-      if (res.error) {
-        // console.log('error : ', res);
+      const res: string | ApiErrorResponse = await Active2FA();
+      if (typeof res === 'object' && 'error' in res) {
+        setSnackBarMsg('Error update: ' + res.message);
       } else {
         setQRCode(res);
         setInputValue(true);
@@ -143,20 +156,20 @@ export default function AccountItem({ keyName, value, setUserProfile }: ItemProp
         </> 
         :
         <FormControl variant="standard" className='w-full'>
-          {/* <InputLabel htmlFor="component-helper">Name</InputLabel> */}
           <Input
-            id="component-helper"
-            aria-describedby="component-helper-text"
+            id={keyName + '_id'}
+            aria-describedby={ keyName + '_text'}
             className="w-full"
             defaultValue={value}
             onChange={(e) => { setInputValue(e.target.value); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleForm(); }}
             autoFocus
           />
           <FormHelperText
-            id="component-helper-text"
+            id={ keyName + '_text'}
             color="error"
             sx={{ color: 'red' }}
-            error={error ? true : false}
+            error={error != '' ? true : false}
           >
             {error}
           </FormHelperText>

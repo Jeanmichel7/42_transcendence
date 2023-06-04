@@ -1,53 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserAccount } from '../api/user';
 import AccountProfile from '../components/Account/AccountProfile';
-import AccountGameHistory from '../components/Account/AccountGameHistory';
 import ProfileFriends from '../components/Profile/ProfileFriends';
+import HistoryGame from '../components/Profile/HistoryGame';
+import { setError, setUser } from '../store/userSlice';
+import { ApiErrorResponse, UserInterface } from '../types';
+import { RootState } from '../store';
 
-export interface AccountProps {
-  login: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  description: string;
-  is2FAEnabled: boolean;
-  avatar: string;
-  status: string;
-}
 export default function Account() {
-  const [user, setUserProfile] = useState<AccountProps>({
-    login: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    description: '',
-    is2FAEnabled: false,
-    avatar: '',
-    status: '',
-  });
+  const dispatch = useDispatch();
+  const { userData, error } = useSelector((state: RootState) => state.user);
   
-  async function fetchAndSetUserProfile() {
-    const res: any = await fetchUserAccount();
-    if (res.error) {
-      // console.log(res);
-    } else
-      setUserProfile(res);
-  }
-
   useEffect(() => {
-    fetchAndSetUserProfile();
-  }, []);
-
-  // useEffect(() => {
-  //   console.log(user)
-  // }, [user]);
-
-
+    async function fetchAndSetUserAccount(): Promise<void> {
+      const fetchedUser: UserInterface | ApiErrorResponse = await fetchUserAccount();
+      if ('error' in fetchedUser)
+        dispatch(setError(fetchedUser));
+      else
+        dispatch(setUser(fetchedUser));
+    }
+    fetchAndSetUserAccount();
+  }, [dispatch]);
+  
+  if (error) {
+    return <div>Une erreur s'est produite: {error.message}</div>;
+  }
   return (
     <>
-      <AccountProfile user={user} setUserProfile={setUserProfile}/>
-      <ProfileFriends user={user}/>
-      <AccountGameHistory />
+      {userData && userData.id !== -1 &&
+        <>
+          <AccountProfile user={userData} />
+          <ProfileFriends user={userData} />
+          <HistoryGame user={userData} />
+        </>
+      }
     </>
   );
 }

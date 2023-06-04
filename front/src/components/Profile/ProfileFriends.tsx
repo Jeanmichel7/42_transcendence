@@ -11,6 +11,7 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
+import { UserInterface } from '../../types';
 
 export interface AccountProps {
   id: number;
@@ -21,7 +22,7 @@ export interface AccountProps {
   description: string;
   is2FAEnabled: boolean;
   avatar: string;
-  status: string;
+  status: 'online' | 'offline' | 'absent' | 'in game',
 }
 
 export function FriendCard({
@@ -38,6 +39,7 @@ export function FriendCard({
   avatar,
   status,
   email,
+  is2FAEnabled,
 }: AccountProps & { actualUserLogin: string } & { setFriends: any } & { state: any } & { setState: any } & { setSnackBarMsg: any }) {
 
   const userData: any = useSelector((dataState: any) => dataState.user.userData);
@@ -66,6 +68,7 @@ export function FriendCard({
         status: status,
         avatar: avatar,
         description: description,
+        is2FAEnabled: is2FAEnabled,
       }));
       if (userData.login == actualUserLogin) setFriends((prev: any) => [...prev, res]);
       setSnackBarMsg('Friend added');
@@ -102,6 +105,7 @@ export function FriendCard({
         status: status,
         avatar: avatar,
         description: description,
+        is2FAEnabled: is2FAEnabled,
       }));
       if (userData.login == actualUserLogin)
         setFriends((prev: any) => prev.filter((friend: any) => friend.id !== userIdToBlock));
@@ -225,7 +229,7 @@ export function FriendCard({
 
 
 
-export default function ProfileFriends({ user }: any) {
+export default function ProfileFriends({ user }: { user: UserInterface }) {
   // const actuelUser: any = useSelector((state: any) => state.user.userData);
   const [friends, setFriends] = useState<AccountProps[]>([]);
   const [snackBarMsg, setSnackBarMsg] = React.useState('Friend deleted');

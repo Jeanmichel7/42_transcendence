@@ -110,7 +110,7 @@ export class AuthController {
         },
       });
     } else {
-      res.status(200).send({ is2FAactived: false });
+      res.status(200).send({ is2FAactived: false, user: null });
     }
   }
 

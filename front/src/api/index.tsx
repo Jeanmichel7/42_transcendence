@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ApiErrorResponse } from '../types';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000',
@@ -14,5 +15,13 @@ const apiAvatar = axios.create({
   method: 'HEAD',
 });
 
+export const networkErrorResponse: ApiErrorResponse = {
+  status: 500,
+  error: 'Network Error',
+  message: 'Failed to connect. Please check your internet connection.',
+};
+
 export default api;
 export { apiAvatar };
+
+
