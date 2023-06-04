@@ -81,11 +81,13 @@ export const userSlice = createSlice({
       state.userData.friends = action.payload;
     },
     reduxAddFriends: (state, action: PayloadAction<UserInterface>) => {
+      console.log('action.payload add frinds : ', action.payload)
       state.userData.friends = [...state.userData.friends, action.payload];
       state.userData.userBlocked = state.userData.userBlocked
         .filter((userBlocked: UserInterface) => userBlocked.id !== action.payload.id);
     },
     reduxRemoveFriends: (state, action: PayloadAction<number>) => {
+      console.log('action.payload remove friends: ', action.payload)
       state.userData.friends = state.userData.friends.filter((friend: UserInterface) => friend.id !== action.payload);
     },
 

@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
-import {  patchUserAccount } from '../../api/user';
-import AccountItem from './AccountItem';
-import Box from '@mui/material/Box';
-import { Alert, Button, Snackbar } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import React, { useState, createRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../store/userSlice';
+import { RootState } from '../../store';
 
+import AccountItem from './AccountItem';
+
+import {  patchUserAccount } from '../../api/user';
 import { UserInterface, ApiErrorResponse } from '../../types';
 
-export default function AccountProfile( { user }: { user: UserInterface, }) {
-  // console.log('user : ', user);
-  const [stateSnackBar, setStateSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = React.useState<string>();
+import Box from '@mui/material/Box';
+import { Alert, Button, Snackbar } from '@mui/material';
 
+
+export default function AccountProfile() {
+  // console.log('user : ', user);
+  const { userData } = useSelector((state: RootState) => state.user);
+  const [stateSnackBar, setStateSnackBar] = useState<boolean>(false);
+  const [snackBarMsg, setSnackBarMsg] = useState<string>();
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
-  const fileInputRef = React.createRef<HTMLInputElement>();
+
+  const fileInputRef = createRef<HTMLInputElement>();
   const dispatch = useDispatch();
 
   const handleFileUpload = async () => {
@@ -28,7 +33,7 @@ export default function AccountProfile( { user }: { user: UserInterface, }) {
     if ('error' in updatedUser) {
       setSnackBarMsg('Error update: ' + updatedUser.message);
     } else {
-      dispatch(setUser({ ...user, avatar: updatedUser.avatar }));
+      dispatch(setUser({ ...userData, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
       setSnackBarMsg('Updated!');
     }
@@ -48,9 +53,9 @@ export default function AccountProfile( { user }: { user: UserInterface, }) {
 
       <Box className="flex justify-between" >
         <div className="w-1/4">
-          { user && user.avatar && 
+          { userData && userData.avatar && 
           <img
-            src={'http://localhost:3000/avatars/' + user.avatar}
+            src={'http://localhost:3000/avatars/' + userData.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
@@ -96,7 +101,7 @@ export default function AccountProfile( { user }: { user: UserInterface, }) {
             </div>
           }
           <p className='mt-5 font-bold'> Description : </p>
-          <p className='mt-1'> {user.description ? user.description : 'No description'} </p>
+          <p className='mt-1'> {userData.description ? userData.description : 'No description'} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -104,28 +109,28 @@ export default function AccountProfile( { user }: { user: UserInterface, }) {
 
             <AccountItem
               keyName="login"
-              value={user.login}
+              value={userData.login}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="email"
-              value={user.email}
+              value={userData.email}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="firstName"
-              value={user.firstName}
+              value={userData.firstName}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="lastName"
-              value={user.lastName}
+              value={userData.lastName}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />
@@ -139,14 +144,14 @@ export default function AccountProfile( { user }: { user: UserInterface, }) {
 
             <AccountItem
               keyName="description"
-              value={user.description}
+              value={userData.description}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="Active 2FA"
-              value={user.is2FAEnabled}
+              value={userData.is2FAEnabled}
               setStateSnackBar={setStateSnackBar}
               setSnackBarMsg={setSnackBarMsg}
             />

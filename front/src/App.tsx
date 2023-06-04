@@ -30,7 +30,7 @@ function App() {
       }
     };
     checkAuth();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="flex flex-col h-screen min-h-md ">

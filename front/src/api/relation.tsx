@@ -1,8 +1,11 @@
-import api from './index';
+import { AxiosError } from 'axios';
+import api, { networkErrorResponse } from './index';
+import { ApiErrorResponse, UserInterface } from '../types';
 
 export async function getFriends() {
   try {
     const response = await api.get('/relations/friends');
+    console.log('response gerFriends : ', response);
     if (response.status === 200) {
       return response.data;
     }
@@ -12,16 +15,24 @@ export async function getFriends() {
   }
 }
 
-export async function getFriendProfile(login: string) {
+export async function getFriendProfile(login: string):
+Promise< ApiErrorResponse | UserInterface[] > {
   try {
-    const response = await api.get('/relations/profilefriends/' + login );
+    const response = await api.get<UserInterface[]>('/relations/profilefriends/' + login );
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get friend profile');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to get friend profile: ' + e);
   }
+  throw new Error('Unexpected error');
 }
 
 export async function deleteFriend(userIdToRemove: number) {

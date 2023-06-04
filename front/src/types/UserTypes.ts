@@ -1,6 +1,6 @@
 
 export interface UserInterface {
-  id: number;
+  id: number,
   login: string,
   email: string,
   firstName: string,
@@ -13,3 +13,4 @@ export interface UserInterface {
   role?: 'user' | 'admin',
   is2FAEnabled: boolean,
 }
+
