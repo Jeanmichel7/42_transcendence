@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
@@ -15,39 +15,44 @@ import {
   setUser,
 } from './store/userSlice';
 import { ApiErrorResponse, UserInterface } from './types';
+import { useNavigate } from 'react-router-dom';
+import { ReduxActionInterface } from './types/utilsTypes';
+
+
 
 function App() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const fetchData = useCallback( async function<T extends UserInterface | UserInterface[] >(
+    apiFunction : () => Promise< T | ApiErrorResponse >,
+    action: ((payload: T ) => ReduxActionInterface),
+  ): Promise<void> {
+    const result = await apiFunction();
+    if ('error' in result) {
+      console.log('error: ', result);
+    } else {
+      dispatch(action(result));
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
-      if (isAuth === true) {
+      if (typeof isAuth === 'boolean' && isAuth === true) {
         dispatch(setLogged(true));
 
-        const data: UserInterface | ApiErrorResponse = await getUserData();
-        if ('error' in data)
-          console.log('data : ', data);
-        else
-          dispatch(setUser(data));
-        
-        const friends: UserInterface[] | ApiErrorResponse = await getFriends();
-        if ('error' in friends)
-          console.log('friends : ', friends);
-        else
-          dispatch(reduxSetFriends(friends));
-        
-        const userBlocked: UserInterface[] | ApiErrorResponse = await getBlockedUsers();
-        if ('error' in userBlocked)
-          console.log('userBlocked : ', userBlocked);
-        else
-          dispatch(reduxSetUserBlocked(userBlocked));
+        await fetchData(getUserData, setUser);
+        await fetchData(getFriends, reduxSetFriends);
+        await fetchData(getBlockedUsers, reduxSetUserBlocked);
 
       } else {
         dispatch(setLogged(false));
+        navigate('/');
       }
     };
     checkAuth();
-  }, [dispatch]);
+  }, [dispatch, navigate, fetchData]);
 
   return (
     <div className="flex flex-col h-screen min-h-md ">

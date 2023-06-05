@@ -43,16 +43,13 @@ function Chat() {
       </div>
 
       <div className="w-3/4 h-full">
-      {
-        serviceToCall === 'chat' &&
+      { serviceToCall === 'chat' &&
         <Conversation {...currentChatUser} />
       }
-      {
-        serviceToCall === 'addFriends' &&
+      { serviceToCall === 'addFriends' &&
         <AddFriends />
       }
       </div>
-
     </div>
   );
 }

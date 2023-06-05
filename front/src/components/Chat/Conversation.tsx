@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { sendMessage, getOldMessages } from '../../api/chat';
 import { BiPaperPlane } from 'react-icons/bi';
 import { io } from 'socket.io-client';
-import { UserInterface } from '../../types';
+import { ApiErrorResponse, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { MessageInterface } from '../../types/ChatTypes';
 
@@ -11,17 +11,21 @@ import { MessageInterface } from '../../types/ChatTypes';
 const Conversation = (userSelected: UserInterface) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
 
-  const [statusSendMsg, setStatusSendMsg] = useState('');
+  const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
-  const [text, setText] = useState('');
-  const [rows, setRows] = useState(1);
+  const [text, setText] = useState<string>('');
+  const [rows, setRows] = useState<number>(1);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const ref = useRef(document.createElement('div'));
 
-  const joinRoom = () => {
+
+  // get old messages en fct de l'user selectionne
+  useEffect(() => {
+    if (userSelected.id == -1) return;
+
     // console.log('join room : ', userData);
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
@@ -41,19 +45,21 @@ const Conversation = (userSelected: UserInterface) => {
         message,
       ]);
     });
-  };
 
-  // get old messages en fct de l'user selectionne
-  useEffect(() => {
-    if (userSelected.id == -1) return;
-    joinRoom();
+    
     async function fetchOldMessages() {
-      const res = await getOldMessages(userSelected.id);
-      console.log('res old messages : ', res);
-      setMessages(res);
+      const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id);
+      if ('error' in allMessages)
+        console.log(allMessages);
+      else
+        setMessages(allMessages);
     }
     fetchOldMessages();
-  }, [userSelected.id]);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userData.id, userSelected.id]);
 
 
   // set approximatif de la hauteur du textarea
@@ -83,35 +89,37 @@ const Conversation = (userSelected: UserInterface) => {
   const handleSubmit = async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setStatusSendMsg('pending');
-    const res = await sendMessage(
-      text,
-      userSelected.id,
-    );
-    if (!res.status)
-      setStatusSendMsg('');
+    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, userSelected.id);
+    if ('error' in newMessage)
+      setStatusSendMsg(newMessage.message);
     else
-      setStatusSendMsg(res.data.message);
+      setStatusSendMsg('');
     setText('');
   };
 
 
-  function getTimeSince(time: Date) {
+  function getTimeSince(time: Date): string {
     const now = new Date();
     const dataTime = new Date(time);
     const diff = now.getTime() - dataTime.getTime();
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
+    let result = '';
 
-    if (hours > 24) {
-      return dataTime.toLocaleDateString();
-    } else if (hours >= 1) {
-      return `${hours}h`;
-    } else if (minutes >= 1) {
-      return `${minutes}m`;
-    } else {
-      return `${seconds}s`;
+    if (hours > 24)
+      result += 'Le ' + dataTime.toLocaleDateString();
+    else {
+      result += 'Il y a ';
+      if (hours >= 1) {
+        result += `${hours}h`;
+      } else if (minutes >= 1) {
+        result += `${minutes}m`;
+      } else {
+        result += `${seconds}s`;
+      }
     }
+    return result;
   }
 
 
@@ -150,7 +158,7 @@ const Conversation = (userSelected: UserInterface) => {
               <div className=''>
                 <div className='font-semibold'>{message.ownerUser.login}
                   <span className='text-xs text-gray-500 font-normal ml-2'> 
-                    { 'Il y a ' + getTimeSince(message.createdAt) } 
+                    { getTimeSince(message.createdAt) } 
                   </span>
                 </div>
                 <div className=''>{message.text}</div>

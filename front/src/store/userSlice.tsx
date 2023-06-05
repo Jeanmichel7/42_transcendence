@@ -16,6 +16,36 @@ export interface UserState {
 //   },
 // );
 
+const addFriend = (state: UserState, user: UserInterface) => {
+  if (state.userData.friends === undefined)
+    state.userData.friends = [user];
+  else
+    state.userData.friends = [...state.userData.friends, user];
+};
+
+const removeFriend = (state: UserState, user: UserInterface) => {
+  if (state.userData.friends === undefined)
+    return;
+  state.userData.friends = state.userData.friends
+    .filter((friend: UserInterface) => friend.id !== user.id);
+};
+
+const addUserBlocked = (state: UserState, user: UserInterface) => {
+  if (state.userData.userBlocked === undefined)
+    state.userData.userBlocked = [user];
+  else
+    state.userData.userBlocked = [...state.userData.userBlocked, user];
+};
+
+const removeUserBlocked = (state: UserState, user: UserInterface) => {
+  if (state.userData.userBlocked === undefined)
+    return;
+  state.userData.userBlocked = state.userData.userBlocked
+    .filter((userBlocked: UserInterface) => userBlocked.id !== user.id);
+};
+
+
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -68,7 +98,7 @@ export const userSlice = createSlice({
         lastName: '',
         status: 'offline',
         avatar: '',
-        role:'user',
+        role: 'user',
         description: '',
         is2FAEnabled: false,
         friends: [],
@@ -76,60 +106,42 @@ export const userSlice = createSlice({
       };
     },
 
-
+    // manage friends
     reduxSetFriends: (state, action: PayloadAction<UserInterface[]>) => {
       state.userData.friends = action.payload;
     },
     reduxAddFriends: (state, action: PayloadAction<UserInterface>) => {
-      console.log('action.payload add frinds : ', action.payload)
-      state.userData.friends = [...state.userData.friends, action.payload];
-      state.userData.userBlocked = state.userData.userBlocked
-        .filter((userBlocked: UserInterface) => userBlocked.id !== action.payload.id);
+      addFriend(state, action.payload);
+      removeUserBlocked(state, action.payload);
     },
-    reduxRemoveFriends: (state, action: PayloadAction<number>) => {
-      console.log('action.payload remove friends: ', action.payload)
-      state.userData.friends = state.userData.friends.filter((friend: UserInterface) => friend.id !== action.payload);
+    reduxRemoveFriends: (state, action: PayloadAction<UserInterface>) => {
+      removeFriend(state, action.payload);
     },
 
-    reduxSetUserBlocked: (state, action: PayloadAction< UserInterface[] >) => {
+    //manage user blocked
+    reduxSetUserBlocked: (state, action: PayloadAction<UserInterface[]>) => {
       state.userData.userBlocked = action.payload;
     },
-    reduxAddUserBlocked: (state, action: PayloadAction< UserInterface >) => {
-      state.userData.userBlocked = [...state.userData.userBlocked, action.payload];
-      state.userData.friends = state.userData.friends
-        .filter((friend: UserInterface) => friend.id !== action.payload.id);
+    reduxAddUserBlocked: (state, action: PayloadAction<UserInterface>) => {
+      addUserBlocked(state, action.payload);
+      removeFriend(state, action.payload);
     },
-    // reduxRemoveUserBlocked: (state, action: PayloadAction<any>) => {
-    //   state.userData.userBlocked = state.userData.userBlocked.filter((userBlocked: any) => userBlocked.id !== action.payload);
-    // },
+    reduxRemoveUserBlocked: (state, action: PayloadAction<UserInterface>) => {
+      removeUserBlocked(state, action.payload);
+    },
 
+    //manage error
     setError: (state, action: PayloadAction<ApiErrorResponse>) => {
       state.error = action.payload;
     },
   },
 
-  // extraReducers: (builder) => {
-  //   builder.addCase(fetchUser.pending, (state) => {
-  //     state.error = null;
-  //   });
-  //   builder.addCase(fetchUser.fulfilled, (state, action: PayloadAction< UserInterface | ApiErrorResponse >) => {
-  //     if ('error' in action.payload) {
-  //       state.error = action.payload;
-  //     } else {
-  //       state.userData = action.payload;
-  //       state.isLogged = true;
-  //     }
-  //   });
-  //   builder.addCase(fetchUser.rejected, (state, action: any ) => {
-  //     state.error = action.error;
-  //   });
-  // },
 });
 
-export const { 
+export const {
   setUser, setLogged, setLogout,
   reduxSetFriends, reduxAddFriends, reduxRemoveFriends,
-  reduxSetUserBlocked, reduxAddUserBlocked,
+  reduxSetUserBlocked, reduxAddUserBlocked, reduxRemoveUserBlocked,
   setError,
 } = userSlice.actions;
 

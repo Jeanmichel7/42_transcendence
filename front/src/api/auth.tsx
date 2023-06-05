@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import api, { networkErrorResponse } from './index';
 import { ApiErrorResponse, Api2FAResponse, UserInterface, ApiLogin2FACode } from '../types';
+import { AuthLogout } from '../types/AuthTypes';
 
 export async function isAuthenticated(): Promise< boolean | ApiErrorResponse > {
   try {
@@ -40,33 +41,23 @@ export async function check2FACookie(): Promise< Api2FAResponse | ApiErrorRespon
   throw new Error('Unexpected error');
 }
 
-// export async function send2FA(code: any, userId: any) {
-//   const body = {
-//     code,
-//     userId,
-//   };
-//   try {
-//     const response = await api.post('/auth/2FA', body);
-//     if (response.status === 200) {
-//       return response.data;
-//     }
-//   }
-//   catch (e: any) {
-//     return e.response.data
-//     // throw new Error('Failed to send 2FA code');
-//   }
-// }
-
-export async function logout() {
+export async function logout(): Promise < AuthLogout | ApiErrorResponse > {
   try {
-    const response = await api.get('/auth/logout');
+    const response = await api.get< AuthLogout >('/auth/logout');
     if (response.status === 200) {
       return response.data;
     }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to logout');
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError;
+    if (axiosError) {
+      if (!axiosError.response)
+        return networkErrorResponse;
+      else
+        return axiosError.response.data as ApiErrorResponse;
+    }
+    throw new Error('Failed to logout : ' + e);
   }
+  throw new Error('Unexpected error');
 }
 
 export async function Active2FA(): Promise< string | ApiErrorResponse > {

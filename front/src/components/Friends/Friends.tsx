@@ -48,7 +48,7 @@ export function FriendRow({
     if (typeof res === 'object' && 'error' in res) {
       console.log('error remove friend : ', res.error);
     } else {
-      dispatch(reduxRemoveFriends(userToRemove.id));
+      dispatch(reduxRemoveFriends(userToRemove));
 
       //return home if currentChatUser is the user removed
       if (currentChatUser.login === userToRemove.login) {
@@ -132,7 +132,9 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
 
   useEffect(() => {
     const ClickOutside = (event: MouseEvent) => {
-      // event.stopPropagation();
+      // console.log('click outside', event.target);
+      event.stopPropagation();
+      if (!ref.current) return;
       if (!ref.current.contains(event.target as Node))
         setOpen(false);
     };
@@ -142,17 +144,17 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
 
   return (
     <>
-      {userData && userData.friends &&
         <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
       hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`}
           onClick={() => setOpen(!open)}
         >
           <h2>Friends</h2>
-          <div ref={ref} className={`w-full bg-white
-          border shadow-lg text-center rounded-xl mt-5
+          { open && userData && userData.friends &&
+          <div ref={ref} className={`w-full bg-white border shadow-lg text-center rounded-xl mt-5
           ${open ? '' : 'hidden'} transition-all`}
           >
-            {userData.friends.length === 0 ? <p className="text-center">No friends yet</p>
+            {userData.friends.length === 0 ? 
+              <p className="text-center">No friends yet</p>
               :
               userData.friends.map((friend: UserInterface) => {
                 if (userData.id !== friend.id)
@@ -168,8 +170,8 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
                   );
               })}
           </div>
+          }
         </div>
-      }
     </>
   );
 }

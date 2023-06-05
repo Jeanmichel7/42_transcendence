@@ -72,19 +72,14 @@ function AddFriends() {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
 
-
-
   useEffect(() => {
     async function fetchUsers() {
       const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers();
       if ('error' in allUsers)
         console.log(allUsers);
       else {
-        console.log('allUsers : ', allUsers);
-        console.log('userData friends : ', userData.friends);
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id && !userData.friends?.find((f: UserInterface) => f.id === u.id));
-        
         setUsers(resFiltered);
       }
       setSelectedUser(null);
@@ -105,7 +100,6 @@ function AddFriends() {
     if ('error' in res)
       setSnackBarMsg('Error add friend: ' + res.message);
     else {
-      // await new Promise(() => { dispatch(reduxAddFriends(user)); }); 
       dispatch(reduxAddFriends(user));
       setSnackBarMsg('Friend added');
       setSelectedUser(null);

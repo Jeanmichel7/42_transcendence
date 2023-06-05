@@ -86,7 +86,17 @@ export default function FriendCard({
     if (typeof res === 'object' && 'error' in res) {
       setSnackBar((prev) => ({ ...prev, message: 'Error delete friends: ' + res.error }));
     } else {
-      dispatch(reduxRemoveFriends(userIdToRemove));
+      dispatch(reduxRemoveFriends({
+        id: id,
+        login: login,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        status: status,
+        avatar: avatar,
+        description: description,
+        is2FAEnabled: is2FAEnabled,
+      }));
       setSnackBar((prev) => ({ ...prev, message: 'Friend deleted' }));
       if (userData.login == actualUserLogin)
         setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
