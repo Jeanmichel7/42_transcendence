@@ -2,23 +2,30 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { sendMessage, getOldMessages } from '../../api/chat';
 import { BiPaperPlane } from 'react-icons/bi';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
+import { ApiErrorResponse, UserInterface } from '../../types';
+import { RootState } from '../../store';
+import { MessageInterface } from '../../types/ChatTypes';
 
 
-const Conversation = (userSelected: any) => {
-  const userData: any = useSelector((state: any) => state.user.userData);
+const Conversation = (userSelected: UserInterface) => {
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
 
-  const [statusSendMsg, setStatusSendMsg] = useState('');
-  const [messages, setMessages] = useState<any[]>([]);
-  const [text, setText] = useState('');
-  const [rows, setRows] = useState(1);
+  const [statusSendMsg, setStatusSendMsg] = useState<string>('');
+  const [messages, setMessages] = useState<MessageInterface[]>([]);
+  const [text, setText] = useState<string>('');
+  const [rows, setRows] = useState<number>(1);
 
-  const textareaRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const ref = useRef(document.createElement('div'));
 
-  const joinRoom = () => {
+
+  // get old messages en fct de l'user selectionne
+  useEffect(() => {
+    if (userSelected.id == -1) return;
+
     // console.log('join room : ', userData);
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
@@ -28,7 +35,7 @@ const Conversation = (userSelected: any) => {
     //connect to room
     socket.emit('joinPrivateRoom', { 
       user1Id: userData.id,
-      user2Id: userSelected.user.id,
+      user2Id: userSelected.id,
     });
 
     //listen on /message
@@ -38,18 +45,21 @@ const Conversation = (userSelected: any) => {
         message,
       ]);
     });
-  };
 
-  // get old messages en fct de l'user selectionne
-  useEffect(() => {
-    if (userSelected.user.id == -1) return;
-    joinRoom();
+    
     async function fetchOldMessages() {
-      const res = await getOldMessages(userSelected.user.id);
-      setMessages(res);
+      const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id);
+      if ('error' in allMessages)
+        console.log(allMessages);
+      else
+        setMessages(allMessages);
     }
     fetchOldMessages();
-  }, [userSelected.user.id]);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userData.id, userSelected.id]);
 
 
   // set approximatif de la hauteur du textarea
@@ -76,52 +86,52 @@ const Conversation = (userSelected: any) => {
 
 
   // send message
-  const HandleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     setStatusSendMsg('pending');
-    const res = await sendMessage(
-      text,
-      userSelected.user.id,
-    );
-    // console.log('res big data: ', res);
-    if (!res.status)
-      setStatusSendMsg('');
+    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, userSelected.id);
+    if ('error' in newMessage)
+      setStatusSendMsg(newMessage.message);
     else
-      setStatusSendMsg(res.data.message);
+      setStatusSendMsg('');
     setText('');
   };
 
 
-  function getTimeSince(time: Date) {
-    // console.log('time : ', time)
+  function getTimeSince(time: Date): string {
     const now = new Date();
     const dataTime = new Date(time);
     const diff = now.getTime() - dataTime.getTime();
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
+    let result = '';
 
-    if (hours > 24) {
-      return dataTime.toLocaleDateString();
-    } else if (hours >= 1) {
-      return `${hours}h`;
-    } else if (minutes >= 1) {
-      return `${minutes}m`;
-    } else {
-      return `${seconds}s`;
+    if (hours > 24)
+      result += 'Le ' + dataTime.toLocaleDateString();
+    else {
+      result += 'Il y a ';
+      if (hours >= 1) {
+        result += `${hours}h`;
+      } else if (minutes >= 1) {
+        result += `${minutes}m`;
+      } else {
+        result += `${seconds}s`;
+      }
     }
+    return result;
   }
 
 
   return (
-    userSelected.user.id == -1 && 
+    userSelected.id == -1 && 
     <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
       Select a user to start a conversation
     </div> 
     ||
     <div ref={ref} className="flex flex-col h-full justify-between">
       <div className="w-full text-lg text-blue text-center">
-        {userSelected.user.login}
+        {userSelected.login}
       </div>
 
       <div className="overflow-y-auto">
@@ -129,7 +139,7 @@ const Conversation = (userSelected: any) => {
 
         {/* display old messages */}
         <div className='text-lg m-1 p-2 '>
-          {messages.map((message: any, index: number) => (
+          {messages.map((message: MessageInterface, index: number) => (
             <div 
               className='w-full flex my-2' 
               key={message.id}
@@ -148,7 +158,7 @@ const Conversation = (userSelected: any) => {
               <div className=''>
                 <div className='font-semibold'>{message.ownerUser.login}
                   <span className='text-xs text-gray-500 font-normal ml-2'> 
-                    { 'Il y a ' + getTimeSince(message.createdAt) } 
+                    { getTimeSince(message.createdAt) } 
                   </span>
                 </div>
                 <div className=''>{message.text}</div>
@@ -167,15 +177,16 @@ const Conversation = (userSelected: any) => {
             rows={rows}
             value={text}
             onChange={e => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { HandleSubmit(e); } }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { handleSubmit(e); } }}
             placeholder="Enter your text here..."
             className=" w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
           ></textarea>
           <button className='flex justify-center items-center'
-            onClick={HandleSubmit}
+            onClick={(e) => handleSubmit(e)}
           >
             <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
           </button>
+
           {/* display status send message */}
           {statusSendMsg !== '' &&
             <span className={`

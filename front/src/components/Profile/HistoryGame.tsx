@@ -2,29 +2,27 @@ import { useEffect, useState } from 'react';
 
 import { getHistoryGames } from '../../api/game';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, tableCellClasses } from '@mui/material';
-
 import { styled } from '@mui/material/styles';
 
-export default function HistoryGame({ user }: any) {
-  const [games, setGames] = useState<any[]>([]);
+import { UserInterface } from '../../types';
+import { GameInterface } from '../../types/GameTypes';
 
-
+export default function HistoryGame({ user }: { user: UserInterface }) {
+  const [games, setGames] = useState<GameInterface[]>([]);
 
   useEffect(() => {
     if (typeof user === 'undefined' || !user.id)
       return;
     async function fetchAndSetFriendsProfile() {
-      const res = await getHistoryGames(user.id);
-      // console.log('res get friends profile : ', res);
-      if (res.error) {
+      const gamesFetched = await getHistoryGames(user.id);
+      if ('error' in gamesFetched) {
         // console.log(res);
       } else {
-        setGames(res);
+        setGames(gamesFetched);
       }
     }
     fetchAndSetFriendsProfile();
   }, [user]);
-
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -46,7 +44,7 @@ export default function HistoryGame({ user }: any) {
     },
   }));
 
-  const calculDuration = (dateStart: string, dateEnd: string) => {
+  const calculDuration = (dateStart: Date, dateEnd: Date) => {
     const start = new Date(dateStart);
     const end = new Date(dateEnd);
     const diff = Math.abs(end.getTime() - start.getTime());
@@ -87,8 +85,8 @@ export default function HistoryGame({ user }: any) {
                   <StyledTableCell align="right">{row.player2.login}</StyledTableCell>
                   <StyledTableCell align="right">{row.scorePlayer1}</StyledTableCell>
                   <StyledTableCell align="right">{row.scorePlayer2}</StyledTableCell>
-                  <StyledTableCell align="right">{row.status == 'finished' ? calculDuration(row.createdAt, row.finishAt) : row.status }</StyledTableCell>
-                  <StyledTableCell align="right">{row.status == 'finished' ? row.winner.login : row.status}</StyledTableCell>
+                  <StyledTableCell align="right">{row.finishAt ? calculDuration(row.createdAt, row.finishAt) : row.status }</StyledTableCell>
+                  <StyledTableCell align="right">{row.winner ? row.winner.login : row.status}</StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>

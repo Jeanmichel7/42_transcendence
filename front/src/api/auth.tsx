@@ -1,93 +1,58 @@
-import api from './index';
+import { apiRequest } from './index';
+import { ApiErrorResponse, Api2FAResponse, UserInterface, ApiLogin2FACode } from '../types';
+import { AuthLogout } from '../types/AuthTypes';
 
-export async function isAuthenticated() {
-  try {
-    const response = await api.get('/auth/isAuthenticated');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function isAuthenticated(): Promise< boolean | ApiErrorResponse > {
+  return apiRequest<boolean>(
+    'get',
+    '/auth/isAuthenticated',
+    'Failed to check authentication: ',
+  );
 }
 
-export async function check2FACookie() {
-  try {
-    const response = await api.get('/auth/check-2FA');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check  2FA ');
-  }
+export async function check2FACookie(): Promise< Api2FAResponse | ApiErrorResponse > {
+  return apiRequest<Api2FAResponse>(
+    'get',
+    '/auth/check-2FA',
+    'Failed to check 2FA cookie: ',
+  );
 }
 
-// export async function send2FA(code: any, userId: any) {
-//   const body = {
-//     code,
-//     userId,
-//   };
-//   try {
-//     const response = await api.post('/auth/2FA', body);
-//     if (response.status === 200) {
-//       return response.data;
-//     }
-//   }
-//   catch (e: any) {
-//     return e.response.data
-//     // throw new Error('Failed to send 2FA code');
-//   }
-// }
-
-export async function logout() {
-  try {
-    const response = await api.get('/auth/logout');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to logout');
-  }
+export async function logout(): Promise < AuthLogout | ApiErrorResponse > {
+  return apiRequest<AuthLogout>(
+    'get',
+    '/auth/logout',
+    'Failed to logout: ',
+  );
 }
 
-export async function Active2FA() {
-  try {
-    const response = await api.put('auth/enable2FA');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function Active2FA(): Promise< string | ApiErrorResponse > {
+  return apiRequest<string>(
+    'put',
+    '/auth/enable2FA',
+    'Failed to active 2FA: ',
+  );
 }
 
-export async function Desactive2FA() {
-  try {
-    const response = await api.put('auth/disable2fa');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function Desactive2FA(): Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'put',
+    '/auth/disable2fa',
+    'Failed to desactive 2FA: ',
+  );
 }
 
-export async function check2FACode(code: string, userId: number) {
-  try {
-    const response = await api.post('/auth/login2fa', { 
+export async function check2FACode(
+  code: string,
+  userId: number,
+): Promise< ApiLogin2FACode | ApiErrorResponse > {
+  return apiRequest<ApiLogin2FACode>(
+    'post',
+    '/auth/login2fa',
+    'Failed to check 2FA code: ',
+    {
       code: code,
       userId: userId,
-    });
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+    },
+  );
 }

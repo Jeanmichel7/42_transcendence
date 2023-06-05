@@ -17,6 +17,9 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { ApiErrorResponse, UserInterface } from '../../types';
+import { RootState } from '../../store';
+import { AuthLogout } from '../../types/AuthTypes';
 
 
 function Header() {
@@ -24,8 +27,8 @@ function Header() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   /* redux */
-  const userData: any = useSelector((state: any) => state.user.userData);
-  const userIsLogged: any = useSelector((state: any) => state.user.isLogged);
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -45,9 +48,9 @@ function Header() {
   };
 
   async function handleLogout() {
-    const res = await logout();
-    if (res.error) {
-      // console.log(res);
+    const res: AuthLogout | ApiErrorResponse = await logout();
+    if ('error' in res) {
+      console.error(res);
     } else {
       dispatch(setLogout());
       navigate('/');
@@ -213,13 +216,14 @@ function Header() {
               <>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    { userData.avatar &&
                     <Avatar alt="avatar" src={'http://localhost:3000/avatars/' + userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
                         target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
                       }}
-                    />
+                    />}
                   </IconButton>
                 </Tooltip>
                 <Menu

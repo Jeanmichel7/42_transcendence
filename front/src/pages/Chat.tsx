@@ -1,13 +1,28 @@
 import { useState } from 'react';
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 // import ChatRoom from '../components/Chat/ChatRoom';
-import Friends from '../components/Friends/Friends';
+import Friends from '../components/Chat/Friends/Friends';
 import Conversation from '../components/Chat/Conversation';
-import ButtonAddFriends, { AddFriends } from '../components/Friends/ButtonAddFriends';
+import ButtonInterfaceAddFriends from '../components/Chat/Friends/ButtonInterfaceAddFriends';
+import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
+
+import { UserInterface } from '../types';
 
 function Chat() {
-  const [currentChatUser, setCurrentChatUser] = useState({ id: -1 });
-  const [serviceToCall, setServiceToCall] = useState('chat');
+  const [serviceToCall, setServiceToCall] = useState<string>('chat');
+  const [currentChatUser, setCurrentChatUser] = useState<UserInterface>({
+    id: -1,
+    login: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    status: 'offline',
+    avatar: '',
+    description: '',
+    is2FAEnabled: false,
+    friends: [],
+    userBlocked: [],
+  });
 
   return (
     <div className="
@@ -18,7 +33,7 @@ function Chat() {
     >
       <div className="w-1/4 flex flex-col h-full">
         <ButtonNewGroup  />
-        <ButtonAddFriends 
+        <ButtonInterfaceAddFriends 
           setServiceToCall={ setServiceToCall }
         />
         <Friends
@@ -30,16 +45,13 @@ function Chat() {
       </div>
 
       <div className="w-3/4 h-full">
-      {
-        serviceToCall === 'chat' &&
-        <Conversation user={currentChatUser} />
+      { serviceToCall === 'chat' &&
+        <Conversation {...currentChatUser} />
       }
-      {
-        serviceToCall === 'addFriends' &&
-        <AddFriends />
+      { serviceToCall === 'addFriends' &&
+        <FriendsSearch />
       }
       </div>
-
     </div>
   );
 }

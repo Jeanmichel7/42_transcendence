@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
-import { getProfileByPseudo } from '../api/user';
-// import { getFriendProfile } from '../api/relation';
-import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { reduxAddFriends } from '../store/userSlice';
+import { setErrorSnackbar, setMsgSnackbar } from '../store/snackbarSlice';
+
 import ProfileFriends from '../components/Profile/ProfileFriends';
 import HistoryGame from '../components/Profile/HistoryGame';
 
-export interface AccountProps {
-  login: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  description: string;
-  is2FAEnabled: boolean;
-  avatar: string;
-  status: string;
-}
+import { getProfileByPseudo } from '../api/user';
+import { addFriend } from '../api/relation';
+
+import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
+
+
+import Box from '@mui/material/Box';
+import { Button } from '@mui/material';
 
 function Profile() {
   const { pseudo } = useParams();
-  const [user, setUserProfile] = useState<AccountProps>({
+  const { userData } = useSelector((state: RootState) => state.user);
+  const [userProfile, setUserProfile] = useState<UserInterface>({
+    id: -1,
     login: '',
     email: '',
     firstName: '',
@@ -27,34 +30,40 @@ function Profile() {
     description: '',
     is2FAEnabled: false,
     avatar: '',
-    status: '',
+    status: 'offline',
   });
-  // const [friends, setFriends] = useState<AccountProps[]>([]);
-
-  async function fetchAndSetUserProfile() {
-    if (typeof pseudo === 'undefined')
-      return;
-    const res: any = await getProfileByPseudo(pseudo);
-    if (res.error) {
-      // console.log(res);
-    } else
-      setUserProfile(res);
-    // console.log(res);
-  }
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    async function fetchAndSetUserProfile() {
+      if (typeof pseudo === 'undefined')
+        return;
+      const profilesFetched: UserInterface | ApiErrorResponse = await getProfileByPseudo(pseudo);
+      if ('error' in profilesFetched) {
+        dispatch(setErrorSnackbar('Error get profile: ' + profilesFetched.error));
+      } else
+        setUserProfile(profilesFetched);
+    }
     fetchAndSetUserProfile();
-  }, [pseudo]);
+  }, [pseudo, dispatch]);
 
+  const handleAddFriend = async () => {
+    const res: UserRelation | ApiErrorResponse = await addFriend(userProfile.id);
+    if ('error' in res) {
+      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+    } else {
+      dispatch(reduxAddFriends(userProfile));
+      dispatch(setMsgSnackbar('Friend added'));
+    }
+  };
 
   return (
-
     <>
       <Box className="flex justify-between">
         <div className="w-1/4">
-          {user.avatar &&
+          {userProfile.avatar &&
             <img
-              src={'http://localhost:3000/avatars/' + user.avatar}
+              src={'http://localhost:3000/avatars/' + userProfile.avatar}
               className="text-center mb-2 w-full rounded-[16px]"
               alt="avatar"
               onError={(e) => {
@@ -64,33 +73,44 @@ function Profile() {
               }}
             />
           }
-          <p> {user.description ? user.description : 'No description'} </p>
+          <p> {userProfile.description ? userProfile.description : 'No description'} </p>
         </div>
 
-        <div className="w-3/4 m-5 border-2px ">
-          <h2 className="text-3xl text-center mb-5">{user.firstName + ' ' + user.lastName}</h2>
+        <div className="w-3/4 m-5 border-2px">
+          <h2 className="text-3xl text-center mb-5">
+            {userProfile.firstName + ' ' + userProfile.lastName}
+          </h2>
+          { userData && userData.friends && 
+            !userData.friends.find(u => u.id === userProfile.id) &&
+            userData.id != userProfile.id &&
+            <Button variant="contained" color="primary" 
+              onClick={() => handleAddFriend()}
+              sx={{ display: 'block', margin: 'auto' }}
+            >
+              Add friend
+            </Button>
+          }
           <div className="flex justify-between">
-            <div className="w-1/4">
+            <div className="w-1/4 font-bold">
               <p className="text-xl">Pseudo</p>
               <p className="text-xl">Email</p>
               <p className="text-xl">Status</p>
             </div>
             <div className="w-3/4">
-              <p className="text-xl">{user.login}</p>
-              <p className="text-xl">{user.email}</p>
-              <p className="text-xl">{user.status}</p>
+              <p className="text-xl">{userProfile.login}</p>
+              <p className="text-xl">{userProfile.email}</p>
+              <p className="text-xl">{userProfile.status}</p>
             </div>
-
           </div>
         </div>
       </Box>
 
       <Box className="w-full">
-        <ProfileFriends user={user} />
+        <ProfileFriends user={userProfile} />
       </Box>
 
       <Box className="w-full">
-        <HistoryGame user={user} />
+        <HistoryGame user={userProfile} />
       </Box>
     </>
 

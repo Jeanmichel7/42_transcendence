@@ -1,52 +1,38 @@
-import React, { useState } from 'react';
-import {  patchUserAccount } from '../../api/user';
+import React, { useState, createRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { setUser } from '../../store/userSlice';
+import { RootState } from '../../store';
+
 import AccountItem from './AccountItem';
+
+import {  patchUserAccount } from '../../api/user';
+import { UserInterface, ApiErrorResponse } from '../../types';
+
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/userSlice';
 
-export interface AccountProps {
-  login: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  description: string;
-  is2FAEnabled: boolean;
-  avatar: string;
-  status: string;
-}
 
-export default function AccountProfile(
-  { user, setUserProfile }: { user: AccountProps, setUserProfile: (user: AccountProps) => any },
-) {
+export default function AccountProfile() {
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
-  const fileInputRef = React.createRef<HTMLInputElement>();
   const dispatch = useDispatch();
+  const fileInputRef = createRef<HTMLInputElement>();
 
   const handleFileUpload = async () => {
-    const fileInput: any = fileInputRef.current;
-    const formData = new FormData();
-    formData.append('avatar', fileInput.files[0]);
+    const fileInput: HTMLInputElement | null = fileInputRef.current;
+    const formData: FormData = new FormData();
+    formData.append('avatar', fileInput?.files?.[0] as File);
 
-
-    const res = await patchUserAccount(formData);
-    // console.log('res images : ', res);
-    if (res.error) {
-      // console.log('res error : ', res);
+    const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
+    if ('error' in updatedUser) {
+      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
     } else {
-      // console.log('res ok : ', res);
-      dispatch(setUser(res));
-      setUserProfile({ ...user, avatar: res.avatar });
+      dispatch(setUser({ ...userData, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
+      dispatch(setMsgSnackbar('Updated!'));
     }
   };
-
-  // const handleFileChange = (event: any) => {
-  //   const file = event.target.files[0];
-  //   console.log(file); // log file object pour vérifier
-  // };
-
 
   return (
     <>
@@ -54,9 +40,9 @@ export default function AccountProfile(
 
       <Box className="flex justify-between" >
         <div className="w-1/4">
-          { user.avatar && 
+          { userData && userData.avatar && 
           <img
-            src={'http://localhost:3000/avatars/' + user.avatar}
+            src={'http://localhost:3000/avatars/' + userData.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
@@ -84,7 +70,7 @@ export default function AccountProfile(
               Annuler
             </Button>
           </div>
-          {openInputAvatar &&
+          { openInputAvatar &&
             <div className="mt-5">
               <div className='flex justify-center' >
                 <input
@@ -101,9 +87,8 @@ export default function AccountProfile(
               </div>
             </div>
           }
-
           <p className='mt-5 font-bold'> Description : </p>
-          <p className='mt-1'> {user.description ? user.description : 'No description'} </p>
+          <p className='mt-1'> {userData.description ? userData.description : 'No description'} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -111,46 +96,38 @@ export default function AccountProfile(
 
             <AccountItem
               keyName="login"
-              value={user.login}
-              setUserProfile={setUserProfile}
+              value={userData.login}
             />
 
             <AccountItem
               keyName="email"
-              value={user.email}
-              setUserProfile={setUserProfile}
+              value={userData.email}
             />
 
             <AccountItem
               keyName="firstName"
-              value={user.firstName}
-              setUserProfile={setUserProfile}
+              value={userData.firstName}
             />
 
             <AccountItem
               keyName="lastName"
-              value={user.lastName}
-              setUserProfile={setUserProfile}
+              value={userData.lastName}
             />
 
             <AccountItem
               keyName="password"
               value="********"
-              setUserProfile={setUserProfile}
             />
 
             <AccountItem
               keyName="description"
-              value={user.description}
-              setUserProfile={setUserProfile}
+              value={userData.description}
             />
 
             <AccountItem
               keyName="Active 2FA"
-              value={user.is2FAEnabled}
-              setUserProfile={setUserProfile}
+              value={userData.is2FAEnabled}
             />
-
 
           </div>
         </div>
@@ -159,4 +136,3 @@ export default function AccountProfile(
 
   );
 }
-

@@ -1,63 +1,67 @@
-import api from './index';
+import { apiRequest } from './index';
+import { UserInterface, ApiErrorResponse } from '../types';
 
-export async function getUserData() {
-  try {
-    const response = await api.get('/users');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get user');
-  }
+export async function getUserData()
+: Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'get',
+    '/users',
+    'Failed to get user data: ',
+  );
 }
 
-export async function fetchUserAccount() {
-  try {
-    const response = await api.get('users/allDatas');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+// export async function fetchUserAccount(): Promise< UserInterface | ApiErrorResponse> {
+//   try {
+//     const response = await api.get< UserInterface >('users/allDatass');
+//     if (response.status === 200) {
+//       return response.data;
+//     }
+//   } catch (e: unknown) {
+//     console.log('e : ', e)
+//     if (e instanceof Error && 'response' in e) {
+//       // const errorResponse = e.response.data ;
+//       return e.response.data;
+//     }
+//     throw new Error('Failed to check auth: ' + e);
+//   }
+//   throw new Error('Unexpected error');
+// }
+
+export async function fetchUserAccount()
+: Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'get',
+    '/users/allDatas',
+    'Failed to get user data: ',
+  );
 }
 
-export async function getProfileByPseudo(pseudo: string) {
-  try {
-    const response = await api.get('users/' + pseudo + '/profile');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function getProfileByPseudo(
+  pseudo: string,
+): Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'get',
+    '/users/' + pseudo + '/profile',
+    'Failed to get profile: ',
+  );
 }
 
-export async function patchUserAccount(data: any) {
-  try {
-    const response = await api.patch('users', data);
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function patchUserAccount(
+  data: FormData,
+): Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'patch',
+    '/users',
+    'Failed to modify user: ',
+    data,
+  );
 }
 
-
-export async function getAllUsers() {
-  try {
-    const response = await api.get('users/all');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to check auth');
-  }
+export async function getAllUsers()
+: Promise< UserInterface[] | ApiErrorResponse > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/users/all',
+    'Failed to get all users: ',
+  );
 }
-

@@ -1,0 +1,179 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { reduxAddFriends, reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice';
+import { RootState } from '../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { Link } from 'react-router-dom';
+
+import { deleteFriend, apiBlockUser, addFriend } from '../../api/relation';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+
+import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Badge } from '@mui/material';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import SportsTennisIcon from '@mui/icons-material/SportsTennis';
+import AddIcon from '@mui/icons-material/Add';
+import { red } from '@mui/material/colors';
+
+export default function FriendCard({
+  actualUserLogin,
+  friend,
+  setFriends,
+}: {
+  actualUserLogin: string,
+  friend: UserInterface,
+  setFriends: React.Dispatch<React.SetStateAction<UserInterface[]>>
+}) {
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state: RootState) => state.user);
+  const descriptionParsed = friend.description ? friend.description.substring(0, 50) + '...' : 'No description';
+  const badgeColor: 'success' | 'warning' | 'error'
+  = friend.status === 'online' ? 'success' :
+    friend.status === 'absent' ? 'warning' : 'error';
+
+  const handleDefi = (userIdToDefi: number) => async () => {
+    console.log(userIdToDefi);
+  };
+
+
+  const handleAddFriend = async (userIdToAdd: number) => {
+    const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
+    if ('error' in res) {
+      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+    } else {
+      dispatch(reduxAddFriends(friend));
+      if (userData.login == actualUserLogin)
+        setFriends((prev: UserInterface[]) => [...prev, friend]);
+      dispatch(setMsgSnackbar('Friend added'));
+    }
+  };
+  
+  const handleRemoveFriend = async (userIdToRemove: number) => {
+    const res: void | ApiErrorResponse = await deleteFriend(userIdToRemove);
+    if (typeof res === 'object' && 'error' in res) {
+      dispatch(setErrorSnackbar('Error delete friends: ' + res.error));
+    } else {
+      dispatch(reduxRemoveFriends(friend));
+      dispatch(setMsgSnackbar('Friend deleted'));
+      if (userData.login == actualUserLogin)
+        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
+    }
+  };
+
+  const handleBlockUser = async (userToBlock: UserInterface) => {
+    const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
+    if ('error' in res) {
+      dispatch(setErrorSnackbar('Error block user: ' + res.error));
+    } else {
+      dispatch(setMsgSnackbar('User blocked'));
+      dispatch(reduxAddUserBlocked(userToBlock));
+      if (userData.login == actualUserLogin)
+        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userToBlock.id));
+    }
+  };
+
+
+  function isMyFriend() {
+    if (userData.login == friend.login) // if it's own profile
+      return true;
+    return userData.friends?.find((f: UserInterface) => f.id === friend.id);
+  }
+
+
+  return (
+    <Card key={friend.login} sx={{ maxWidth: 200, margin: '10px' }}>
+      <Link to={`/profile/${friend.login}`}>
+        <CardActionArea>
+          <Badge
+            color={badgeColor}
+            overlap="circular"
+            badgeContent=" "
+          >
+            <CardMedia
+              component="img"
+              height="140"
+              image={'http://localhost:3000/avatars/' + friend.avatar}
+              alt={friend.login}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              }}
+            />
+          </Badge>
+          <CardContent>
+            <Typography gutterBottom variant="h6" component="div">
+              {friend.firstName} {friend.lastName}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ height: 42 }}>
+              {friend.description ? descriptionParsed : 'No description'}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Link>
+
+
+
+      {/**
+       * Bouton action
+       **/}
+      <CardActions className='flex items-center justify-between w-full'>
+
+        <Tooltip
+          title="Defier" arrow
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 600 }}
+        >
+          <IconButton aria-label="delete friend"
+            onClick={() => handleDefi(friend.id)}
+          >
+            <SportsTennisIcon color='info' />
+          </IconButton>
+        </Tooltip>
+
+
+        { userData && userData.friends && !isMyFriend() &&
+        <Tooltip
+          title="Add Friend" arrow
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 600 }}
+        >
+            <IconButton aria-label="add friend"
+              onClick={() => handleAddFriend(friend.id)}
+            >
+              <AddIcon color='primary' />
+            </IconButton>
+
+        </Tooltip> }
+
+        {userData && userData.login == actualUserLogin &&
+          <>
+            <Tooltip
+              title="Delete friend" arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+            >
+              <IconButton aria-label="delete friend"
+                onClick={() => handleRemoveFriend(friend.id)}
+              >
+                <DeleteForeverIcon sx={{ color: red[800] }} />
+              </IconButton>
+            </Tooltip>
+
+
+            <Tooltip
+              title="Block user" arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+            >
+              <IconButton aria-label="delete friend"
+                onClick={() => handleBlockUser(friend)}
+              >
+                <RemoveCircleIcon sx={{ color: red[800] }} />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
+      </CardActions>
+    </Card>
+  );
+}

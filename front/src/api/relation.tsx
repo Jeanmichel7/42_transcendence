@@ -1,73 +1,60 @@
-import api from './index';
+import { apiRequest } from './index';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
 
-export async function getFriends() {
-  try {
-    const response = await api.get('/relations/friends');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get friends');
-  }
+export async function getFriends(): Promise< ApiErrorResponse | UserInterface[] > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/relations/friends',
+    'Failed to get friends: ',
+  );
 }
 
-export async function getFriendProfile(login: string) {
-  try {
-    const response = await api.get('/relations/profilefriends/' + login );
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get friend profile');
-  }
+export async function getFriendProfile(
+  login: string,
+): Promise< ApiErrorResponse | UserInterface[] > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/relations/profilefriends/' + login,
+    'Failed to get profile friend: ',
+  );
 }
 
-export async function deleteFriend(userIdToRemove: number) {
-  try {
-    const response = await api.delete('relations/friends/' + userIdToRemove + '/delete');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to remove friend');
-  }
+export async function getBlockedUsers()
+: Promise< ApiErrorResponse | UserInterface[] > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/relations/blocked',
+    'Failed to get blocked users: ',
+  );
 }
 
-export async function addFriend(userIdToAdd: number) {
-  try {
-    const response = await api.put('relations/friends/' + userIdToAdd + '/add');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to add friend');
-  }
+export async function deleteFriend(
+  userIdToRemove: number,
+): Promise<void | ApiErrorResponse> {
+  return apiRequest<void>(
+    'delete',
+    '/relations/friends/' + userIdToRemove + '/delete',
+    'Failed to delete user friend: ',
+  );
 }
 
-export async function getBlockedUsers() {
-  try {
-    const response = await api.get('/relations/blocked');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to get blocked users');
-  }
+export async function addFriend(
+  userIdToAdd: number,
+): Promise< UserRelation | ApiErrorResponse > {
+  return apiRequest<UserRelation>(
+    'put',
+    '/relations/friends/' + userIdToAdd + '/add',
+    'Failed to add user friend: ',
+  );
 }
 
-export async function apiBlockUser(userIdToBlock: number) {
-  try {
-    const response = await api.put('relations/friends/' + userIdToBlock + '/block');
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: any) {
-    return e.response.data;
-    // throw new Error('Failed to block user');
-  }
+
+export async function apiBlockUser(
+  userIdToBlock: UserInterface['id'],
+): Promise< UserRelation | ApiErrorResponse> {
+  return apiRequest<UserRelation>(
+    'put',
+    '/relations/friends/' + userIdToBlock + '/block',
+    'Failed to block user: ',
+  );
 }
