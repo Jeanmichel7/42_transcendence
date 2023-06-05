@@ -18,7 +18,7 @@ import { ApiErrorResponse, UserInterface } from './types';
 import { useNavigate } from 'react-router-dom';
 import { ReduxActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
-import { closeSnackbar } from './store/snackbarSlice';
+import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 
 
@@ -36,9 +36,9 @@ function App() {
     apiFunction: () => Promise<T | ApiErrorResponse>,
     action: ((payload: T) => ReduxActionInterface),
   ): Promise<void> {
-    const result = await apiFunction();
+    const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      console.log('error: ', result);
+      dispatch(setErrorSnackbar(result.error));
     } else {
       dispatch(action(result));
     }
@@ -56,7 +56,7 @@ function App() {
 
       } else {
         dispatch(setLogged(false));
-        navigate('/');
+        // navigate('/');
       }
     };
     checkAuth();
@@ -64,7 +64,6 @@ function App() {
 
   return (
     <>
-
       <div className="flex flex-col h-screen min-h-md ">
         <Header />
         <div className="relative flex-grow bg-[#eaeaff] w-full">
@@ -77,7 +76,6 @@ function App() {
         </div>
         <Footer />
       </div>
-
 
       <Snackbar
         anchorOrigin={{ 

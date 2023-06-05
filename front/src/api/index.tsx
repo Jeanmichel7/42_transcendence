@@ -35,19 +35,14 @@ export async function apiRequest<T>(
   } catch (e: unknown) {
     const axiosError = e as AxiosError;
     if (axiosError) {
-      if (!axiosError.response){
-        console.log("oui ?")  
+      if (!axiosError.response) {
         return networkErrorResponse;
-      }
-      else{
-        console.log("non ?")
+      } else {
         return axiosError.response.data as ApiErrorResponse;
       }
     }
-    console.log("et merde ?")
     throw new Error(`${error}: ${e}`);
   }
-  console.log("et merde ?")
   throw new Error('Unexpected error');
 }
 

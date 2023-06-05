@@ -2,6 +2,10 @@ import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLogout } from '../../store/userSlice';
+import { ApiErrorResponse, UserInterface } from '../../types';
+import { RootState } from '../../store';
+import { AuthLogout } from '../../types/AuthTypes';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import { logout } from '../../api/auth';
 
@@ -17,9 +21,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { ApiErrorResponse, UserInterface } from '../../types';
-import { RootState } from '../../store';
-import { AuthLogout } from '../../types/AuthTypes';
 
 
 function Header() {
@@ -50,9 +51,10 @@ function Header() {
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
     if ('error' in res) {
-      console.error(res);
+      dispatch(setErrorSnackbar('Error logout: ' + res.error));
     } else {
       dispatch(setLogout());
+      dispatch(setMsgSnackbar('Logout success'));
       navigate('/');
     }
   }

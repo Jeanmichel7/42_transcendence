@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage, getOldMessages } from '../../api/chat';
 import { BiPaperPlane } from 'react-icons/bi';
 import { io } from 'socket.io-client';
 import { ApiErrorResponse, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { MessageInterface } from '../../types/ChatTypes';
+import { setErrorSnackbar } from '../../store/snackbarSlice';
 
 
 const Conversation = (userSelected: UserInterface) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-
+  const dispatch = useDispatch();
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [text, setText] = useState<string>('');
@@ -50,7 +51,7 @@ const Conversation = (userSelected: UserInterface) => {
     async function fetchOldMessages() {
       const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id);
       if ('error' in allMessages)
-        console.log(allMessages);
+        dispatch(setErrorSnackbar('Error get old messages: ' + allMessages.error));
       else
         setMessages(allMessages);
     }
@@ -59,7 +60,7 @@ const Conversation = (userSelected: UserInterface) => {
     return () => {
       socket.disconnect();
     };
-  }, [userData.id, userSelected.id]);
+  }, [userData.id, userSelected.id, dispatch]);
 
 
   // set approximatif de la hauteur du textarea

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,8 @@ import { getBlockedUsers, getFriends } from '../api/relation';
 import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice';
 import { FormControl, InputLabel, FormHelperText, Box, OutlinedInput, Button, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ReduxActionInterface, UserInterface } from '../types';
+import { setErrorSnackbar } from '../store/snackbarSlice';
 
 function ConnectPage() {
   const navigate = useNavigate();
@@ -23,36 +25,49 @@ function ConnectPage() {
   // const userData: any = useSelector((state: any) => state.user.userData);
   const dispatch = useDispatch();
 
+  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
+    apiFunction: () => Promise<T | ApiErrorResponse>,
+    action: ((payload: T) => ReduxActionInterface),
+  ): Promise<void> {
+    const result: T | ApiErrorResponse = await apiFunction();
+    if ('error' in result) {
+      dispatch(setErrorSnackbar(result.error));
+    } else {
+      dispatch(action(result));
+    }
+  }, [dispatch]);
+  
   //save user data in redux
-  async function saveUserData() {
-    const res = await getUserData();
-    const friends = await getFriends();
-    const userBlocked = await getBlockedUsers();
-    dispatch(setUser(res));
+  const saveUserData = useCallback( async function () {
     dispatch(setLogged(true));
-    dispatch(reduxSetFriends(friends));
-    dispatch(reduxSetUserBlocked(userBlocked));
-  }
+    await fetchData(getUserData, setUser);
+    await fetchData(getFriends, reduxSetFriends);
+    await fetchData(getBlockedUsers, reduxSetUserBlocked);
+  }, [dispatch, fetchData]);
 
   //check if 2FA is activated
   useEffect(() => {
     async function fetchAndSetIs2FAactived() {
       try {
-        const res = await check2FACookie();
-        if (res.is2FAactived) {
-          setIs2FAactiv(res.is2FAactived);
-          setUserId(res.user.id);
+        const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+        if ('error' in res) {
+          dispatch(setErrorSnackbar('Error get user data: ' + res.error));
         } else {
-          await saveUserData();
-          // await new Promise(r => setTimeout(r, 10000)); wait 10s
-          navigate('/home');
+          if (res.is2FAactived) {
+            setIs2FAactiv(res.is2FAactived);
+            setUserId(res.user.id);
+          } else {
+            await saveUserData();
+            // await new Promise(r => setTimeout(r, 10000)); wait 10s
+            navigate('/home');
+          }
         }
       } catch (e) {
         console.log('Error fetching user profile:', e);
       }
     }
     fetchAndSetIs2FAactived();
-  }, []);
+  }, [dispatch, navigate, saveUserData]);
 
   //send code to server
   async function handleSendCode() {
@@ -67,14 +82,14 @@ function ConnectPage() {
         !(/^[0-9]{6}$/).test(code2FA) ? 'Code must be digits' : 'Wrong Code',
     );
 
-    const res = await check2FACode(code2FA, userId);
+    const res:  ApiLogin2FACode | ApiErrorResponse = await check2FACode(code2FA, userId);
     setLoading(false);
-    if (res.error) {
+    if ('error' in res) {
       setError(true);
+      dispatch(setErrorSnackbar('Error login: ' + res.error));
     } else {
       setError(false);
       await saveUserData();
-      // await new Promise(r => setTimeout(r, 20000)); //wait 20s
       navigate('/home');
     }
   }
