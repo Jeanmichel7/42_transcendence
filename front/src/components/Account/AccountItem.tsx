@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../store/userSlice';
+import { RootState } from '../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { ApiErrorResponse, ApiLogin2FACode, UserInterface } from '../../types';
 
 import { Active2FA, Desactive2FA, check2FACode } from '../../api/auth';
@@ -18,14 +20,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TransitionProps } from '@mui/material/transitions';
 import Slide from '@mui/material/Slide';
-import { RootState } from '../../store';
 
 
 interface ItemProps {
   keyName: string;
   value: string | number | boolean;
-  setStateSnackBar: (state: boolean) => void;
-  setSnackBarMsg: (msg: string) => void;
   // setUserProfile: (user: any) => any;
 }
 
@@ -43,7 +42,7 @@ const Transition = React.forwardRef(function Transition(
 
 
 
-export default function AccountItem({ keyName, value, setStateSnackBar, setSnackBarMsg }: ItemProps) {
+export default function AccountItem({ keyName, value }: ItemProps) {
   const dispatch = useDispatch();
 
   // console.log(keyName, value)
@@ -66,28 +65,27 @@ export default function AccountItem({ keyName, value, setStateSnackBar, setSnack
       setError2FA(false);
       setQRCode('');
       setUserCode('');
-      setSnackBarMsg('2FA actived!');
+      setMsgSnackbar('2FA actived!');
       // setValidCode(false);
     }
   }
 
   async function handleForm(): Promise<void> {
     setLoading(true);
-    setStateSnackBar(true);
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300)); // pour le style
 
     const formData: FormData = new FormData();
     formData.append(keyName, inputValue as string);
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
       setError(updatedUser.message);
+      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
       setInputValue(value);
-      setSnackBarMsg('Error update: ' + updatedUser.message);
     } else {
       dispatch(setUser({ ...userData, [keyName]: inputValue }));
       setError('');
       setEdit(false);
-      setSnackBarMsg('Updated!');
+      dispatch(setMsgSnackbar('Updated!'));
     }
     setLoading(false);
   }
@@ -113,13 +111,12 @@ export default function AccountItem({ keyName, value, setStateSnackBar, setSnack
 
 
   async function handleChange2FA() {
-    setStateSnackBar(true);
     if (inputValue) {
       // disable 2FA
       setInputValue(false);
       const res: UserInterface | ApiErrorResponse = await Desactive2FA();
       if ('error' in res) {
-        setSnackBarMsg('Error update: ' + res.message);
+        dispatch(setErrorSnackbar('Error update: ' + res.message));
       } else {
         setInputValue(false);
         setQRCode('');
@@ -128,7 +125,7 @@ export default function AccountItem({ keyName, value, setStateSnackBar, setSnack
       // enable 2FA
       const res: string | ApiErrorResponse = await Active2FA();
       if (typeof res === 'object' && 'error' in res) {
-        setSnackBarMsg('Error update: ' + res.message);
+        dispatch(setErrorSnackbar('Error update: ' + res.message));
       } else {
         setQRCode(res);
         setInputValue(true);

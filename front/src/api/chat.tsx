@@ -1,47 +1,27 @@
-import { AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types';
-import api, { networkErrorResponse } from './index';
+import { apiRequest } from './index';
 import { MessageInterface } from '../types/ChatTypes';
 
-export async function sendMessage(message: string, receiverId: number):
-Promise< MessageInterface | ApiErrorResponse > {
-  try {
-    const response = await api.post< MessageInterface >('messages/users/' + receiverId + '/send', {
-      text: message,
-    });
-    if (response.status === 200 || response.status === 201) {
-      return response.data;
-    }
-  } catch (e: unknown) {
-    const axiosError = e as AxiosError;
-    if (axiosError) {
-      if (!axiosError.response)
-        return networkErrorResponse;
-      else
-        return axiosError.response.data as ApiErrorResponse;
-    }
-    throw new Error('Failed to send message : ' + e);
-  }
-  throw new Error('Unexpected error');
+
+
+export async function sendMessage(
+  message: string,
+  receiverId: number,
+): Promise<MessageInterface | ApiErrorResponse> {
+  return apiRequest<MessageInterface>(
+    'post',
+    'messages/users/' + receiverId + '/send',
+    'Failed to send message: ',
+    { text: message },
+  );
 }
 
 export async function getOldMessages(userId: number): Promise< MessageInterface[] | ApiErrorResponse > {
-  try {
-    const response = await api.get< MessageInterface[] >('/messages/users/' + userId);
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e: unknown) {
-    const axiosError = e as AxiosError;
-    if (axiosError) {
-      if (!axiosError.response)
-        return networkErrorResponse;
-      else
-        return axiosError.response.data as ApiErrorResponse;
-    }
-    throw new Error('Failed to get all messages: ' + e);
-  }
-  throw new Error('Unexpected error');
+  return apiRequest< MessageInterface[] >(
+    'get',
+    'messages/users/' + userId,
+    'Failed to get old messages: ',
+  );
 }
 
 // export async function imgExist(url: string) {

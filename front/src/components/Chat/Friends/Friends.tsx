@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice';
-import { apiBlockUser, deleteFriend } from '../../api/relation';
+import { reduxRemoveFriends, reduxAddUserBlocked } from '../../../store/userSlice';
+import { apiBlockUser, deleteFriend } from '../../../api/relation';
 
 import { ImBlocked } from 'react-icons/im';
 import { IconButton, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { RootState } from '../../store';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+import { RootState } from '../../../store';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 
 export function FriendRow({
@@ -32,9 +33,10 @@ export function FriendRow({
     e.stopPropagation();
     const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
     if ('error' in res) {
-      // console.log('error bloc user : ', res.error);
+      dispatch(setErrorSnackbar('Error block user: ' + res.error));
     } else {
       dispatch(reduxAddUserBlocked(userToBlock));
+      dispatch(setMsgSnackbar('User blocked'));
     }
   }
 
@@ -46,9 +48,10 @@ export function FriendRow({
     e.stopPropagation();
     const res: void | ApiErrorResponse = await deleteFriend(userToRemove.id);
     if (typeof res === 'object' && 'error' in res) {
-      console.log('error remove friend : ', res.error);
+      dispatch(setErrorSnackbar('Error delete friends: ' + res.error));
     } else {
       dispatch(reduxRemoveFriends(userToRemove));
+      dispatch(setMsgSnackbar('Friend deleted'));
 
       //return home if currentChatUser is the user removed
       if (currentChatUser.login === userToRemove.login) {
@@ -64,11 +67,9 @@ export function FriendRow({
       cursor-pointer flex flex-row items-center text-left">
         <div className="flex-grow text-black m-2 p-2 flex items-center "
           onClick={() => {
-            if (currentChatUser.login !== userFriend.login) {
-              setCurrentChatUser(userFriend);
-              setOpen(false);
-              setServiceToCall('chat');
-            }
+            setCurrentChatUser(userFriend);
+            setOpen(false);
+            setServiceToCall('chat');
           }}
         >
           <img

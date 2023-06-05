@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 // import ChatRoom from '../components/Chat/ChatRoom';
-import Friends from '../components/Friends/Friends';
+import Friends from '../components/Chat/Friends/Friends';
 import Conversation from '../components/Chat/Conversation';
-import ButtonAddFriends, { AddFriends } from '../components/Friends/ButtonAddFriends';
+import ButtonInterfaceAddFriends from '../components/Chat/Friends/ButtonInterfaceAddFriends';
+import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
+
 import { UserInterface } from '../types';
 
 function Chat() {
@@ -31,7 +33,7 @@ function Chat() {
     >
       <div className="w-1/4 flex flex-col h-full">
         <ButtonNewGroup  />
-        <ButtonAddFriends 
+        <ButtonInterfaceAddFriends 
           setServiceToCall={ setServiceToCall }
         />
         <Friends
@@ -47,7 +49,7 @@ function Chat() {
         <Conversation {...currentChatUser} />
       }
       { serviceToCall === 'addFriends' &&
-        <AddFriends />
+        <FriendsSearch />
       }
       </div>
     </div>

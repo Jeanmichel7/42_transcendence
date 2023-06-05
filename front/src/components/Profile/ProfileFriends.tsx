@@ -1,24 +1,13 @@
-import { useEffect, useState, SyntheticEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { getFriendProfile } from '../../api/relation';
-import { Snackbar, Alert } from '@mui/material';
 import { ApiErrorResponse, UserInterface } from '../../types';
-import FriendCard from '../Friends/FriendsCard';
-import { SnackbarInterface } from '../../types/utilsTypes';
+import FriendCard from './FriendsCard';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar } from '../../store/snackbarSlice';
 
 export default function ProfileFriends({ user }: { user: UserInterface }) {
   const [friends, setFriends] = useState<UserInterface[]>([]);
-  const [snackBar, setSnackBar] = useState<SnackbarInterface>({
-    open: false,
-    message: '',
-    severity: 'success',
-    vertical: 'bottom',
-    horizontal: 'right',
-  });
-
-  const handleClose = (_event: SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') { return; }
-    setSnackBar({ ...snackBar, open: false });
-  };
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (typeof user === 'undefined' || !user.login)
@@ -26,41 +15,32 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
     async function fetchAndSetFriendsProfile() {
       const friendsFetched: UserInterface[] | ApiErrorResponse = await getFriendProfile(user.login);
       if ('error' in friendsFetched) {
-        console.log(friendsFetched);
+        dispatch(setErrorSnackbar('Error get friends: ' + friendsFetched.error));
       } else {
         setFriends(friendsFetched);
       }
     }
     fetchAndSetFriendsProfile();
-  }, [user]);
+  }, [user, dispatch]);
 
 
   return (
     <>
       <h2 className="text-3xl text-center mb-5">Friends</h2>
       <div className="flex items-center w-full pb-3">
-        {friends.length && friends.map((friend) => {
-          if (friend.login != user.login)
-            return (
-              <FriendCard
-                key={friend.id}
-                actualUserLogin={user.login}
-                friend={friend}
-                setFriends={setFriends}
-                setSnackBar={setSnackBar}
-                {...friend}
-              />);
-        })}
-        <Snackbar
-          anchorOrigin={{ vertical: snackBar.vertical, horizontal: snackBar.horizontal }}
-          open={snackBar.open}
-          autoHideDuration={6000}
-          onClose={handleClose}
-        >
-          <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-            {snackBar.message}
-          </Alert>
-        </Snackbar>
+        {friends.length == 0 ?
+          <p> No friends </p>
+          :
+          friends.map((friend) => {
+            if (friend.login != user.login)
+              return (
+                <FriendCard
+                  key={friend.id}
+                  actualUserLogin={user.login}
+                  friend={friend}
+                  setFriends={setFriends}
+                />);
+          })}
       </div>
     </>
   );

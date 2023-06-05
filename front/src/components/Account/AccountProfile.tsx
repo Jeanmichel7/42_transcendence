@@ -1,5 +1,6 @@
 import React, { useState, createRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { setUser } from '../../store/userSlice';
 import { RootState } from '../../store';
 
@@ -9,42 +10,28 @@ import {  patchUserAccount } from '../../api/user';
 import { UserInterface, ApiErrorResponse } from '../../types';
 
 import Box from '@mui/material/Box';
-import { Alert, Button, Snackbar } from '@mui/material';
+import { Button } from '@mui/material';
 
 
 export default function AccountProfile() {
-  // console.log('user : ', user);
-  const { userData } = useSelector((state: RootState) => state.user);
-  const [stateSnackBar, setStateSnackBar] = useState<boolean>(false);
-  const [snackBarMsg, setSnackBarMsg] = useState<string>();
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
-
-  const fileInputRef = createRef<HTMLInputElement>();
   const dispatch = useDispatch();
+  const fileInputRef = createRef<HTMLInputElement>();
 
   const handleFileUpload = async () => {
-    setStateSnackBar(true);
-
     const fileInput: HTMLInputElement | null = fileInputRef.current;
     const formData: FormData = new FormData();
     formData.append('avatar', fileInput?.files?.[0] as File);
 
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
-      setSnackBarMsg('Error update: ' + updatedUser.message);
+      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
     } else {
       dispatch(setUser({ ...userData, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
-      setSnackBarMsg('Updated!');
+      dispatch(setMsgSnackbar('Updated!'));
     }
-  };
-
-
-  const handleCloseSnackBar = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setStateSnackBar(false);
   };
 
   return (
@@ -110,66 +97,42 @@ export default function AccountProfile() {
             <AccountItem
               keyName="login"
               value={userData.login}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="email"
               value={userData.email}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="firstName"
               value={userData.firstName}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="lastName"
               value={userData.lastName}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="password"
               value="********"
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="description"
               value={userData.description}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
             <AccountItem
               keyName="Active 2FA"
               value={userData.is2FAEnabled}
-              setStateSnackBar={setStateSnackBar}
-              setSnackBarMsg={setSnackBarMsg}
             />
 
           </div>
         </div>
       </Box>
-      <Snackbar
-        open={stateSnackBar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackBar}
-      >
-        <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }}>
-          {snackBarMsg}
-        </Alert>
-      </Snackbar>
     </>
 
   );
 }
-

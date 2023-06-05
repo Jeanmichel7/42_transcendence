@@ -1,18 +1,20 @@
-import { Alert, Autocomplete, Button, Snackbar, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { getAllUsers } from '../../api/user';
-import { addFriend } from '../../api/relation';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+
+import { getAllUsers } from '../../../api/user';
+import { addFriend } from '../../../api/relation';
+
+import { reduxAddFriends } from '../../../store/userSlice';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
 
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-
-import { useDispatch, useSelector } from 'react-redux';
-import { reduxAddFriends } from '../../store/userSlice';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
-import { RootState } from '../../store';
+import { Autocomplete, Button, TextField } from '@mui/material';
 
 
 function UserCard({ user, handleAdd }: {
@@ -20,7 +22,6 @@ function UserCard({ user, handleAdd }: {
   handleAdd: (user: UserInterface | null) => void
 }) {
   return (
-    // <div className="m-2">
     <Card sx={{ width: 220, margin: 1 }}>
       <CardMedia
         sx={{ height: 140 }}
@@ -30,10 +31,10 @@ function UserCard({ user, handleAdd }: {
           src={'http://localhost:3000/avatars/' + user.avatar}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.onerror = null; 
+            target.onerror = null;
             target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
           }}
-          className="w-40 h-40 rounded-full object-cover mx-auto "
+          className="w-40 h-40 rounded-full object-cover mx-auto"
           alt="avatar"
         />
       </CardMedia>
@@ -52,7 +53,6 @@ function UserCard({ user, handleAdd }: {
         >Add</Button>
       </CardActions>
     </Card>
-    // </div>
   );
 }
 
@@ -64,11 +64,9 @@ function UserCard({ user, handleAdd }: {
 
 
 
-function AddFriends() {
-  const [users, setUsers] = React.useState< UserInterface[] >([]);
-  const [selectedUser, setSelectedUser] = useState< UserInterface | null >(null);
-  const [stateSnackBar, setStateSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = React.useState('Friend deleted');
+export default function FriendsSearch() {
+  const [users, setUsers] = React.useState<UserInterface[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
 
@@ -76,7 +74,7 @@ function AddFriends() {
     async function fetchUsers() {
       const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers();
       if ('error' in allUsers)
-        console.log(allUsers);
+        dispatch(setErrorSnackbar('Error get users: ' + allUsers.error));
       else {
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id && !userData.friends?.find((f: UserInterface) => f.id === u.id));
@@ -85,7 +83,7 @@ function AddFriends() {
       setSelectedUser(null);
     }
     fetchUsers();
-  }, [userData.id, userData.friends]);
+  }, [userData.id, userData.friends, dispatch]);
 
 
   function isMyFriend(userId: number): boolean {
@@ -95,41 +93,35 @@ function AddFriends() {
   const handleAdd = async (user: UserInterface | null) => {
     if (!user)
       return;
-    setStateSnackBar(true);
     const res: UserRelation | ApiErrorResponse = await addFriend(user.id);
     if ('error' in res)
-      setSnackBarMsg('Error add friend: ' + res.message);
+      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
     else {
       dispatch(reduxAddFriends(user));
-      setSnackBarMsg('Friend added');
+      dispatch(setMsgSnackbar('Friend added'));
       setSelectedUser(null);
     }
-  };
-
-  const handleCloseSnackBar = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') { return; }
-    setStateSnackBar(false);
   };
 
   return (
     <div className="m-5 p-5">
       {users &&
-      <Autocomplete
-        id="searchFriends"
-        options={users}
-        getOptionLabel={(option: UserInterface) => option.login}
-        style={{  }}
-        onChange={(event: React.ChangeEvent<object>, newValue: UserInterface | null) => {
-          event.stopPropagation();
-          setSelectedUser(newValue);
-        }}
-        value={selectedUser}
-        renderInput={(params) => <TextField {...params} label="Search Friends" variant="outlined" />}
-      />
+        <Autocomplete
+          id="searchFriends"
+          options={users}
+          getOptionLabel={(option: UserInterface) => option.login}
+          style={{}}
+          onChange={(event: React.ChangeEvent<object>, newValue: UserInterface | null) => {
+            event.stopPropagation();
+            setSelectedUser(newValue);
+          }}
+          value={selectedUser}
+          renderInput={(params) => <TextField {...params} label="Search Friends" variant="outlined" />}
+        />
       }
 
       <div className="flex">
-        <Button 
+        <Button
           onClick={() => handleAdd(selectedUser)}
           variant="contained"
         > Add </Button>
@@ -148,38 +140,9 @@ function AddFriends() {
                 />
               );
           })}
-          <Snackbar
-            open={ stateSnackBar }
-            autoHideDuration={6000}
-            onClose={handleCloseSnackBar}
-          >
-            <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }} >
-              {snackBarMsg}
-            </Alert>
-          </Snackbar>
-          
         </div>
       </div>
 
     </div>
   );
 }
-export { AddFriends };
-
-
-
-
-
-
-
-function ButtonAddFriends({ setServiceToCall }: { setServiceToCall: (service: string) => void }) {
-  return (
-    <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
-        hover:bg-gray-100`}
-      onClick={() => setServiceToCall('addFriends')}
-    >
-      <h2>Add Friends</h2>
-    </div>
-  );
-}
-export default ButtonAddFriends;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import SideBar from './components/Sidebar/Sidebar';
@@ -17,16 +17,24 @@ import {
 import { ApiErrorResponse, UserInterface } from './types';
 import { useNavigate } from 'react-router-dom';
 import { ReduxActionInterface } from './types/utilsTypes';
+import { Alert, Snackbar } from '@mui/material';
+import { closeSnackbar } from './store/snackbarSlice';
+import { RootState } from './store';
 
 
 
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
-  const fetchData = useCallback( async function<T extends UserInterface | UserInterface[] >(
-    apiFunction : () => Promise< T | ApiErrorResponse >,
-    action: ((payload: T ) => ReduxActionInterface),
+  const handleClose = () => {
+    dispatch(closeSnackbar());
+  };
+
+  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
+    apiFunction: () => Promise<T | ApiErrorResponse>,
+    action: ((payload: T) => ReduxActionInterface),
   ): Promise<void> {
     const result = await apiFunction();
     if ('error' in result) {
@@ -55,18 +63,40 @@ function App() {
   }, [dispatch, navigate, fetchData]);
 
   return (
-    <div className="flex flex-col h-screen min-h-md ">
-      <Header />
-      <div className="relative flex-grow bg-[#eaeaff] w-full">
-        <div className="mr-12 p-6 h-full">
-          <AppRoutes />
+    <>
+
+      <div className="flex flex-col h-screen min-h-md ">
+        <Header />
+        <div className="relative flex-grow bg-[#eaeaff] w-full">
+          <div className="mr-12 p-6 h-full">
+            <AppRoutes />
+          </div>
+          <div className="absolute right-0 top-0">
+            <SideBar />
+          </div>
         </div>
-        <div className="absolute right-0 top-0">
-          <SideBar />
-        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+
+
+      <Snackbar
+        anchorOrigin={{ 
+          vertical: snackbar.vertical,
+          horizontal: snackbar.horizontal,
+        }}
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert 
+          onClose={handleClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 export default App;
