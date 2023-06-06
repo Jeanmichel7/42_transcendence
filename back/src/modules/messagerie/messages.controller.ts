@@ -13,6 +13,7 @@ import {
   ValidationPipe,
   // UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,12 +45,21 @@ export class MessageController {
   async getMessages(
     @Req() req: RequestWithUser,
     @Param('userIdDest', ParseIntPipe) userIdDest: bigint,
+    @Query('page', ParseIntPipe) page: number,
   ): Promise<MessageBtwTwoUserInterface[]> {
-    const result: MessageBtwTwoUserInterface[] =
-      await this.MessageService.getMessagesBetweenUsers(
+    let result: MessageBtwTwoUserInterface[] = [];
+    if (page) {
+      result = await this.MessageService.getMessagesBetweenUsersPaginate(
+        req.user.id,
+        userIdDest,
+        page,
+      );
+    } else {
+      result = await this.MessageService.getMessagesBetweenUsers(
         req.user.id,
         userIdDest,
       );
+    }
     return result;
   }
 

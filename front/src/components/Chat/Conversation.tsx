@@ -16,21 +16,20 @@ import { BiPaperPlane } from 'react-icons/bi';
 import { TextareaAutosize } from '@mui/material';
 
 
-const Conversation = (userSelected: UserInterface) => {
+const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [text, setText] = useState<string>('');
+  const [pageDisplay, setPageDisplay] = useState<number>(1);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // get old messages en fct de l'user selectionne
-  useEffect(() => {
-    if (userSelected.id == -1) return;
-
-    // console.log('join room : ', userData);
+  // connect socket
+  const connectSocket = useCallback(() => {
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -50,29 +49,68 @@ const Conversation = (userSelected: UserInterface) => {
       ]);
     });
 
-    async function fetchOldMessages() {
-      const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id);
-      if ('error' in allMessages)
-        dispatch(setErrorSnackbar('Error get old messages: ' + allMessages.error));
-      else
-        setMessages(allMessages);
-    }
-    fetchOldMessages();
-
     return () => {
       socket.off('message');
       socket.disconnect();
     };
-  }, [userData.id, userSelected.id, dispatch]);
+  }, [userData.id, userSelected.id]);
 
+  // get messages
+  const fetchOldMessages = useCallback(async () => {
+    if (userSelected.id == -1) return;
+    setShouldScrollToBottom(false);
+
+    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id, pageDisplay);
+    if ('error' in allMessages)
+      dispatch(setErrorSnackbar('Error get old messages: ' + allMessages.error));
+    else {
+      //save pos scrool
+      const scrollContainer = document.querySelector('.overflow-y-auto');
+      if ( !scrollContainer ) return;
+      const oldScrollHeight = scrollContainer.scrollHeight;
+
+      const reversedMessageArray = allMessages.reverse();
+      setMessages((prev) => [...reversedMessageArray, ...prev]);
+      
+      //set pos scrool to top old messages
+      requestAnimationFrame(() => {
+        const newScrollHeight = scrollContainer.scrollHeight;
+        scrollContainer.scrollTop += newScrollHeight - oldScrollHeight;
+        setShouldScrollToBottom(true);
+      });
+    }
+  }, [dispatch, pageDisplay, userSelected.id]);
+
+
+
+  useEffect(() => {
+    connectSocket();
+  }, [connectSocket]);
+
+
+  // get old messages en fct de l'user selectionne
+  useEffect(() => {
+    fetchOldMessages();
+  }, [pageDisplay, fetchOldMessages]);
 
   // scroll to bottom
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (shouldScrollToBottom && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
-  }, [messages, text]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
+
+
+  //scrool top = fetch new page messages
+  const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+    const element = e.target as HTMLDivElement;
+    if (element.scrollTop === 0) {
+      setPageDisplay((prev) => prev + 1);
+      //display waiting message
+    }
+  };
 
   // delete message
   const handleDeleteMessage = async (id: number) => {
@@ -107,8 +145,8 @@ const Conversation = (userSelected: UserInterface) => {
     else
       setStatusSendMsg('');
     setText('');
+    setShouldScrollToBottom(true);
   };
-
 
 
   /* set text input currying + callback */
@@ -133,7 +171,7 @@ const Conversation = (userSelected: UserInterface) => {
             {userSelected.login}
           </div>
 
-          <div className="overflow-y-auto">
+          <div className="overflow-y-auto" onScroll={handleScroll}>
 
             {/* display messages */}
             <div className='text-lg m-1 p-2 '>

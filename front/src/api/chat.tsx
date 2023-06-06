@@ -16,10 +16,10 @@ export async function sendMessage(
   );
 }
 
-export async function getOldMessages(userId: number): Promise< MessageInterface[] | ApiErrorResponse > {
+export async function getOldMessages(userId: number, page: number): Promise< MessageInterface[] | ApiErrorResponse > {
   return apiRequest< MessageInterface[] >(
     'get',
-    'messages/users/' + userId,
+    'messages/users/' + userId + '?page=' + page,
     'Failed to get old messages: ',
   );
 }

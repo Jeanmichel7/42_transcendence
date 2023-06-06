@@ -15,6 +15,8 @@ import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.
 import { MessageCreatedEvent } from './event/message.event';
 import { UserInterface } from '../users/interfaces/users.interface';
 
+const limit = 20;
+
 @Injectable()
 export class MessageService {
   constructor(
@@ -82,6 +84,42 @@ export class MessageService {
         { userIdFrom, userIdTo },
       )
       .orderBy('message.createdAt', 'ASC')
+      .getMany();
+
+    const result: MessageBtwTwoUserInterface[] = messages;
+    return result;
+  }
+
+  async getMessagesBetweenUsersPaginate(
+    userIdFrom: bigint,
+    userIdTo: bigint,
+    page: number,
+  ): Promise<MessageBtwTwoUserInterface[]> {
+    const skip = (page - 1) * limit;
+
+    const messages: MessageEntity[] = await this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('message.destUser', 'destUser')
+      .select([
+        'message',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'destUser.id',
+        'destUser.firstName',
+        'destUser.lastName',
+        'destUser.login',
+      ])
+      .where(
+        '(ownerUser.id = :userIdFrom AND destUser.id = :userIdTo) OR (ownerUser.id = :userIdTo AND destUser.id = :userIdFrom)',
+        { userIdFrom, userIdTo },
+      )
+      .orderBy('message.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
       .getMany();
 
     const result: MessageBtwTwoUserInterface[] = messages;

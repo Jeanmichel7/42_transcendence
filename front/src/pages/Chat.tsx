@@ -46,7 +46,7 @@ function Chat() {
 
       <div className="w-3/4 h-full">
       { serviceToCall === 'chat' &&
-        <Conversation {...currentChatUser} />
+        <Conversation key={currentChatUser.id} userSelected={currentChatUser} />
       }
       { serviceToCall === 'addFriends' &&
         <FriendsSearch />
