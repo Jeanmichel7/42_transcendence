@@ -44,7 +44,8 @@ export async function apiDeleteMessage(messageId: number): Promise< any> {
   );
 }
 
-export async function apiEditMessage(messageId: number, message: string): Promise< MessageInterface | ApiErrorResponse> {
+export async function apiEditMessage(messageId: number, message: string)
+  : Promise< MessageInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'messages/' + messageId,

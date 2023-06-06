@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
-import { apiEditMessage, apiDeleteMessage } from '../../api/chat';
+import { apiEditMessage } from '../../api/chat';
 
 import { ApiErrorResponse } from '../../types';
 import { MessageInterface } from '../../types/ChatTypes';
@@ -17,10 +17,14 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 interface MessageItemProps {
   message: MessageInterface;
+  userDataId: number;
+  handleDeleteMessage: (id: number) => void;
 }
 
 const MessageItem: FC<MessageItemProps> = memo(({
   message,
+  userDataId,
+  handleDeleteMessage,
 }) => {
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -38,6 +42,8 @@ const MessageItem: FC<MessageItemProps> = memo(({
 
     if (hours > 24)
       result += 'Le ' + dataTime.toLocaleDateString();
+    else if (hours == 0 && minutes == 0 && seconds <= 30)
+      result += 'Now';
     else {
       result += 'Il y a ';
       if (hours >= 1) {
@@ -68,29 +74,24 @@ const MessageItem: FC<MessageItemProps> = memo(({
     }
   };
 
-  const handleDelete = (id: number) => async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-
-    const res = await apiDeleteMessage(id);
-    if (typeof res === 'object' && 'error' in res)
-      dispatch(setErrorSnackbar('Error delete message: ' + res.error));
-    else {
-      message.text = inputMessage;
-      message.updatedAt = new Date();
-      dispatch(setMsgSnackbar('Message deleted'));
-    }
+  const handleDelete = () => {
+    handleDeleteMessage(message.id);
   };
 
-  function handleCloseEdit() {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputMessage(e.target.value);
+  };
+
+  const handleCloseEdit = () => {
     setEditMessage(false);
     setInputMessage('');
-  }
+  };
 
-  const handleMouseEnter = () => () => {
+  const handleMouseEnter = () => {
     setIsHovered(true);
   };
 
-  const handleMouseLeave = () => () => {
+  const handleMouseLeave = () => {
     setIsHovered(false);
   };
 
@@ -99,8 +100,8 @@ const MessageItem: FC<MessageItemProps> = memo(({
       <div
         // ref={index === messages.length - 1 ? bottomRef : null}
         className={`w-full flex my-2 ${isHovered ? 'bg-blue-100' : ''}`}
-        onMouseEnter={handleMouseEnter()}
-        onMouseLeave={handleMouseLeave()}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/**
         * Display message
@@ -143,7 +144,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
             title="Edit message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
           >
             <IconButton onClick={() => setEditMessage(true)} color='primary'>
               <EditOutlinedIcon />
@@ -154,9 +155,9 @@ const MessageItem: FC<MessageItemProps> = memo(({
             title="Delete message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
           >
-            <IconButton onClick={handleDelete(message.id)} color='warning'>
+            <IconButton onClick={handleDelete} color='warning'>
               <CloseIcon />
             </IconButton>
           </Tooltip>
@@ -174,7 +175,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
               aria-describedby={'edit-message' + message.id + '_text'}
               className="w-full"
               defaultValue={message.text}
-              onChange={(e) => { setInputMessage(e.target.value); }}
+              onChange={handleOnChange}
               onKeyDown={handleEdit(message.id)}
               autoFocus
             />
