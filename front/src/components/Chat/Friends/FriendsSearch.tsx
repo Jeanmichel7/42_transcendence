@@ -14,7 +14,8 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Autocomplete, Button, TextField } from '@mui/material';
+import { Autocomplete, Button, CardActionArea, TextField } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 
 function UserCard({ user, handleAdd }: {
@@ -23,33 +24,44 @@ function UserCard({ user, handleAdd }: {
 }) {
   return (
     <Card sx={{ width: 220, margin: 1 }}>
-      <CardMedia
-        sx={{ height: 140 }}
-        title={`${user.login} avatar`}
-      >
-        <img
-          src={'http://localhost:3000/avatars/' + user.avatar}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-          }}
-          className="w-40 h-40 rounded-full object-cover mx-auto"
-          alt="avatar"
-        />
-      </CardMedia>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {user.login}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {user.description}
-        </Typography>
-      </CardContent>
+      <Link to={'/profile/' + user.login}>
+        <CardActionArea>
+          <CardMedia
+            title={`${user.login} avatar`}
+            sx={{ 
+              height: 140,
+              '&:hover': { boxShadow: 'md', borderColor: 'neutral.outlinedHoverBorder' },
+            }}
+          >
+            <img
+              src={'http://localhost:3000/avatars/' + user.avatar}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              }}
+              className="w-40 h-40 rounded-full object-cover mx-auto"
+              alt="avatar"
+            />
+          </CardMedia>
+
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+              {user.login}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {user.description}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Link>
+
       <CardActions>
         <Button
+          variant="outlined"
           onClick={() => handleAdd(user)}
           size="small"
+          sx={{}}
         >Add</Button>
       </CardActions>
     </Card>

@@ -1,12 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { sendMessage, getOldMessages } from '../../api/chat';
-import { BiPaperPlane } from 'react-icons/bi';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import { ApiErrorResponse, UserInterface } from '../../types';
+
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { MessageInterface } from '../../types/ChatTypes';
 import { setErrorSnackbar } from '../../store/snackbarSlice';
+
+import MessageItem from './ConversationItem';
+
+import { sendMessage, getOldMessages } from '../../api/chat';
+
+import { ApiErrorResponse, UserInterface } from '../../types';
+import { MessageInterface } from '../../types/ChatTypes';
+
+import { BiPaperPlane } from 'react-icons/bi';
 
 
 const Conversation = (userSelected: UserInterface) => {
@@ -16,12 +22,10 @@ const Conversation = (userSelected: UserInterface) => {
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [text, setText] = useState<string>('');
   const [rows, setRows] = useState<number>(1);
+  // const [hoveredMessageId, setHoveredMessageId] = useState<number>(-1);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const ref = useRef(document.createElement('div'));
-
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // get old messages en fct de l'user selectionne
   useEffect(() => {
@@ -34,7 +38,7 @@ const Conversation = (userSelected: UserInterface) => {
     });
 
     //connect to room
-    socket.emit('joinPrivateRoom', { 
+    socket.emit('joinPrivateRoom', {
       user1Id: userData.id,
       user2Id: userSelected.id,
     });
@@ -47,7 +51,7 @@ const Conversation = (userSelected: UserInterface) => {
       ]);
     });
 
-    
+
     async function fetchOldMessages() {
       const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id);
       if ('error' in allMessages)
@@ -78,16 +82,22 @@ const Conversation = (userSelected: UserInterface) => {
   }, [text]);
 
 
+
   // scroll to bottom
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, rows]);
+
+
+
 
 
   // send message
-  const handleSubmit = async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleSubmit = () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e === null) return;
+    if (typeof e === 'object' && 'key' in e && e.key !== 'Enter') return;
     e.preventDefault();
     setStatusSendMsg('pending');
     const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, userSelected.id);
@@ -98,74 +108,40 @@ const Conversation = (userSelected: UserInterface) => {
     setText('');
   };
 
-
-  function getTimeSince(time: Date): string {
-    const now = new Date();
-    const dataTime = new Date(time);
-    const diff = now.getTime() - dataTime.getTime();
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    let result = '';
-
-    if (hours > 24)
-      result += 'Le ' + dataTime.toLocaleDateString();
-    else {
-      result += 'Il y a ';
-      if (hours >= 1) {
-        result += `${hours}h`;
-      } else if (minutes >= 1) {
-        result += `${minutes}m`;
-      } else {
-        result += `${seconds}s`;
-      }
-    }
-    return result;
-  }
+  /* currying method handler */
+  const handleChangeTextArea = useCallback(
+    (setTextFn: React.Dispatch<React.SetStateAction<string>>) => (
+      e: React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
+      setTextFn(e.target.value);
+    }, [],
+  );
 
 
   return (
-    userSelected.id == -1 && 
+    userSelected.id == -1 &&
     <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
       Select a user to start a conversation
-    </div> 
+    </div>
     ||
-    <div ref={ref} className="flex flex-col h-full justify-between">
+    // <div ref={ref} className="flex flex-col h-full justify-between">
+    <div className="flex flex-col h-full justify-between">
       <div className="w-full text-lg text-blue text-center">
         {userSelected.login}
       </div>
 
       <div className="overflow-y-auto">
-        {/* <BarAdmin /> */}
 
-        {/* display old messages */}
+        {/* display messages */}
         <div className='text-lg m-1 p-2 '>
-          {messages.map((message: MessageInterface, index: number) => (
-            <div 
-              className='w-full flex my-2' 
+          {messages.map((message: MessageInterface) => (
+            <MessageItem
               key={message.id}
-              ref={index === messages.length - 1 ? bottomRef : null}
-            >
-              <img
-                className="w-10 h-10 rounded-full m-2 object-cover "
-                src={'http://localhost:3000/avatars/' + message.ownerUser.avatar}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null; 
-                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-                }}
-                alt="avatar"
-              />
-              <div className=''>
-                <div className='font-semibold'>{message.ownerUser.login}
-                  <span className='text-xs text-gray-500 font-normal ml-2'> 
-                    { getTimeSince(message.createdAt) } 
-                  </span>
-                </div>
-                <div className=''>{message.text}</div>
-              </div>
-            </div>
+              message={message}
+              // setMessages={setMessages}
+            />
           ))}
+           <div ref={bottomRef}></div>
         </div>
 
         {/* display form message */}
@@ -177,13 +153,13 @@ const Conversation = (userSelected: UserInterface) => {
             name="text"
             rows={rows}
             value={text}
-            onChange={e => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { handleSubmit(e); } }}
+            onChange={handleChangeTextArea(setText)}
+            onKeyDown={handleSubmit()}
             placeholder="Enter your text here..."
             className=" w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
           ></textarea>
           <button className='flex justify-center items-center'
-            onClick={(e) => handleSubmit(e)}
+            onClick={handleSubmit()}
           >
             <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
           </button>
@@ -209,5 +185,6 @@ const Conversation = (userSelected: UserInterface) => {
     </div>
   );
 };
+
 
 export default Conversation;
