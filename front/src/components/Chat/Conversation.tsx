@@ -13,6 +13,7 @@ import { ApiErrorResponse, UserInterface } from '../../types';
 import { MessageInterface } from '../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
+import { TextareaAutosize } from '@mui/material';
 
 
 const Conversation = (userSelected: UserInterface) => {
@@ -21,7 +22,6 @@ const Conversation = (userSelected: UserInterface) => {
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [text, setText] = useState<string>('');
-  const [rows, setRows] = useState<number>(1);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -66,35 +66,41 @@ const Conversation = (userSelected: UserInterface) => {
   }, [userData.id, userSelected.id, dispatch]);
 
 
-  // set approximatif de la hauteur du textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      if (text.length > 0) {
-        setRows(
-          Math.floor(text.length / (textareaRef.current.offsetWidth / 7))
-          + text.split('\n').length,
-        );
-      } else {
-        setRows(1);
-      }
-    }
-  }, [text]);
-
-
   // scroll to bottom
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, rows]);
+  }, [messages, text]);
+
+
+  // delete message
+  const handleDeleteMessage = async (id: number) => {
+    const res = await apiDeleteMessage(id);
+    if (typeof res === 'object' && 'error' in res)
+      dispatch(setErrorSnackbar('Error delete message: ' + res.error));
+    else {
+      setMessages((prev) => prev.filter((message) => message.id !== id));
+      dispatch(setMsgSnackbar('Message deleted'));
+    }
+  };
 
 
   // send message
   const handleSubmit = () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (e === null) return;
-    if (typeof e === 'object' && 'key' in e && e.key !== 'Enter') return;
+    if ('key' in e) {
+      if (e.shiftKey && e.key === 'Enter') {
+        setText((prev) => prev + '\n');
+        e.preventDefault();
+        return;
+      } else if (e.key !== 'Enter')
+        return;
+    }
+    if (text.trim() === '') return;
     e.preventDefault();
     setStatusSendMsg('pending');
+
     const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, userSelected.id);
     if ('error' in newMessage)
       setStatusSendMsg(newMessage.message);
@@ -103,20 +109,9 @@ const Conversation = (userSelected: UserInterface) => {
     setText('');
   };
 
-  const handleDeleteMessage = async (id: number) => {
-    const res = await apiDeleteMessage(id);
-    console.log('id: ', id, 'res: ', res, 'messages: ', messages);
-    if (typeof res === 'object' && 'error' in res)
-      dispatch(setErrorSnackbar('Error delete message: ' + res.error));
-    else {
-      setMessages((prev) => prev.filter((message) => message.id !== id));
-      // message.text = inputMessage;
-      // message.updatedAt = new Date();
-      dispatch(setMsgSnackbar('Message deleted'));
-    }
-  };
 
-  /* currying + callback */
+
+  /* set text input currying + callback */
   const handleChangeTextArea = useCallback(
     (setTextFn: React.Dispatch<React.SetStateAction<string>>) => (
       e: React.ChangeEvent<HTMLTextAreaElement>,
@@ -150,23 +145,20 @@ const Conversation = (userSelected: UserInterface) => {
                   handleDeleteMessage={handleDeleteMessage}
                 />
               ))}
-              <div ref={bottomRef}></div>
             </div>
 
+ 
             {/* display form message */}
-            <form
-              className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2"
-            >
-              <textarea
+            <form className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2">
+              <TextareaAutosize
                 ref={textareaRef}
                 name="text"
-                rows={rows}
                 value={text}
                 onChange={handleChangeTextArea(setText)}
                 onKeyDown={handleSubmit()}
                 placeholder="Enter your text here..."
-                className=" w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
-              ></textarea>
+                className="w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
+              />
               <button className='flex justify-center items-center'
                 onClick={handleSubmit()}
               >
@@ -174,7 +166,7 @@ const Conversation = (userSelected: UserInterface) => {
               </button>
 
               {/* display status send message */}
-              {statusSendMsg !== '' &&
+              { statusSendMsg !== '' &&
                 <span className={`
                 ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
                 bottom-16 
@@ -190,7 +182,9 @@ const Conversation = (userSelected: UserInterface) => {
               }
             </form>
 
+          <div ref={bottomRef}></div>
           </div>
+
         </div>
       }
     </>
