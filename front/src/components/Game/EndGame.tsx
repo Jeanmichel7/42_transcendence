@@ -48,9 +48,6 @@ function Loose({
   setCurrentPage: setCurrentPage;
   lastGameInfo: any;
 }) {
-  function handleClick() {
-    setCurrentPage('searchOpponent');
-  }
   return (
     <LooseWrapper>
       {lastGameInfo.current.win ? (
@@ -58,7 +55,7 @@ function Loose({
       ) : (
         <StyledTitle>Perdu</StyledTitle>
       )}
-      <StyledRetryButton onClick={handleClick}>Rejouer</StyledRetryButton>
+      <StyledRetryButton onClick={() => setCurrentPage('searchOpponent')}>Rejouer</StyledRetryButton>
     </LooseWrapper>
   );
 }

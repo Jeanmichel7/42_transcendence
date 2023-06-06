@@ -13,6 +13,7 @@ import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
 import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
 import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
+import { GameEntity } from 'src/modules/game/entity/game.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -108,7 +109,7 @@ export class UserEntity extends BaseEntity {
   })
   lastActivity: Date;
 
-  // messagerie
+  /* messagerie */
   @OneToMany(() => MessageEntity, (message) => message.ownerUser, {
     cascade: true,
   })
@@ -131,7 +132,7 @@ export class UserEntity extends BaseEntity {
   )
   blocked: UserEntity[];
 
-  // chat  messages
+  /* chat */
   @OneToMany(() => ChatMessageEntity, (message) => message.user, {
     cascade: true,
   })
@@ -176,4 +177,23 @@ export class UserEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   roomMutedUsers: ChatRoomEntity[];
+
+  /*  Games  */
+  @OneToMany(() => GameEntity, (game) => game.player1, {
+    // cascade: true,
+    onDelete: 'CASCADE',
+  })
+  gamesAsPlayer1: GameEntity[];
+
+  @OneToMany(() => GameEntity, (game) => game.player2, {
+    // cascade: true,
+    onDelete: 'CASCADE',
+  })
+  gamesAsPlayer2: GameEntity[];
+
+  @OneToMany(() => GameEntity, (game) => game.winner, {
+    // cascade: true,
+    onDelete: 'CASCADE',
+  })
+  wonGames: GameEntity[];
 }

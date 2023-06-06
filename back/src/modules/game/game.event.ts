@@ -49,6 +49,7 @@ export class GameEvents {
   //conexion
   async handleConnection(client: Socket) {
     //const token = client.handshake.headers.cookies['jwt'];
+
     let cookieArray = client.handshake.headers.cookie.split(';');
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
@@ -76,9 +77,12 @@ export class GameEvents {
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
-    console.log('client connected: ' + client.id);
-    if (this.gameService.checkAlreadyInGame(client.id))
+    if (this.gameService.checkAlreadyInGame(client.data.userId)) {
       this.server.to(client.id).emit('userGameStatus', 'alreadyInGame');
+      this.gameService.updateClientSocketId(client.id, client.data.userId);
+    } else {
+      this.server.to(client.id).emit('userGameStatus', 'notInGame');
+    }
     return 'connected';
   }
 

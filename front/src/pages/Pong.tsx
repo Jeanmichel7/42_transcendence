@@ -14,6 +14,8 @@ import {
 } from '../components/Game/Interface';
 import { useSelector, useDispatch } from 'react-redux'
 import {Overlay} from '../components/Game/Overlay';
+import CountDown from '../components/Game/CountDown';
+
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
@@ -24,9 +26,8 @@ const BALL_RADIUS = BALL_DIAMETER / 2;
 export const GROUND_MAX_SIZE = 1000;
 const INITIAL_BALL_SPEED = 0.4;
 // POSITION_THRESHOLD value for correction of ball position with server state
-const POSITION_THRESHOLD = 100;
+const POSITION_THRESHOLD = 30;
 const SPEED_INCREASE = 0.3;
-const BALL_DIRECTION_FACTOR = 0.02;
 
 
 // Variable constante for optimisation, don't change
@@ -45,6 +46,7 @@ const GameWrapper = styled.div`
   flex-direction: row;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
 `;
 
 const Racket = styled.div.attrs((props) => ({
@@ -106,13 +108,16 @@ function Game({
   const [fps, setFps] = useState(0);
   const lastDateTime = useRef(0);
   const gameId = useRef(0);
+  const [gameStarted, setGameStarted] = useState();
   const { gameData } = useSocketConnection(
     socket,
     keyStateRef,
     posRacket,
     gameId,
-    scorePlayers
+    scorePlayers,
+    setGameStarted
   );
+  const fail = useRef(false);
   const correctionFactor = useRef(0);
 
   useEffect(() => {
@@ -136,6 +141,18 @@ function Game({
 
   useEffect(() => {
     let animationFrameId: number;
+    if (!gameStarted) {
+      setBall((oldBall) => {
+        let newBall = { ...oldBall };
+        newBall.vx = 0 ;
+        newBall.vy = 0;
+        newBall.x = 500;
+        newBall.y = 500;
+        console.log(newBall);
+        return newBall;
+      })
+      return;
+    };
     upLoop();
     function upLoop() {
       const currentTime = performance.now();
@@ -159,17 +176,6 @@ function Game({
         let newBall = { ...oldBall };
 
         if (
-          oldBall.x + BALL_RADIUS > GROUND_MAX_SIZE ||
-          oldBall.x - BALL_RADIUS < 0
-        ) {
-          newBall.vx = -newBall.vx;
-          if (oldBall.x + BALL_RADIUS > GROUND_MAX_SIZE) {
-            newBall.x = GROUND_MAX_SIZE - BALL_RADIUS;
-          } else {
-            newBall.x = 0 + BALL_RADIUS;
-          }
-        }
-        if (
           oldBall.y + BALL_RADIUS > GROUND_MAX_SIZE ||
           oldBall.y - BALL_RADIUS < 0
         ) {
@@ -183,56 +189,54 @@ function Game({
         if (
           oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
           oldBall.y > posRacket.current.left &&
-          oldBall.y < posRacket.current.left + RACKET_HEIGHT_10
+          oldBall.y < posRacket.current.left + RACKET_HEIGHT_10 && fail.current === false
         ) {
-          newBall.vx = -newBall.vx;
           newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
           if (keyStateRef.current.ArrowDown) {
            newBall.vy += SPEED_INCREASE; 
+           newBall.vx = -newBall.vx;
           }
           else if (keyStateRef.current.ArrowUp) {
             newBall.vy -= SPEED_INCREASE;
+            newBall.vx = -newBall.vx; 
           } else {
-            if (newBall.y > posRacket.current.left + RACKET_HEIGHT_10 / 2) {
-              newBall.vy += SPEED_INCREASE / 2;
-            } else if  (newBall.y < posRacket.current.left + RACKET_HEIGHT_10 / 2)
-              {
-                console.log('test');
-                console.log('newBall.vy:', newBall.vy);
-                console.log('RACKET_HEIGHT_10:', RACKET_HEIGHT_10);
-                console.log('posRacket.current.left:', posRacket.current.left);
-                newBall.vy -= SPEED_INCREASE / 2;
-                console.log('newBall.vy2:', newBall.vy);
-              }
-              else if (newBall.y === posRacket.current.left + RACKET_HEIGHT_10 / 2) {
-                newBall.vy += SPEED_INCREASE / 4;
-            }
+            const racketCenter = posRacket.current.left + RACKET_HEIGHT_10 / 2;
+            const relativePostion = newBall.y - racketCenter;
+            const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) / 2;
+            console.log({proportion});
+            newBall.vy = proportion  ;
+            newBall.vx = 0.50 - Math.abs(proportion) + 0.1;
+            console.log(newBall.vy, newBall.vx);
           }
         } else if (
           oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
           oldBall.y > posRacket.current.right &&
-          oldBall.y < posRacket.current.right + RACKET_HEIGHT_10
+          oldBall.y < posRacket.current.right + RACKET_HEIGHT_10 && fail.current === false
         ) {
-          newBall.vx = -newBall.vx;
           newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
           if (keyStateRef.current.ArrowDown) {
             newBall.vy += SPEED_INCREASE; 
+            newBall.vx = -newBall.vx;
            }
             else if (keyStateRef.current.ArrowUp) {
               newBall.vy -= SPEED_INCREASE;
+              newBall.vx = -newBall.vx;
             } else {
-              if (newBall.y > posRacket.current.right + RACKET_HEIGHT_10 / 2) {
-                newBall.vy += SPEED_INCREASE / 2;
-              }
-              else if (newBall.y < posRacket.current.right + RACKET_HEIGHT_10 / 2) {
-                newBall.vy -= SPEED_INCREASE / 2;
-              }
-              else if (newBall.y === posRacket.current.right + RACKET_HEIGHT_10 / 2) {
-                newBall.vy += SPEED_INCREASE / 4;
-
-            }
+              const racketCenter = posRacket.current.right + RACKET_HEIGHT_10 / 2;
+              const relativePostion = newBall.y - racketCenter;
+              const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) /2;
+            console.log({proportion});
+              newBall.vy = proportion;
+            newBall.vx = 0.50 - Math.abs(proportion) + 0.1;
+            newBall.vx = -newBall.vx;
+            console.log(newBall.vy, newBall.vx);
         }
       }
+        else if (oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS || oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS)
+        {
+          fail.current = true;
+        }
+      
         newBall.x += newBall.vx * deltaTime;
         newBall.y += newBall.vy * deltaTime;
         //console.log(gameData.current.ball);
@@ -256,6 +260,7 @@ function Game({
           Math.abs(newBall.y - gameData.current.ball?.y) > POSITION_THRESHOLD
         ) {
           console.log('correction');
+          fail.current = false;
           newBall.x = gameData.current.ball?.x;
           newBall.y = gameData.current.ball?.y;
           newBall.vx = gameData.current.ball?.vx;
@@ -291,7 +296,7 @@ function Game({
         console.log('cancelAnimationFrame');
       }
     };
-  }, []);
+  }, [gameStarted]);
 
   useEffect(() => {
     function handleKeyDown(e: any) {
@@ -311,8 +316,8 @@ function Game({
   }, []);
   return (
     <div>
-      {' '}
       <p style={{ color: 'white' }}>{`FPS: ${fps.toFixed(2)}`}</p>
+      {!gameStarted && <CountDown/>}
       <Score
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
@@ -350,11 +355,15 @@ function Pong() {
     });
 
     socket.on('userGameStatus', (message) => {
+      console.log('Pong status updtae', message);
       if (message === 'found') {
         setCurrentPage('game');
       }
       if (message === 'alreadyInGame') {
         setCurrentPage('game');
+      }
+      if (message === 'notInGame') {
+        setCurrentPage('lobby');
       }
     });
     return () => {

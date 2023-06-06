@@ -6,15 +6,12 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 5;
+const SCORE_FOR_WIN = 50;
 const INITIAL_BALL_SPEED = 0.4;
 const SPEED_INCREASE = 0.3;
-const BALL_DIRECTION_FACTOR = 0.02;
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
-const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
-const RACKET_FACTOR_1000 = RACKET_FACTOR / 1000;
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
@@ -45,6 +42,9 @@ export class Game {
   player2ArrowDown: boolean;
   lastTime: number;
   id: string;
+  gameStart: boolean;
+  startTime: number;
+  fail: boolean;
 
   constructor(
     socketPlayer1Id: string,
@@ -70,23 +70,23 @@ export class Game {
     this.player2Score = 0;
     this.racketLeft = 500 - RACKET_HEIGHT_10 / 2;
     this.racketRight = 500 - RACKET_HEIGHT_10 / 2;
+    this.gameStart = false;
+    this.startTime = performance.now();
+    this.fail = false;
   }
 
   updateBallPosition() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
-    if (
-      this.ball.x + BALL_RADIUS > GROUND_MAX_SIZE ||
-      this.ball.x - BALL_RADIUS < 0
-    ) {
-      this.ball.vx = -this.ball.vx;
-      if (this.ball.x + BALL_RADIUS > GROUND_MAX_SIZE) {
-        this.ball.x = GROUND_MAX_SIZE - BALL_RADIUS;
+    if (!this.gameStart) {
+      if (currentTime - this.startTime > 3000) {
+        this.gameStart = true;
       } else {
-        this.ball.x = BALL_RADIUS;
+        return;
       }
     }
+
     if (
       this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE ||
       this.ball.y - BALL_RADIUS < 0
@@ -101,53 +101,54 @@ export class Game {
     if (
       this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       this.ball.y >= this.racketLeft &&
-      this.ball.y <= this.racketLeft + RACKET_HEIGHT_10
+      this.ball.y <= this.racketLeft + RACKET_HEIGHT_10 &&
+      !this.fail
     ) {
-      this.ball.vx = -this.ball.vx;
+      console.log('fail');
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
       if (this.player1ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
+        this.ball.vx = -this.ball.vx;
       } else if (this.player1ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
+        this.ball.vx = -this.ball.vx;
       } else {
-        if (this.ball.y > this.racketLeft + RACKET_HEIGHT_10 / 2) {
-          console.log('p1 >', this.ball.vy);
-          this.ball.vy += SPEED_INCREASE / 2;
-        } else if (this.ball.y < this.racketLeft + RACKET_HEIGHT_10 / 2) {
-          console.log('p1 <', this.ball.vy);
-          this.ball.vy -= SPEED_INCREASE / 2;
-          console.log('p1 <', this.ball.vy);
-        } else if (this.ball.y === this.racketLeft + RACKET_HEIGHT_10 / 2) {
-          console.log('p1 ===', this.ball.vy);
-
-          this.ball.vy += SPEED_INCREASE / 4;
-        }
+        const racketCenter = this.racketLeft + RACKET_HEIGHT_10 / 2;
+        const relativePostion = this.ball.y - racketCenter;
+        const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) / 2;
+        this.ball.vy = proportion;
+        this.ball.vx = 0.5 - Math.abs(proportion) + 0.1;
       }
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
       this.ball.y >= this.racketRight &&
-      this.ball.y <= this.racketRight + RACKET_HEIGHT_10
+      this.ball.y <= this.racketRight + RACKET_HEIGHT_10 &&
+      !this.fail
     ) {
-      this.ball.vx = -this.ball.vx;
       this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
       if (this.player2ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
+        this.ball.vx = -this.ball.vx;
       } else if (this.player2ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
+        this.ball.vx = -this.ball.vx;
       } else {
-        if (this.ball.y > this.racketRight + RACKET_HEIGHT_10 / 2) {
-          this.ball.vy += SPEED_INCREASE / 2;
-        } else if (this.ball.y < this.racketRight + RACKET_HEIGHT_10 / 2) {
-          console.log('p2 <', this.ball.vy);
-          this.ball.vy -= SPEED_INCREASE / 2;
-          console.log('p2 <', this.ball.vy);
-        } else if (this.ball.y === this.racketRight + RACKET_HEIGHT_10 / 2) {
-          this.ball.vy += SPEED_INCREASE / 4;
-        }
+        const racketCenter = this.racketRight + RACKET_HEIGHT_10 / 2;
+        const relativePostion = this.ball.y - racketCenter;
+        const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) / 2;
+        this.ball.vy = proportion;
+        this.ball.vx = 0.5 - Math.abs(proportion) + 0.1;
+        this.ball.vx = -this.ball.vx;
       }
+    } else if (
+      this.ball.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS ||
+      this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS
+    ) {
+      this.fail = true;
     }
     if (
-      this.ball.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
+      this.ball.x <
+        RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS - 200 &&
       !this.isOver
     ) {
       if (this.player1Score > SCORE_FOR_WIN) {
@@ -162,9 +163,10 @@ export class Game {
         this.ball.y = 500;
         this.ball.vx = INITIAL_BALL_SPEED;
         this.ball.vy = 0;
+        this.fail = false;
       }
     } else if (
-      this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
+      this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS + 200 &&
       !this.isOver
     ) {
       if (this.player2Score > SCORE_FOR_WIN) {
@@ -178,6 +180,7 @@ export class Game {
         this.ball.y = 500;
         this.ball.vy = 0;
         this.ball.vx = -INITIAL_BALL_SPEED;
+        this.fail = false;
       }
     }
     this.ball.x += this.ball.vx * deltaTime;
@@ -196,6 +199,7 @@ export class Game {
       isPlayerRight: false,
       player1Username: this.player1Username,
       player2Username: this.player2Username,
+      gameStart: this.gameStart,
     };
   }
 
@@ -212,15 +216,43 @@ export class Game {
   }
 }
 
+/**
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ * - *
+ */
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { GameEntity } from './entity/game.entity';
+import { UserEntity } from '../users/entity/users.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { GameInterface } from './interfaces/game.interface';
+
 @Injectable()
 export class GameService {
   games: Map<string, Game>;
   playerWaiting1: any;
   playerWaiting2: any;
 
-  constructor() {
+  constructor(
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
+  ) {
     this.games = new Map<string, Game>();
   }
+
+  /** **********************
+   *        YANN PART
+   *********************** */
 
   getGames(): Map<string, Game> {
     return this.games;
@@ -246,6 +278,18 @@ export class GameService {
       return true;
     }
     return false;
+  }
+
+  updateClientSocketId(newSocketId: string, username: string) {
+    this.games.forEach((game) => {
+      if (game.player1Username === username) {
+        console.log('update socket id');
+        game.socketPlayer1Id = newSocketId;
+      } else if (game.player2Username === username) {
+        console.log('update socket id');
+        game.socketPlayer2Id = newSocketId;
+      }
+    });
   }
 
   addToQueue(socketId: string, username: string) {
@@ -290,11 +334,78 @@ export class GameService {
       this.games.get(clientData.gameId)?.updateGameData(clientData, clientId);
   }
 
-  test() {
-    return { message: 'test' };
+  /** **********************
+   *         JM PART
+   *********************** */
+
+  // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+  async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+    const newGame = new GameEntity();
+    newGame.player1 = await this.userRepository.findOne({
+      where: { id: userId1 },
+    });
+    newGame.player2 = await this.userRepository.findOne({
+      where: { id: userId2 },
+    });
+    newGame.status = 'playing';
+    newGame.createdAt = new Date();
+    await this.gameRepository.save(newGame);
+
+    const result: GameInterface = newGame;
+    console.log('result create game : ', result);
+    return result;
   }
 
-  test2() {
-    return { message: 'test2' };
+  async saveEndGame(
+    gameId: bigint,
+    winnerId: bigint,
+    scorePlayer1: number,
+    scorePlayer2: number,
+  ): Promise<GameInterface> {
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: gameId },
+    });
+    game.status = 'finished';
+    game.finishAt = new Date();
+    game.scorePlayer1 = scorePlayer1;
+    game.scorePlayer2 = scorePlayer2;
+    game.winner = await this.userRepository.findOne({
+      where: { id: winnerId },
+    });
+    await this.gameRepository.save(game);
+
+    const result: GameInterface = game;
+    console.log('result end game : ', result);
+    return result;
+  }
+
+  async getAllUserGames(userId: bigint): Promise<GameInterface[]> {
+    const games: GameEntity[] = await this.gameRepository
+      .createQueryBuilder('game')
+      .leftJoinAndSelect('game.player1', 'player1')
+      .leftJoinAndSelect('game.player2', 'player2')
+      .leftJoinAndSelect('game.winner', 'winner')
+      .select([
+        'game',
+        'player1.id',
+        'player1.firstName',
+        'player1.lastName',
+        'player1.login',
+        'player2.id',
+        'player2.firstName',
+        'player2.lastName',
+        'player2.login',
+        'winner.id',
+        'winner.firstName',
+        'winner.lastName',
+        'winner.login',
+      ])
+      .where('(player1.id = :userId OR player2.id = :userId)', { userId })
+      .orderBy('game.createdAt', 'DESC')
+      .getMany();
+
+    const result: GameInterface[] = games;
+    console.log('result get all game : ', result);
+    return result;
   }
 }

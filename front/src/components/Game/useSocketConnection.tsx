@@ -9,7 +9,8 @@ const useSocketConnection = (
   keyStateRef: any,
   posRacket: any,
   gameId: any,
-  scorePlayers: any
+  scorePlayers: any,
+  setGameStarted: any,
 ) => {
   const data = useRef({});
 
@@ -44,6 +45,10 @@ const useSocketConnection = (
 
     socket.on('gameUpdate', (serverData) => {
       data.current = normalizeGameData(serverData);
+      if (data.current.gameStart) {
+      console.log(data.current.gameStart);
+        setGameStarted(true);
+      }
     });
 
     return () => {
