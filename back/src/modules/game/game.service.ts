@@ -7,8 +7,9 @@ const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 50;
-const INITIAL_BALL_SPEED = 0.4;
-const SPEED_INCREASE = 0.3;
+const INITIAL_BALL_SPEED = 0.25;
+const SPEED_INCREASE = 0.04;
+const bonus_id = ['racketSize', 'slow', 'laser']
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -25,7 +26,7 @@ interface clientUpdate {
 }
 
 export class Game {
-  ball: { x: number; y: number; vx: number; vy: number };
+  ball: { x: number; y: number; vx: number; vy: number; speed: number };
   racketLeft: number;
   racketRight: number;
   isOver: boolean;
@@ -45,6 +46,8 @@ export class Game {
   gameStart: boolean;
   startTime: number;
   fail: boolean;
+  bonuses: any[];
+  bonusesLastGeneration: number;
 
   constructor(
     socketPlayer1Id: string,
@@ -58,11 +61,13 @@ export class Game {
       y: 500,
       vx: INITIAL_BALL_SPEED,
       vy: 0,
+      speed: INITIAL_BALL_SPEED,
     };
     this.socketPlayer1Id = socketPlayer1Id;
     this.socketPlayer2Id = socketPlayer2Id;
     this.player1Username = player1Username;
     this.player2Username = player2Username;
+    this.bonusesLastGeneration = performance.now();
     this.winner = null;
     this.lastTime = performance.now();
     this.id = Math.random().toString(36).substr(2, 9);
@@ -73,8 +78,31 @@ export class Game {
     this.gameStart = false;
     this.startTime = performance.now();
     this.fail = false;
+    this.bonuses = [];
   }
 
+  generateBonus() {
+    const bonus = {
+      x: Math.random() * GROUND_MAX_SIZE,
+      y: Math.random() * GROUND_MAX_SIZE,
+      id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
+      boxSize: 10
+    }
+    this.bonuses.push(bonus);
+  }
+
+
+  checkBonusCollision() {
+    this.bonuses.forEach((bonus) => {
+      if (
+        this.ball.x + BALL_RADIUS > bonus.x &&
+        this.ball.x - BALL_RADIUS < bonus.x + bonus.boxSize &&
+        this.ball.y + BALL_RADIUS > bonus.y &&
+        this.ball.y - BALL_RADIUS < bonus.y + bonus.boxSize
+      ) {
+      }
+      return false;
+    })}
   updateBallPosition() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
@@ -85,6 +113,10 @@ export class Game {
       } else {
         return;
       }
+    }
+    if(currentTime - this.bonusesLastGeneration > 20000) {  
+      this.bonusesLastGeneration = currentTime;
+      this.generateBonus();
     }
 
     if (
@@ -109,15 +141,20 @@ export class Game {
       if (this.player1ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
         this.ball.vx = -this.ball.vx;
+        this.ball.speed += SPEED_INCREASE;
       } else if (this.player1ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
         this.ball.vx = -this.ball.vx;
+        this.ball.speed -= SPEED_INCREASE;
       } else {
-        const racketCenter = this.racketLeft + RACKET_HEIGHT_10 / 2;
+        const racketCenter = this.racketLeft + RACKET_HEIGHT_10 / 2 ;
         const relativePostion = this.ball.y - racketCenter;
-        const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) / 2;
+        let proportion = relativePostion / (RACKET_HEIGHT_10 / 2);
+        proportion = Math.max(Math.min(proportion, 0.9), -0.9);
+        this.ball.speed += SPEED_INCREASE;
         this.ball.vy = proportion;
-        this.ball.vx = 0.5 - Math.abs(proportion) + 0.1;
+        this.ball.vx = Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;; 
+        this.ball.vy *= this.ball.speed;
       }
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
@@ -129,15 +166,22 @@ export class Game {
       if (this.player2ArrowDown) {
         this.ball.vy += SPEED_INCREASE;
         this.ball.vx = -this.ball.vx;
+        this.ball.speed += SPEED_INCREASE;
       } else if (this.player2ArrowUp) {
         this.ball.vy -= SPEED_INCREASE;
         this.ball.vx = -this.ball.vx;
+        this.ball.speed -= SPEED_INCREASE;
       } else {
-        const racketCenter = this.racketRight + RACKET_HEIGHT_10 / 2;
+        const racketCenter = this.racketRight + RACKET_HEIGHT_10 /2 ;
         const relativePostion = this.ball.y - racketCenter;
-        const proportion = relativePostion / (RACKET_HEIGHT_10 / 2) / 2;
+        let proportion = relativePostion / (RACKET_HEIGHT_10 / 2) ;
+        proportion =  Math.max(Math.min(proportion, 0.9), -0.9);
+        this.ball.speed += SPEED_INCREASE;
         this.ball.vy = proportion;
-        this.ball.vx = 0.5 - Math.abs(proportion) + 0.1;
+        this.ball.vy = Math.min(this.ball.vy, 0.9);  
+this.ball.vy = Math.max(this.ball.vy, -0.9); 
+        this.ball.vx =  Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;
+        this.ball.vy *= this.ball.speed;
         this.ball.vx = -this.ball.vx;
       }
     } else if (
@@ -163,6 +207,7 @@ export class Game {
         this.ball.y = 500;
         this.ball.vx = INITIAL_BALL_SPEED;
         this.ball.vy = 0;
+        this.ball.speed = INITIAL_BALL_SPEED;
         this.fail = false;
       }
     } else if (
@@ -180,6 +225,7 @@ export class Game {
         this.ball.y = 500;
         this.ball.vy = 0;
         this.ball.vx = -INITIAL_BALL_SPEED;
+        this.ball.speed = INITIAL_BALL_SPEED;
         this.fail = false;
       }
     }
@@ -200,6 +246,7 @@ export class Game {
       player1Username: this.player1Username,
       player2Username: this.player2Username,
       gameStart: this.gameStart,
+      bonuses: this.bonuses,
     };
   }
 

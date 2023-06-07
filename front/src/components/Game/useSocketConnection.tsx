@@ -10,6 +10,7 @@ const useSocketConnection = (
   posRacket: any,
   gameId: any,
   scorePlayers: any,
+  bonusesRef: any,
   setGameStarted: any,
 ) => {
   const data = useRef({});
@@ -29,6 +30,7 @@ const useSocketConnection = (
       posRacket.current.right = serverData.racketRight;
     }
     gameId.current = serverData.gameId;
+    bonusesRef.current = serverData.bonuses;
     return data.current;
   }
 
@@ -46,9 +48,9 @@ const useSocketConnection = (
     socket.on('gameUpdate', (serverData) => {
       data.current = normalizeGameData(serverData);
       if (data.current.gameStart) {
-      console.log(data.current.gameStart);
         setGameStarted(true);
       }
+      
     });
 
     return () => {

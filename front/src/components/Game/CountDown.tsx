@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+// Définir une animation keyframes pour le fondu et le zoom.
+const fadeAndZoomIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
 
 const CountdownWrapper = styled.div`
   font-size: 2em;
@@ -8,6 +22,16 @@ const CountdownWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+const Number = styled.span`
+  font-size: 8em; // Augmenter la taille de la police
+  color: #;
+  animation: ${fadeAndZoomIn} 1s ease-out;
 `;
 
 const Countdown = () => {
@@ -26,7 +50,9 @@ const Countdown = () => {
 
   return (
     <CountdownWrapper>
-      {count > 0 ? count : "Go!"}
+      <Number key={count}>
+        {count > 0 ? count : "Go!"}
+      </Number>
     </CountdownWrapper>
   );
 };
