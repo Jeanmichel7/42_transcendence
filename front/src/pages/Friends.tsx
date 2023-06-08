@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { acceptFriend, getBlockedUsers, getFriendRequestsToMe, getFriends, getFriendRequestsSent } from '../api/relation';
-import { ApiErrorResponse, UserInterface } from '../types';
+import { acceptFriend, declineFriend, cancelFriendRequest, getBlockedUsers, getFriendRequestsToMe, getFriends, getFriendRequestsSent, apiUnblockUser, apiBlockUser, deleteFriend } from '../api/relation';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
 import { useDispatch } from 'react-redux';
-import { setErrorSnackbar } from '../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar } from '../store/snackbarSlice';
+import { Button } from '@mui/material';
 
 export default function FriendsPage() {
   const [waitingListSend, setWaitingListSent] = useState<UserInterface[]>([]); // waitingListToBeAccepted
@@ -61,17 +62,74 @@ export default function FriendsPage() {
 
   }, [dispatch]);
 
+
+
+
   const handleAcceptFriendRequest = async (userToAcceptId: number) => {
-    const resAcceptRequest = await acceptFriend(userToAcceptId);
+    const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAcceptId);
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar('Error accept friend request: ' + resAcceptRequest.message));
     else {
       setWaitingListToAccept((prev) => prev.filter((user) => user.id !== userToAcceptId));
+      dispatch(setMsgSnackbar('Friend request accepted'));
       // setWaitingListToAccept(waitingListToAccept.filter((user) => user.id !== userToAcceptId));
       // setFriendsList([...friendsList, resAcceptRequest]);
       // disatch userData.friends
     }
   };
+
+  const handleDeclineFriendRequest = async (userToDeclineId: number) => {
+    const resDeclineRequest: void | ApiErrorResponse = await declineFriend(userToDeclineId);
+    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
+      dispatch(setErrorSnackbar('Error decline friend request: ' + resDeclineRequest.message));
+    else {
+      setWaitingListToAccept((prev) => prev.filter((user) => user.id !== userToDeclineId));
+      dispatch(setMsgSnackbar('Friend request declined'));
+    }
+  };
+
+  const handleUnblockUser = async (userToUnblockId: number) => {
+    const resUnblockRequest: void | ApiErrorResponse  = await apiUnblockUser(userToUnblockId);
+    if (typeof resUnblockRequest === 'object' && 'error' in resUnblockRequest)
+      dispatch(setErrorSnackbar('Error unblock user: ' + resUnblockRequest.message));
+    else {
+      setBlockedUsersList((prev) => prev.filter((user) => user.id !== userToUnblockId));
+      dispatch(setMsgSnackbar('User unblocked'));
+    }
+  };
+
+  const handleCancelFriendRequest = async (userToCancelId: number) => {
+    const resCancelRequest: void | ApiErrorResponse = await cancelFriendRequest(userToCancelId);
+    if (typeof resCancelRequest === 'object' && 'error' in resCancelRequest)
+      dispatch(setErrorSnackbar('Error cancel friend request: ' + resCancelRequest.message));
+    else {
+      setWaitingListSent((prev) => prev.filter((user) => user.id !== userToCancelId));
+      dispatch(setMsgSnackbar('Friend request canceled'));
+    }
+  };
+
+  const handleBlockUser = async (userToBlockId: number) => {
+    const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlockId);
+    if ('error' in resBlockRequest)
+      dispatch(setErrorSnackbar('Error block user: ' + resBlockRequest.message));
+    else {
+      setFriendsList((prev) => prev.filter((user) => user.id !== userToBlockId));
+      // setBlockedUsersList((prev) => [...prev, resBlockRequest]);
+      dispatch(setMsgSnackbar('User blocked'));
+    }
+  };
+
+  const handleDeleteFriend = async (userToDeleteId: number) => {
+    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(userToDeleteId);
+    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
+      dispatch(setErrorSnackbar('Error delete friend: ' + resDeleteRequest.message));
+    else {
+      setFriendsList((prev) => prev.filter((user) => user.id !== userToDeleteId));
+      dispatch(setMsgSnackbar('Friend deleted'));
+    }
+  };
+
+
 
   useEffect(() => {
     console.log('111 updated waitingListSend:', waitingListSend);
@@ -86,38 +144,46 @@ export default function FriendsPage() {
       <h2 className='font-bold mt-5'>wainting request sent</h2>
       { waitingListSend.map((user) => (
         <div key={user.id}>
-          <p>{user.firstName} {user.lastName}</p>
+          <p>{user.firstName} {user.lastName}
+            <Button onClick={() => handleCancelFriendRequest(user.id)}>Cancel</Button>
+          </p>
         </div>
       )) }
 
       <h2 className='font-bold mt-5'>waiting request to be accepted</h2>
       { waitingListToAccept.map((user) => (
         <div key={user.id}>
-          <p>{user.firstName} {user.lastName}</p>
-          <span>
-            <button onClick={() => handleAcceptFriendRequest(user.id)}>Accept</button>
-          </span>
+          <p>{user.firstName} {user.lastName}
+            <span>
+              <Button onClick={() => handleAcceptFriendRequest(user.id)}>Accept</Button>
+              <Button onClick={() => handleDeclineFriendRequest(user.id)}>Decline</Button>
+            </span>
+          </p>
         </div>
       )) }
 
       <h2 className='font-bold mt-5'>friends</h2>
       { friendsList.map((user) => (
         <div key={user.id}>
-          <p>{user.firstName} {user.lastName}</p>
+          <p>{user.firstName} {user.lastName}
+            <span>
+              <Button onClick={() => handleBlockUser(user.id)}>block</Button>
+              <Button onClick={() => handleDeleteFriend(user.id)}>delete</Button>
+            </span>
+          </p>
         </div>
       )) }
 
       <h2 className='font-bold mt-5'>blocked users</h2>
       { blockedUsersList.map((user) => (
         <div key={user.id}>
-          <p>{user.firstName} {user.lastName}</p>
+          <p>{user.firstName} {user.lastName}
+          <span>
+            <Button onClick={() => handleUnblockUser(user.id)}>Unblock</Button>
+          </span>
+          </p>
         </div>
       )) }
-      
-
-
-
     </div>
   );
 }
-

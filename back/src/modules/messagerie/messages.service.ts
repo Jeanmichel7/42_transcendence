@@ -136,24 +136,28 @@ export class MessageService {
       select: ['id', 'login'],
       relations: ['messagesSend'],
     });
+    if (!userSend)
+      throw new NotFoundException(`User with id ${userIdFrom} not found`);
 
     const userReceive: UserEntity = await this.userRepository.findOne({
       where: { id: userIdTo },
       select: ['id'],
-      relations: ['messagesReceive', 'blocked', 'friends'],
+      relations: [
+        'messagesReceive',
+        'initiatedRelations.userInitiateur',
+        'initiatedRelations.userRelation',
+        'relatedRelations.userRelation',
+        'relatedRelations.userInitiateur',
+      ],
     });
+    if (!userReceive)
+      throw new NotFoundException(`User with id ${userIdTo} not found`);
 
-    // console.log('userSend', userSend.id);
-    // console.log('userReceive', userReceive.id, userReceive.blocked);
-    // console.log('userReceive', userReceive.friends);
-
-    // // test if userSend is blocked by userReceive
-    // if (userReceive.blocked.map((user) => user.id).includes(userSend.id)) {
-    //   console.log('userSend is blocked by userReceive');
-    //   throw new ForbiddenException(
-    //     `You can't send a message to ${userReceive.login}, you are blocked`,
-    //   );
-    // }
+    if (userReceive.blocked.map((user) => user.id).includes(userSend.id)) {
+      throw new ForbiddenException(
+        `You can't send a message to ${userReceive.login}, you are blocked`,
+      );
+    }
 
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);

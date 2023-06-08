@@ -201,4 +201,29 @@ export class UserEntity extends BaseEntity {
   get relations(): UserRelationEntity[] {
     return [...this.initiatedRelations, ...this.relatedRelations];
   }
+
+  get friends(): UserEntity[] {
+    return [...this.initiatedRelations, ...this.relatedRelations]
+      .filter(
+        (relation) =>
+          relation.relationType === 'friend' &&
+          relation.mutuelBlocked === false,
+      )
+      .map((relation) =>
+        relation.userInitiateur.id === this.id
+          ? relation.userRelation
+          : relation.userInitiateur,
+      );
+  }
+
+  get blocked(): UserEntity[] {
+    console.log('execution get blocked users');
+    return [...this.initiatedRelations, ...this.relatedRelations]
+      .filter((relation) => relation.relationType === 'blocked')
+      .map((relation) =>
+        relation.userInitiateur.id === this.id
+          ? relation.userRelation
+          : relation.userInitiateur,
+      );
+  }
 }

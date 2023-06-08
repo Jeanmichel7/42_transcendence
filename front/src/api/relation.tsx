@@ -38,14 +38,6 @@ export async function deleteFriend(
   );
 }
 
-
-
-
-
-
-
-
-
 export async function requestAddFriend(
   userIdToAdd: number,
 ): Promise< UserRelation | ApiErrorResponse > {
@@ -63,6 +55,26 @@ export async function acceptFriend(
     'put',
     '/relations/friends/' + userIdToAdd + '/accept',
     'Failed to accept user friend: ',
+  );
+}
+
+export async function declineFriend(
+  userIdToAdd: number,
+): Promise< void | ApiErrorResponse > {
+  return apiRequest<void>(
+    'put',
+    '/relations/friends/' + userIdToAdd + '/decline',
+    'Failed to decline user friend: ',
+  );
+}
+
+export async function cancelFriendRequest(
+  userIdToAdd: number,
+): Promise< void | ApiErrorResponse > {
+  return apiRequest<void>(
+    'put',
+    '/relations/friends/' + userIdToAdd + '/cancel',
+    'Failed to cancel user friend request: ',
   );
 }
 
@@ -84,10 +96,6 @@ export async function getFriendRequestsSent(
   );
 }
 
-
-
-
-
 export async function addFriend(
   userIdToAdd: number,
 ): Promise< UserRelation | ApiErrorResponse > {
@@ -105,5 +113,14 @@ export async function apiBlockUser(
     'put',
     '/relations/friends/' + userIdToBlock + '/block',
     'Failed to block user: ',
+  );
+}
+export async function apiUnblockUser(
+  userIdToUnblock: UserInterface['id'],
+): Promise< void | ApiErrorResponse> {
+  return apiRequest<void>(
+    'put',
+    '/relations/friends/' + userIdToUnblock + '/unblock',
+    'Failed to unblock user: ',
   );
 }

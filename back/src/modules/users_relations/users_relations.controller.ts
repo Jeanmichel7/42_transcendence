@@ -73,9 +73,28 @@ export class UsersRelationsController {
     return result;
   }
 
-  // @Get('friends/:friendId/decline')
+  @Put('friends/:friendId/decline')
+  async declineFriend(
+    @Req() req: RequestWithUser,
+    @Param('friendId', ParseIntPipe) friendId: bigint,
+  ): Promise<HttpStatus> {
+    // const result: UserRelationInterface =
+    await this.usersRelationsService.declineFriendRequest(
+      req.user.id,
+      friendId,
+    );
+    return HttpStatus.NO_CONTENT;
+  }
 
-  // @Get('friends/:friendId/cancel')
+  @Put('friends/:friendId/cancel')
+  async cancelFriendRequest(
+    @Req() req: RequestWithUser,
+    @Param('friendId', ParseIntPipe) friendId: bigint,
+  ): Promise<HttpStatus> {
+    // const result: UserRelationInterface =
+    await this.usersRelationsService.cancelFriendRequest(req.user.id, friendId);
+    return HttpStatus.NO_CONTENT;
+  }
 
   @Get('/friends/requestsPending')
   async getAllRequestsPending(
@@ -104,16 +123,25 @@ export class UsersRelationsController {
     return HttpStatus.NO_CONTENT;
   }
 
-  // @Put('friends/:userBlockedId/block')
-  // // @UseGuards(AuthOwnerAdmin)
-  // async blockFriend(
-  //   @Req() req: RequestWithUser,
-  //   @Param('userBlockedId', ParseIntPipe) userBlockedId: bigint,
-  // ): Promise<UserRelationInterface> {
-  //   const result: UserRelationInterface =
-  //     await this.usersRelationsService.blockUser(req.user.id, userBlockedId);
-  //   return result;
-  // }
+  @Put('friends/:userBlockedId/block')
+  async blockFriend(
+    @Req() req: RequestWithUser,
+    @Param('userBlockedId', ParseIntPipe) userBlockedId: bigint,
+  ): Promise<UserRelationInterface> {
+    const result: UserRelationInterface =
+      await this.usersRelationsService.blockUser(req.user.id, userBlockedId);
+    return result;
+  }
+
+  @Put('friends/:userBlockedId/unblock')
+  async unblockFriend(
+    @Req() req: RequestWithUser,
+    @Param('userBlockedId', ParseIntPipe) userBlockedId: bigint,
+  ): Promise<HttpStatus> {
+    // const result: UserRelationInterface =
+    await this.usersRelationsService.unblockUser(req.user.id, userBlockedId);
+    return HttpStatus.NO_CONTENT;
+  }
 
   /* ************************************************ */
   /*         ???          ADMIN          ???          */
