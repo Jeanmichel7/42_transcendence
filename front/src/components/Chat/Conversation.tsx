@@ -30,17 +30,20 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
 
   // connect socket
   const connectSocket = useCallback(() => {
+    if (userSelected.id == -1) return;
+    if (userData.id == -1) return;
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
+
 
     //connect to room
     socket.emit('joinPrivateRoom', {
       user1Id: userData.id,
       user2Id: userSelected.id,
     });
-
+ 
     //listen on /message
     socket.on('message', (message) => {
       setMessages((prevMessages) => [

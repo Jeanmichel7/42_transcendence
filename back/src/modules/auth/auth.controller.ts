@@ -30,12 +30,20 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   // supprimer plus tard
-  @Post('login')
+  @Post('loginFakeUser')
   @Public()
   @UsePipes(ValidationPipe)
-  async login(@Body() newUser: UserLoginDTO): Promise<AuthInterface> {
+  async login(
+    @Body() newUser: UserLoginDTO,
+    @Res() res: Response,
+  ): Promise<any> {
     const result: AuthInterface = await this.authService.login(newUser);
-    return result;
+    res.cookie('jwt', result.accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
+      sameSite: 'strict',
+    });
+    res.status(200).send(result);
   }
 
   @Get('isAuthenticated')

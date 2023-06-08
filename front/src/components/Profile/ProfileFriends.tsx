@@ -27,7 +27,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
   return (
     <>
       <h2 className="text-3xl text-center mb-5">Friends</h2>
-      <div className="flex items-center w-full pb-3">
+      <div className="flex flex-wrap items-center w-full pb-3">
         {friends.length == 0 ?
           <p> No friends </p>
           :

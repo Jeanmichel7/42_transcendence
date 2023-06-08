@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxRemoveFriends, reduxAddUserBlocked } from '../../../store/userSlice';
-import { apiBlockUser, deleteFriend } from '../../../api/relation';
+import { reduxRemoveFriends } from '../../../store/userSlice';
+import {  deleteFriend } from '../../../api/relation';
 
-import { ImBlocked } from 'react-icons/im';
-import { IconButton, Tooltip, Zoom } from '@mui/material';
+// import { ImBlocked } from 'react-icons/im';
+import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { RootState } from '../../../store';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
+import { ApiErrorResponse, UserInterface } from '../../../types';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 
@@ -26,19 +26,19 @@ export function FriendRow({
 }) {
   const dispatch = useDispatch();
 
-  async function handleBlockUser(
-    userToBlock: UserInterface,
-    e: React.MouseEvent<HTMLButtonElement>,
-  ) {
-    e.stopPropagation();
-    const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
-    if ('error' in res) {
-      dispatch(setErrorSnackbar('Error block user: ' + res.error));
-    } else {
-      dispatch(reduxAddUserBlocked(userToBlock));
-      dispatch(setMsgSnackbar('User blocked'));
-    }
-  }
+  // async function handleBlockUser(
+  //   userToBlock: UserInterface,
+  //   e: React.MouseEvent<HTMLButtonElement>,
+  // ) {
+  //   e.stopPropagation();
+  //   const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
+  //   if ('error' in res) {
+  //     dispatch(setErrorSnackbar('Error block user: ' + res.error));
+  //   } else {
+  //     dispatch(reduxAddUserBlocked(userToBlock));
+  //     dispatch(setMsgSnackbar('User blocked'));
+  //   }
+  // }
 
 
   async function handleRemoveFriend(
@@ -65,24 +65,48 @@ export function FriendRow({
     <div>
       <div className="border rounded-xl hover:bg-gray-100 transition-all 
       cursor-pointer flex flex-row items-center text-left">
-        <div className="flex-grow text-black m-2 p-2 flex items-center "
+        <div className="flex flex-grow text-black m-2 items-center "
           onClick={() => {
             setCurrentChatUser(userFriend);
             setOpen(false);
             setServiceToCall('chat');
           }}
         >
-          <img
-            className="w-10 h-10 rounded-full object-cover mr-2 "
-            src={'http://localhost:3000/avatars/' + userFriend.avatar}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+          <Badge
+            color={ 
+              userFriend.status === 'online' ? 'success' :
+                userFriend.status === 'absent' ? 'warning' :
+                  'error' 
+            }
+            overlap="circular"
+            badgeContent=" "
+            variant="dot"
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
             }}
-            alt="avatar"
-          />
-          {userFriend.login}
+            sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
+          >
+            <img
+              className="w-10 h-10 rounded-full object-cover mr-2 "
+              src={'http://localhost:3000/avatars/' + userFriend.avatar}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              }}
+              alt="avatar"
+            />
+          </Badge>
+          <Typography component="span"
+            sx={{ 
+              overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
+              color: userFriend.status === 'online' ? 'success' : 'error',
+            }}
+            title={userFriend.login}
+          >
+            {userFriend.login.length > 15 ? userFriend.login.slice(0, 12) + '...' : userFriend.login}
+          </Typography>
         </div>
 
         <Tooltip
@@ -95,7 +119,7 @@ export function FriendRow({
           </IconButton>
         </Tooltip>
 
-        <Tooltip
+        {/* <Tooltip
           title="Block User" arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
@@ -103,7 +127,7 @@ export function FriendRow({
           <IconButton onClick={(e) => handleBlockUser(userFriend, e)} color='error'>
             <ImBlocked />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
 
       </div>
     </div>
@@ -145,16 +169,18 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
 
   return (
     <>
-        <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono p-3 cursor-pointer 
+      <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg font-mono cursor-pointer 
       hover:bg-gray-100 transition-all ${open ? 'bg-gray-100' : ''}`}
-          onClick={() => setOpen(!open)}
-        >
-          <h2>Friends</h2>
-          { open && userData && userData.friends &&
-          <div ref={ref} className={`w-full bg-white border shadow-lg text-center rounded-xl mt-5
-          ${open ? '' : 'hidden'} transition-all`}
+        onClick={() => setOpen(!open)}
+      >
+        <h2 className='p-3'>Friends</h2>
+        {open && userData && userData.friends &&
+          <div ref={ref} className={
+            `w-full bg-white border shadow-lg text-center rounded-xl
+            ${open ? '' : 'hidden'} 
+            transition-all overflow-auto h-[calc(100vh-520px)]`}
           >
-            {userData.friends.length === 0 ? 
+            {userData.friends.length === 0 ?
               <p className="text-center">No friends yet</p>
               :
               userData.friends.map((friend: UserInterface) => {
@@ -171,8 +197,8 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
                   );
               })}
           </div>
-          }
-        </div>
+        }
+      </div>
     </>
   );
 }

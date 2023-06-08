@@ -38,6 +38,56 @@ export async function deleteFriend(
   );
 }
 
+
+
+
+
+
+
+
+
+export async function requestAddFriend(
+  userIdToAdd: number,
+): Promise< UserRelation | ApiErrorResponse > {
+  return apiRequest<UserRelation>(
+    'get',
+    '/relations/friends/' + userIdToAdd + '/request',
+    'Failed to request add user friend: ',
+  );
+}
+
+export async function acceptFriend(
+  userIdToAdd: number,
+): Promise< UserRelation | ApiErrorResponse > {
+  return apiRequest<UserRelation>(
+    'put',
+    '/relations/friends/' + userIdToAdd + '/accept',
+    'Failed to accept user friend: ',
+  );
+}
+
+export async function getFriendRequestsToMe(
+): Promise< UserInterface[] | ApiErrorResponse > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/relations/friends/requestsPending',
+    'Failed to get friend requests: ',
+  );
+}
+
+export async function getFriendRequestsSent(
+): Promise< UserInterface[] | ApiErrorResponse > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    '/relations/friends/requestsSent',
+    'Failed to get friend requests: ',
+  );
+}
+
+
+
+
+
 export async function addFriend(
   userIdToAdd: number,
 ): Promise< UserRelation | ApiErrorResponse > {
@@ -47,7 +97,6 @@ export async function addFriend(
     'Failed to add user friend: ',
   );
 }
-
 
 export async function apiBlockUser(
   userIdToBlock: UserInterface['id'],

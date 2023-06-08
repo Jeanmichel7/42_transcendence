@@ -52,6 +52,17 @@ export class AuthService {
     };
     if (user.is2FAEnabled) return res;
 
+    /* update status user */
+    const resultUpdate: UpdateResult = await this.userRepository.update(
+      { id: user.id },
+      {
+        status: 'online',
+        updatedAt: new Date(),
+      },
+    );
+    if (resultUpdate.affected === 0)
+      throw new BadRequestException(`User ${user.id} has not been updated.`);
+
     res.accessToken = await this.createJWT(user);
     return res;
   }

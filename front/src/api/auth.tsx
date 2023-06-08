@@ -1,6 +1,6 @@
 import { apiRequest } from './index';
 import { ApiErrorResponse, Api2FAResponse, UserInterface, ApiLogin2FACode } from '../types';
-import { AuthLogout } from '../types/AuthTypes';
+import { AuthInterface, AuthLogout } from '../types/AuthTypes';
 
 export async function isAuthenticated(): Promise< boolean | ApiErrorResponse > {
   return apiRequest<boolean>(
@@ -54,5 +54,30 @@ export async function check2FACode(
       code: code,
       userId: userId,
     },
+  );
+}
+
+export async function loginFakeUser(
+  login: string,
+  password: string,
+): Promise< AuthInterface | ApiErrorResponse > {
+  return apiRequest<AuthInterface>(
+    'post',
+    '/auth/loginFakeUser',
+    'Failed to login fake user: ',
+    {
+      login: login,
+      password: password,
+    },
+  );
+}
+
+export async function registerFakeUser(body: any)
+  : Promise< UserInterface | ApiErrorResponse > {
+  return apiRequest<UserInterface>(
+    'post',
+    '/users/registerFakeUser',
+    'Failed to register fake user: ',
+    body,
   );
 }

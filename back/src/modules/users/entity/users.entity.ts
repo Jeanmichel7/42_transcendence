@@ -120,18 +120,6 @@ export class UserEntity extends BaseEntity {
   })
   messagesReceive: MessageEntity[];
 
-  @OneToMany(
-    () => UserRelationEntity,
-    (userRelation) => userRelation.userRelation,
-  )
-  friends: UserEntity[];
-
-  @OneToMany(
-    () => UserRelationEntity,
-    (userRelation) => userRelation.userRelation,
-  )
-  blocked: UserEntity[];
-
   /* chat */
   @OneToMany(() => ChatMessageEntity, (message) => message.user, {
     cascade: true,
@@ -196,4 +184,21 @@ export class UserEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   wonGames: GameEntity[];
+
+  /* users relations */
+  @OneToMany(
+    () => UserRelationEntity,
+    (userRelation) => userRelation.userInitiateur,
+  )
+  initiatedRelations: UserRelationEntity[];
+
+  @OneToMany(
+    () => UserRelationEntity,
+    (userRelation) => userRelation.userRelation,
+  )
+  relatedRelations: UserRelationEntity[];
+
+  get relations(): UserRelationEntity[] {
+    return [...this.initiatedRelations, ...this.relatedRelations];
+  }
 }
