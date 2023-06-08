@@ -7,10 +7,12 @@ import SideBar from './components/Sidebar/Sidebar';
 import AppRoutes from './routes/indexRoutes';
 import { isAuthenticated } from './api/auth';
 import { getUserData } from './api/user';
-import { getBlockedUsers, getFriends } from './api/relation';
+import { getBlockedUsers, getFriendRequests, getFriendRequestsSent, getFriends } from './api/relation';
 import {
   reduxSetFriends,
   reduxSetUserBlocked,
+  reduxSetWaitingFriends,
+  reduxSetWaitingFriendsSent,
   setLogged,
   setUser,
 } from './store/userSlice';
@@ -53,6 +55,8 @@ function App() {
         await fetchData(getUserData, setUser);
         await fetchData(getFriends, reduxSetFriends);
         await fetchData(getBlockedUsers, reduxSetUserBlocked);
+        await fetchData(getFriendRequests, reduxSetWaitingFriends);
+        await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
 
       } else {
         dispatch(setLogged(false));

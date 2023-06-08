@@ -78,7 +78,7 @@ export async function cancelFriendRequest(
   );
 }
 
-export async function getFriendRequestsToMe(
+export async function getFriendRequests(
 ): Promise< UserInterface[] | ApiErrorResponse > {
   return apiRequest<UserInterface[]>(
     'get',

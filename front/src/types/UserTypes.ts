@@ -8,10 +8,13 @@ export interface UserInterface {
   status: 'online' | 'offline' | 'absent' | 'in game',
   avatar: string,
   description: string,
-  friends?: UserInterface[],
-  userBlocked?: UserInterface[],
   role?: 'user' | 'admin',
   is2FAEnabled: boolean,
+  friends?: UserInterface[],
+  userBlocked?: UserInterface[],
+  waitingFriendsRequestReceived?: UserInterface[],
+  waitingFriendsRequestSent?: UserInterface[],
+
 }
 
 export interface UserRelation {

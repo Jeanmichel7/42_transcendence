@@ -63,7 +63,7 @@ export function FriendRow({
 
   return (
     <div>
-      <div className="border rounded-xl hover:bg-gray-100 transition-all 
+      <div className="border hover:bg-gray-100 transition-all 
       cursor-pointer flex flex-row items-center text-left">
         <div className="flex flex-grow text-black m-2 items-center "
           onClick={() => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 // import ChatRoom from '../components/Chat/ChatRoom';
-import Friends from '../components/Chat/Friends/Friends';
+import Friends from '../components/Chat/Friends/FriendsRaw';
 import Conversation from '../components/Chat/Conversation';
 import ButtonInterfaceAddFriends from '../components/Chat/Friends/FriendsSearchButton';
 import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
