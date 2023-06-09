@@ -9,11 +9,13 @@ import { CircularProgress } from '@mui/material';
 import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { useState } from 'react';
 import FriendItem from './FriendItem';
+import { useNavigate } from 'react-router-dom';
 
 const AllFriends = () => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
@@ -41,6 +43,10 @@ const AllFriends = () => {
     }
   };
 
+  const handleNavigateToChat = (user: UserInterface) => {
+    navigate(`/chat?service=chat&userId=${user.id}`);
+  };
+
   if (isLoading) {
     return <CircularProgress />;
   }
@@ -56,6 +62,7 @@ const AllFriends = () => {
          key={user.id}
           user={user}
           actions={[
+            { name: 'Chat', callback: handleNavigateToChat },
             { name: 'Block', callback: handleBlockUser },
             { name: 'Delete', callback: handleDeleteFriend },
           ]}

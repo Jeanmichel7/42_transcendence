@@ -346,7 +346,7 @@ export class GameService {
       .getMany();
 
     const result: GameInterface[] = games;
-    console.log('result get all game : ', result);
+    // console.log('result get all game : ', result);
     return result;
   }
 }

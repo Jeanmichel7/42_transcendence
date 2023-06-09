@@ -1,5 +1,6 @@
 import { Badge, Button, Typography } from '@mui/material';
 import { UserInterface } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendItemProps {
   user: UserInterface;
@@ -10,12 +11,15 @@ interface FriendItemProps {
 }
 
 const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
+  const navigate = useNavigate();
+  
   return (
     <div>
-
       <div className="border hover:bg-gray-100 transition-all 
       cursor-pointer flex flex-row items-center">
-        <div className="flex flex-grow text-black m-2 items-center">
+        <div className="flex flex-grow text-black m-2 items-center"
+          onClick={() => {navigate(`/profile/${user.login}`);}}
+        >
           <Badge
             color={
               user.status === 'online' ? 'success' :
@@ -64,6 +68,12 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
                 key={index}
                 variant='outlined'
                 onClick={() => action.callback(user)}
+                color={
+                  action.name === 'Delete' ||
+                  action.name === 'Cancel' ||
+                  action.name === 'Decline' ? 'error' 
+                    : action.name === 'Block' ? 'warning' 
+                      : 'primary' }
                 sx={{ marginRight: '10px' }}
               >
                 {action.name}

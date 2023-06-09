@@ -12,6 +12,9 @@ import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
 import { UserRelationInterface } from 'src/modules/users_relations/interfaces/users_relations.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationInterface } from '../users/interfaces/notification.interface';
+import { NotificationCreatedEvent } from '../users/events/notification.event';
 
 @Injectable()
 export class UsersRelationsService {
@@ -20,6 +23,7 @@ export class UsersRelationsService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(UserRelationEntity)
     private readonly userRelationRepository: Repository<UserRelationEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   // surement foireux !
@@ -131,7 +135,7 @@ export class UsersRelationsService {
           }),
         )
         .getMany();
-    console.log('allRelationFriends : ', allRelationFriends);
+    // console.log('allRelationFriends : ', allRelationFriends);
 
     const allFriends: UserInterface[] = allRelationFriends.map((relation) =>
       relation.userInitiateur.id == userId
@@ -265,12 +269,14 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
+      select: ['id', 'login'],
     });
     if (!userToUpdate)
       throw new NotFoundException(`User with id ${userId} not found`);
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
+      select: ['id', 'login'],
     });
     if (!userFriend)
       throw new NotFoundException(`User friend with id ${friendId} not found`);
@@ -322,6 +328,22 @@ export class UsersRelationsService {
       try {
         const createdRelation: UserRelationEntity =
           await this.userRelationRepository.save(newRelation);
+
+        // send notification to userFriend
+        const notification: NotificationInterface = {
+          type: 'friendRequest',
+          content: `send you a friend request`,
+          read: false,
+          receiver: userFriend,
+          sender: userToUpdate,
+          createdAt: new Date(),
+        };
+        // this.eventEmitter.emit('notification.created', notification);
+        this.eventEmitter.emit(
+          'notification.created',
+          new NotificationCreatedEvent(notification),
+        );
+
         return createdRelation;
       } catch (e) {
         throw new BadRequestException(
@@ -564,8 +586,8 @@ export class UsersRelationsService {
     }
 
     if (relationExist.relationType == 'pending') {
-      console.log('relationExist : ', relationExist.userInitiateur.id);
-      console.log('userId : ', userId);
+      // console.log('relationExist : ', relationExist.userInitiateur.id);
+      // console.log('userId : ', userId);
       if (relationExist.userInitiateur.id == userId) {
         try {
           await this.userRelationRepository.delete({

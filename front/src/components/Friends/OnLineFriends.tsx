@@ -7,10 +7,12 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { CircularProgress } from '@mui/material';
 import FriendItem from './FriendItem';
+import { useNavigate } from 'react-router-dom';
 
 const OnLineFriends = () => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
@@ -39,6 +41,10 @@ const OnLineFriends = () => {
     }
   };
 
+  const handleNavigateToChat = (user: UserInterface) => {
+    navigate(`/chat?service=chat&userId=${user.id}`);
+  };
+
   if (isLoading) {
     return <CircularProgress />;
   }
@@ -55,6 +61,7 @@ const OnLineFriends = () => {
           key={user.id}
           user={user}
           actions={[
+            { name: 'Chat', callback: handleNavigateToChat },
             { name: 'Block', callback: handleBlockUser },
             { name: 'Delete', callback: handleDeleteFriend },
           ]}

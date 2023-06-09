@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
 
 interface FriendCardProps {
-  actualUserLogin: string,
+  actualUserLogin?: string,
   friend: UserInterface,
   setFriends?: React.Dispatch<React.SetStateAction<UserInterface[]>> 
 }

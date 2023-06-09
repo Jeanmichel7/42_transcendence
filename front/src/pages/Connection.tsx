@@ -48,22 +48,18 @@ function ConnectPage() {
   //check if 2FA is activated
   useEffect(() => {
     async function fetchAndSetIs2FAactived() {
-      try {
-        const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-        if ('error' in res) {
-          dispatch(setErrorSnackbar('Error get user data: ' + res.error));
+      const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+      if ('error' in res) {
+        dispatch(setErrorSnackbar('Error get user data: ' + res.error));
+      } else {
+        if (res.is2FAactived) {
+          setIs2FAactiv(res.is2FAactived);
+          setUserId(res.user.id);
         } else {
-          if (res.is2FAactived) {
-            setIs2FAactiv(res.is2FAactived);
-            setUserId(res.user.id);
-          } else {
-            await saveUserData();
-            // await new Promise(r => setTimeout(r, 10000)); wait 10s
-            navigate('/home');
-          }
+          await saveUserData();
+          // await new Promise(r => setTimeout(r, 10000)); wait 10s
+          navigate('/home');
         }
-      } catch (e) {
-        console.log('Error fetching user profile:', e);
       }
     }
     fetchAndSetIs2FAactived();

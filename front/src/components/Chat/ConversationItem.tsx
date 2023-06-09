@@ -172,8 +172,8 @@ const MessageItem: FC<MessageItemProps> = memo(({
       </div>
 
       {/**
-    * Formulaires edit message
-    **/}
+      * Formulaires edit message
+      **/}
       {editMessage &&
         <div className='flex'>
           <FormControl variant="standard" className='w-full'>

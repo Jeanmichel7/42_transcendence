@@ -15,8 +15,11 @@ import { MessageInterface } from '../../types/ChatTypes';
 import { BiPaperPlane } from 'react-icons/bi';
 import { TextareaAutosize } from '@mui/material';
 
+interface ConversationProps {
+  id: number;
+}
 
-const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
+const Conversation: React.FC<ConversationProps> = ({ id }) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
@@ -30,7 +33,7 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
 
   // connect socket
   const connectSocket = useCallback(() => {
-    if (userSelected.id == -1) return;
+    if (id == -1) return;
     if (userData.id == -1) return;
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
@@ -41,7 +44,7 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
     //connect to room
     socket.emit('joinPrivateRoom', {
       user1Id: userData.id,
-      user2Id: userSelected.id,
+      user2Id: id,
     });
  
     //listen on /message
@@ -54,16 +57,20 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
 
     return () => {
       socket.off('message');
+      // socket.emit('leaveRoom', {
+      //   user1Id: userData.id,
+      //   user2Id: id,
+      // });
       socket.disconnect();
     };
-  }, [userData.id, userSelected.id]);
+  }, [userData.id, id]);
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
-    if (userSelected.id == -1) return;
+    if (id == -1) return;
     setShouldScrollToBottom(false);
 
-    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(userSelected.id, pageDisplay);
+    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay);
     if ('error' in allMessages)
       dispatch(setErrorSnackbar('Error get old messages: ' + allMessages.error));
     else {
@@ -82,7 +89,7 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
         setShouldScrollToBottom(true);
       });
     }
-  }, [dispatch, pageDisplay, userSelected.id]);
+  }, [dispatch, pageDisplay, id]);
 
 
 
@@ -116,12 +123,12 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
   };
 
   // delete message
-  const handleDeleteMessage = async (id: number) => {
+  const handleDeleteMessage = async (msgId: number) => {
     const res = await apiDeleteMessage(id);
     if (typeof res === 'object' && 'error' in res)
       dispatch(setErrorSnackbar('Error delete message: ' + res.error));
     else {
-      setMessages((prev) => prev.filter((message) => message.id !== id));
+      setMessages((prev) => prev.filter((message) => message.id !== msgId));
       dispatch(setMsgSnackbar('Message deleted'));
     }
   };
@@ -142,7 +149,7 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
     e.preventDefault();
     setStatusSendMsg('pending');
 
-    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, userSelected.id);
+    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, id);
     if ('error' in newMessage)
       setStatusSendMsg(newMessage.message);
     else
@@ -164,15 +171,15 @@ const Conversation = ({ userSelected }: { userSelected: UserInterface }) => {
 
   return (
     <>
-      {userSelected.id == -1 ?
+      {id == -1 ?
         <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
           Select a user to start a conversation
         </div>
         :
         <div className="flex flex-col h-full justify-between">
-          <div className="w-full text-lg text-blue text-center">
-            {userSelected.login}
-          </div>
+          {/* <div className="w-full text-lg text-blue text-center">
+            {login}
+          </div> */}
 
           <div className="overflow-y-auto" onScroll={handleScroll}>
 

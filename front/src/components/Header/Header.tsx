@@ -1,14 +1,16 @@
-import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLogout } from '../../store/userSlice';
-import { ApiErrorResponse, UserInterface } from '../../types';
+import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import { logout } from '../../api/auth';
+import { io } from 'socket.io-client';
 
+import { Badge } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -21,11 +23,24 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+// import SearchIcon from '@mui/icons-material/Search';
+// import MailIcon from '@mui/icons-material/Mail';
+
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+
+
+
+import NotificationItem from './NotificationItem';
 
 
 function Header() {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const storedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [anchorElNotification, setAnchorElNotification] = useState<null | HTMLElement>(null);
+  const [notifications, setNotifications] = useState<NotificationInterface[]>(storedNotifications);
 
   /* redux */
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
@@ -33,20 +48,68 @@ function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
+  const connectWebSocket = useCallback(() => {
+    if (!userData.id) return;
+
+    const socket = io('http://localhost:3000/notification', {
+      reconnectionDelayMax: 10000,
+      withCredentials: true,
+    });
+
+    socket.on('connect', () => {
+      console.log('connected general socket');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('disconnected general socket');
+    });
+
+    //connect room
+    socket.emit('joinNotificationRoom', {
+      userId: userData.id,
+    });
+
+    socket.on('notification', (notification: NotificationInterface) => {
+      console.log('new notification : ', notification.content);
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        notification,
+      ]);
+    });
+
+    return () => {
+      socket.off('notification');
+      socket.disconnect();
+    };
+  }, [userData.id]);
+
+  //handler nav menu
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
+  //handlers user menu
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  // handler notifications
+  const handleOpenNotificationMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNotification(event.currentTarget);
+  };
+  const handleCloseNotificationMenu = () => {
+    setAnchorElNotification(null);
+  };
+
+
+
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
@@ -58,6 +121,117 @@ function Header() {
       navigate('/');
     }
   }
+
+
+
+
+  useEffect(() => {
+    connectWebSocket();
+  }, [connectWebSocket]);
+
+  useEffect(() => {
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+    console.log('notifications : ', notifications);
+  }, [notifications]);
+
+
+
+
+  const renderMobileNotification = (
+    <Box sx={{ display: { xs: 'flex flex-raw', md: 'none' } }}>
+      {/* <NavLink to='#'>
+        <MenuItem>
+          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+            <Badge badgeContent={4} color="error">
+              <MailIcon />
+            </Badge>
+          </IconButton>
+          <p>Messages</p>
+        </MenuItem>
+      </NavLink> */}
+
+      <NavLink to='#'>
+        <MenuItem>
+          <IconButton
+            size="large"
+            aria-label="show new notifications"
+            color="inherit"
+            onClick={handleOpenNotificationMenu}
+          >
+            <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
+              { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
+                notifications.length ? <NotificationsIcon /> :
+                <NotificationsNoneIcon /> 
+              }
+            </Badge>
+          </IconButton>
+          <p>Notifications</p>
+        </MenuItem>
+      </NavLink>
+    </Box>
+  );
+
+  const renderStandardNotification = (
+    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+      {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+        <Badge badgeContent={4} color="error">
+          <MailIcon />
+        </Badge>
+      </IconButton> */}
+
+      <IconButton
+        size="large"
+        aria-label="show new notifications"
+        color="inherit"
+        onClick={handleOpenNotificationMenu}
+      >
+        <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
+          { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
+            notifications.length ? <NotificationsIcon /> :
+              <NotificationsNoneIcon />
+          }
+        </Badge>
+      </IconButton>
+    </Box>
+  );
+
+  const notificationMenu = (
+    <Menu
+      sx={{ mt: '55px' }}
+      id="menu-appbar"
+      anchorEl={anchorElNotification}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      open={Boolean(anchorElNotification) && notifications.length > 0}
+      onClose={handleCloseNotificationMenu}
+    >
+      {notifications.map((notification: NotificationInterface, index: number) => (
+        <NotificationItem
+          key={index}
+          notification={notification}
+          setNotifications={setNotifications}
+          setAnchorElNotification={setAnchorElNotification}
+        />
+      ))}
+    </Menu>
+  );
+
+
+
+
+
+
+
+  if (!userData.id)
+    return null;
+
 
   return (
     <AppBar position="static">
@@ -207,26 +381,37 @@ function Header() {
           {/**
            * Display Menu icon user
            */}
-          <Box sx={{ flexGrow: 0 }}>
-            {!userIsLogged ?
-              <div className='flex'>
-                <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
-                  <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
-                    Login Intra
-                  </Button>
-                </NavLink>
-                <NavLink to="/fakeconnection">
-                  <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
-                    Login Fake
-                  </Button>
-                </NavLink>
-
-              </div>
-              :
-              <>
-                <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    { userData.avatar &&
+          <Box sx={{ flexGrow: 1 }} />
+          {userIsLogged == false &&
+            <div className='flex'>
+              <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
+                <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                  Login Intra
+                </Button>
+              </NavLink>
+              <NavLink to="/fakeconnection">
+                <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                  Login Fake
+                </Button>
+              </NavLink>
+            </div>
+          }
+          {userIsLogged &&
+            <>
+              { renderStandardNotification }
+              {/**
+              *       always display
+              */}
+              <Tooltip title="Open settings">
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-haspopup="true"
+                  onClick={handleOpenUserMenu}
+                  color="inherit"
+                >
+                  {userData.avatar &&
                     <Avatar alt="avatar" src={'http://localhost:3000/avatars/' + userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -234,43 +419,50 @@ function Header() {
                         target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
                       }}
                     />}
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <NavLink to='/account'>
-                    <MenuItem onClick={handleCloseUserMenu}>
-                      Account
-                    </MenuItem>
-                  </NavLink>
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {renderMobileNotification}
 
-                  <NavLink to='/' onClick={handleLogout}>
-                    <MenuItem onClick={handleCloseUserMenu}>
-                      Logout
-                    </MenuItem>
-                  </NavLink>
-                </Menu>
-              </>
-            }
-          </Box>
+                <NavLink to='/account'>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    Account
+                  </MenuItem>
+                </NavLink>
+
+                <NavLink to='/' onClick={handleLogout}>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    Logout
+                  </MenuItem>
+                </NavLink>
+              </Menu>
+
+              {/** Menu notifications */}
+              {notificationMenu}
+
+            </>
+          }
+
 
         </Toolbar>
       </Container>
     </AppBar>
+
   );
 }
 

@@ -14,7 +14,7 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
   namespace: 'messagerie',
   cors: {
     origin: 'http://localhost:3006',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },
 })
@@ -41,6 +41,7 @@ export class MessagerieWebsocketService {
     console.log('joined private room', privateRoomName, data);
   }
 
+  @SubscribeMessage('leavePrivateRoom')
   async handleLeave(
     @MessageBody() data: { user1Id: string; user2Id: string },
     @ConnectedSocket() client: Socket,

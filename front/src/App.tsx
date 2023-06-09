@@ -46,26 +46,28 @@ function App() {
     }
   }, [dispatch]);
 
+  const checkAuth = useCallback(async () => {
+    const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
+    if (typeof isAuth === 'boolean' && isAuth === true) {
+      dispatch(setLogged(true));
+
+      await fetchData(getUserData, setUser);
+      await fetchData(getFriends, reduxSetFriends);
+      await fetchData(getBlockedUsers, reduxSetUserBlocked);
+      await fetchData(getFriendRequests, reduxSetWaitingFriends);
+      await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
+
+    } else {
+      dispatch(setLogged(false));
+      // navigate('/');
+    }
+  }, [dispatch, fetchData]);
+
+
   useEffect(() => {
-    const checkAuth = async () => {
-      const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
-      if (typeof isAuth === 'boolean' && isAuth === true) {
-        dispatch(setLogged(true));
-
-        await fetchData(getUserData, setUser);
-        await fetchData(getFriends, reduxSetFriends);
-        await fetchData(getBlockedUsers, reduxSetUserBlocked);
-        await fetchData(getFriendRequests, reduxSetWaitingFriends);
-        await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
-
-      } else {
-        dispatch(setLogged(false));
-        // navigate('/');
-      }
-    };
     checkAuth();
-  }, [dispatch, navigate, fetchData]);
-
+  }, [dispatch, navigate, fetchData, checkAuth]);
+  
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
