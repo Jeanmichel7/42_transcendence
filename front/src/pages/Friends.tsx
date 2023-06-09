@@ -5,7 +5,7 @@ import WaitingRequestSent from '../components/Friends/WaitingRequestSent';
 import AllFriends from '../components/Friends/AllFriends';
 import BlockedUser from '../components/Friends/BlockedUser';
 
-import { AppBar, Badge, Box, Divider, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import { AppBar, Badge, Box, Tab, Tabs, Toolbar, Typography } from '@mui/material';
 import OnLineFriends from '../components/Friends/OnLineFriends';
 import AddFriends from '../components/Friends/AddFriends';
 import { useSelector } from 'react-redux';

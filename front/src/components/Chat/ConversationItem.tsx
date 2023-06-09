@@ -87,7 +87,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
   useEffect(() => {
     const fctTime = setInterval(() => {
       setMessageTime(getTimeSince(message.createdAt));
-    }, 1000 * 10);
+    }, 1000 * 10); //10sec
     return () => {
       clearInterval(fctTime);
     };
