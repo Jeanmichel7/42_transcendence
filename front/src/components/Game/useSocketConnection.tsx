@@ -10,8 +10,11 @@ const useSocketConnection = (
   posRacket: any,
   gameId: any,
   scorePlayers: any,
-  bonusesRef: any,
+  bonusPositionRef: any,
   setGameStarted: any,
+  bonusIsLoading: any,
+  bonusValueRef: any,
+  racketHeightRef: any,
 ) => {
   const data = useRef({});
 
@@ -23,14 +26,26 @@ const useSocketConnection = (
       posRacket.current.right = serverData.racketLeft;
       scorePlayers.current.left = serverData.player1Score;
       scorePlayers.current.right = serverData.player2Score;
-
-    } else {
+      racketHeightRef.current.left = serverData.racketRightHeight;
+      racketHeightRef.current.right = serverData.racketLeftHeight;
+      if (serverData.bonus) {
+      bonusPositionRef.current = serverData.bonus;
+        bonusPositionRef.current.x = GROUND_MAX_SIZE - serverData.bonus.x;
+      }
+      bonusIsLoading.current = serverData.bonusPlayer2Loading;
+      bonusValueRef.current = serverData.bonusPlayer2?.id;
+      }
+     else {
+      racketHeightRef.current.left = serverData.racketLeftHeight;
+      racketHeightRef.current.right = serverData.racketRightHeight;
       scorePlayers.current.left = serverData.player2Score;
       scorePlayers.current.right = serverData.player1Score;
       posRacket.current.right = serverData.racketRight;
+      bonusPositionRef.current = serverData.bonus;
+      bonusIsLoading.current = serverData.bonusPlayer1Loading;
+      bonusValueRef.current = serverData.bonusPlayer1?.id;
     }
     gameId.current = serverData.gameId;
-    bonusesRef.current = serverData.bonuses;
     return data.current;
   }
 
@@ -42,6 +57,7 @@ const useSocketConnection = (
         ArrowDown: keyStateRef.current['ArrowDown'],
         ArrowUp: keyStateRef.current['ArrowUp'],
         gameId: gameId.current,
+        useBonus: keyStateRef.current[' '],
       });
     }, 1000 / 60);
 

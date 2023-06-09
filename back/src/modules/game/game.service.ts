@@ -9,7 +9,10 @@ const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 50;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
-const bonus_id = ['racketSize', 'slow', 'laser']
+const BONUSES_TAB = 
+[{id: 'racketSize', duration: 10000}
+,{id: 'slow', duration: 10000}
+,{id: 'laser', duration: 10000}];
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -18,11 +21,13 @@ const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
 
+
 interface clientUpdate {
   posRacket: number;
   ArrowDown: boolean;
   ArrowUp: boolean;
   gameId: string;
+  useBonus: boolean;
 }
 
 export class Game {
@@ -46,8 +51,18 @@ export class Game {
   gameStart: boolean;
   startTime: number;
   fail: boolean;
-  bonuses: any[];
+
+  bonus: any;
   bonusesLastGeneration: number;
+  bonusPlayer1: any;
+  bonusPlayer1Loading: boolean;
+  bonusPlayer2: any;
+  bonusPlayer2Loading: boolean;
+  racketLeftHeight: number;
+  racketRightHeight: number;
+  player1useBonus: boolean;
+  player2useBonus: boolean;
+
 
   constructor(
     socketPlayer1Id: string,
@@ -67,7 +82,6 @@ export class Game {
     this.socketPlayer2Id = socketPlayer2Id;
     this.player1Username = player1Username;
     this.player2Username = player2Username;
-    this.bonusesLastGeneration = performance.now();
     this.winner = null;
     this.lastTime = performance.now();
     this.id = Math.random().toString(36).substr(2, 9);
@@ -78,31 +92,80 @@ export class Game {
     this.gameStart = false;
     this.startTime = performance.now();
     this.fail = false;
-    this.bonuses = [];
+    this.bonus = null;
+    this.bonusPlayer1 = null;
+    this.bonusPlayer2 = null;
+    this.bonusesLastGeneration = performance.now();
+    this.racketLeftHeight = RACKET_HEIGHT_10;
+    this.racketRightHeight = RACKET_HEIGHT_10;
+    this.player1useBonus = false;
+    this.player2useBonus = false;
   }
 
   generateBonus() {
-    const bonus = {
-      x: Math.random() * GROUND_MAX_SIZE,
-      y: Math.random() * GROUND_MAX_SIZE,
-      id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
-      boxSize: 10
+    if (this.bonus === null)
+    {
+      let x; 
+      do 
+      x = Math.random() * GROUND_MAX_SIZE;
+      while (x > RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 && x < RACKET_RIGHT_POS_X_10);
+      this.bonus = {
+        x: Math.random() * GROUND_MAX_SIZE,
+        y: Math.random() * GROUND_MAX_SIZE,
+        //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
+        boxSize: 50,
+      }
+     
     }
-    this.bonuses.push(bonus);
   }
 
-
   checkBonusCollision() {
-    this.bonuses.forEach((bonus) => {
-      if (
-        this.ball.x + BALL_RADIUS > bonus.x &&
-        this.ball.x - BALL_RADIUS < bonus.x + bonus.boxSize &&
-        this.ball.y + BALL_RADIUS > bonus.y &&
-        this.ball.y - BALL_RADIUS < bonus.y + bonus.boxSize
+  
+      if (this.bonus && 
+        this.ball.x + BALL_RADIUS > this.bonus.x &&
+        this.ball.x - BALL_RADIUS < this.bonus.x + this.bonus.boxSize &&
+        this.ball.y + BALL_RADIUS > this.bonus.y &&
+        this.ball.y - BALL_RADIUS < this.bonus.y + this.bonus.boxSize
       ) {
-      }
-      return false;
-    })}
+      return true;
+    }
+    return false;
+  }
+   
+  checkBonusDuration(currentTime: number) {
+
+    if (this.bonusPlayer1 && currentTime - this.bonusPlayer1.duration > this.bonusPlayer1.duration) {
+        this.bonusPlayer1 = null;
+    }
+
+    if (this.bonusPlayer2 && currentTime - this.bonusPlayer2.duration > this.bonusPlayer2.duration) {
+        this.bonusPlayer2 = null;
+    }
+}
+
+  async assignRandomBonus() {
+    if (this.ball.vx > 0) {
+      this.bonusPlayer1Loading = true;
+    } else {
+      this.bonusPlayer2Loading = true;
+    }
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const bonus = BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)];
+  
+    // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
+    if (this.bonusPlayer1Loading) {
+      this.bonusPlayer1 = bonus;
+      this.bonusPlayer1.duration = performance.now();
+      this.bonusPlayer1Loading = false;
+    } else {
+      this.bonusPlayer2 = bonus;
+      this.bonusPlayer1.duration = performance.now();
+      this.bonusPlayer2Loading = false;
+    }
+  }
+
+  
   updateBallPosition() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
@@ -114,11 +177,24 @@ export class Game {
         return;
       }
     }
-    if(currentTime - this.bonusesLastGeneration > 20000) {  
+    if(this.bonus === null && currentTime - this.bonusesLastGeneration > 20000) {  
       this.bonusesLastGeneration = currentTime;
       this.generateBonus();
+      console.log('generate bonus');
     }
-
+    if (this.checkBonusCollision()){
+      if (this.ball.vx > 0) {
+        this.bonusPlayer1 = this.bonus;
+      }
+      else {
+        this.bonusPlayer2 = this.bonus;
+      }
+      this.bonusesLastGeneration = currentTime;
+      this.bonus = null;
+    }
+    console.log(this.bonusPlayer1, this.bonusPlayer2);
+    console.log(this.player1useBonus , this.player2useBonus);
+   
     if (
       this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE ||
       this.ball.y - BALL_RADIUS < 0
@@ -133,57 +209,41 @@ export class Game {
     if (
       this.ball.x <= RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
       this.ball.y >= this.racketLeft &&
-      this.ball.y <= this.racketLeft + RACKET_HEIGHT_10 &&
+      this.ball.y <= this.racketLeft + this.racketLeftHeight &&
       !this.fail
     ) {
       console.log('fail');
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
-      if (this.player1ArrowDown) {
-        this.ball.vy += SPEED_INCREASE;
-        this.ball.vx = -this.ball.vx;
-        this.ball.speed += SPEED_INCREASE;
-      } else if (this.player1ArrowUp) {
-        this.ball.vy -= SPEED_INCREASE;
-        this.ball.vx = -this.ball.vx;
-        this.ball.speed -= SPEED_INCREASE;
-      } else {
-        const racketCenter = this.racketLeft + RACKET_HEIGHT_10 / 2 ;
+    
+        const racketCenter = this.racketLeft + this.racketLeftHeight / 2 ;
         const relativePostion = this.ball.y - racketCenter;
-        let proportion = relativePostion / (RACKET_HEIGHT_10 / 2);
+        let proportion = relativePostion / (this.racketLeftHeight / 1);
         proportion = Math.max(Math.min(proportion, 0.9), -0.9);
         this.ball.speed += SPEED_INCREASE;
         this.ball.vy = proportion;
         this.ball.vx = Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;; 
         this.ball.vy *= this.ball.speed;
-      }
+      
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
       this.ball.y >= this.racketRight &&
-      this.ball.y <= this.racketRight + RACKET_HEIGHT_10 &&
+      this.ball.y <= this.racketRight + this.racketRightHeight &&
       !this.fail
     ) {
       this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
-      if (this.player2ArrowDown) {
-        this.ball.vy += SPEED_INCREASE;
-        this.ball.vx = -this.ball.vx;
-        this.ball.speed += SPEED_INCREASE;
-      } else if (this.player2ArrowUp) {
-        this.ball.vy -= SPEED_INCREASE;
-        this.ball.vx = -this.ball.vx;
-        this.ball.speed -= SPEED_INCREASE;
-      } else {
-        const racketCenter = this.racketRight + RACKET_HEIGHT_10 /2 ;
+     
+        const racketCenter = this.racketRight + this.racketRightHeight /2 ;
         const relativePostion = this.ball.y - racketCenter;
-        let proportion = relativePostion / (RACKET_HEIGHT_10 / 2) ;
+        let proportion = relativePostion / (this.racketRightHeight / 2) ;
         proportion =  Math.max(Math.min(proportion, 0.9), -0.9);
         this.ball.speed += SPEED_INCREASE;
         this.ball.vy = proportion;
         this.ball.vy = Math.min(this.ball.vy, 0.9);  
-this.ball.vy = Math.max(this.ball.vy, -0.9); 
+        this.ball.vy = Math.max(this.ball.vy, -0.9); 
         this.ball.vx =  Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;
         this.ball.vy *= this.ball.speed;
         this.ball.vx = -this.ball.vx;
-      }
+      
     } else if (
       this.ball.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS ||
       this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS
@@ -231,7 +291,8 @@ this.ball.vy = Math.max(this.ball.vy, -0.9);
     }
     this.ball.x += this.ball.vx * deltaTime;
     this.ball.y += this.ball.vy * deltaTime;
-  }
+  
+}
 
   getState() {
     return {
@@ -246,7 +307,13 @@ this.ball.vy = Math.max(this.ball.vy, -0.9);
       player1Username: this.player1Username,
       player2Username: this.player2Username,
       gameStart: this.gameStart,
-      bonuses: this.bonuses,
+      bonus: this.bonus,
+      bonusPlayer1: this.bonusPlayer1,
+      bonusPlayer2: this.bonusPlayer2,
+      racketLeftHeight: this.racketLeftHeight,
+      racketRightHeight: this.racketRightHeight,
+      bonusPlayer1Loading: this.bonusPlayer1Loading,
+      bonusPlayer2Loading: this.bonusPlayer2Loading,
     };
   }
 
@@ -255,7 +322,9 @@ this.ball.vy = Math.max(this.ball.vy, -0.9);
       this.racketLeft = clientData.posRacket;
       this.player1ArrowDown = clientData.ArrowDown;
       this.player1ArrowUp = clientData.ArrowUp;
+      this.player1useBonus = clientData.useBonus;
     } else if (clientId === this.socketPlayer2Id) {
+      this.player2useBonus = clientData.useBonus;
       this.racketRight = clientData.posRacket;
       this.player2ArrowDown = clientData.ArrowDown;
       this.player2ArrowUp = clientData.ArrowUp;

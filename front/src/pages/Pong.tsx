@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import EndGame from '../components/Game/EndGame';
 import Score from '../components/Game/Score';
 import { BiWindows } from 'react-icons/bi';
@@ -15,6 +15,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import {Overlay} from '../components/Game/Overlay';
 import CountDown from '../components/Game/CountDown';
+import BonusBox from '../components/Game/BonusBox';
 
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
@@ -50,15 +51,22 @@ const GameWrapper = styled.div`
 `;
 
 const Bonus = styled.div`
+width: 10px;
+height: 10px;
+border : 1px solid red;
+position: absolute;
+left: ${(props) => props.posX}px;
+top: ${(props) => props.posY}px;
 `
+
 
 const Racket = styled.div.attrs((props) => ({
   style: {
-    transform: `translateY(${props.posY * RACKET_FACTOR_1000}%)`,
+    transform: `translateY(${props.posY * ((100 / props.height) )}%)`,
   },
 }))`
   width: ${RACKET_WIDTH}%;
-  height: ${RACKET_HEIGHT}%;
+  height: ${(props) => props.height / 10}%;
   background-color: blue;
   position: absolute;
   left: ${(props) =>
@@ -84,6 +92,33 @@ const Ball = styled.div.attrs((props) => {
   top: 0%;
   border-radius: 50%;
 `;
+
+const laserGlow = keyframes`
+  0% { box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.7); }
+  50% { box-shadow: 0 0 20px 3px rgba(255, 0, 0, 0.9); }
+  100% { box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.7); }
+`;
+
+const laserFlow = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 0; }
+`;
+
+// Use the animations in your component
+const Laser = styled.div`
+  position: absolute;
+  width: 100000px;
+  height: 10px;
+  top: 50%;
+  z-index: 10;
+  background: linear-gradient(to right, red, white, red);
+  background-size: 50px 100%;
+  animation: ${laserFlow} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite;
+`;
+
+
+
+
 
 function Game({
   socket,
@@ -112,20 +147,24 @@ function Game({
   const lastDateTime = useRef(0);
   const gameId = useRef(0);
   const [gameStarted, setGameStarted] = useState();
-  const bonusesRef = useRef({} as any);
+  const bonusPositionRef = useRef({} as any);
+  const bonusIsLoading = useRef(false);
+  const bonusValueRef = useRef();
+  const racketHeightRef = useRef({left : RACKET_HEIGHT_10, right : RACKET_HEIGHT_10});
   const { gameData } = useSocketConnection(
     socket,
     keyStateRef,
     posRacket,
     gameId,
     scorePlayers,
-    bonusesRef,
-    setGameStarted
+    bonusPositionRef,
+    setGameStarted,
+    bonusIsLoading,
+    bonusValueRef,
+    racketHeightRef
   );
   const fail = useRef(false);
   const correctionFactor = useRef(0);
-
-
 
   useEffect(() => {
     const handleResize = () => {
@@ -155,19 +194,19 @@ function Game({
         newBall.vy = 0;
         newBall.x = 500;
         newBall.y = 500;
-        console.log(newBall);
         return newBall;
       })
       return;
     };
     upLoop();
     function upLoop() {
+      console.log(gameData.current.bonus);
       const currentTime = performance.now();
       let deltaTime = currentTime - lastTime;
       lastTime = currentTime;
       if (keyStateRef.current['ArrowDown']) {
         posRacket.current.left =
-          posRacket.current.left < 1000 - RACKET_HEIGHT_10
+          posRacket.current.left < 1000 - racketHeightRef.current.left
             ? posRacket.current.left + 20
             : posRacket.current.left;
       } else if (keyStateRef.current['ArrowUp']) {
@@ -193,57 +232,36 @@ function Game({
         if (
           oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
           oldBall.y > posRacket.current.left &&
-          oldBall.y < posRacket.current.left + RACKET_HEIGHT_10 && fail.current === false
+          oldBall.y < posRacket.current.left + racketHeightRef.current.left && fail.current === false
         ) {
           newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
-          if (keyStateRef.current.ArrowDown) {
-           newBall.vy += SPEED_INCREASE; 
-           newBall.vx = -newBall.vx;
-           newBall.speed += SPEED_INCREASE;
-          }
-          else if (keyStateRef.current.ArrowUp) {
-            newBall.vy -= SPEED_INCREASE;
-            newBall.vx = -newBall.vx; 
-            newBall.speed -= SPEED_INCREASE;
-          } else {
+ 
             newBall.speed += SPEED_INCREASE;
-            const racketCenter = posRacket.current.left + RACKET_HEIGHT_10 / 2 ;
+            const racketCenter = posRacket.current.left + racketHeightRef.current.left / 2 ;
             const relativePostion = newBall.y - racketCenter;
-            let proportion = relativePostion / (RACKET_HEIGHT_10 / 2) ;
+            let proportion = relativePostion / (racketHeightRef.current.left / 2) ;
             proportion = Math.max(Math.min(proportion, 0.9), -0.9);
-            console.log(proportion);
             newBall.vy = proportion   ;
             newBall.vx = Math.sqrt(1 - newBall.vy*newBall.vy) * newBall.speed;
             newBall.vy *= newBall.speed;
-          }
+          
         } else if (
           oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
           oldBall.y > posRacket.current.right &&
-          oldBall.y < posRacket.current.right + RACKET_HEIGHT_10 && fail.current === false
+          oldBall.y < posRacket.current.right + racketHeightRef.current.right && fail.current === false
         ) {
           newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
-          if (keyStateRef.current.ArrowDown) {
-            newBall.vy += SPEED_INCREASE; 
-            newBall.vx = -newBall.vx;
-            newBall.speed += SPEED_INCREASE;
-           }
-            else if (keyStateRef.current.ArrowUp) {
-              newBall.vy -= SPEED_INCREASE;
-              newBall.vx = -newBall.vx;
-              newBall.speed -= SPEED_INCREASE;
-            } else {
               newBall.speed += SPEED_INCREASE;
-              const racketCenter = posRacket.current.right + RACKET_HEIGHT_10 / 2 ;
+              const racketCenter = posRacket.current.right + racketHeightRef.current.right / 2 ;
               const relativePostion = newBall.y - racketCenter;
-              let proportion = relativePostion / (RACKET_HEIGHT_10 / 2) ;
+              let proportion = relativePostion / (racketHeightRef.current.right / 2) ;
               proportion = Math.max(Math.min(proportion, 0.9), -0.9);
-              console.log(proportion);
               newBall.vy = proportion;
               newBall.vx = Math.sqrt(1 - newBall.vy*newBall.vy) * newBall.speed;
               newBall.vy *= newBall.speed;
               newBall.vx = -newBall.vx;
           
-        }
+        
       }
         else if (oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS || oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS)
         {
@@ -335,20 +353,18 @@ function Game({
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
       />
-      <Racket posY={posRacket.current.left} type="left" />
+      <Racket posY={posRacket.current.left} height={racketHeightRef.current.left} type="left" />
       <Ball
         posX={ball.x * (gameDimensions.current.width / 1000)}
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
-      
-      <Racket posY={posRacket.current.right} type="right" />
+        {gameData.current.bonus &&  <Bonus posX={bonusPositionRef.current.x *  (gameDimensions.current.width / 1000)} posY={bonusPositionRef.current.y * (gameDimensions.current.height / 1000)} />}
+        <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>
+        <Laser/>
+      <Racket posY={posRacket.current.right} height={racketHeightRef.current.right}type="right" />
     </div>
   );
 }
-/*
-{bonusesRef.current.map((bonus: any) => 
-        <Bonus key={bonus.id} posX={bonus.x} posY={bonus.y} />
-      )}*/
 
 function Pong() {
   const [socket, setSocket] = useState({});

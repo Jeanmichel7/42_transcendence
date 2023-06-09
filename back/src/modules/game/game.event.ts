@@ -18,6 +18,7 @@ interface clientUpdate {
   ArrowDown: boolean;
   ArrowUp: boolean;
   gameId: string;
+  useBonus: boolean;
 }
 
 @WebSocketGateway({
