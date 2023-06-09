@@ -73,7 +73,7 @@ export class UsersController {
   }
 
   /* probably useless but I keep it for now */
-  @Post('sign-in')
+  @Post('registerFakeUser')
   @Public()
   @UsePipes(ValidationPipe)
   async createUser(@Body() newUser: UserCreateDTO): Promise<UserInterface> {

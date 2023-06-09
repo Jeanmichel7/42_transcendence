@@ -15,6 +15,8 @@ import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.
 import { MessageCreatedEvent } from './event/message.event';
 import { UserInterface } from '../users/interfaces/users.interface';
 
+const limit = 20;
+
 @Injectable()
 export class MessageService {
   constructor(
@@ -88,6 +90,42 @@ export class MessageService {
     return result;
   }
 
+  async getMessagesBetweenUsersPaginate(
+    userIdFrom: bigint,
+    userIdTo: bigint,
+    page: number,
+  ): Promise<MessageBtwTwoUserInterface[]> {
+    const skip = (page - 1) * limit;
+
+    const messages: MessageEntity[] = await this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('message.destUser', 'destUser')
+      .select([
+        'message',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'destUser.id',
+        'destUser.firstName',
+        'destUser.lastName',
+        'destUser.login',
+      ])
+      .where(
+        '(ownerUser.id = :userIdFrom AND destUser.id = :userIdTo) OR (ownerUser.id = :userIdTo AND destUser.id = :userIdFrom)',
+        { userIdFrom, userIdTo },
+      )
+      .orderBy('message.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getMany();
+
+    const result: MessageBtwTwoUserInterface[] = messages;
+    return result;
+  }
+
   async createMessage(
     messageToSave: MessageCreateDTO,
     userIdFrom: bigint,
@@ -98,14 +136,23 @@ export class MessageService {
       select: ['id', 'login'],
       relations: ['messagesSend'],
     });
+    if (!userSend)
+      throw new NotFoundException(`User with id ${userIdFrom} not found`);
 
     const userReceive: UserEntity = await this.userRepository.findOne({
       where: { id: userIdTo },
       select: ['id'],
-      relations: ['messagesReceive', 'blocked'],
+      relations: [
+        'messagesReceive',
+        'initiatedRelations.userInitiateur',
+        'initiatedRelations.userRelation',
+        'relatedRelations.userRelation',
+        'relatedRelations.userInitiateur',
+      ],
     });
+    if (!userReceive)
+      throw new NotFoundException(`User with id ${userIdTo} not found`);
 
-    // test if userSend is blocked by userReceive
     if (userReceive.blocked.map((user) => user.id).includes(userSend.id)) {
       throw new ForbiddenException(
         `You can't send a message to ${userReceive.login}, you are blocked`,

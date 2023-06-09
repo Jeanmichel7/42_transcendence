@@ -2,6 +2,10 @@ import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLogout } from '../../store/userSlice';
+import { ApiErrorResponse, UserInterface } from '../../types';
+import { RootState } from '../../store';
+import { AuthLogout } from '../../types/AuthTypes';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import { logout } from '../../api/auth';
 
@@ -17,9 +21,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { ApiErrorResponse, UserInterface } from '../../types';
-import { RootState } from '../../store';
-import { AuthLogout } from '../../types/AuthTypes';
 
 
 function Header() {
@@ -50,9 +51,10 @@ function Header() {
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
     if ('error' in res) {
-      console.error(res);
+      dispatch(setErrorSnackbar('Error logout: ' + res.error));
     } else {
       dispatch(setLogout());
+      dispatch(setMsgSnackbar('Logout success'));
       navigate('/');
     }
   }
@@ -207,11 +209,19 @@ function Header() {
            */}
           <Box sx={{ flexGrow: 0 }}>
             {!userIsLogged ?
-              <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
-                <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
-                  Login
-                </Button>
-              </NavLink>
+              <div className='flex'>
+                <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
+                  <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                    Login Intra
+                  </Button>
+                </NavLink>
+                <NavLink to="/fakeconnection">
+                  <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                    Login Fake
+                  </Button>
+                </NavLink>
+
+              </div>
               :
               <>
                 <Tooltip title="Open settings">

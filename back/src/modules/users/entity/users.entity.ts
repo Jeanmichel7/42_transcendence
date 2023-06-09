@@ -120,18 +120,6 @@ export class UserEntity extends BaseEntity {
   })
   messagesReceive: MessageEntity[];
 
-  @OneToMany(
-    () => UserRelationEntity,
-    (userRelation) => userRelation.userRelation,
-  )
-  friends: UserEntity[];
-
-  @OneToMany(
-    () => UserRelationEntity,
-    (userRelation) => userRelation.userRelation,
-  )
-  blocked: UserEntity[];
-
   /* chat */
   @OneToMany(() => ChatMessageEntity, (message) => message.user, {
     cascade: true,
@@ -196,4 +184,46 @@ export class UserEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   wonGames: GameEntity[];
+
+  /* users relations */
+  @OneToMany(
+    () => UserRelationEntity,
+    (userRelation) => userRelation.userInitiateur,
+  )
+  initiatedRelations: UserRelationEntity[];
+
+  @OneToMany(
+    () => UserRelationEntity,
+    (userRelation) => userRelation.userRelation,
+  )
+  relatedRelations: UserRelationEntity[];
+
+  get relations(): UserRelationEntity[] {
+    return [...this.initiatedRelations, ...this.relatedRelations];
+  }
+
+  get friends(): UserEntity[] {
+    return [...this.initiatedRelations, ...this.relatedRelations]
+      .filter(
+        (relation) =>
+          relation.relationType === 'friend' &&
+          relation.mutuelBlocked === false,
+      )
+      .map((relation) =>
+        relation.userInitiateur.id === this.id
+          ? relation.userRelation
+          : relation.userInitiateur,
+      );
+  }
+
+  get blocked(): UserEntity[] {
+    console.log('execution get blocked users');
+    return [...this.initiatedRelations, ...this.relatedRelations]
+      .filter((relation) => relation.relationType === 'blocked')
+      .map((relation) =>
+        relation.userInitiateur.id === this.id
+          ? relation.userRelation
+          : relation.userInitiateur,
+      );
+  }
 }

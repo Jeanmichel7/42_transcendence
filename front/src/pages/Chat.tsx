@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 // import ChatRoom from '../components/Chat/ChatRoom';
-import Friends from '../components/Chat/Friends/Friends';
+import Friends from '../components/Chat/Friends/FriendsRaw';
 import Conversation from '../components/Chat/Conversation';
-import ButtonInterfaceAddFriends from '../components/Chat/Friends/ButtonInterfaceAddFriends';
+import ButtonInterfaceAddFriends from '../components/Chat/Friends/FriendsSearchButton';
 import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
 
 import { UserInterface } from '../types';
@@ -25,11 +25,11 @@ function Chat() {
   });
 
   return (
-    <div className="
-      h-[calc(100vh-320px)]
-      flex justify-center items-stretch
+    <div className={
+      //  serviceToCall !== 'chat' ? 'h-[calc(100vh-320px)]' : '' +
+      `h-[calc(100vh-320px)] flex justify-center items-stretch
       border rounded-xl shadow-lg bg-[#F2F2FF] 
-      text-indigo-900 p-5"
+      text-indigo-900 p-2`}
     >
       <div className="w-1/4 flex flex-col h-full">
         <ButtonNewGroup  />
@@ -46,7 +46,7 @@ function Chat() {
 
       <div className="w-3/4 h-full">
       { serviceToCall === 'chat' &&
-        <Conversation {...currentChatUser} />
+        <Conversation key={currentChatUser.id} userSelected={currentChatUser} />
       }
       { serviceToCall === 'addFriends' &&
         <FriendsSearch />

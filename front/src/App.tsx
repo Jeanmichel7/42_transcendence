@@ -7,10 +7,12 @@ import SideBar from './components/Sidebar/Sidebar';
 import AppRoutes from './routes/indexRoutes';
 import { isAuthenticated } from './api/auth';
 import { getUserData } from './api/user';
-import { getBlockedUsers, getFriends } from './api/relation';
+import { getBlockedUsers, getFriendRequests, getFriendRequestsSent, getFriends } from './api/relation';
 import {
   reduxSetFriends,
   reduxSetUserBlocked,
+  reduxSetWaitingFriends,
+  reduxSetWaitingFriendsSent,
   setLogged,
   setUser,
 } from './store/userSlice';
@@ -18,7 +20,7 @@ import { ApiErrorResponse, UserInterface } from './types';
 import { useNavigate } from 'react-router-dom';
 import { ReduxActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
-import { closeSnackbar } from './store/snackbarSlice';
+import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 
 
@@ -36,9 +38,9 @@ function App() {
     apiFunction: () => Promise<T | ApiErrorResponse>,
     action: ((payload: T) => ReduxActionInterface),
   ): Promise<void> {
-    const result = await apiFunction();
+    const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      console.log('error: ', result);
+      dispatch(setErrorSnackbar(result.message));
     } else {
       dispatch(action(result));
     }
@@ -53,10 +55,12 @@ function App() {
         await fetchData(getUserData, setUser);
         await fetchData(getFriends, reduxSetFriends);
         await fetchData(getBlockedUsers, reduxSetUserBlocked);
+        await fetchData(getFriendRequests, reduxSetWaitingFriends);
+        await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
 
       } else {
         dispatch(setLogged(false));
-        navigate('/');
+        // navigate('/');
       }
     };
     checkAuth();
@@ -64,7 +68,6 @@ function App() {
 
   return (
     <>
-
       <div className="flex flex-col h-screen min-h-md ">
         <Header />
         <div className="relative flex-grow bg-[#eaeaff] w-full">
@@ -77,7 +80,6 @@ function App() {
         </div>
         <Footer />
       </div>
-
 
       <Snackbar
         anchorOrigin={{ 

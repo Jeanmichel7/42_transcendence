@@ -16,10 +16,10 @@ export async function sendMessage(
   );
 }
 
-export async function getOldMessages(userId: number): Promise< MessageInterface[] | ApiErrorResponse > {
+export async function getOldMessages(userId: number, page: number): Promise< MessageInterface[] | ApiErrorResponse > {
   return apiRequest< MessageInterface[] >(
     'get',
-    'messages/users/' + userId,
+    'messages/users/' + userId + '?page=' + page,
     'Failed to get old messages: ',
   );
 }
@@ -35,3 +35,21 @@ export async function getOldMessages(userId: number): Promise< MessageInterface[
 //     return false;
 //   }
 // }
+
+export async function apiDeleteMessage(messageId: number): Promise< any> {
+  return apiRequest(
+    'delete',
+    'messages/' + messageId,
+    'Failed to delete message: ',
+  );
+}
+
+export async function apiEditMessage(messageId: number, message: string)
+  : Promise< MessageInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'messages/' + messageId,
+    'Failed to edit message: ',
+    { text: message },
+  );
+}

@@ -1,10 +1,9 @@
-import { UserInterface } from "src/modules/users/interfaces/users.interface";
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 export interface AuthInterface {
-    accessToken: string;
-    user: UserInterface;
+  accessToken: string;
+  user: UserInterface;
 }
-
 
 // export interface Auth2faInterface {
 //     access_token: string;

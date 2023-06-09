@@ -17,9 +17,15 @@ export class UserRelationEntity extends BaseEntity {
 
   @Column({
     type: 'text',
-    nullable: true,
+    default: 'pending',
   })
   relationType: string;
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  mutuelBlocked: boolean;
 
   @Column({
     nullable: true,
@@ -35,18 +41,13 @@ export class UserRelationEntity extends BaseEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user, {
+  @ManyToOne(() => UserEntity, (user) => user.initiatedRelations, {
     onDelete: 'CASCADE',
   })
-  user: UserEntity;
+  userInitiateur: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.friends, {
+  @ManyToOne(() => UserEntity, (user) => user.relatedRelations, {
     onDelete: 'CASCADE',
   })
   userRelation: UserEntity;
-
-  @ManyToOne(() => UserEntity, (user) => user.blocked, {
-    onDelete: 'CASCADE',
-  })
-  userBlocked: UserEntity;
 }

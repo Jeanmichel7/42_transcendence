@@ -61,9 +61,11 @@ export const userSlice = createSlice({
       avatar: '',
       description: '',
       role: 'user',
+      is2FAEnabled: false,
       friends: [],
       userBlocked: [],
-      is2FAEnabled: false,
+      waitingFriendsRequestReceived: [],
+      waitingFriendsRequestSent: [],
     },
   } as UserState,
 
@@ -79,9 +81,11 @@ export const userSlice = createSlice({
       state.userData.avatar = action.payload.avatar;
       state.userData.role = action.payload.role;
       state.userData.description = action.payload.description;
+      state.userData.is2FAEnabled = action.payload.is2FAEnabled;
       state.userData.friends = action.payload.friends;
       state.userData.userBlocked = action.payload.userBlocked;
-      state.userData.is2FAEnabled = action.payload.is2FAEnabled;
+      state.userData.waitingFriendsRequestReceived = action.payload.waitingFriendsRequestReceived;
+      state.userData.waitingFriendsRequestSent = action.payload.waitingFriendsRequestSent;
       state.isLogged = true;
       state.error = null;
     },
@@ -103,6 +107,8 @@ export const userSlice = createSlice({
         is2FAEnabled: false,
         friends: [],
         userBlocked: [],
+        waitingFriendsRequestReceived: [],
+        waitingFriendsRequestSent: [],
       };
     },
 
@@ -130,6 +136,45 @@ export const userSlice = createSlice({
       removeUserBlocked(state, action.payload);
     },
 
+    //manage waiting friends request
+    reduxSetWaitingFriends: (state, action: PayloadAction<UserInterface[]>) => {
+      state.userData.waitingFriendsRequestReceived = action.payload;
+    },
+    reduxAddWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
+      if (state.userData.waitingFriendsRequestReceived === undefined)
+        state.userData.waitingFriendsRequestReceived = [action.payload];
+      else
+        state.userData.waitingFriendsRequestReceived = [...state.userData.waitingFriendsRequestReceived, action.payload];
+    },
+    reduxRemoveWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
+      if (state.userData.waitingFriendsRequestReceived === undefined)
+        return;
+      state.userData.waitingFriendsRequestReceived = state.userData.waitingFriendsRequestReceived
+        .filter((waitingFriend: UserInterface) => waitingFriend.id !== action.payload.id);
+    },
+
+
+    //manage waiting friends request sent
+    reduxSetWaitingFriendsSent: (state, action: PayloadAction<UserInterface[]>) => {
+      state.userData.waitingFriendsRequestSent = action.payload;
+    },
+    reduxAddWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
+      if (state.userData.waitingFriendsRequestSent === undefined)
+        state.userData.waitingFriendsRequestSent = [action.payload];
+      else
+        state.userData.waitingFriendsRequestSent = [...state.userData.waitingFriendsRequestSent, action.payload];
+    },
+    reduxRemoveWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
+      if (state.userData.waitingFriendsRequestSent === undefined)
+        return;
+      state.userData.waitingFriendsRequestSent = state.userData.waitingFriendsRequestSent
+        .filter((waitingFriend: UserInterface) => waitingFriend.id !== action.payload.id);
+    },
+
+
+
+
+
     //manage error
     setError: (state, action: PayloadAction<ApiErrorResponse>) => {
       state.error = action.payload;
@@ -142,6 +187,8 @@ export const {
   setUser, setLogged, setLogout,
   reduxSetFriends, reduxAddFriends, reduxRemoveFriends,
   reduxSetUserBlocked, reduxAddUserBlocked, reduxRemoveUserBlocked,
+  reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
+  reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
   setError,
 } = userSlice.actions;
 

@@ -12,7 +12,7 @@ export const snackbarSlice = createSlice({
       open: false,
       message: '',
       severity: 'success',
-      vertical: 'top',
+      vertical: 'bottom',
       horizontal: 'right',
     } as SnackbarInterface,
   },
