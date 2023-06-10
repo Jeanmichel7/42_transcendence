@@ -2,15 +2,16 @@ import { CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
-import { UserInterface, ApiErrorResponse, UserRelation } from '../../types';
+import { UserInterface, ApiErrorResponse, UserRelation, NotificationInterface } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddFriends, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
 import FriendItem from './FriendItem';
 
 const WaitingAcceptRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
   const dispatch = useDispatch();
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
@@ -19,10 +20,17 @@ const WaitingAcceptRequest = () => {
     setIsLoading(false);
 
     if ('error' in resAcceptRequest)
-      dispatch(setErrorSnackbar('Error accept friend request: ' + resAcceptRequest.message));
+      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
+
+      //search notif ans delete
+      const notif: NotificationInterface = notifications.find((n) => 
+        n.type === 'friendRequest' && n.sender.id === userToAccept.id && n.receiver.id === userData.id, 
+      ) as NotificationInterface;
+      if (notif) dispatch(reduxRemoveNotification(notif));
+
       dispatch(setMsgSnackbar('Friend request accepted'));
     }
   };
@@ -33,9 +41,16 @@ const WaitingAcceptRequest = () => {
     setIsLoading(false);
     
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-      dispatch(setErrorSnackbar('Error decline friend request: ' + resDeclineRequest.message));
+      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
+
+      //search notif ans delete
+      const notif: NotificationInterface = notifications.find((n) => 
+        n.type === 'friendRequest' && n.sender.id === userToDecline.id && n.receiver.id === userData.id, 
+      ) as NotificationInterface;
+      if (notif) dispatch(reduxRemoveNotification(notif));
+      
       dispatch(setMsgSnackbar('Friend request declined'));
     }
   };

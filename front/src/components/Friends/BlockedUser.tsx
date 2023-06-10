@@ -21,7 +21,7 @@ const BlockedUser = () => {
     setIsLoading(false);
 
     if (typeof resUnblockRequest === 'object' && 'error' in resUnblockRequest)
-      dispatch(setErrorSnackbar('Error unblock user: ' + resUnblockRequest.message));
+      dispatch(setErrorSnackbar(resUnblockRequest.error + resUnblockRequest.message ? ': ' + resUnblockRequest.message : ''));
     else {
       dispatch(reduxRemoveUserBlocked(userToUnblock));
       dispatch(setMsgSnackbar('User unblocked'));

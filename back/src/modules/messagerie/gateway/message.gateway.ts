@@ -14,7 +14,7 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
   namespace: 'messagerie',
   cors: {
     origin: 'http://localhost:3006',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },
 })
@@ -41,6 +41,7 @@ export class MessagerieWebsocketService {
     console.log('joined private room', privateRoomName, data);
   }
 
+  @SubscribeMessage('leavePrivateRoom')
   async handleLeave(
     @MessageBody() data: { user1Id: string; user2Id: string },
     @ConnectedSocket() client: Socket,
@@ -56,6 +57,24 @@ export class MessagerieWebsocketService {
     const roomName = this.PrivateRoomName(user1, user2);
     this.server.to(roomName).emit('message', message);
     console.log('message sent to room' + roomName);
+  }
+
+  emitEditMessage(message: MessageInterface) {
+    console.log('messages edited', message);
+    const user1 = message.ownerUser.id;
+    const user2 = message.destUser.id;
+    const roomName = this.PrivateRoomName(user1, user2);
+    this.server.to(roomName).emit('editMessage', message);
+    console.log('message edited sent to room' + roomName);
+  }
+
+  emitDeleteMessage(message: MessageInterface) {
+    console.log('messages deleted', message);
+    const user1 = message.ownerUser.id;
+    const user2 = message.destUser.id;
+    const roomName = this.PrivateRoomName(user1, user2);
+    this.server.to(roomName).emit('deleteMessage', message);
+    console.log('message deleted sent to room' + roomName);
   }
 
   /* ************************* */

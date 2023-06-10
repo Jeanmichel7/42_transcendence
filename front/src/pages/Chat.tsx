@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
 // import ChatRoom from '../components/Chat/ChatRoom';
 import Friends from '../components/Chat/Friends/FriendsRaw';
@@ -6,23 +6,24 @@ import Conversation from '../components/Chat/Conversation';
 import ButtonInterfaceAddFriends from '../components/Chat/Friends/FriendsSearchButton';
 import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
 
-import { UserInterface } from '../types';
+import { useLocation } from 'react-router-dom';
 
 function Chat() {
+  const location = useLocation();
   const [serviceToCall, setServiceToCall] = useState<string>('chat');
-  const [currentChatUser, setCurrentChatUser] = useState<UserInterface>({
-    id: -1,
-    login: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    status: 'offline',
-    avatar: '',
-    description: '',
-    is2FAEnabled: false,
-    friends: [],
-    userBlocked: [],
-  });
+  const [currentChatUserId, setCurrentChatUserId] = useState<number>(-1);
+
+  //check query params
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const serviceParam = query.get('service');
+    const userIdParam = query.get('userId');
+    
+    if (serviceParam === 'chat' && userIdParam) {
+      console.log('params : ', serviceParam, userIdParam);
+      setCurrentChatUserId(parseInt(userIdParam));
+    }
+  }, [location.search]);
 
   return (
     <div className={
@@ -38,15 +39,18 @@ function Chat() {
         />
         <Friends
           setServiceToCall={ setServiceToCall }
-          currentChatUser={currentChatUser}
-          setCurrentChatUser={setCurrentChatUser}
+          currentChatUserId={currentChatUserId}
+          setCurrentChatUserId={setCurrentChatUserId}
         />
         {/* <ChatRoom /> */}
       </div>
 
       <div className="w-3/4 h-full">
       { serviceToCall === 'chat' &&
-        <Conversation key={currentChatUser.id} userSelected={currentChatUser} />
+        <Conversation 
+          key={ currentChatUserId }
+          id={ currentChatUserId }
+         />
       }
       { serviceToCall === 'addFriends' &&
         <FriendsSearch />

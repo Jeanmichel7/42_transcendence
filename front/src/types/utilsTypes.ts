@@ -20,3 +20,21 @@ export interface ReduxActionInterface {
   type: string;
   payload?: UserInterface | UserInterface[];
 }
+
+export interface NotificationInterface {
+  // id: number;
+  type: 'friendRequest' |
+  'friendRequestAccepted' |
+  'friendRequestDeclined' |
+  'friendRequestCanceled' |
+  'friendDeleted' |
+  'blockUser' |
+  'unblockUser' |
+  'message';
+  // title: string;
+  content: string;
+  read: boolean;
+  createdAt: Date;
+  receiver: UserInterface;
+  sender: UserInterface;
+}

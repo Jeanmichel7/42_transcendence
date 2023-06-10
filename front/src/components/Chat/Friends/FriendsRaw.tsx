@@ -13,14 +13,14 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 export function FriendRow({
   userFriend,
-  currentChatUser,
-  setCurrentChatUser,
+  currentChatUserId,
+  setCurrentChatUserId,
   setOpen,
   setServiceToCall,
 }: {
   userFriend: UserInterface,
-  currentChatUser: UserInterface,
-  setCurrentChatUser: React.Dispatch<React.SetStateAction<UserInterface>>,
+  currentChatUserId: number,
+  setCurrentChatUserId: React.Dispatch<React.SetStateAction<number>>,
   setOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setServiceToCall: React.Dispatch<React.SetStateAction<string>>
 }) {
@@ -48,14 +48,14 @@ export function FriendRow({
     e.stopPropagation();
     const res: void | ApiErrorResponse = await deleteFriend(userToRemove.id);
     if (typeof res === 'object' && 'error' in res) {
-      dispatch(setErrorSnackbar('Error delete friends: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(reduxRemoveFriends(userToRemove));
       dispatch(setMsgSnackbar('Friend deleted'));
 
-      //return home if currentChatUser is the user removed
-      if (currentChatUser.login === userToRemove.login) {
-        setCurrentChatUser({} as UserInterface);
+      //return home if currentChatUserId is the user removed
+      if (currentChatUserId === userToRemove.id) {
+        setCurrentChatUserId(-1);
         setServiceToCall('home');
       }
     }
@@ -67,7 +67,7 @@ export function FriendRow({
       cursor-pointer flex flex-row items-center text-left">
         <div className="flex flex-grow text-black m-2 items-center "
           onClick={() => {
-            setCurrentChatUser(userFriend);
+            setCurrentChatUserId(userFriend.id);
             setOpen(false);
             setServiceToCall('chat');
           }}
@@ -146,10 +146,10 @@ export function FriendRow({
 
 
 
-function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
+function Friends({ setServiceToCall, currentChatUserId, setCurrentChatUserId }:
 { setServiceToCall: React.Dispatch<React.SetStateAction<string>> } &
-{ currentChatUser: UserInterface } &
-{ setCurrentChatUser: React.Dispatch<React.SetStateAction<UserInterface>> },
+{ currentChatUserId: number } &
+{ setCurrentChatUserId: React.Dispatch<React.SetStateAction<number>> },
 ) {
   const { userData } = useSelector((state: RootState) => state.user);
   const [open, setOpen] = useState<boolean>(false);
@@ -178,7 +178,7 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
           <div ref={ref} className={
             `w-full bg-white border shadow-lg text-center rounded-xl
             ${open ? '' : 'hidden'} 
-            transition-all overflow-auto h-[calc(100vh-520px)]`}
+            transition-all overflow-auto max-h-[calc(100vh-520px)]`}
           >
             {userData.friends.length === 0 ?
               <p className="text-center">No friends yet</p>
@@ -189,8 +189,8 @@ function Friends({ setServiceToCall, currentChatUser, setCurrentChatUser }:
                     <FriendRow
                       key={friend.id}
                       userFriend={friend}
-                      currentChatUser={currentChatUser}
-                      setCurrentChatUser={setCurrentChatUser}
+                      currentChatUserId={currentChatUserId}
+                      setCurrentChatUserId={setCurrentChatUserId}
                       setOpen={setOpen}
                       setServiceToCall={setServiceToCall}
                     />

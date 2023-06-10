@@ -9,11 +9,13 @@ import { CircularProgress } from '@mui/material';
 import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { useState } from 'react';
 import FriendItem from './FriendItem';
+import { useNavigate } from 'react-router-dom';
 
 const AllFriends = () => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
@@ -21,7 +23,7 @@ const AllFriends = () => {
     setIsLoading(false);
 
     if ('error' in resBlockRequest)
-      dispatch(setErrorSnackbar('Error block user: ' + resBlockRequest.message));
+      dispatch(setErrorSnackbar(resBlockRequest.error + resBlockRequest.message ? ': ' + resBlockRequest.message : ''));
     else {
       dispatch(reduxAddUserBlocked(userToBlock));
       dispatch(setMsgSnackbar('User blocked'));
@@ -34,11 +36,15 @@ const AllFriends = () => {
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(setErrorSnackbar('Error delete friend: ' + resDeleteRequest.message));
+      dispatch(setErrorSnackbar(resDeleteRequest.error + resDeleteRequest.message ? ': ' + resDeleteRequest.message : ''));
     else {
       dispatch(reduxRemoveFriends(userToDelete));
       dispatch(setMsgSnackbar('Friend deleted'));
     }
+  };
+
+  const handleNavigateToChat = (user: UserInterface) => {
+    navigate(`/chat?service=chat&userId=${user.id}`);
   };
 
   if (isLoading) {
@@ -56,6 +62,7 @@ const AllFriends = () => {
          key={user.id}
           user={user}
           actions={[
+            { name: 'Chat', callback: handleNavigateToChat },
             { name: 'Block', callback: handleBlockUser },
             { name: 'Delete', callback: handleDeleteFriend },
           ]}

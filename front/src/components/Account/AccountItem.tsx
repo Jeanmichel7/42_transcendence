@@ -67,6 +67,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setUserCode('');
       setMsgSnackbar('2FA actived!');
       // setValidCode(false);
+      localStorage.removeItem('2FA');
     }
   }
 
@@ -79,7 +80,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
       setError(updatedUser.message);
-      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
+      dispatch(setErrorSnackbar(updatedUser.error + updatedUser.message ? ': ' + updatedUser.message : ''));
       setInputValue(value);
     } else {
       dispatch(setUser({ ...userData, [keyName]: inputValue }));
@@ -113,10 +114,11 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   async function handleChange2FA() {
     if (inputValue) {
       // disable 2FA
+      localStorage.removeItem('2FA');
       setInputValue(false);
       const res: UserInterface | ApiErrorResponse = await Desactive2FA();
       if ('error' in res) {
-        dispatch(setErrorSnackbar('Error update: ' + res.message));
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
       } else {
         setInputValue(false);
         setQRCode('');
@@ -125,8 +127,9 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       // enable 2FA
       const res: string | ApiErrorResponse = await Active2FA();
       if (typeof res === 'object' && 'error' in res) {
-        dispatch(setErrorSnackbar('Error update: ' + res.message));
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
       } else {
+        localStorage.setItem('2FA', res);
         setQRCode(res);
         setInputValue(true);
       }
@@ -137,6 +140,17 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   useEffect(() => {
     setInputValue(value);
   }, [value]);
+
+  useEffect(() => {
+    if (keyName === 'Active 2FA') {
+      if (localStorage.getItem('2FA')) {
+        setQRCode(localStorage.getItem('2FA') as string);
+        setInputValue(true);
+      } else {
+        setInputValue(false);
+      }
+    }
+  }, [keyName]);
 
   return (
     <div className="flex items-center w-full pb-3">

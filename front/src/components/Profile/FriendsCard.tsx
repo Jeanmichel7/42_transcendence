@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
 
 interface FriendCardProps {
-  actualUserLogin: string,
+  actualUserLogin?: string,
   friend: UserInterface,
   setFriends?: React.Dispatch<React.SetStateAction<UserInterface[]>> 
 }
@@ -41,7 +41,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     // const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(userIdToAdd);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       // send event to socket
       // dispatch(reduxAddFriends(friend));
@@ -54,7 +54,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   const handleRemoveFriend = async (userIdToRemove: number) => {
     const res: void | ApiErrorResponse = await deleteFriend(userIdToRemove);
     if (typeof res === 'object' && 'error' in res) {
-      dispatch(setErrorSnackbar('Error delete friends: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(reduxRemoveFriends(friend));
       dispatch(setMsgSnackbar('Friend deleted'));
@@ -66,7 +66,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   const handleBlockUser = async (userToBlock: UserInterface) => {
     const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error block user: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setMsgSnackbar('User blocked'));
       dispatch(reduxAddUserBlocked(userToBlock));

@@ -25,7 +25,7 @@ export default function FakeConnection() {
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error));
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       dispatch(action(result));
     }
@@ -50,7 +50,7 @@ export default function FakeConnection() {
   const handleConnection = async () => {
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(login, password);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error login: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       await saveUserData();
       navigate('/home');
@@ -76,7 +76,7 @@ export default function FakeConnection() {
 
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error register: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       console.log('user created');
     }

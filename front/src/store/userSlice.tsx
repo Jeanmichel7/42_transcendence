@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiErrorResponse, UserInterface } from '../types';
+import { ApiErrorResponse, NotificationInterface, UserInterface } from '../types';
 // import { fetchUserAccount } from '../api/user';
 
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
+  notifications: NotificationInterface[];
   error: null | ApiErrorResponse;
 }
 
@@ -16,6 +17,8 @@ export interface UserState {
 //   },
 // );
 
+
+// Friends management
 const addFriend = (state: UserState, user: UserInterface) => {
   if (state.userData.friends === undefined)
     state.userData.friends = [user];
@@ -30,6 +33,7 @@ const removeFriend = (state: UserState, user: UserInterface) => {
     .filter((friend: UserInterface) => friend.id !== user.id);
 };
 
+// User blocked management
 const addUserBlocked = (state: UserState, user: UserInterface) => {
   if (state.userData.userBlocked === undefined)
     state.userData.userBlocked = [user];
@@ -44,13 +48,42 @@ const removeUserBlocked = (state: UserState, user: UserInterface) => {
     .filter((userBlocked: UserInterface) => userBlocked.id !== user.id);
 };
 
+// Waiting friends request management
+const addWaitingFriends = (state: UserState, user: UserInterface) => {
+  if (state.userData.waitingFriendsRequestReceived === undefined)
+    state.userData.waitingFriendsRequestReceived = [user];
+  else
+    state.userData.waitingFriendsRequestReceived = [...state.userData.waitingFriendsRequestReceived, user];
+};
 
+const removeWaitingFriends = (state: UserState, user: UserInterface) => {
+  if (state.userData.waitingFriendsRequestReceived === undefined)
+    return;
+  state.userData.waitingFriendsRequestReceived = state.userData.waitingFriendsRequestReceived
+    .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
+};
+
+// Waiting friends request sent management
+const addWaitingFriendsSent = (state: UserState, user: UserInterface) => {
+  if (state.userData.waitingFriendsRequestSent === undefined)
+    state.userData.waitingFriendsRequestSent = [user];
+  else
+    state.userData.waitingFriendsRequestSent = [...state.userData.waitingFriendsRequestSent, user];
+};
+
+const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
+  if (state.userData.waitingFriendsRequestSent === undefined)
+    return;
+  state.userData.waitingFriendsRequestSent = state.userData.waitingFriendsRequestSent
+    .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
+};
 
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
     isLogged: false,
     error: null,
+    notifications: localStorage.getItem('notifications') ? JSON.parse(localStorage.getItem('notifications') as string) : [] as NotificationInterface[],
     userData: {
       id: -1,
       login: '',
@@ -112,6 +145,30 @@ export const userSlice = createSlice({
       };
     },
 
+    // manage notifications
+    reduxSetNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
+      state.notifications = action.payload;
+    },
+    reduxAddNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      if (state.notifications === undefined)
+        state.notifications = [action.payload];
+      else
+        state.notifications = [...state.notifications, action.payload];
+    },
+    reduxRemoveNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      console.log('remove notif : ', action.payload);
+      state.notifications = state.notifications
+        .filter((notif: NotificationInterface) => JSON.stringify(notif) !== JSON.stringify(action.payload));
+    },
+    reduxReadNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      state.notifications = state.notifications
+        .map((notif: NotificationInterface) => {
+          if (JSON.stringify(notif) === JSON.stringify(action.payload))
+            return { ...notif, read: true };
+          return notif;
+        });
+    },
+
     // manage friends
     reduxSetFriends: (state, action: PayloadAction<UserInterface[]>) => {
       state.userData.friends = action.payload;
@@ -141,39 +198,31 @@ export const userSlice = createSlice({
       state.userData.waitingFriendsRequestReceived = action.payload;
     },
     reduxAddWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
-      if (state.userData.waitingFriendsRequestReceived === undefined)
-        state.userData.waitingFriendsRequestReceived = [action.payload];
-      else
-        state.userData.waitingFriendsRequestReceived = [...state.userData.waitingFriendsRequestReceived, action.payload];
+      addWaitingFriends(state, action.payload);
     },
     reduxRemoveWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
-      if (state.userData.waitingFriendsRequestReceived === undefined)
-        return;
-      state.userData.waitingFriendsRequestReceived = state.userData.waitingFriendsRequestReceived
-        .filter((waitingFriend: UserInterface) => waitingFriend.id !== action.payload.id);
+      removeWaitingFriends(state, action.payload);
     },
-
 
     //manage waiting friends request sent
     reduxSetWaitingFriendsSent: (state, action: PayloadAction<UserInterface[]>) => {
       state.userData.waitingFriendsRequestSent = action.payload;
     },
     reduxAddWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
-      if (state.userData.waitingFriendsRequestSent === undefined)
-        state.userData.waitingFriendsRequestSent = [action.payload];
-      else
-        state.userData.waitingFriendsRequestSent = [...state.userData.waitingFriendsRequestSent, action.payload];
+      addWaitingFriendsSent(state, action.payload);
     },
     reduxRemoveWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
-      if (state.userData.waitingFriendsRequestSent === undefined)
-        return;
-      state.userData.waitingFriendsRequestSent = state.userData.waitingFriendsRequestSent
-        .filter((waitingFriend: UserInterface) => waitingFriend.id !== action.payload.id);
+      removeWaitingFriendsSent(state, action.payload);
     },
 
-
-
-
+    //manage actions request
+    reduxAcceptedRequest: (state, action: PayloadAction<NotificationInterface>) => {
+      addFriend(state, action.payload.sender);
+      removeWaitingFriendsSent(state, action.payload.sender);
+    },
+    reduxDeclinedRequest: (state, action: PayloadAction<NotificationInterface>) => {
+      removeWaitingFriendsSent(state, action.payload.sender);
+    },
 
     //manage error
     setError: (state, action: PayloadAction<ApiErrorResponse>) => {
@@ -189,6 +238,8 @@ export const {
   reduxSetUserBlocked, reduxAddUserBlocked, reduxRemoveUserBlocked,
   reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
   reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
+  reduxAcceptedRequest, reduxDeclinedRequest,
+  reduxSetNotifications, reduxAddNotification, reduxRemoveNotification, reduxReadNotification,
   setError,
 } = userSlice.actions;
 

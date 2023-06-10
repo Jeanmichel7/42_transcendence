@@ -12,6 +12,9 @@ import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
 import { UserRelationInterface } from 'src/modules/users_relations/interfaces/users_relations.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationInterface } from '../users/interfaces/notification.interface';
+import { NotificationCreatedEvent } from '../users/events/notification.event';
 
 @Injectable()
 export class UsersRelationsService {
@@ -20,9 +23,10 @@ export class UsersRelationsService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(UserRelationEntity)
     private readonly userRelationRepository: Repository<UserRelationEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  // surement foireux !
+  // surement foireux ! et pas utilisé
   async getAllRelations(userId: bigint): Promise<UserRelationInterface[]> {
     const userRelations: UserRelationEntity[] =
       await this.userRelationRepository
@@ -131,7 +135,7 @@ export class UsersRelationsService {
           }),
         )
         .getMany();
-    console.log('allRelationFriends : ', allRelationFriends);
+    // console.log('allRelationFriends : ', allRelationFriends);
 
     const allFriends: UserInterface[] = allRelationFriends.map((relation) =>
       relation.userInitiateur.id == userId
@@ -213,46 +217,18 @@ export class UsersRelationsService {
     return allRequestsSent;
   }
 
-  // async getAllFriendsOfUser(userId: bigint): Promise<UserInterface[]> {
-  //   const userRelations: UserRelationEntity[] =
-  //     await this.userRelationRepository.find({
-  //       where: { user: { id: userId }, relationType: 'friend' },
-  //       relations: ['userRelation'],
-  //     });
-  //   const allFriends: UserInterface[] = userRelations.map((relation) => {
-  //     return {
-  //       id: relation.userRelation.id,
-  //       firstName: relation.userRelation.firstName,
-  //       lastName: relation.userRelation.lastName,
-  //       login: relation.userRelation.login,
-  //       email: relation.userRelation.email,
-  //       description: relation.userRelation.description,
-  //       avatar: relation.userRelation.avatar,
-  //       status: relation.userRelation.status,
-  //     };
-  //   });
-  //   return allFriends;
-  // }
-
-  // async getAllBlockedUsers(userId: bigint): Promise<UserInterface[]> {
-  //   const userRelations: UserRelationEntity[] =
-  //     await this.userRelationRepository.find({
-  //       where: { user: { id: userId }, relationType: 'blocked' },
-  //       relations: ['userRelation'],
-  //     });
-  //   const allBlockedUsers: UserInterface[] = userRelations.map((relation) => {
-  //     return {
-  //       id: relation.userRelation.id,
-  //       firstName: relation.userRelation.firstName,
-  //       lastName: relation.userRelation.lastName,
-  //       login: relation.userRelation.login,
-  //       email: relation.userRelation.email,
-  //       description: relation.userRelation.description,
-  //       avatar: relation.userRelation.avatar,
-  //       status: relation.userRelation.status,
-  //     };
-  //   });
-  //   return allBlockedUsers;
+  // async requestAddFriend(
+  //   userId: bigint,
+  //   friendId: bigint,
+  // ): Promise<UserRelationInterface> {
+  //   console.log('In requestAddFriend function');
+  //   try {
+  //     console.log('Inside try block');
+  //     return Promise.resolve({} as UserRelationInterface); // Temporary return a resolved promise
+  //   } catch (e) {
+  //     console.log('Caught an error');
+  //     throw new InternalServerErrorException(e);
+  //   }
   // }
 
   async requestAddFriend(
@@ -265,12 +241,14 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
+      select: ['id', 'login'],
     });
     if (!userToUpdate)
       throw new NotFoundException(`User with id ${userId} not found`);
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
+      select: ['id', 'login'],
     });
     if (!userFriend)
       throw new NotFoundException(`User friend with id ${friendId} not found`);
@@ -296,12 +274,17 @@ export class UsersRelationsService {
           `${otherUser.login} is already your friend`,
         );
       else if (relationExist.relationType == 'pending') {
-        if (relationExist.userInitiateur.id == userId)
+        if (relationExist.userInitiateur.id == userId) {
           throw new ConflictException(
             `You already send a request to ${otherUser.login}`,
           );
-        else {
-        } // accept friend request
+        } else {
+          // accept friend request
+          // this.acceptFriendRequest(userId, friendId);
+          throw new ConflictException(
+            `${otherUser.login} already send a request to you, accept it`,
+          );
+        }
       } else if (relationExist.relationType == 'blocked') {
         if (relationExist.userInitiateur.id == userId)
           throw new ConflictException(
@@ -312,7 +295,9 @@ export class UsersRelationsService {
             `You can't send a request to ${otherUser.login}, you are blocked`,
           );
       } else {
-        console.log('relationExist type non gere... qu;est ce que tu fou ?');
+        throw new ConflictException(
+          `relationExist type non gere... qu;est ce que tu fou ?`,
+        );
       }
     } else {
       const newRelation: Partial<UserRelationEntity> = {
@@ -322,6 +307,21 @@ export class UsersRelationsService {
       try {
         const createdRelation: UserRelationEntity =
           await this.userRelationRepository.save(newRelation);
+
+        // send notification to userFriend
+        const notification: NotificationInterface = {
+          type: 'friendRequest',
+          content: `send you a friend request`,
+          read: false,
+          receiver: userFriend,
+          sender: userToUpdate,
+          createdAt: new Date(),
+        };
+
+        this.eventEmitter.emit(
+          'notification.friendRequest',
+          new NotificationCreatedEvent(notification),
+        );
         return createdRelation;
       } catch (e) {
         throw new BadRequestException(
@@ -401,6 +401,20 @@ export class UsersRelationsService {
           const updatedRelation: UserRelationEntity =
             await this.userRelationRepository.save(relationExist);
 
+          // send notification to userFriend
+          const notification: NotificationInterface = {
+            type: 'friendRequestAccepted',
+            content: `accepted your friend request`,
+            read: false,
+            receiver: userFriend,
+            sender: userToUpdate,
+            createdAt: new Date(),
+          };
+
+          this.eventEmitter.emit(
+            'notification.friendRequestAccepted',
+            new NotificationCreatedEvent(notification),
+          );
           return updatedRelation;
         } catch (e) {
           throw new BadRequestException(
@@ -489,6 +503,21 @@ export class UsersRelationsService {
           await this.userRelationRepository.delete({
             id: relationExist.id,
           });
+
+          // send notification to userFriend
+          const notification: NotificationInterface = {
+            type: 'friendRequestDeclined',
+            content: `declined your friend request`,
+            read: false,
+            receiver: userFriend,
+            sender: userToUpdate,
+            createdAt: new Date(),
+          };
+
+          this.eventEmitter.emit(
+            'notification.friendRequestDeclined',
+            new NotificationCreatedEvent(notification),
+          );
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't decline ${friendId}`,
@@ -564,13 +593,28 @@ export class UsersRelationsService {
     }
 
     if (relationExist.relationType == 'pending') {
-      console.log('relationExist : ', relationExist.userInitiateur.id);
-      console.log('userId : ', userId);
+      // console.log('relationExist : ', relationExist.userInitiateur.id);
+      // console.log('userId : ', userId);
       if (relationExist.userInitiateur.id == userId) {
         try {
           await this.userRelationRepository.delete({
             id: relationExist.id,
           });
+
+          // send notification to userFriend
+          const notification: NotificationInterface = {
+            type: 'friendRequestCanceled',
+            content: `canceled your friend request`,
+            read: false,
+            receiver: userFriend,
+            sender: userToUpdate,
+            createdAt: new Date(),
+          };
+
+          this.eventEmitter.emit(
+            'notification.friendRequestCanceled',
+            new NotificationCreatedEvent(notification),
+          );
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't cancel ${friendId}`,
@@ -599,16 +643,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'email', 'firstName', 'lastName'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
 
@@ -617,16 +652,7 @@ export class UsersRelationsService {
 
     const userBlocked: UserEntity = await this.userRepository.findOne({
       where: { id: blockedId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'email', 'firstName', 'lastName'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
 
@@ -658,6 +684,20 @@ export class UsersRelationsService {
           const updatedRelation: UserRelationEntity =
             await this.userRelationRepository.save(relationExist);
 
+          //event notification
+          const notification: NotificationInterface = {
+            type: 'blockUser',
+            content: `blocked you`,
+            read: false,
+            receiver: userBlocked,
+            sender: userToUpdate,
+            createdAt: new Date(),
+          };
+
+          this.eventEmitter.emit(
+            'notification.blockUser',
+            new NotificationCreatedEvent(notification),
+          );
           return updatedRelation;
         } catch (e) {
           throw new BadRequestException(
@@ -683,6 +723,21 @@ export class UsersRelationsService {
           try {
             const updatedRelation: UserRelationEntity =
               await this.userRelationRepository.save(relationExist);
+
+            //event notification
+            const notification: NotificationInterface = {
+              type: 'blockUser',
+              content: `blocked you`,
+              read: false,
+              receiver: userBlocked,
+              sender: userToUpdate,
+              createdAt: new Date(),
+            };
+
+            this.eventEmitter.emit(
+              'notification.blockUser',
+              new NotificationCreatedEvent(notification),
+            );
 
             return updatedRelation;
           } catch (e) {
@@ -811,6 +866,20 @@ export class UsersRelationsService {
               `Error while deleting relation between user ${userId} and user friend ${blockedId}`,
             );
           }
+
+          // send notification to userBlocked
+          const notification: NotificationInterface = {
+            type: 'unblockUser',
+            content: `unblocked you`,
+            read: false,
+            receiver: userBlocked,
+            sender: userToUpdate,
+            createdAt: new Date(),
+          };
+          this.eventEmitter.emit(
+            'notification.unblockUser',
+            new NotificationCreatedEvent(notification),
+          );
         } catch (e) {
           throw new InternalServerErrorException(
             `Error while deleting relation between user ${userId} and user friend ${blockedId}`,
@@ -827,115 +896,28 @@ export class UsersRelationsService {
     }
   }
 
-  // async addFriend(
-  //   userId: bigint,
-  //   friendId: bigint,
-  // ): Promise<UserRelationInterface> {
-  //   if (userId == friendId)
-  //     throw new ConflictException(`You can't add yourself as friend`);
-
-  //   const userToUpdate: UserEntity = await this.userRepository.findOne({
-  //     where: { id: userId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userToUpdate)
-  //     throw new NotFoundException(`User with id ${userId} not found`);
-
-  //   const userFriend: UserEntity = await this.userRepository.findOne({
-  //     where: { id: friendId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userFriend)
-  //     throw new NotFoundException(`User friend with id ${friendId} not found`);
-
-  //   // check if relation already exist
-  //   const relationExist: UserRelationEntity =
-  //     await this.userRelationRepository.findOne({
-  //       where: { user: { id: userId }, userRelation: { id: friendId } },
-  //       select: ['id', 'relationType'],
-  //     });
-  //   console.log(relationExist);
-  //   if (relationExist?.relationType == 'friend')
-  //     throw new ConflictException(`${userFriend.login} is already your friend`);
-
-  //   const updateRelation: Partial<UserRelationEntity> = {
-  //     ...relationExist,
-  //     relationType: 'friend',
-  //     user: userToUpdate,
-  //     userRelation: userFriend,
-  //     updatedAt: new Date(),
-  //   };
-
-  //   try {
-  //     let newRelation: UserRelationEntity;
-  //     if (relationExist?.relationType === 'blocked') {
-  //       await this.userRelationRepository.update(
-  //         { user: { id: userId }, userRelation: { id: friendId } },
-  //         updateRelation,
-  //       );
-  //       newRelation = await this.userRelationRepository
-  //         .createQueryBuilder('user_relation')
-  //         .select([
-  //           'user_relation.id',
-  //           'user_relation.relationType',
-  //           'user_relation.createdAt',
-  //           'user_relation.updatedAt',
-  //         ])
-  //         .leftJoin('user_relation.user', 'user')
-  //         .addSelect([
-  //           'user.id',
-  //           'user.login',
-  //           'user.email',
-  //           'user.firstName',
-  //           'user.lastName',
-  //           'user.description',
-  //           'user.avatar',
-  //           'user.status',
-  //         ])
-  //         .leftJoin('user_relation.userRelation', 'userRelation')
-  //         .addSelect([
-  //           'userRelation.id',
-  //           'userRelation.login',
-  //           'userRelation.email',
-  //           'userRelation.firstName',
-  //           'userRelation.lastName',
-  //           'userRelation.description',
-  //           'userRelation.avatar',
-  //           'userRelation.status',
-  //         ])
-  //         .where('user.id = :userId', { userId })
-  //         .andWhere('userRelation.id = :friendId', { friendId })
-  //         .getOne();
-  //     } else
-  //       newRelation = await this.userRelationRepository.save(updateRelation);
-  //     return newRelation;
-  //   } catch (e) {
-  //     throw new BadRequestException(
-  //       `User ${userId} can't block ${friendId}`,
-  //       e,
-  //     );
-  //   }
-  // }
-
   async deleteRelation(userId: bigint, friendId: bigint): Promise<void> {
+    if (userId == friendId)
+      throw new ConflictException(`You can't delete yourself`);
+
+    // check users
+    const userToUpdate: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      relations: ['initiatedRelations', 'relatedRelations'],
+    });
+    if (!userToUpdate)
+      throw new NotFoundException(`User with id ${userId} not found`);
+
+    const userFriend: UserEntity = await this.userRepository.findOne({
+      where: { id: friendId },
+      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      relations: ['initiatedRelations', 'relatedRelations'],
+    });
+    if (!userFriend)
+      throw new NotFoundException(`User friend with id ${friendId} not found`);
+
+    // check if relation already exist
     const relationExist: UserRelationEntity =
       await this.userRelationRepository.findOne({
         where: [
@@ -960,212 +942,19 @@ export class UsersRelationsService {
         `Error while deleting relation between user ${userId} and user friend ${friendId}`,
       );
     }
+
+    // send notification to userFriend
+    const notification: NotificationInterface = {
+      type: 'friendDeleted',
+      content: `deleted you from his friend list`,
+      read: false,
+      receiver: userFriend,
+      sender: userToUpdate,
+      createdAt: new Date(),
+    };
+    this.eventEmitter.emit(
+      'notification.removeFriend',
+      new NotificationCreatedEvent(notification),
+    );
   }
-
-  // async deleteRelation(userId: bigint, friendId: bigint): Promise<boolean> {
-  //   if (userId === friendId)
-  //     throw new BadRequestException(
-  //       `User ${userId} can't delete himself as friend`,
-  //     );
-
-  //   const userToUpdate: UserEntity = await this.userRepository.findOne({
-  //     where: { id: userId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userToUpdate)
-  //     throw new NotFoundException(`User with id ${userId} not found`);
-
-  //   const userFriend: UserEntity = await this.userRepository.findOne({
-  //     where: { id: friendId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userFriend)
-  //     throw new NotFoundException(`User friend with id ${friendId} not found`);
-
-  //   // check if relation already exist
-  //   const relationExist: UserRelationEntity[] =
-  //     await this.userRelationRepository.find({
-  //       where: {
-  //         user: { id: userId },
-  //         relationType: 'friend',
-  //         userRelation: { id: friendId },
-  //       },
-  //       select: ['id'],
-  //     });
-  //   if (relationExist?.length === 0)
-  //     throw new BadRequestException(
-  //       `User ${userId} don't have ${friendId} as friend`,
-  //     );
-
-  //   // delete relation in users_relation table
-  //   const relationToDelete: UserRelationEntity =
-  //     await this.userRelationRepository.findOne({
-  //       where: {
-  //         user: { id: userId },
-  //         relationType: 'friend',
-  //         userRelation: { id: friendId },
-  //       },
-  //       select: ['id'],
-  //     });
-  //   if (!relationToDelete)
-  //     throw new NotFoundException(
-  //       `Relation between user ${userId} and user friend ${friendId} not found`,
-  //     );
-
-  //   try {
-  //     const deletedRelation = await this.userRelationRepository.remove(
-  //       relationToDelete,
-  //     );
-  //     if (deletedRelation?.id == undefined) return true;
-  //     else return false;
-  //   } catch (error) {
-  //     throw new BadRequestException(
-  //       `Error while deleting relation between user ${userId} and user friend ${friendId}`,
-  //       error,
-  //     );
-  //   }
-  // }
-
-  // async blockUser(
-  //   userId: bigint,
-  //   blockedId: bigint,
-  // ): Promise<UserRelationInterface> {
-  //   if (userId === blockedId)
-  //     throw new BadRequestException(`User ${userId} can't block himself`);
-
-  //   const userToUpdate: UserEntity = await this.userRepository.findOne({
-  //     where: { id: userId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userToUpdate)
-  //     throw new NotFoundException(`User with id ${userId} not found`);
-
-  //   const userBlocked: UserEntity = await this.userRepository.findOne({
-  //     where: { id: blockedId },
-  //     select: [
-  //       'id',
-  //       'login',
-  //       'email',
-  //       'firstName',
-  //       'lastName',
-  //       'description',
-  //       'avatar',
-  //       'status',
-  //     ],
-  //   });
-  //   if (!userBlocked)
-  //     throw new NotFoundException(
-  //       `User blocked with id ${blockedId} not found`,
-  //     );
-
-  //   const relationExist: UserRelationEntity =
-  //     await this.userRelationRepository.findOne({
-  //       where: { user: { id: userId }, userBlocked: { id: blockedId } },
-  //       select: ['id', 'relationType'],
-  //     });
-
-  //   if (relationExist?.relationType === 'blocked')
-  //     throw new BadRequestException(
-  //       `User ${userId} already blocked ${blockedId}`,
-  //     );
-
-  //   const updateRelation: Partial<UserRelationEntity> = {
-  //     ...relationExist,
-  //     relationType: 'blocked',
-  //     user: userToUpdate,
-  //     userRelation: null,
-  //     userBlocked: userBlocked,
-  //     updatedAt: new Date(),
-  //   };
-
-  //   // try {
-  //   let newRelation: UserRelationEntity;
-  //   // if (relationExist?.relationType === 'friend') {
-  //   //   await this.userRelationRepository.update(
-  //   //     { user: { id: userId }, userRelation: { id: blockedId } },
-  //   //     updateRelation,
-  //   //   );
-  //   //   newRelation = await this.userRelationRepository
-  //   //     .createQueryBuilder('user-relation')
-  //   //     .select([
-  //   //       'user-relation.id',
-  //   //       'user-relation.relationType',
-  //   //       'user-relation.createdAt',
-  //   //       'user-relation.updatedAt',
-  //   //     ])
-  //   //     .leftJoin('user-relation.user', 'user')
-  //   //     .addSelect([
-  //   //       'user.id',
-  //   //       'user.login',
-  //   //       'user.email',
-  //   //       'user.firstName',
-  //   //       'user.lastName',
-  //   //       'user.description',
-  //   //       'user.avatar',
-  //   //       'user.status',
-  //   //     ])
-  //   //     .leftJoin('user-relation.userRelation', 'userRelation')
-  //   //     .addSelect([
-  //   //       'userRelation.id',
-  //   //       'userRelation.login',
-  //   //       'userRelation.email',
-  //   //       'userRelation.firstName',
-  //   //       'userRelation.lastName',
-  //   //       'userRelation.description',
-  //   //       'userRelation.avatar',
-  //   //       'userRelation.status',
-  //   //     ])
-  //   //     .where('user.id = :userId', { userId })
-  //   //     .andWhere('userRelation.id = :blockedId', { blockedId })
-  //   //     .getOne();
-  //   // } else
-
-  //   //delte friend relation if exist
-  //   const friendRelation: UserRelationEntity =
-  //     await this.userRelationRepository.findOne({
-  //       where: {
-  //         user: { id: userId },
-  //         relationType: 'friend',
-  //         userRelation: { id: blockedId },
-  //       },
-  //       select: ['id'],
-  //     });
-  //   if (friendRelation)
-  //     await this.userRelationRepository.remove(friendRelation);
-
-  //   newRelation = await this.userRelationRepository.save(updateRelation);
-  //   return newRelation;
-  //   // } catch (e) {
-  //   //   throw new BadRequestException(
-  //   //     `User ${userId} can't block ${blockedId}`,
-  //   //     e,
-  //   //   );
-  // }
 }

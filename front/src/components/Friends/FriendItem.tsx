@@ -1,5 +1,6 @@
 import { Badge, Button, Typography } from '@mui/material';
 import { UserInterface } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendItemProps {
   user: UserInterface;
@@ -10,12 +11,15 @@ interface FriendItemProps {
 }
 
 const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
+  const navigate = useNavigate();
+  
   return (
     <div>
-
       <div className="border hover:bg-gray-100 transition-all 
       cursor-pointer flex flex-row items-center">
-        <div className="flex flex-grow text-black m-2 items-center">
+        <div className="flex flex-grow text-black m-2 items-center"
+          onClick={() => {navigate(`/profile/${user.login}`);}}
+        >
           <Badge
             color={
               user.status === 'online' ? 'success' :
@@ -31,16 +35,18 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
             }}
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
+          { user.avatar && 
             <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
-              src={'http://localhost:3000/avatars/' + user.avatar}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-              }}
-              alt="avatar"
+            className="w-10 h-10 rounded-full object-cover mr-2 "
+            src={'http://localhost:3000/avatars/' + user.avatar}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+            }}
+            alt="avatar"
             />
+          }
           </Badge>
           <Typography component="span"
             sx={{
@@ -64,6 +70,12 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
                 key={index}
                 variant='outlined'
                 onClick={() => action.callback(user)}
+                color={
+                  action.name === 'Delete' ||
+                  action.name === 'Cancel' ||
+                  action.name === 'Decline' ? 'error' 
+                    : action.name === 'Block' ? 'warning' 
+                      : 'primary' }
                 sx={{ marginRight: '10px' }}
               >
                 {action.name}

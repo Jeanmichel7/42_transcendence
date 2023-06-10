@@ -15,7 +15,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
     async function fetchAndSetFriendsProfile() {
       const friendsFetched: UserInterface[] | ApiErrorResponse = await getFriendProfile(user.login);
       if ('error' in friendsFetched) {
-        dispatch(setErrorSnackbar('Error get friends: ' + friendsFetched.error));
+        dispatch(setErrorSnackbar(friendsFetched.error + friendsFetched.message ? ': ' + friendsFetched.message : ''));
       } else {
         setFriends(friendsFetched);
       }

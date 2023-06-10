@@ -40,32 +40,34 @@ function App() {
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.message));
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       dispatch(action(result));
     }
   }, [dispatch]);
 
+  const checkAuth = useCallback(async () => {
+    const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
+    if (typeof isAuth === 'boolean' && isAuth === true) {
+      dispatch(setLogged(true));
+
+      await fetchData(getUserData, setUser);
+      await fetchData(getFriends, reduxSetFriends);
+      await fetchData(getBlockedUsers, reduxSetUserBlocked);
+      await fetchData(getFriendRequests, reduxSetWaitingFriends);
+      await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
+
+    } else {
+      dispatch(setLogged(false));
+      // navigate('/');
+    }
+  }, [dispatch, fetchData]);
+
+
   useEffect(() => {
-    const checkAuth = async () => {
-      const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
-      if (typeof isAuth === 'boolean' && isAuth === true) {
-        dispatch(setLogged(true));
-
-        await fetchData(getUserData, setUser);
-        await fetchData(getFriends, reduxSetFriends);
-        await fetchData(getBlockedUsers, reduxSetUserBlocked);
-        await fetchData(getFriendRequests, reduxSetWaitingFriends);
-        await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
-
-      } else {
-        dispatch(setLogged(false));
-        // navigate('/');
-      }
-    };
     checkAuth();
-  }, [dispatch, navigate, fetchData]);
-
+  }, [dispatch, navigate, fetchData, checkAuth]);
+  
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">

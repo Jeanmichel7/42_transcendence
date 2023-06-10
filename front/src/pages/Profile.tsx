@@ -3,14 +3,14 @@ import { useParams } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { reduxAddFriends } from '../store/userSlice';
+import { reduxAddWaitingFriendsSent } from '../store/userSlice';
 import { setErrorSnackbar, setMsgSnackbar } from '../store/snackbarSlice';
 
 import ProfileFriends from '../components/Profile/ProfileFriends';
 import HistoryGame from '../components/Profile/HistoryGame';
 
 import { getProfileByPseudo } from '../api/user';
-import { addFriend } from '../api/relation';
+import { requestAddFriend } from '../api/relation';
 
 import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
 
@@ -40,7 +40,7 @@ function Profile() {
         return;
       const profilesFetched: UserInterface | ApiErrorResponse = await getProfileByPseudo(pseudo);
       if ('error' in profilesFetched) {
-        dispatch(setErrorSnackbar('Error get profile: ' + profilesFetched.error));
+        dispatch(setErrorSnackbar(profilesFetched.error + profilesFetched.message ? ': ' + profilesFetched.message : ''));
       } else
         setUserProfile(profilesFetched);
     }
@@ -48,12 +48,12 @@ function Profile() {
   }, [pseudo, dispatch]);
 
   const handleAddFriend = async () => {
-    const res: UserRelation | ApiErrorResponse = await addFriend(userProfile.id);
+    const res: UserRelation | ApiErrorResponse = await requestAddFriend(userProfile.id);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      dispatch(reduxAddFriends(userProfile));
-      dispatch(setMsgSnackbar('Friend added'));
+      dispatch(setMsgSnackbar('Request sent'));
+      dispatch(reduxAddWaitingFriendsSent(userProfile));
     }
   };
 
