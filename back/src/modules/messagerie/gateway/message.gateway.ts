@@ -59,6 +59,15 @@ export class MessagerieWebsocketService {
     console.log('message sent to room' + roomName);
   }
 
+  emitEditMessage(message: MessageInterface) {
+    console.log('messages edited', message);
+    const user1 = message.ownerUser.id;
+    const user2 = message.destUser.id;
+    const roomName = this.PrivateRoomName(user1, user2);
+    this.server.to(roomName).emit('editMessage', message);
+    console.log('message edited sent to room' + roomName);
+  }
+
   /* ************************* */
   /*           Utils           */
   /* ************************* */

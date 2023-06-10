@@ -227,7 +227,7 @@ export class MessageService {
     const messageToUpdate = await this.findMsgWithRelationOwner(messageId);
     if (!messageToUpdate)
       throw new NotFoundException(`Message with id ${messageId} not found`);
-
+    console.log('messageToUpdate', messageToUpdate);
     if (messageToUpdate.ownerUser.id !== user.id && user.role !== 'admin')
       throw new ForbiddenException(`You can't update this message`);
 
@@ -237,6 +237,15 @@ export class MessageService {
         text: newMessage.text,
         updatedAt: new Date(),
       },
+    );
+
+    this.eventEmitter.emit(
+      'message.updated',
+      new MessageCreatedEvent({
+        ...messageToUpdate,
+        text: newMessage.text,
+        updatedAt: new Date(),
+      }),
     );
 
     const result: MessageInterface = await this.findOne(messageId);
@@ -266,12 +275,17 @@ export class MessageService {
     const message: MessageEntity = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('message.destUser', 'destUser')
       .select([
         'message',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
+        'destUser.id',
+        'destUser.firstName',
+        'destUser.lastName',
+        'destUser.login',
       ])
       .where('message.id = :id', { id })
       .getOne();

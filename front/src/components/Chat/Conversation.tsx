@@ -55,8 +55,22 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
       ]);
     });
 
+    socket.on('editMessage', (message) => {
+      console.log('edit message : ', message);
+      setMessages((prevMessages) => {
+        const newMessages = prevMessages.map((msg) => {
+          if (msg.id === message.id) {
+            return { ...msg, text: message.text, updatedAt: message.updatedAt };
+          }
+          return msg;
+        });
+        return newMessages;
+      });
+    });
+
     return () => {
       socket.off('message');
+      socket.off('editMessage');
       // socket.emit('leaveRoom', {
       //   user1Id: userData.id,
       //   user2Id: id,
@@ -184,18 +198,20 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
           <div className="overflow-y-auto" onScroll={handleScroll}>
 
             {/* display messages */}
+            { messages && 
             <div className='text-lg m-1 p-2 '>
               {messages.map((message: MessageInterface) => (
                 <MessageItem
-                  key={message.id}
-                  message={message}
-                  userDataId={userData.id}
-                  handleDeleteMessage={handleDeleteMessage}
+                key={message.id}
+                message={message}
+                userDataId={userData.id}
+                handleDeleteMessage={handleDeleteMessage}
                 />
               ))}
             </div>
+            }
 
- 
+
             {/* display form message */}
             <form className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2">
               <TextareaAutosize

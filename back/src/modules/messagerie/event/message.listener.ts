@@ -12,4 +12,10 @@ export class MessageListener {
     console.log('event message.created recu', event.message.text);
     this.socketEvents.emitMessage(event.message);
   }
+
+  @OnEvent('message.updated')
+  handleMessageUpdated(event: MessageCreatedEvent) {
+    console.log('event message.updated recu', event.message.text);
+    this.socketEvents.emitEditMessage(event.message);
+  }
 }

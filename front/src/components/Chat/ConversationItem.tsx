@@ -50,8 +50,6 @@ const MessageItem: FC<MessageItemProps> = memo(({
     if ('error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
-      message.text = inputMessage;
-      message.updatedAt = new Date();
       dispatch(setMsgSnackbar('Message edited'));
       setEditMessage(false);
       setInputMessage('');
@@ -87,13 +85,11 @@ const MessageItem: FC<MessageItemProps> = memo(({
   useEffect(() => {
     const fctTime = setInterval(() => {
       setMessageTime(getTimeSince(message.createdAt));
-    }, 1000 * 10); //10sec
+    }, 1000 * 1); //10sec
     return () => {
       clearInterval(fctTime);
     };
-  }, [message.createdAt]);
-
-
+  }, [message.createdAt, message.text, message.updatedAt]);
 
   return (
     <div key={message.id}>
@@ -199,6 +195,8 @@ const MessageItem: FC<MessageItemProps> = memo(({
   );
 }, (prevProps, nextProps) => {
   if (prevProps.message.id !== nextProps.message.id) return false;
+  if (prevProps.message.text !== nextProps.message.text) return false;
+  if (prevProps.message.updatedAt !== nextProps.message.updatedAt) return false;
   return true;
 });
 
