@@ -28,7 +28,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
   handleDeleteMessage,
 }) => {
   const [editMessage, setEditMessage] = useState<boolean>(false);
-  const [inputMessage, setInputMessage] = useState<string>('');
+  const [inputMessage, setInputMessage] = useState<string>(message.text);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [messageTime, setMessageTime] = useState<string>(getTimeSince(message.createdAt));
   const dispatch = useDispatch();
@@ -36,6 +36,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
 
   const handleEdit = (id: number) => async (e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (e === null) return;
+
     if ('key' in e) {
       if (e.shiftKey && e.key === 'Enter') {
         setInputMessage((prev) => prev + '\n');
@@ -45,14 +46,19 @@ const MessageItem: FC<MessageItemProps> = memo(({
     }
     if (inputMessage.trim() === '') return;
     e.stopPropagation();
+    e.preventDefault();
 
+    if (inputMessage === message.text) {
+      setEditMessage(false);
+      return;
+    }
     const res: MessageInterface | ApiErrorResponse = await apiEditMessage(id, inputMessage);
     if ('error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
       dispatch(setMsgSnackbar('Message edited'));
       setEditMessage(false);
-      setInputMessage('');
+      setInputMessage(inputMessage);
     }
   };
 
@@ -70,7 +76,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
 
   const handleCloseEdit = () => {
     setEditMessage(false);
-    setInputMessage('');
+    setInputMessage(message.text);
   };
 
   const handleMouseEnter = () => {
@@ -142,7 +148,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
         {/**
         * Display boutons edit et delete
         **/}
-        <div className='flex-none flex w-20 h-full pt-1'>
+        <div className='flex-none flex w-20 h-full pt-2'>
           <Tooltip
             title="Edit message" arrow
             TransitionComponent={Zoom}
@@ -171,25 +177,27 @@ const MessageItem: FC<MessageItemProps> = memo(({
       * Formulaires edit message
       **/}
       {editMessage &&
-        <div className='flex'>
+        <form className="bg-gray-100 rounded-md shadow-md flex border-2 border-zinc-400 mx-2">
           <FormControl variant="standard" className='w-full'>
             <TextareaAutosize
               id={'edit-message' + message.id}
               aria-describedby={'edit-message' + message.id + '_text'}
-              className="w-full"
-              value={inputMessage == '' ? message.text : inputMessage}
+              className="w-full p-2 rounded-md m-1 pb-1 shadow-sm font-sans resize-none"
+              value={inputMessage}
               onChange={handleOnChange(setInputMessage)}
               onKeyDown={handleEdit(message.id)}
               autoFocus
             />
           </FormControl>
+
           <IconButton onClick={handleEdit(message.id)} color='primary'>
             <BiPaperPlane />
           </IconButton>
+
           <IconButton onClick={handleCloseEdit} color='error'>
             <CloseIcon />
           </IconButton>
-        </div>
+        </form>
       }
     </div>
   );

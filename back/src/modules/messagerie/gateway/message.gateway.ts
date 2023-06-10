@@ -68,6 +68,15 @@ export class MessagerieWebsocketService {
     console.log('message edited sent to room' + roomName);
   }
 
+  emitDeleteMessage(message: MessageInterface) {
+    console.log('messages deleted', message);
+    const user1 = message.ownerUser.id;
+    const user2 = message.destUser.id;
+    const roomName = this.PrivateRoomName(user1, user2);
+    this.server.to(roomName).emit('deleteMessage', message);
+    console.log('message deleted sent to room' + roomName);
+  }
+
   /* ************************* */
   /*           Utils           */
   /* ************************* */

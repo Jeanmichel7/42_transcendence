@@ -265,6 +265,8 @@ export class MessageService {
 
     const result = await this.messageRepository.delete({ id: messageId });
     if (result.affected === 0) return false;
+
+    this.eventEmitter.emit('message.deleted', new MessageCreatedEvent(message));
     return true;
   }
 

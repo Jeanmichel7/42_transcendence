@@ -68,6 +68,11 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
       });
     });
 
+    socket.on('deleteMessage', (message) => {
+      console.log('delete message : ', message);
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
+    });
+
     return () => {
       socket.off('message');
       socket.off('editMessage');
@@ -138,7 +143,7 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
 
   // delete message
   const handleDeleteMessage = async (msgId: number) => {
-    const res = await apiDeleteMessage(id);
+    const res = await apiDeleteMessage(msgId);
     if (typeof res === 'object' && 'error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
@@ -159,8 +164,11 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
       } else if (e.key !== 'Enter')
         return;
     }
-    if (text.trim() === '') return;
     e.preventDefault();
+    if (text.trim() === '') {
+      setText('');
+      return;
+    }
     setStatusSendMsg('pending');
 
     const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, id);

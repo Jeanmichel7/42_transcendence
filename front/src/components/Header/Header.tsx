@@ -96,12 +96,12 @@ function Header() {
     });
 
     socket.on('notification_block_user', (notification: NotificationInterface) => {
-      dispatch(reduxAddUserBlocked(notification.sender));
+      dispatch(reduxRemoveFriends(notification.sender));
     });
 
-    socket.on('notification_unblock_user', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveUserBlocked(notification.sender));
-    });
+    // socket.on('notification_unblock_user', (notification: NotificationInterface) => {
+    //   dispatch(reduxRemoveUserBlocked(notification.sender));
+    // });
 
     return () => {
       socket.off('notification_friend_request');
