@@ -40,7 +40,7 @@ function App() {
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.message));
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       dispatch(action(result));
     }

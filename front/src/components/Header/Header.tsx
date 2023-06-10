@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddNotification, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, reduxSetNotifications, setLogout } from '../../store/userSlice';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
+import NotificationItem from './NotificationItem';
 import { logout } from '../../api/auth';
 import { io } from 'socket.io-client';
 
@@ -23,8 +24,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-// import SearchIcon from '@mui/icons-material/Search';
-// import MailIcon from '@mui/icons-material/Mail';
 
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
@@ -32,21 +31,20 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 
 
-import NotificationItem from './NotificationItem';
-
-
 function Header() {
   const storedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElNotification, setAnchorElNotification] = useState<null | HTMLElement>(null);
-  const [notifications, setNotifications] = useState<NotificationInterface[]>(storedNotifications);
+  // const [notifications, setNotifications] = useState<NotificationInterface[]>(storedNotifications);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   /* redux */
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
+  // dispatch(reduxSetNotifications(storedNotifications));
 
 
   const connectWebSocket = useCallback(() => {
@@ -72,12 +70,11 @@ function Header() {
     });
 
     socket.on('notification_friend_request', (notification: NotificationInterface) => {
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        notification,
-      ]);
-
-      //update user data
+      // setNotifications((prevNotifications) => [
+      //   ...prevNotifications,
+      //   notification,
+      // ]);
+      dispatch(reduxAddNotification(notification));
       dispatch(reduxAddWaitingFriends(notification.sender));
     });
 
@@ -92,7 +89,8 @@ function Header() {
     });
 
     socket.on('notification_friend_request_canceled', (notification: NotificationInterface) => {
-      setNotifications(notifications.filter(n => n.sender.id !== notification.sender.id));
+      dispatch(reduxRemoveNotification(notification));
+      // setNotifications(notifications.filter(n => n.sender.id !== notification.sender.id));
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request canceled'));
       dispatch(reduxRemoveWaitingFriends(notification.sender));
     });
@@ -146,13 +144,10 @@ function Header() {
     setAnchorElNotification(null);
   };
 
-
-
-
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error logout: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setLogout());
       dispatch(setMsgSnackbar('Logout success'));
@@ -161,18 +156,14 @@ function Header() {
   }
 
 
-
-
   useEffect(() => {
     connectWebSocket();
   }, [connectWebSocket]);
 
-  useEffect(() => {
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-    console.log('notifications : ', notifications);
-  }, [notifications]);
-
-
+  // useEffect(() => {
+  //   localStorage.setItem('notifications', JSON.stringify(notifications));
+  //   console.log('notifications : ', notifications);
+  // }, [notifications]);
 
 
   const renderMobileNotification = (
@@ -198,12 +189,6 @@ function Header() {
 
   const renderStandardNotification = (
     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-      {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-        <Badge badgeContent={4} color="error">
-          <MailIcon />
-        </Badge>
-      </IconButton> */}
-
       <IconButton
         size="large"
         aria-label="show new notifications"
@@ -241,7 +226,6 @@ function Header() {
         <NotificationItem
           key={index}
           notification={notification}
-          setNotifications={setNotifications}
           setAnchorElNotification={setAnchorElNotification}
         />
       ))}
@@ -280,7 +264,6 @@ function Header() {
           >
             Pong
           </Typography>
-
 
           {/**
            * Display Menu pages on small screen
@@ -338,7 +321,6 @@ function Header() {
             </Menu>
           </Box>
 
-
           {/**
            * Display Icon and Title on small screen
            */}
@@ -363,7 +345,6 @@ function Header() {
           >
             Pong
           </Typography>
-
 
           {/**
            * Display pages on large screen
@@ -393,8 +374,6 @@ function Header() {
               </Button>
             </NavLink>
           </Box>
-
-
 
           {/**
            * Display Menu icon user

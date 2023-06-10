@@ -7,18 +7,18 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
-import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddFriends, reduxReadNotification, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
 
 
 interface NotificationItemProps {
   notification: NotificationInterface;
-  setNotifications: React.Dispatch<React.SetStateAction<NotificationInterface[]>>;
+  // setNotifications: React.Dispatch<React.SetStateAction<NotificationInterface[]>>;
   setAnchorElNotification: React.Dispatch<React.SetStateAction<null | HTMLElement>>;
 }
 
 const NotificationItem = ({
   notification,
-  setNotifications,
+  // setNotifications,
   setAnchorElNotification,
 }: NotificationItemProps) => {
   // const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -32,7 +32,7 @@ const NotificationItem = ({
     setIsLoading(false);
 
     if ('error' in resAcceptRequest)
-      dispatch(setErrorSnackbar('Error accept friend request: ' + resAcceptRequest.message));
+      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
@@ -48,7 +48,7 @@ const NotificationItem = ({
     setIsLoading(false);
     
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-      dispatch(setErrorSnackbar('Error decline friend request: ' + resDeclineRequest.message));
+      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
       dispatch(setMsgSnackbar('Friend request declined'));
@@ -72,7 +72,8 @@ const NotificationItem = ({
 
   const handleDeleteNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
-    setNotifications((prev) => prev.filter((n) => n !== notif));
+    dispatch(reduxRemoveNotification(notif));
+    // setNotifications((prev) => prev.filter((n) => n !== notif));
   };
 
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
@@ -99,13 +100,14 @@ const NotificationItem = ({
   //handler mouse notif
   const handleMouseEnter = () => {
     // setIsHovered(true);
-    setNotifications(
-      (prev) => prev.map((n) => {
-        if (n === notification)
-          n.read = true;
-        return n;
-      }),
-    );
+    dispatch(reduxReadNotification(notification));
+    // setNotifications(
+    //   (prev) => prev.map((n) => {
+    //     if (n === notification)
+    //       n.read = true;
+    //     return n;
+    //   }),
+    // );
   };
 
   const handleMouseLeave = () => {

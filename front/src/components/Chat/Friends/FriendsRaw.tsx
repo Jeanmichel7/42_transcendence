@@ -48,7 +48,7 @@ export function FriendRow({
     e.stopPropagation();
     const res: void | ApiErrorResponse = await deleteFriend(userToRemove.id);
     if (typeof res === 'object' && 'error' in res) {
-      dispatch(setErrorSnackbar('Error delete friends: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(reduxRemoveFriends(userToRemove));
       dispatch(setMsgSnackbar('Friend deleted'));

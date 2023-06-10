@@ -5,6 +5,7 @@ import { ApiErrorResponse, NotificationInterface, UserInterface } from '../types
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
+  notifications: NotificationInterface[];
   error: null | ApiErrorResponse;
 }
 
@@ -82,6 +83,7 @@ export const userSlice = createSlice({
   initialState: {
     isLogged: false,
     error: null,
+    notifications: [],
     userData: {
       id: -1,
       login: '',
@@ -141,6 +143,29 @@ export const userSlice = createSlice({
         waitingFriendsRequestReceived: [],
         waitingFriendsRequestSent: [],
       };
+    },
+
+    // manage notifications
+    reduxSetNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
+      state.notifications = action.payload;
+    },
+    reduxAddNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      if (state.notifications === undefined)
+        state.notifications = [action.payload];
+      else
+        state.notifications = [...state.notifications, action.payload];
+    },
+    reduxRemoveNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      state.notifications = state.notifications
+        .filter((notif: NotificationInterface) => notif !== action.payload);
+    },
+    reduxReadNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      state.notifications = state.notifications
+        .map((notif: NotificationInterface) => {
+          if (notif === action.payload)
+            notif.read = true;
+          return notif;
+        });
     },
 
     // manage friends
@@ -213,6 +238,7 @@ export const {
   reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
   reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
   reduxAcceptedRequest, reduxDeclinedRequest,
+  reduxSetNotifications, reduxAddNotification, reduxRemoveNotification, reduxReadNotification,
   setError,
 } = userSlice.actions;
 

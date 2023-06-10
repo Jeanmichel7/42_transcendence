@@ -20,7 +20,7 @@ const WaitingRequestSent = () => {
     setIsLoading(false);
 
     if (typeof resCancelRequest === 'object' && 'error' in resCancelRequest)
-      dispatch(setErrorSnackbar('Error cancel friend request: ' + resCancelRequest.message));
+      dispatch(setErrorSnackbar(resCancelRequest.error + resCancelRequest.message ? ': ' + resCancelRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriendsSent(userToCancel));
       dispatch(setMsgSnackbar('Friend request canceled'));

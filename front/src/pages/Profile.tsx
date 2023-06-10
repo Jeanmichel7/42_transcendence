@@ -40,7 +40,7 @@ function Profile() {
         return;
       const profilesFetched: UserInterface | ApiErrorResponse = await getProfileByPseudo(pseudo);
       if ('error' in profilesFetched) {
-        dispatch(setErrorSnackbar('Error get profile: ' + profilesFetched.error));
+        dispatch(setErrorSnackbar(profilesFetched.error + profilesFetched.message ? ': ' + profilesFetched.message : ''));
       } else
         setUserProfile(profilesFetched);
     }
@@ -50,7 +50,7 @@ function Profile() {
   const handleAddFriend = async () => {
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(userProfile.id);
     if ('error' in res) {
-      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(userProfile));

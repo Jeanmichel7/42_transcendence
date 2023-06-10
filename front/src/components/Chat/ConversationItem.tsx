@@ -48,7 +48,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
 
     const res: MessageInterface | ApiErrorResponse = await apiEditMessage(id, inputMessage);
     if ('error' in res)
-      dispatch(setErrorSnackbar('Error edit message: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
       message.text = inputMessage;
       message.updatedAt = new Date();

@@ -26,7 +26,7 @@ export default function AccountProfile() {
 
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
-      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
+      dispatch(setErrorSnackbar(updatedUser.error + updatedUser.message ? ': ' + updatedUser.message : ''));
     } else {
       dispatch(setUser({ ...userData, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);

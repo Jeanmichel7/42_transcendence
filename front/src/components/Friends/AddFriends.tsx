@@ -26,7 +26,7 @@ const AddFriends = () => {
       setIsLoading(false);
       
       if ('error' in allUsersFetched)
-        dispatch(setErrorSnackbar('Error get users: ' + allUsersFetched.error));
+        dispatch(setErrorSnackbar(allUsersFetched.error + allUsersFetched.message ? ': ' + allUsersFetched.message : ''));
       else {
         const resFiltered = allUsersFetched.filter((u: UserInterface) =>
           u.id != userData.id &&
@@ -54,7 +54,7 @@ const AddFriends = () => {
     setIsLoading(false);
 
     if ('error' in res)
-      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(user));

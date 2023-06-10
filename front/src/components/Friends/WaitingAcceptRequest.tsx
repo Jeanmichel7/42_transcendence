@@ -19,7 +19,7 @@ const WaitingAcceptRequest = () => {
     setIsLoading(false);
 
     if ('error' in resAcceptRequest)
-      dispatch(setErrorSnackbar('Error accept friend request: ' + resAcceptRequest.message));
+      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
@@ -33,7 +33,7 @@ const WaitingAcceptRequest = () => {
     setIsLoading(false);
     
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-      dispatch(setErrorSnackbar('Error decline friend request: ' + resDeclineRequest.message));
+      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
       dispatch(setMsgSnackbar('Friend request declined'));

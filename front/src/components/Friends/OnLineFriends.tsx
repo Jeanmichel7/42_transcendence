@@ -21,7 +21,7 @@ const OnLineFriends = () => {
     setIsLoading(false);
 
     if ('error' in resBlockRequest)
-      dispatch(setErrorSnackbar('Error block user: ' + resBlockRequest.message));
+      dispatch(setErrorSnackbar(resBlockRequest.error + resBlockRequest.message ? ': ' + resBlockRequest.message : ''));
     else {
       dispatch(reduxAddUserBlocked(userToBlock));
       dispatch(setMsgSnackbar('User blocked'));
@@ -34,7 +34,7 @@ const OnLineFriends = () => {
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(setErrorSnackbar('Error delete friend: ' + resDeleteRequest.message));
+      dispatch(setErrorSnackbar(resDeleteRequest.error + resDeleteRequest.message ? ': ' + resDeleteRequest.message : ''));
     else {
       dispatch(reduxRemoveFriends(userToDelete));
       dispatch(setMsgSnackbar('Friend deleted'));

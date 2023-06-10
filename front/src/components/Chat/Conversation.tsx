@@ -72,7 +72,7 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
 
     const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay);
     if ('error' in allMessages)
-      dispatch(setErrorSnackbar('Error get old messages: ' + allMessages.error));
+      dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
       //save pos scrool
       const scrollContainer = document.querySelector('.overflow-y-auto');
@@ -126,7 +126,7 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
   const handleDeleteMessage = async (msgId: number) => {
     const res = await apiDeleteMessage(id);
     if (typeof res === 'object' && 'error' in res)
-      dispatch(setErrorSnackbar('Error delete message: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
       setMessages((prev) => prev.filter((message) => message.id !== msgId));
       dispatch(setMsgSnackbar('Message deleted'));

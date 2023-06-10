@@ -28,7 +28,7 @@ export default function FriendsSearch() {
       setIsLoading(false);
 
       if ('error' in allUsers)
-        dispatch(setErrorSnackbar('Error get users: ' + allUsers.error));
+        dispatch(setErrorSnackbar(allUsers.error + allUsers.message ? ': ' + allUsers.message : ''));
       else {
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id &&
@@ -58,7 +58,7 @@ export default function FriendsSearch() {
       return;
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(user.id);
     if ('error' in res)
-      dispatch(setErrorSnackbar('Error add friend: ' + res.error));
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
       dispatch(reduxAddWaitingFriendsSent(user));
       dispatch(setMsgSnackbar('Request sent'));

@@ -79,7 +79,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
       setError(updatedUser.message);
-      dispatch(setErrorSnackbar('Error update: ' + updatedUser.message));
+      dispatch(setErrorSnackbar(updatedUser.error + updatedUser.message ? ': ' + updatedUser.message : ''));
       setInputValue(value);
     } else {
       dispatch(setUser({ ...userData, [keyName]: inputValue }));
@@ -116,7 +116,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setInputValue(false);
       const res: UserInterface | ApiErrorResponse = await Desactive2FA();
       if ('error' in res) {
-        dispatch(setErrorSnackbar('Error update: ' + res.message));
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
       } else {
         setInputValue(false);
         setQRCode('');
@@ -125,7 +125,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       // enable 2FA
       const res: string | ApiErrorResponse = await Active2FA();
       if (typeof res === 'object' && 'error' in res) {
-        dispatch(setErrorSnackbar('Error update: ' + res.message));
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
       } else {
         setQRCode(res);
         setInputValue(true);
