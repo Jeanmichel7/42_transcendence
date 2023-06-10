@@ -83,7 +83,7 @@ export const userSlice = createSlice({
   initialState: {
     isLogged: false,
     error: null,
-    notifications: [],
+    notifications: localStorage.getItem('notifications') ? JSON.parse(localStorage.getItem('notifications') as string) : [] as NotificationInterface[],
     userData: {
       id: -1,
       login: '',
@@ -156,14 +156,15 @@ export const userSlice = createSlice({
         state.notifications = [...state.notifications, action.payload];
     },
     reduxRemoveNotification: (state, action: PayloadAction<NotificationInterface>) => {
+      console.log('remove notif : ', action.payload);
       state.notifications = state.notifications
-        .filter((notif: NotificationInterface) => notif !== action.payload);
+        .filter((notif: NotificationInterface) => JSON.stringify(notif) !== JSON.stringify(action.payload));
     },
     reduxReadNotification: (state, action: PayloadAction<NotificationInterface>) => {
       state.notifications = state.notifications
         .map((notif: NotificationInterface) => {
-          if (notif === action.payload)
-            notif.read = true;
+          if (JSON.stringify(notif) === JSON.stringify(action.payload))
+            return { ...notif, read: true };
           return notif;
         });
     },

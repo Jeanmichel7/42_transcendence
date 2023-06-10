@@ -38,12 +38,12 @@ const AddFriends = () => {
       }
     }
     fetchUsers();
-  }, [userData.id,
+  }, [ dispatch,
+    userData.id,
     userData.friends,
-    dispatch,
     userData.waitingFriendsRequestSent,
-    userData.userBlocked],
-  );
+    userData.userBlocked,
+  ]);
 
   const handleRequestAddFriend = async (user: UserInterface | null) => {
     if (!user)

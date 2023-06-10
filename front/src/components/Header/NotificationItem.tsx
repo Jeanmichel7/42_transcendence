@@ -12,16 +12,13 @@ import { reduxAddFriends, reduxReadNotification, reduxRemoveNotification, reduxR
 
 interface NotificationItemProps {
   notification: NotificationInterface;
-  // setNotifications: React.Dispatch<React.SetStateAction<NotificationInterface[]>>;
   setAnchorElNotification: React.Dispatch<React.SetStateAction<null | HTMLElement>>;
 }
 
 const NotificationItem = ({
   notification,
-  // setNotifications,
   setAnchorElNotification,
 }: NotificationItemProps) => {
-  // const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -73,7 +70,6 @@ const NotificationItem = ({
   const handleDeleteNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
     dispatch(reduxRemoveNotification(notif));
-    // setNotifications((prev) => prev.filter((n) => n !== notif));
   };
 
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
@@ -99,25 +95,12 @@ const NotificationItem = ({
 
   //handler mouse notif
   const handleMouseEnter = () => {
-    // setIsHovered(true);
     dispatch(reduxReadNotification(notification));
-    // setNotifications(
-    //   (prev) => prev.map((n) => {
-    //     if (n === notification)
-    //       n.read = true;
-    //     return n;
-    //   }),
-    // );
   };
 
   const handleMouseLeave = () => {
-    // setIsHovered(false);
   };
 
-  // useEffect(() => {
-  //   if (notification.read === true)
-  //     console.log('notif read !!!')
-  // }, [notification.read]);
 
   if (isLoading) {
     return <CircularProgress />;

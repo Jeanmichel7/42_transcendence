@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddNotification, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, reduxSetNotifications, setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddNotification, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -32,11 +32,9 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 
 function Header() {
-  const storedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElNotification, setAnchorElNotification] = useState<null | HTMLElement>(null);
-  // const [notifications, setNotifications] = useState<NotificationInterface[]>(storedNotifications);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -44,8 +42,6 @@ function Header() {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
   const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
-  // dispatch(reduxSetNotifications(storedNotifications));
-
 
   const connectWebSocket = useCallback(() => {
     if (!userData.id) return;
@@ -154,17 +150,15 @@ function Header() {
       navigate('/');
     }
   }
-
-
   useEffect(() => {
     connectWebSocket();
   }, [connectWebSocket]);
-
-  // useEffect(() => {
-  //   localStorage.setItem('notifications', JSON.stringify(notifications));
-  //   console.log('notifications : ', notifications);
-  // }, [notifications]);
-
+  
+  useEffect(() => {
+    // console.log('setnotifications localstorage', notifications);
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+  }, [notifications]);
+  
 
   const renderMobileNotification = (
     <Box sx={{ display: { xs: 'flex flex-raw', md: 'none' } }}>

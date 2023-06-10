@@ -217,6 +217,20 @@ export class UsersRelationsService {
     return allRequestsSent;
   }
 
+  // async requestAddFriend(
+  //   userId: bigint,
+  //   friendId: bigint,
+  // ): Promise<UserRelationInterface> {
+  //   console.log('In requestAddFriend function');
+  //   try {
+  //     console.log('Inside try block');
+  //     return Promise.resolve({} as UserRelationInterface); // Temporary return a resolved promise
+  //   } catch (e) {
+  //     console.log('Caught an error');
+  //     throw new InternalServerErrorException(e);
+  //   }
+  // }
+
   async requestAddFriend(
     userId: bigint,
     friendId: bigint,
@@ -260,12 +274,17 @@ export class UsersRelationsService {
           `${otherUser.login} is already your friend`,
         );
       else if (relationExist.relationType == 'pending') {
-        if (relationExist.userInitiateur.id == userId)
+        if (relationExist.userInitiateur.id == userId) {
           throw new ConflictException(
             `You already send a request to ${otherUser.login}`,
           );
-        else {
-        } // accept friend request
+        } else {
+          // accept friend request
+          // this.acceptFriendRequest(userId, friendId);
+          throw new ConflictException(
+            `${otherUser.login} already send a request to you, accept it`,
+          );
+        }
       } else if (relationExist.relationType == 'blocked') {
         if (relationExist.userInitiateur.id == userId)
           throw new ConflictException(
@@ -276,7 +295,9 @@ export class UsersRelationsService {
             `You can't send a request to ${otherUser.login}, you are blocked`,
           );
       } else {
-        console.log('relationExist type non gere... qu;est ce que tu fou ?');
+        throw new ConflictException(
+          `relationExist type non gere... qu;est ce que tu fou ?`,
+        );
       }
     } else {
       const newRelation: Partial<UserRelationEntity> = {
@@ -301,7 +322,6 @@ export class UsersRelationsService {
           'notification.friendRequest',
           new NotificationCreatedEvent(notification),
         );
-
         return createdRelation;
       } catch (e) {
         throw new BadRequestException(

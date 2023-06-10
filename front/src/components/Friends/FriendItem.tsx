@@ -35,16 +35,18 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
             }}
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
+          { user.avatar && 
             <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
-              src={'http://localhost:3000/avatars/' + user.avatar}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-              }}
-              alt="avatar"
+            className="w-10 h-10 rounded-full object-cover mr-2 "
+            src={'http://localhost:3000/avatars/' + user.avatar}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+            }}
+            alt="avatar"
             />
+          }
           </Badge>
           <Typography component="span"
             sx={{

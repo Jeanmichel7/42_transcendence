@@ -20,7 +20,9 @@ import { RequestWithUser } from '../users/interfaces/request.user.interface';
 
 @Controller('relations')
 export class UsersRelationsController {
-  constructor(private readonly usersRelationsService: UsersRelationsService) {}
+  constructor(private usersRelationsService: UsersRelationsService) {
+    console.log('UsersRelationsController constructor', usersRelationsService);
+  }
 
   @Get()
   async findAll(@Req() req: RequestWithUser): Promise<UserRelationInterface[]> {
@@ -55,9 +57,21 @@ export class UsersRelationsController {
     @Req() req: RequestWithUser,
     @Param('friendId', ParseIntPipe) friendId: bigint,
   ): Promise<UserRelationInterface> {
-    const result: UserRelationInterface =
-      await this.usersRelationsService.requestAddFriend(req.user.id, friendId);
-    return result;
+    try {
+      console.log('requestAddFriend controler');
+      console.log('req.user.id : ', req.user.id);
+      console.log('friendId : ', friendId);
+      const result: UserRelationInterface =
+        await this.usersRelationsService.requestAddFriend(
+          req.user.id,
+          friendId,
+        );
+      console.log('result : ', result);
+      return result;
+    } catch (error) {
+      console.log('error : ', error);
+      throw error;
+    }
   }
 
   @Put('friends/:friendId/accept')
