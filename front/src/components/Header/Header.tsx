@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -51,6 +51,7 @@ function Header() {
 
   const connectWebSocket = useCallback(() => {
     if (!userData.id) return;
+    if (userIsLogged === false) return;
 
     const socket = io('http://localhost:3000/notification', {
       reconnectionDelayMax: 10000,
@@ -70,19 +71,56 @@ function Header() {
       userId: userData.id,
     });
 
-    socket.on('notification', (notification: NotificationInterface) => {
-      console.log('new notification : ', notification.content);
+    socket.on('notification_friend_request', (notification: NotificationInterface) => {
       setNotifications((prevNotifications) => [
         ...prevNotifications,
         notification,
       ]);
+
+      //update user data
+      dispatch(reduxAddWaitingFriends(notification.sender));
+    });
+
+    socket.on('notification_friend_request_accepted', (notification: NotificationInterface) => {
+      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
+      dispatch(reduxAcceptedRequest(notification));
+    });
+
+    socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
+      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request declined'));
+      dispatch(reduxDeclinedRequest(notification));
+    });
+
+    socket.on('notification_friend_request_canceled', (notification: NotificationInterface) => {
+      setNotifications(notifications.filter(n => n.sender.id !== notification.sender.id));
+      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request canceled'));
+      dispatch(reduxRemoveWaitingFriends(notification.sender));
+    });
+
+    socket.on('notification_friend_deleted', (notification: NotificationInterface) => {
+      dispatch(reduxRemoveFriends(notification.sender));
+    });
+
+    socket.on('notification_block_user', (notification: NotificationInterface) => {
+      dispatch(reduxAddUserBlocked(notification.sender));
+    });
+
+    socket.on('notification_unblock_user', (notification: NotificationInterface) => {
+      dispatch(reduxRemoveUserBlocked(notification.sender));
     });
 
     return () => {
-      socket.off('notification');
+      socket.off('notification_friend_request');
+      socket.off('notification_friend_request_accepted');
+      socket.off('notification_friend_request_declined');
+      socket.off('notification_friend_request_canceled');
+      socket.off('notification_friend_deleted');
+      socket.off('notification_block_user');
+      socket.off('notification_unblock_user');
       socket.disconnect();
     };
-  }, [userData.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, userData.id]);
 
   //handler nav menu
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -139,35 +177,22 @@ function Header() {
 
   const renderMobileNotification = (
     <Box sx={{ display: { xs: 'flex flex-raw', md: 'none' } }}>
-      {/* <NavLink to='#'>
-        <MenuItem>
-          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <MailIcon />
-            </Badge>
-          </IconButton>
-          <p>Messages</p>
-        </MenuItem>
-      </NavLink> */}
-
-      <NavLink to='#'>
-        <MenuItem>
-          <IconButton
-            size="large"
-            aria-label="show new notifications"
-            color="inherit"
-            onClick={handleOpenNotificationMenu}
-          >
-            <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
-              { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
-                notifications.length ? <NotificationsIcon /> :
-                <NotificationsNoneIcon /> 
-              }
-            </Badge>
-          </IconButton>
-          <p>Notifications</p>
-        </MenuItem>
-      </NavLink>
+      <MenuItem>
+        <IconButton
+          size="large"
+          aria-label="show new notifications"
+          color="inherit"
+          onClick={handleOpenNotificationMenu}
+        >
+          <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
+            { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
+              notifications.length ? <NotificationsIcon /> :
+              <NotificationsNoneIcon /> 
+            }
+          </Badge>
+        </IconButton>
+        <p>Notifications</p>
+      </MenuItem>
     </Box>
   );
 
@@ -224,15 +249,8 @@ function Header() {
   );
 
 
-
-
-
-
-
   if (!userData.id)
     return null;
-
-
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -454,16 +472,12 @@ function Header() {
 
               {/** Menu notifications */}
               {notificationMenu}
-
             </>
           }
-
-
         </Toolbar>
       </Container>
     </AppBar>
 
   );
 }
-
 export default Header;

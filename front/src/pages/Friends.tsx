@@ -73,9 +73,9 @@ export default function FriendsPage() {
   }, [location.search]);
 
 
-  useEffect(() => {
-    console.log('value : ', value);
-  }, [value]);
+  // useEffect(() => {
+  //   console.log('value : ', value);
+  // }, [value]);
 
 
   useEffect(() => {

@@ -7,9 +7,41 @@ import { NotificationCreatedEvent } from './notification.event';
 export class NotificationListener {
   constructor(private readonly socketEvents: NotificationGateway) {}
 
-  @OnEvent('notification.created')
+  // notif friend request
+  @OnEvent('notification.friendRequest')
   handleMessageCreated(event: NotificationCreatedEvent) {
-    console.log('event notification.created recu', event.data);
-    this.socketEvents.emitNotification(event.data);
+    this.socketEvents.emitNotificationFriendRequest(event.data);
+  }
+
+  @OnEvent('notification.friendRequestAccepted')
+  handleFriendRequestAccepted(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationFriendRequestAccepted(event.data);
+  }
+
+  @OnEvent('notification.friendRequestDeclined')
+  handleFriendRequestDeclined(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationFriendRequestDeclined(event.data);
+  }
+
+  @OnEvent('notification.friendRequestCanceled')
+  handleFriendRequestCanceled(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationFriendRequestCanceled(event.data);
+  }
+
+  //notif remove friend
+  @OnEvent('notification.removeFriend')
+  handleRemoveFriend(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationRemoveFriend(event.data);
+  }
+
+  //notif user blocked
+  @OnEvent('notification.blockUser')
+  handleBlockUser(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationBlockUser(event.data);
+  }
+
+  @OnEvent('notification.unblockUser')
+  handleUnblockUser(event: NotificationCreatedEvent) {
+    this.socketEvents.emitNotificationUnblockUser(event.data);
   }
 }

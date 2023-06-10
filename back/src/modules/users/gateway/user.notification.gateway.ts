@@ -45,11 +45,46 @@ export class NotificationGateway {
     console.log('left private room notification_' + data.userId);
   }
 
-  emitNotification(data: NotificationInterface) {
+  emitNotificationFriendRequest(data: NotificationInterface) {
     this.server
       .to('notification_room_' + data.receiver.id)
-      .emit('notification', data);
-    console.log('notification sent to room' + data.receiver.id);
+      .emit('notification_friend_request', data);
+  }
+
+  emitNotificationFriendRequestAccepted(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_friend_request_accepted', data);
+  }
+
+  emitNotificationFriendRequestDeclined(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_friend_request_declined', data);
+  }
+
+  emitNotificationFriendRequestCanceled(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_friend_request_canceled', data);
+  }
+
+  emitNotificationRemoveFriend(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_friend_deleted', data);
+  }
+
+  emitNotificationBlockUser(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_block_user', data);
+  }
+
+  emitNotificationUnblockUser(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_unblock_user', data);
   }
 
   // emitJoinRoom(roomId: string, userId: string) {
