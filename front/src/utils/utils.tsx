@@ -1,3 +1,5 @@
+import { UserInterface, RoomInterface, ConversationInterface } from '../types';
+
 export function getTimeSince(time: Date): string {
   const now: Date = new Date();
   const dataTime: Date = new Date(time);
@@ -22,4 +24,32 @@ export function getTimeSince(time: Date): string {
     }
   }
   return result;
+}
+
+export function isUserInterface(obj: any): obj is UserInterface {
+  return obj && obj.login !== undefined;
+}
+
+export function isRoomInterface(obj: any): obj is RoomInterface {
+  return obj && obj.name !== undefined;
+}
+
+export function isConvAlreadyExist(
+  conv: (UserInterface | RoomInterface),
+  listConvs: ConversationInterface[],
+): boolean {
+  return listConvs.some((convInList) => {
+    if (isRoomInterface(convInList.room) && isRoomInterface(conv)) {
+      if (convInList.room.id === conv.id)
+        return true;
+      else
+        return false;
+    } else if (isUserInterface(convInList.user) && isUserInterface(conv)) {
+      if (convInList.user.id === conv.id)
+        return true;
+      else
+        return false;
+    }
+    return false;
+  });
 }

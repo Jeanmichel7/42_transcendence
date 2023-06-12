@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react';
-import ButtonNewGroup from '../components/Chat/ButtonNewGroup';
-// import ChatRoom from '../components/Chat/ChatRoom';
-import Friends from '../components/Chat/Friends/FriendsRaw';
-import Conversation from '../components/Chat/Conversation';
+import ConversationList from '../components/Chat/ConversationList/ConversationList';
+import PrivateConversation from '../components/Chat/Conversation/PrivateConversation';
 import ButtonInterfaceAddFriends from '../components/Chat/Friends/FriendsSearchButton';
-import FriendsSearch from '../components/Chat/Friends/FriendsSearch';
+import FriendsSearch from '../components/Chat/Friends/FriendsSearchInterface';
 
 import { useLocation } from 'react-router-dom';
+import { ButtonCreateGroup, ButtonInterfaceAddGroups } from '../components/Chat/Channel/ChannelButtons';
+import CreateGroupInterface from '../components/Chat/Channel/ChannelCreateInterface';
+import { Divider } from '@mui/material';
+import ChannelSearch from '../components/Chat/Channel/ChannelSearchInterface';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 function Chat() {
   const location = useLocation();
-  const [serviceToCall, setServiceToCall] = useState<string>('chat');
-  const [currentChatUserId, setCurrentChatUserId] = useState<number>(-1);
+  const [ serviceToCall, setServiceToCall ] = useState<string>('none');
+  const [ convSelectedId, setConvSelectedId ] = useState<number>(-1);
+  const { conversationsList } = useSelector((state: RootState) => state.chat);
+
 
   //check query params
   useEffect(() => {
@@ -19,42 +25,70 @@ function Chat() {
     const serviceParam = query.get('service');
     const userIdParam = query.get('userId');
     
-    if (serviceParam === 'chat' && userIdParam) {
+    if (serviceParam === 'privateConversation' && userIdParam) {
       console.log('params : ', serviceParam, userIdParam);
-      setCurrentChatUserId(parseInt(userIdParam));
+
+      // check type room ou user
+      // setConvSelected( ???
+      //    parseInt(userIdParam),
+      // );
     }
   }, [location.search]);
 
+  // useEffect(() => {
+  //   console.log('serviceToCall : ', serviceToCall);
+  //   console.log('convSelectedId : ', convSelectedId);
+  //   console.log('conversationsList : ', conversationsList);
+  //   console.log('conversationsList[convSelectedId] : ', conversationsList[convSelectedId]);
+  // }, [ convSelectedId]);
+
+
   return (
-    <div className={
-      //  serviceToCall !== 'chat' ? 'h-[calc(100vh-320px)]' : '' +
-      `h-[calc(100vh-320px)] flex justify-center items-stretch
-      border rounded-xl shadow-lg bg-[#F2F2FF] 
-      text-indigo-900 p-2`}
-    >
-      <div className="w-1/4 flex flex-col h-full">
-        <ButtonNewGroup  />
-        <ButtonInterfaceAddFriends 
+    <div className='h-full flex justify-center bg-[#F2F2FF]'>
+      <div className="flex flex-col h-full bg-[#e5e5f2]">
+          <ButtonCreateGroup 
+            setServiceToCall={ setServiceToCall }
+          />
+        <div className="flex justify-center items-center">
+          <ButtonInterfaceAddGroups 
+            setServiceToCall={ setServiceToCall }
+          />
+          <ButtonInterfaceAddFriends 
+            setServiceToCall={ setServiceToCall }
+          />
+        </div>
+        <ConversationList
           setServiceToCall={ setServiceToCall }
+          // currentChatUserId={currentChatUserId}
+          setConvSelectedId={setConvSelectedId}
         />
-        <Friends
-          setServiceToCall={ setServiceToCall }
-          currentChatUserId={currentChatUserId}
-          setCurrentChatUserId={setCurrentChatUserId}
-        />
-        {/* <ChatRoom /> */}
       </div>
 
-      <div className="w-3/4 h-full">
-      { serviceToCall === 'chat' &&
-        <Conversation 
-          key={ currentChatUserId }
-          id={ currentChatUserId }
-         />
-      }
-      { serviceToCall === 'addFriends' &&
-        <FriendsSearch />
-      }
+      <Divider orientation="vertical" flexItem />
+
+      <div className="flex-grow h-full">
+        { serviceToCall === 'privateConversation' && convSelectedId !== -1 &&
+          <PrivateConversation
+            key={ conversationsList[convSelectedId].id }
+            id={ conversationsList.find(conv => conv.id === convSelectedId)?.user.id || -1 }
+          />
+        }
+        { serviceToCall === 'channelConversation' &&
+          <p>Channel Conversation</p>
+          // <ChannelConversation />
+        }
+        { serviceToCall === 'addFriends' &&
+          <FriendsSearch />
+        }
+        { serviceToCall === 'createChannel' &&
+          <CreateGroupInterface />
+        }
+        { serviceToCall === 'addChannels' &&
+          <ChannelSearch />
+        }
+        {/* { serviceToCall === 'none' &&
+          <p>Home</p>
+        } */}
       </div>
     </div>
   );

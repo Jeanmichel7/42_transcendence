@@ -44,7 +44,7 @@ export class ChatController {
   /*                       ROOM                       */
   /* ************************************************ */
 
-  @Get('rooms/allRoomsToDisplay')
+  @Get('rooms/public')
   async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] =
       await this.ChatService.getAllRoomsToDisplay();
@@ -96,7 +96,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
     @Body() data: ChatJoinRoomDTO,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.joinRoom(
       req.user.id,
       roomId,
@@ -110,7 +110,7 @@ export class ChatController {
   async leaveRoom(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.leaveRoom(
       req.user.id,
       roomId,

@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import SideBar from './components/Sidebar/Sidebar';
+// import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from './routes/indexRoutes';
 import { isAuthenticated } from './api/auth';
@@ -73,12 +73,12 @@ function App() {
       <div className="flex flex-col h-screen min-h-md ">
         <Header />
         <div className="relative flex-grow bg-[#eaeaff] w-full">
-          <div className="mr-12 p-6 h-full">
+          <div className="h-full">
             <AppRoutes />
           </div>
-          <div className="absolute right-0 top-0">
+          {/* <div className="absolute right-0 top-0">
             <SideBar />
-          </div>
+          </div> */}
         </div>
         <Footer />
       </div>

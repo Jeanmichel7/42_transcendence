@@ -1,80 +1,74 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../types';
-// import { fetchUserAccount } from '../api/user';
 
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
   notifications: NotificationInterface[];
   error: null | ApiErrorResponse;
+  userFriends: UserInterface[],
+  userBlocked: UserInterface[],
+  waitingFriendsRequestReceived: UserInterface[],
+  waitingFriendsRequestSent: UserInterface[],
 }
-
-// export const fetchUser = createAsyncThunk< UserInterface | ApiErrorResponse, void, { state: UserState } >(
-//   'user/fetchUser',
-//   async () => {
-//     const response = await fetchUserAccount();
-//     return response;
-//   },
-// );
-
 
 // Friends management
 const addFriend = (state: UserState, user: UserInterface) => {
-  if (state.userData.friends === undefined)
-    state.userData.friends = [user];
+  if (state.userFriends === undefined)
+    state.userFriends = [user];
   else
-    state.userData.friends = [...state.userData.friends, user];
+    state.userFriends = [...state.userFriends, user];
 };
 
 const removeFriend = (state: UserState, user: UserInterface) => {
-  if (state.userData.friends === undefined)
+  if (state.userFriends === undefined)
     return;
-  state.userData.friends = state.userData.friends
+  state.userFriends = state.userFriends
     .filter((friend: UserInterface) => friend.id !== user.id);
 };
 
 // User blocked management
 const addUserBlocked = (state: UserState, user: UserInterface) => {
-  if (state.userData.userBlocked === undefined)
-    state.userData.userBlocked = [user];
+  if (state.userBlocked === undefined)
+    state.userBlocked = [user];
   else
-    state.userData.userBlocked = [...state.userData.userBlocked, user];
+    state.userBlocked = [...state.userBlocked, user];
 };
 
 const removeUserBlocked = (state: UserState, user: UserInterface) => {
-  if (state.userData.userBlocked === undefined)
+  if (state.userBlocked === undefined)
     return;
-  state.userData.userBlocked = state.userData.userBlocked
+  state.userBlocked = state.userBlocked
     .filter((userBlocked: UserInterface) => userBlocked.id !== user.id);
 };
 
 // Waiting friends request management
 const addWaitingFriends = (state: UserState, user: UserInterface) => {
-  if (state.userData.waitingFriendsRequestReceived === undefined)
-    state.userData.waitingFriendsRequestReceived = [user];
+  if (state.waitingFriendsRequestReceived === undefined)
+    state.waitingFriendsRequestReceived = [user];
   else
-    state.userData.waitingFriendsRequestReceived = [...state.userData.waitingFriendsRequestReceived, user];
+    state.waitingFriendsRequestReceived = [...state.waitingFriendsRequestReceived, user];
 };
 
 const removeWaitingFriends = (state: UserState, user: UserInterface) => {
-  if (state.userData.waitingFriendsRequestReceived === undefined)
+  if (state.waitingFriendsRequestReceived === undefined)
     return;
-  state.userData.waitingFriendsRequestReceived = state.userData.waitingFriendsRequestReceived
+  state.waitingFriendsRequestReceived = state.waitingFriendsRequestReceived
     .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
 };
 
 // Waiting friends request sent management
 const addWaitingFriendsSent = (state: UserState, user: UserInterface) => {
-  if (state.userData.waitingFriendsRequestSent === undefined)
-    state.userData.waitingFriendsRequestSent = [user];
+  if (state.waitingFriendsRequestSent === undefined)
+    state.waitingFriendsRequestSent = [user];
   else
-    state.userData.waitingFriendsRequestSent = [...state.userData.waitingFriendsRequestSent, user];
+    state.waitingFriendsRequestSent = [...state.waitingFriendsRequestSent, user];
 };
 
 const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
-  if (state.userData.waitingFriendsRequestSent === undefined)
+  if (state.waitingFriendsRequestSent === undefined)
     return;
-  state.userData.waitingFriendsRequestSent = state.userData.waitingFriendsRequestSent
+  state.waitingFriendsRequestSent = state.waitingFriendsRequestSent
     .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
 };
 
@@ -84,6 +78,10 @@ export const userSlice = createSlice({
     isLogged: false,
     error: null,
     notifications: localStorage.getItem('notifications') ? JSON.parse(localStorage.getItem('notifications') as string) : [] as NotificationInterface[],
+    userFriends: [],
+    userBlocked: [],
+    waitingFriendsRequestReceived: [],
+    waitingFriendsRequestSent: [],
     userData: {
       id: -1,
       login: '',
@@ -95,10 +93,6 @@ export const userSlice = createSlice({
       description: '',
       role: 'user',
       is2FAEnabled: false,
-      friends: [],
-      userBlocked: [],
-      waitingFriendsRequestReceived: [],
-      waitingFriendsRequestSent: [],
     },
   } as UserState,
 
@@ -115,10 +109,10 @@ export const userSlice = createSlice({
       state.userData.role = action.payload.role;
       state.userData.description = action.payload.description;
       state.userData.is2FAEnabled = action.payload.is2FAEnabled;
-      state.userData.friends = action.payload.friends;
-      state.userData.userBlocked = action.payload.userBlocked;
-      state.userData.waitingFriendsRequestReceived = action.payload.waitingFriendsRequestReceived;
-      state.userData.waitingFriendsRequestSent = action.payload.waitingFriendsRequestSent;
+      // state.userFriends = action.payload.friends;
+      // state.userBlocked = action.payload.userBlocked;
+      // state.waitingFriendsRequestReceived = action.payload.waitingFriendsRequestReceived;
+      // state.waitingFriendsRequestSent = action.payload.waitingFriendsRequestSent;
       state.isLogged = true;
       state.error = null;
     },
@@ -138,12 +132,20 @@ export const userSlice = createSlice({
         role: 'user',
         description: '',
         is2FAEnabled: false,
-        friends: [],
-        userBlocked: [],
-        waitingFriendsRequestReceived: [],
-        waitingFriendsRequestSent: [],
       };
+      state.error = null;
+      // state.userFriends = [];
+      // state.userBlocked = [];
+      // state.waitingFriendsRequestReceived = [];
+      // state.waitingFriendsRequestSent = [];
     },
+
+
+
+
+
+
+
 
     // manage notifications
     reduxSetNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
@@ -171,7 +173,7 @@ export const userSlice = createSlice({
 
     // manage friends
     reduxSetFriends: (state, action: PayloadAction<UserInterface[]>) => {
-      state.userData.friends = action.payload;
+      state.userFriends = action.payload;
     },
     reduxAddFriends: (state, action: PayloadAction<UserInterface>) => {
       addFriend(state, action.payload);
@@ -183,7 +185,7 @@ export const userSlice = createSlice({
 
     //manage user blocked
     reduxSetUserBlocked: (state, action: PayloadAction<UserInterface[]>) => {
-      state.userData.userBlocked = action.payload;
+      state.userBlocked = action.payload;
     },
     reduxAddUserBlocked: (state, action: PayloadAction<UserInterface>) => {
       addUserBlocked(state, action.payload);
@@ -195,7 +197,7 @@ export const userSlice = createSlice({
 
     //manage waiting friends request
     reduxSetWaitingFriends: (state, action: PayloadAction<UserInterface[]>) => {
-      state.userData.waitingFriendsRequestReceived = action.payload;
+      state.waitingFriendsRequestReceived = action.payload;
     },
     reduxAddWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
       addWaitingFriends(state, action.payload);
@@ -206,7 +208,7 @@ export const userSlice = createSlice({
 
     //manage waiting friends request sent
     reduxSetWaitingFriendsSent: (state, action: PayloadAction<UserInterface[]>) => {
-      state.userData.waitingFriendsRequestSent = action.payload;
+      state.waitingFriendsRequestSent = action.payload;
     },
     reduxAddWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
       addWaitingFriendsSent(state, action.payload);

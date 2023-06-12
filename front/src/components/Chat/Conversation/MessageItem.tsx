@@ -1,19 +1,19 @@
 import { useState, memo, FC, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
-import { apiEditMessage } from '../../api/chat';
+import { apiEditMessage } from '../../../api/message';
 
-import { ApiErrorResponse } from '../../types';
-import { MessageInterface } from '../../types/ChatTypes';
+import { ApiErrorResponse } from '../../../types';
+import { MessageInterface } from '../../../types/ChatTypes';
 
 
 import { BiPaperPlane } from 'react-icons/bi';
 import { FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { getTimeSince } from '../../utils/utils';
+import { getTimeSince } from '../../../utils/utils';
 
 
 interface MessageItemProps {
@@ -101,14 +101,14 @@ const MessageItem: FC<MessageItemProps> = memo(({
     <div key={message.id}>
       <div
         // ref={index === messages.length - 1 ? bottomRef : null}
-        className={`w-full flex my-2 ${isHovered ? 'bg-blue-100 rounded-lg' : ''}`}
+        className={`w-full flex ${isHovered && 'bg-[#e7e7f7] rounded-lg'}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {/**
         * Display message
         */}
-        <div className='flex-none w-14 '>
+        <div className='flex-none w-14 mr-2'>
           <Link to={'/profile/' + message.ownerUser.login}>
             <img
               className="w-10 h-10 rounded-full m-2 object-cover "

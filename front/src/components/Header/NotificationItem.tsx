@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { reduxAddFriends, reduxReadNotification, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddConversationList } from '../../store/chatSlicer';
 
 
 interface NotificationItemProps {
@@ -24,6 +25,7 @@ const NotificationItem = ({
   const navigate = useNavigate();
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
+    console.log('userToAccept', userToAccept);
     setIsLoading(true);
     const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAccept.id);
     setIsLoading(false);
@@ -33,6 +35,7 @@ const NotificationItem = ({
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
+      dispatch(reduxAddConversationList(userToAccept));
       dispatch(setMsgSnackbar('Friend request accepted'));
       return true;
     }

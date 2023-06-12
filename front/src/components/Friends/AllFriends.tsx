@@ -10,9 +10,11 @@ import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { useState } from 'react';
 import FriendItem from './FriendItem';
 import { useNavigate } from 'react-router-dom';
+import { reduxAddConversationList } from '../../store/chatSlicer';
 
 const AllFriends = () => {
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userFriends } = useSelector((state: RootState) => state.user);
+
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,20 +46,15 @@ const AllFriends = () => {
   };
 
   const handleNavigateToChat = (user: UserInterface) => {
-    navigate(`/chat?service=chat&userId=${user.id}`);
+    dispatch(reduxAddConversationList(user));
+    navigate(`/chat?service=privateConversation&userId=${user.id}`);
   };
-
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <>
-      { userData.friends?.length === 0 && <p> No friends</p> }
-      { userData.friends?.map((user) => (
+      { !userFriends && <p>Loading...</p>}
+      { userFriends?.length === 0 && <p> No friends</p> }
+      { userFriends?.map((user) => (
         <FriendItem 
          key={user.id}
           user={user}
@@ -68,6 +65,7 @@ const AllFriends = () => {
           ]}
         />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };

@@ -15,7 +15,7 @@ import { reduxAddWaitingFriendsSent } from '../../store/userSlice';
 const AddFriends = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [allUsers, setAllUsers] = useState<UserInterface[]>([]);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userData, userFriends, userBlocked, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
 
@@ -30,19 +30,15 @@ const AddFriends = () => {
       else {
         const resFiltered = allUsersFetched.filter((u: UserInterface) =>
           u.id != userData.id &&
-          !userData.friends?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.userBlocked?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
+          !userFriends?.find((f: UserInterface) => f.id === u.id) &&
+          !userBlocked?.find((f: UserInterface) => f.id === u.id) &&
+          !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
         );
         setAllUsers(resFiltered);
       }
     }
     fetchUsers();
-  }, [ dispatch,
-    userData.id,
-    userData.friends,
-    userData.waitingFriendsRequestSent,
-    userData.userBlocked,
+  }, [ dispatch, userData.id, userFriends, userBlocked, waitingFriendsRequestSent,
   ]);
 
   const handleRequestAddFriend = async (user: UserInterface | null) => {
@@ -61,15 +57,9 @@ const AddFriends = () => {
     }
   };
 
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <>
+      { !allUsers && <p>Loading...</p>}
       { allUsers?.map((user) => (
         <FriendItem 
             key={user.id}
@@ -79,6 +69,7 @@ const AddFriends = () => {
             ]}
           />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };

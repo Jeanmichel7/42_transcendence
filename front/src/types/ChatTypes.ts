@@ -8,3 +8,35 @@ export interface MessageInterface {
   ownerUser: UserInterface;
   destUser: UserInterface;
 }
+
+export interface RoomInterface {
+  id: number;
+  name: string;
+  type: 'public' | 'private';
+  isProtected: boolean;
+  password?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  users?: UserInterface[];
+  messages?: ChatMsgInterface[];
+  ownerUser?: UserInterface;
+  admins?: UserInterface[];
+  bannedUsers?: UserInterface[];
+  mutedUsers?: UserInterface[];
+  acceptedUsers?: UserInterface[];
+}
+
+export interface ChatMsgInterface {
+  id: number;
+  text: string;
+  room: RoomInterface;
+  user: UserInterface;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ConversationInterface {
+  id: number;
+  user: UserInterface
+  room: RoomInterface;
+}

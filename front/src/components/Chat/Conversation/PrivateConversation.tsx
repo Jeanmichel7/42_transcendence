@@ -2,15 +2,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { RootState } from '../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
-import MessageItem from './ConversationItem';
+import MessageItem from './MessageItem';
 
-import { sendMessage, getOldMessages, apiDeleteMessage } from '../../api/chat';
+import { sendMessage, getOldMessages, apiDeleteMessage } from '../../../api/message';
 
-import { ApiErrorResponse, UserInterface } from '../../types';
-import { MessageInterface } from '../../types/ChatTypes';
+import { ApiErrorResponse, UserInterface } from '../../../types';
+import { MessageInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
 import { TextareaAutosize } from '@mui/material';
@@ -19,7 +19,7 @@ interface ConversationProps {
   id: number;
 }
 
-const Conversation: React.FC<ConversationProps> = ({ id }) => {
+const PrivateConversation: React.FC<ConversationProps> = ({ id }) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const dispatch = useDispatch();
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
@@ -203,8 +203,7 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
             {login}
           </div> */}
 
-          <div className="overflow-y-auto" onScroll={handleScroll}>
-
+          <div className="overflow-y-auto max-h-[calc(100vh-240px)] bg-[#efeff8]" onScroll={handleScroll}>
             {/* display messages */}
             { messages && 
             <div className='text-lg m-1 p-2 '>
@@ -216,43 +215,44 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
                 handleDeleteMessage={handleDeleteMessage}
                 />
               ))}
+
+              {/* display form message */}
+              <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
+                <TextareaAutosize
+                  ref={textareaRef}
+                  name="text"
+                  value={text}
+                  onChange={handleChangeTextArea(setText)}
+                  onKeyDown={handleSubmit()}
+                  placeholder="Enter your text here..."
+                  className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
+                />
+                <button className='flex justify-center items-center'
+                  onClick={handleSubmit()}
+                >
+                  <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
+                </button>
+
+                {/* display status send message */}
+                { statusSendMsg !== '' &&
+                  <span className={`
+                  ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
+                  bottom-16 
+                  text-white
+                  p-2
+                  rounded-xl
+                  shadow-lg`}
+                    onClick={() => setStatusSendMsg('')}
+                  >
+                    {statusSendMsg}
+                    <button className="absolute right-2 top-1" >X</button>
+                  </span>
+                }
+              </form>
+
             </div>
             }
 
-
-            {/* display form message */}
-            <form className="bg-gray-100 rounded-xl shadow-md flex border-2 border-zinc-400 mx-2">
-              <TextareaAutosize
-                ref={textareaRef}
-                name="text"
-                value={text}
-                onChange={handleChangeTextArea(setText)}
-                onKeyDown={handleSubmit()}
-                placeholder="Enter your text here..."
-                className="w-full p-2 rounded-lg m-1 pb-1 shadow-sm font-sans resize-none"
-              />
-              <button className='flex justify-center items-center'
-                onClick={handleSubmit()}
-              >
-                <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
-              </button>
-
-              {/* display status send message */}
-              { statusSendMsg !== '' &&
-                <span className={`
-                ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                bottom-16 
-                text-white
-                p-2
-                rounded-xl
-                shadow-lg`}
-                  onClick={() => setStatusSendMsg('')}
-                >
-                  {statusSendMsg}
-                  <button className="absolute right-2 top-1" >X</button>
-                </span>
-              }
-            </form>
 
           <div ref={bottomRef}></div>
           </div>
@@ -263,4 +263,4 @@ const Conversation: React.FC<ConversationProps> = ({ id }) => {
   );
 };
 
-export default Conversation;
+export default PrivateConversation;

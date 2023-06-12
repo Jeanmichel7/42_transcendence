@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
 import { getAllUsers } from '../../../api/user';
 import { requestAddFriend } from '../../../api/relation';
@@ -10,15 +11,14 @@ import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
 
 import FriendCard from '../../Profile/FriendsCard';
 
-import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material';
-import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
+import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material';
 
 export default function FriendsSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState<UserInterface[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userData, userFriends, userBlocked, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -32,25 +32,25 @@ export default function FriendsSearch() {
       else {
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id &&
-          !userData.friends?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.userBlocked?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
+          !userFriends?.find((f: UserInterface) => f.id === u.id) &&
+          !userBlocked?.find((f: UserInterface) => f.id === u.id) &&
+          !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
         );
         setUsers(resFiltered);
       }
       setSelectedUser(null);
     }
     fetchUsers();
-  }, [userData.id,
-    userData.friends,
-    dispatch,
-    userData.userBlocked,
-    userData.waitingFriendsRequestSent,
+  }, [dispatch,,
+    userData.id,
+    userFriends,
+    userBlocked,
+    waitingFriendsRequestSent,
   ]);
 
 
   function isMyFriend(userId: number): boolean {
-    return !!userData.friends?.find((friend: UserInterface) => friend.id === userId);
+    return !!userFriends?.find((friend: UserInterface) => friend.id === userId);
   }
 
   const handleRequestAddFriend = async (user: UserInterface | null) => {
@@ -70,12 +70,12 @@ export default function FriendsSearch() {
   }
   if (!userData || !users)
     return <p>Loading...</p>;
-  
+
 
   return (
-    <div className="m-5 p-5 h-full">
-      <div className='flex'>
-      <Autocomplete
+    <div className="h-full">
+      <div className='flex p-3 border'>
+        <Autocomplete
           id="searchFriends"
           fullWidth
           options={users}
@@ -90,23 +90,21 @@ export default function FriendsSearch() {
         <Button
           onClick={() => handleRequestAddFriend(selectedUser)}
           variant="contained"
+          color="primary"
+          sx={{ ml: 2, height: '40px', alignSelf: 'center' }}
         > Add </Button>
       </div>
 
-
-      <div className='h-full'>
-        <h2 className="text-2xl font-bold">Users</h2>
-        <div className="flex flex-wrap overflow-auto max-h-[calc(100vh-520px)]">
-          {users.map((user: UserInterface) => {
-            if (user.id != userData.id && !isMyFriend(user.id))
-              return (
-                <FriendCard
-                  key={user.id}
-                  friend={user}
-                />
-              );
-          })}
-        </div>
+      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
+        {users.map((user: UserInterface) => {
+          if (user.id != userData.id && !isMyFriend(user.id))
+            return (
+              <FriendCard
+                key={user.id}
+                friend={user}
+              />
+            );
+        })}
       </div>
 
     </div>

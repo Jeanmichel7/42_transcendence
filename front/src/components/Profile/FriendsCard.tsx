@@ -26,7 +26,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   setFriends,
 }) => {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state: RootState) => state.user);
+  const { userData, userFriends } = useSelector((state: RootState) => state.user);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
   const badgeColor: 'success' | 'warning' | 'error'
   = friend.status === 'online' ? 'success' :
@@ -43,10 +43,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      // send event to socket
-      // dispatch(reduxAddFriends(friend));
-      // if (userData.login == actualUserLogin && setFriends )
-      //   setFriends((prev: UserInterface[]) => [...prev, friend]);
       dispatch(setMsgSnackbar('Request sent'));
     }
   };
@@ -79,7 +75,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   function isMyFriend() {
     if (userData.login == friend.login) // if it's own profile
       return true;
-    return userData.friends?.find((f: UserInterface) => f.id === friend.id);
+    return userFriends?.find((f: UserInterface) => f.id === friend.id);
   }
 
 

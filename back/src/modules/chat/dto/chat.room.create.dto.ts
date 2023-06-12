@@ -29,5 +29,5 @@ export class ChatCreateRoomDTO {
   @IsOptional()
   @IsArray()
   @Length(1)
-  acceptedUsers: string[];
+  acceptedUsers: bigint[];
 }

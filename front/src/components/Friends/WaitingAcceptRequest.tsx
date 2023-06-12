@@ -8,9 +8,11 @@ import { RootState } from '../../store';
 import { reduxAddFriends, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
 import FriendItem from './FriendItem';
 
+import { reduxAddConversationList } from '../../store/chatSlicer';
+
 const WaitingAcceptRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userData, waitingFriendsRequestReceived } = useSelector((state: RootState) => state.user);
   const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
   const dispatch = useDispatch();
 
@@ -24,6 +26,7 @@ const WaitingAcceptRequest = () => {
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
+      dispatch(reduxAddConversationList(userToAccept));
 
       //search notif ans delete
       const notif: NotificationInterface = notifications.find((n) => 
@@ -55,17 +58,11 @@ const WaitingAcceptRequest = () => {
     }
   };
 
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
-  
   return (
     <>
-      { userData.waitingFriendsRequestReceived?.length === 0 && <p> No waiting request received</p> }
-      { userData.waitingFriendsRequestReceived?.map((user) => (
+      { !waitingFriendsRequestReceived && <p>Loading...</p>}
+      { waitingFriendsRequestReceived?.length === 0 && <p> No waiting request received</p> }
+      { waitingFriendsRequestReceived?.map((user) => (
         <FriendItem 
           key={user.id}
           user={user} 
@@ -75,6 +72,7 @@ const WaitingAcceptRequest = () => {
           ]}
         />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };

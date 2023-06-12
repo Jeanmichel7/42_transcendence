@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddNotification, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddNotification, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAddConversationList } from '../../store/chatSlicer';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -77,6 +78,7 @@ function Header() {
     socket.on('notification_friend_request_accepted', (notification: NotificationInterface) => {
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
       dispatch(reduxAcceptedRequest(notification));
+      dispatch(reduxAddConversationList(notification.sender));
     });
 
     socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {

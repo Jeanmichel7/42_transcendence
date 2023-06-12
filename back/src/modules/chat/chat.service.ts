@@ -57,14 +57,14 @@ export class ChatService {
     let allUsersAccepted: UserEntity[] = [];
     if (roomToCreate.type === 'private' && roomToCreate.acceptedUsers) {
       allUsersAccepted = await Promise.all(
-        roomToCreate.acceptedUsers.map(async (userLogin) => {
+        roomToCreate.acceptedUsers.map(async (userId) => {
           const userAccepted: UserEntity = await this.userRepository.findOne({
-            where: { login: userLogin },
+            where: { id: userId },
             select: ['id'],
             relations: ['roomUsers'],
           });
           if (!userAccepted)
-            throw new NotFoundException(`User ${userLogin} not found`);
+            throw new NotFoundException(`User ${user.login} not found`);
           return userAccepted;
         }),
       );
@@ -72,28 +72,9 @@ export class ChatService {
     }
     let usersInRoom: UserEntity[] = [user];
     if (roomToCreate.acceptedUsers) {
-      usersInRoom = [...usersInRoom, ...allUsersAccepted];
-    } else {
-      //get all users
-      const users: UserEntity[] = await this.userRepository.find({
-        select: [
-          'id',
-          'firstName',
-          'lastName',
-          'login',
-          'email',
-          'status',
-          'description',
-          'avatar',
-        ],
-      });
-
-      //ajoute tout les users...
-      usersInRoom = [...usersInRoom, ...users];
-
-      //sauf l'user qui a cree la room
-      usersInRoom = usersInRoom.filter((u) => u.id !== user.id);
+      usersInRoom = [user, ...allUsersAccepted];
     }
+
     const room: ChatRoomEntity = await ChatRoomEntity.save({
       ownerUser: user,
       users: usersInRoom,
@@ -232,6 +213,7 @@ export class ChatService {
     roomId: bigint,
     data: ChatJoinRoomDTO,
   ): Promise<ChatRoomInterface> {
+    console.log('data join room : ', data);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id'],
@@ -240,7 +222,7 @@ export class ChatService {
 
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
-      select: ['id', 'type', 'password', 'isProtected'],
+      select: ['id', 'name', 'type', 'password', 'isProtected'],
       relations: [
         'users',
         'ownerUser',
@@ -269,12 +251,13 @@ export class ChatService {
 
     // compare les hashs des passwords
     if (room.isProtected) {
-      if (!data.password)
-        throw new ForbiddenException(`Room ${roomId} is private`);
-
+      if (data.password === null)
+        throw new ForbiddenException(
+          `Room ${roomId} is private and need password`,
+        );
       const isMatch = await bcrypt.compare(data.password, room.password);
       if (!isMatch)
-        throw new ForbiddenException(`Room ${roomId} password is invalid`);
+        throw new ForbiddenException(`Room ${room.name} password is invalid`);
     }
 
     room.users = [...room.users, user];
@@ -853,39 +836,44 @@ export class ChatService {
         'chat_rooms.name',
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
+        'chat_rooms.isProtected',
+        'chat_rooms.password',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
         'ownerUser.avatar',
+        'ownerUser.status',
         'users.id',
         'users.firstName',
         'users.lastName',
         'users.login',
         'users.avatar',
+        'users.status',
         'admins.id',
         'admins.firstName',
         'admins.lastName',
         'admins.login',
         'admins.avatar',
+        'admins.status',
         'bannedUsers.id',
         'bannedUsers.firstName',
         'bannedUsers.lastName',
         'bannedUsers.login',
         'bannedUsers.avatar',
+        'bannedUsers.status',
         'mutedUsers.id',
         'mutedUsers.firstName',
         'mutedUsers.lastName',
         'mutedUsers.login',
         'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .getMany();
 
-    const result: ChatRoomInterface[] = rooms
-      .map((room: ChatRoomEntity) => {
-        return { ...room };
-      })
-      .filter((room) => room.type === 'public');
+    const result: ChatRoomInterface[] = rooms.filter(
+      (room) => room.type === 'public',
+    );
     return result;
   }
 

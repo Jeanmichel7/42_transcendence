@@ -11,7 +11,7 @@ import FriendItem from './FriendItem';
 
 const WaitingRequestSent = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleCancelFriendRequest = async (userToCancel: UserInterface) => {
@@ -27,17 +27,11 @@ const WaitingRequestSent = () => {
     }
   };
 
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <>
-    { userData.waitingFriendsRequestSent?.length === 0 && <p> No waiting request sent</p> }
-    { userData.waitingFriendsRequestSent?.map((user) => (
+    { !waitingFriendsRequestSent && <p>Loading...</p>}
+    { waitingFriendsRequestSent?.length === 0 && <p> No waiting request sent</p> }
+    { waitingFriendsRequestSent?.map((user) => (
       <FriendItem
         key={user.id}
         user={user}
@@ -46,6 +40,7 @@ const WaitingRequestSent = () => {
         ]}
       />
     ))}
+    { isLoading && <CircularProgress />}
     </>
   );
 };

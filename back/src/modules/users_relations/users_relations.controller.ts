@@ -20,9 +20,7 @@ import { RequestWithUser } from '../users/interfaces/request.user.interface';
 
 @Controller('relations')
 export class UsersRelationsController {
-  constructor(private usersRelationsService: UsersRelationsService) {
-    console.log('UsersRelationsController constructor', usersRelationsService);
-  }
+  constructor(private usersRelationsService: UsersRelationsService) {}
 
   @Get()
   async findAll(@Req() req: RequestWithUser): Promise<UserRelationInterface[]> {
