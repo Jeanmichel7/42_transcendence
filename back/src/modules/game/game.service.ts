@@ -6,13 +6,13 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 50;
+const SCORE_FOR_WIN = 1;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = 
-[{id: 'racketSize', duration: 10000}
-,{id: 'slow', duration: 10000}
-,{id: 'laser', duration: 10000}];
+[{id: 'bigRacket', duration: 10000, timeStart: 0, activate: false}
+,{id: 'slow', duration: 0, timeStart: 0, activate: false}
+,{id: 'laser', duration: 10000, timeStart: 0, activate: false}];
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -54,14 +54,21 @@ export class Game {
 
   bonus: any;
   bonusesLastGeneration: number;
-  bonusPlayer1: any;
+  bonusesPlayer1: any;
   bonusPlayer1Loading: boolean;
-  bonusPlayer2: any;
+  bonusesPlayer2: any;
   bonusPlayer2Loading: boolean;
+  bonusPlayer1Start: number;
+  bonusesPlayer2Start: number;
   racketLeftHeight: number;
   racketRightHeight: number;
   player1useBonus: boolean;
   player2useBonus: boolean;
+  player1Laser: boolean;
+  player2Laser: boolean;
+  racketLeftDamage: number;
+  racketRightDamage: number;
+  bonusMode: boolean;
 
 
   constructor(
@@ -69,6 +76,7 @@ export class Game {
     player1Username: string,
     socketPlayer2Id: string,
     player2Username: string,
+    bonusMode: boolean = false,
   ) {
     this.isOver = false;
     this.ball = {
@@ -93,13 +101,20 @@ export class Game {
     this.startTime = performance.now();
     this.fail = false;
     this.bonus = null;
-    this.bonusPlayer1 = null;
-    this.bonusPlayer2 = null;
+    this.bonusesPlayer1 = [];
+    this.bonusesPlayer2 = [];
+    this.racketLeftDamage = 0;
+    this.racketRightDamage = 0;
     this.bonusesLastGeneration = performance.now();
     this.racketLeftHeight = RACKET_HEIGHT_10;
     this.racketRightHeight = RACKET_HEIGHT_10;
     this.player1useBonus = false;
     this.player2useBonus = false;
+    this.bonusPlayer1Loading = false;
+    this.bonusPlayer2Loading = false;
+    this.player1Laser = false;
+    this.player2Laser = false;
+    this.bonusMode = bonusMode;
   }
 
   generateBonus() {
@@ -109,13 +124,13 @@ export class Game {
       do 
       x = Math.random() * GROUND_MAX_SIZE;
       while (x > RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 && x < RACKET_RIGHT_POS_X_10);
+      console.log('x : ', x);
       this.bonus = {
         x: Math.random() * GROUND_MAX_SIZE,
         y: Math.random() * GROUND_MAX_SIZE,
         //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
         boxSize: 50,
       }
-     
     }
   }
 
@@ -134,13 +149,39 @@ export class Game {
    
   checkBonusDuration(currentTime: number) {
 
-    if (this.bonusPlayer1 && currentTime - this.bonusPlayer1.duration > this.bonusPlayer1.duration) {
-        this.bonusPlayer1 = null;
+    let toDelete = -1;
+    
+
+    this.bonusesPlayer1.forEach((bonus, index) => {
+    if (bonus && bonus.timeStart !== 0 && currentTime  > bonus.duration + bonus.timeStart) {
+        toDelete = index;
+        if (bonus.id == "bigRacket") {
+          this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+        }
+        else if (bonus.id == "laser") {
+          this.player1Laser = false;
+    }
+    }});
+    if (toDelete !== -1) {
+    this.bonusesPlayer1.splice(toDelete, 1);
+    toDelete = 0;
     }
 
-    if (this.bonusPlayer2 && currentTime - this.bonusPlayer2.duration > this.bonusPlayer2.duration) {
-        this.bonusPlayer2 = null;
-    }
+    this.bonusesPlayer2.forEach((bonus, index) => {
+      if (bonus && bonus.timeStart !== 0 && currentTime  > bonus.duration + bonus.timeStart) {
+          toDelete = index;
+          if (bonus.id == "bigRacket") {
+            this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+          }
+          else if (bonus.id == "laser") {
+            this.player2Laser = false;
+      }
+      }});
+      if (toDelete !== -1) {
+        this.bonusesPlayer2.splice(toDelete, 1);
+        toDelete = 0;
+        }
+ 
 }
 
   async assignRandomBonus() {
@@ -151,50 +192,111 @@ export class Game {
     }
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    const bonus = BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)];
+    const bonus = {...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)]};
   
     // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
     if (this.bonusPlayer1Loading) {
-      this.bonusPlayer1 = bonus;
-      this.bonusPlayer1.duration = performance.now();
+      this.bonusesPlayer1.push(bonus);
       this.bonusPlayer1Loading = false;
     } else {
-      this.bonusPlayer2 = bonus;
-      this.bonusPlayer1.duration = performance.now();
+      this.bonusesPlayer2.push(bonus);
       this.bonusPlayer2Loading = false;
     }
   }
 
-  
+  useBonus(player: boolean) {
+    if (player == true) {
+      if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == "bigRacket") {
+        console.log('bigRacket');
+        this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+      } else if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id  == "slow") {
+        console.log('slow');
+        this.ball.speed = INITIAL_BALL_SPEED;
+      } else if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id  == "laser") {
+        this.player1Laser = true;
+        console.log('laser');
+      }
+      this.bonusesPlayer1[this.bonusesPlayer1.length - 1].timeStart = performance.now();
+      this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate = true;
+    }
+    else {
+      if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "bigRacket") {
+        console.log('bigRacket');
+        this.racketRightHeight = RACKET_HEIGHT_10 * 2;
+      } else if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "slow") {
+        console.log('slow');
+        this.ball.speed = INITIAL_BALL_SPEED;
+      } else if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "laser") {
+        console.log('laser');
+        this.player2Laser = true;
+      }
+      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].timeStart = performance.now();
+      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate   = true;
+    } 
+  }
+
+  checkLaserCollision() {
+    // Assuming laser position is always in the center of the racket
+    var laserPosition1 = this.racketLeft + this.racketLeftHeight / 2;
+    var laserPosition2 = this.racketRight + this.racketRightHeight / 2;
+
+    if (this.player1Laser) {
+        // Check if the laser is within the height range of the right racket
+        if (laserPosition1 >= this.racketRight && laserPosition1 <= (this.racketRight + this.racketRightHeight)) {
+          this.racketRightDamage += 1;
+          if (this.racketRightDamage >= 180) {
+            this.racketRightHeight = 0;
+            this.racketRightDamage = 0;
+          }
+        }
+    }
+    if (this.player2Laser) {
+        // Check if the laser is within the height range of the left racket
+        if (laserPosition2 >= this.racketLeft && laserPosition2 <= (this.racketLeft + this.racketLeftHeight)) {
+          this.racketLeftDamage += 1;
+          if (this.racketLeftDamage >= 180) {
+            this.racketLeftHeight = 0;
+            this.racketLeftDamage = 0;
+          }
+        }
+    }
+}
+
+
+
   updateBallPosition() {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
     if (!this.gameStart) {
-      if (currentTime - this.startTime > 3000) {
+      if (currentTime - this.startTime > 3001) {
         this.gameStart = true;
       } else {
         return;
       }
     }
+    if (this.bonusMode) {
     if(this.bonus === null && currentTime - this.bonusesLastGeneration > 20000) {  
       this.bonusesLastGeneration = currentTime;
       this.generateBonus();
       console.log('generate bonus');
     }
     if (this.checkBonusCollision()){
-      if (this.ball.vx > 0) {
-        this.bonusPlayer1 = this.bonus;
-      }
-      else {
-        this.bonusPlayer2 = this.bonus;
-      }
+      this.assignRandomBonus(); 
       this.bonusesLastGeneration = currentTime;
       this.bonus = null;
     }
-    console.log(this.bonusPlayer1, this.bonusPlayer2);
-    console.log(this.player1useBonus , this.player2useBonus);
-   
+    this.checkLaserCollision();
+    this.checkBonusDuration(currentTime);
+    if (this.player1useBonus && this.bonusesPlayer1[this.bonusesPlayer1.length - 1]?.activate === false) {
+      this.useBonus(true);
+    }
+      if (this.player2useBonus && this.bonusesPlayer2[this.bonusesPlayer2.length - 1]?.activate === false) { 
+      this.useBonus(false);
+    }
+  }
+
+
     if (
       this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE ||
       this.ball.y - BALL_RADIUS < 0
@@ -269,6 +371,8 @@ export class Game {
         this.ball.vy = 0;
         this.ball.speed = INITIAL_BALL_SPEED;
         this.fail = false;
+        this.racketLeftHeight = RACKET_HEIGHT_10;
+        this.racketRightHeight = RACKET_HEIGHT_10;
       }
     } else if (
       this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS + 200 &&
@@ -287,6 +391,8 @@ export class Game {
         this.ball.vx = -INITIAL_BALL_SPEED;
         this.ball.speed = INITIAL_BALL_SPEED;
         this.fail = false;
+        this.racketRightHeight = RACKET_HEIGHT_10;
+        this.racketLeftHeight = RACKET_HEIGHT_10; 
       }
     }
     this.ball.x += this.ball.vx * deltaTime;
@@ -295,6 +401,7 @@ export class Game {
 }
 
   getState() {
+ 
     return {
       ball: this.ball,
       racketRight: this.racketRight,
@@ -308,12 +415,19 @@ export class Game {
       player2Username: this.player2Username,
       gameStart: this.gameStart,
       bonus: this.bonus,
-      bonusPlayer1: this.bonusPlayer1,
-      bonusPlayer2: this.bonusPlayer2,
+      bonusPlayer1: this.bonusesPlayer1?.length > 0 && this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate 
+  ? null 
+  : (this.bonusesPlayer1?.length > 0 ? this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id : null),
+bonusPlayer2: this.bonusesPlayer2?.length > 0 && this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate 
+  ? null 
+  : (this.bonusesPlayer2?.length > 0 ? this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id : null),
       racketLeftHeight: this.racketLeftHeight,
       racketRightHeight: this.racketRightHeight,
       bonusPlayer1Loading: this.bonusPlayer1Loading,
       bonusPlayer2Loading: this.bonusPlayer2Loading,
+      player1Laser: this.player1Laser,
+      player2Laser: this.player2Laser,
+      bonusMode: this.bonusMode
     };
   }
 
@@ -353,8 +467,10 @@ import { GameInterface } from './interfaces/game.interface';
 @Injectable()
 export class GameService {
   games: Map<string, Game>;
-  playerWaiting1: any;
-  playerWaiting2: any;
+  playerWaiting1Normal: any;
+  playerWaiting2Normal: any;
+  playerWaiting1Bonus: any;
+  playerWaiting2Bonus: any;
 
   constructor(
     @InjectRepository(GameEntity)
@@ -375,6 +491,7 @@ export class GameService {
   }
   updateGame(game: Game) {
     game.updateBallPosition();
+    console.log(game.isOver );
     if (game.isOver) {
       this.games.delete(game.id);
     }
@@ -408,39 +525,70 @@ export class GameService {
     });
   }
 
-  addToQueue(socketId: string, username: string) {
+  addToQueue(socketId: string, username: string, bonusMode: boolean = false) {
     if (this.checkAlreadyInGame(username)) return;
-    console.log('add to queue username : ', username);
-    if (this.playerWaiting1 === undefined) {
-      this.playerWaiting1 = {
+    if (bonusMode) {
+      if (this.playerWaiting1Bonus === undefined) {
+        this.playerWaiting1Bonus = {
+          socketId: socketId,
+          username: username,
+        };
+      } else if (
+        this.playerWaiting2Bonus === undefined // &&
+        // this.playerWaiting1Bonus.username !== username
+      ) {
+        this.playerWaiting2Bonus = {
+          socketId: socketId,
+          username: username,
+        };
+        console.log('Game created');
+        const game = new Game(
+          this.playerWaiting1Bonus.socketId,
+          this.playerWaiting1Bonus.username,
+          this.playerWaiting2Bonus.socketId,
+          this.playerWaiting2Bonus.username,
+          true
+        );
+        this.games.set(game.id, game);
+        this.playerWaiting1Bonus = undefined;
+        this.playerWaiting2Bonus = undefined;
+        return game.socketPlayer1Id;
+      }
+    }
+    else {
+      console.log('normal mode');
+    if (this.playerWaiting1Normal === undefined) {
+      this.playerWaiting1Normal = {
         socketId: socketId,
         username: username,
       };
     } else if (
-      this.playerWaiting2 === undefined // &&
-      // this.playerWaiting1.username !== username
+      this.playerWaiting2Normal === undefined // &&
+      // this.playerWaiting1Normal.username !== username
     ) {
-      this.playerWaiting2 = {
+      this.playerWaiting2Normal = {
         socketId: socketId,
         username: username,
       };
       console.log('Game created');
       const game = new Game(
-        this.playerWaiting1.socketId,
-        this.playerWaiting1.username,
-        this.playerWaiting2.socketId,
-        this.playerWaiting2.username,
+        this.playerWaiting1Normal.socketId,
+        this.playerWaiting1Normal.username,
+        this.playerWaiting2Normal.socketId,
+        this.playerWaiting2Normal.username,
+        false
       );
       this.games.set(game.id, game);
-      this.playerWaiting1 = undefined;
-      this.playerWaiting2 = undefined;
+      this.playerWaiting1Normal = undefined;
+      this.playerWaiting2Normal = undefined;
       return game.socketPlayer1Id;
     }
   }
+  }
 
   removeFromQueue(SocketId: string) {
-    if (this.playerWaiting1 === SocketId) {
-      this.playerWaiting1 = undefined;
+    if (this.playerWaiting1Normal === SocketId) {
+      this.playerWaiting1Normal = undefined;
       console.log('player1 removed from queue');
     }
   }

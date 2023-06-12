@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import styled, {keyframes} from 'styled-components';
+import styled, {keyframes, css} from 'styled-components';
 import EndGame from '../components/Game/EndGame';
 import Score from '../components/Game/Score';
 import { BiWindows } from 'react-icons/bi';
@@ -59,8 +59,15 @@ left: ${(props) => props.posX}px;
 top: ${(props) => props.posY}px;
 `
 
+const explodeAnimation = keyframes`
+  0% {opacity: 1; }
+  50% { opacity: 0.5; }
+  100% {opacity: 0; }
+`;
 
-const Racket = styled.div.attrs((props) => ({
+
+
+const StyledRacket = styled.div.attrs((props) => ({
   style: {
     transform: `translateY(${props.posY * ((100 / props.height) )}%)`,
   },
@@ -73,7 +80,26 @@ const Racket = styled.div.attrs((props) => ({
     props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
   top: 0%;
   border-radius: 10px;
+  z-index: 2;
+  animation: ${(props) => props.isExploding ? css`${explodeAnimation} 1s forwards` : 'none'}
 `;
+
+// Composant Raquette avec le Laser comme enfant
+const Racket = ({ posY, height, type,children }) => {
+  console.log(height);
+  const oldheight = useRef(height);
+  if (height !== oldheight.current && height !== 0) {
+    oldheight.current = height;
+  }
+  return (
+    <StyledRacket posY={posY} height={oldheight.current} type={type} isExploding={height === 0}>
+      {children}
+    </StyledRacket>
+  );
+}
+
+// Dans le rendu de votre jeu
+
 
 const Ball = styled.div.attrs((props) => {
   return {
@@ -99,24 +125,35 @@ const laserGlow = keyframes`
   100% { box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.7); }
 `;
 
-const laserFlow = keyframes`
+const laserFlowRight = keyframes`
   0% { background-position: 0 0; }
   100% { background-position: 50px 0; }
 `;
 
-// Use the animations in your component
-const Laser = styled.div`
-  position: absolute;
-  width: 100000px;
-  height: 10px;
-  top: 50%;
-  z-index: 10;
-  background: linear-gradient(to right, red, white, red);
-  background-size: 50px 100%;
-  animation: ${laserFlow} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite;
+const laserFlowLeft = keyframes`
+  0% { background-position: 50px 0; }
+  100% { background-position: 0 0; }
 `;
 
+// Utilisez les animations dans votre composant
+const Laser = styled.div`
+  position: absolute;
 
+  width: ${({ type }) => type === 'left' ? '10000px' : '10000px'};
+  height: 10px;
+  top: 50%;
+  z-index: 1;
+  background: ${({ type }) => type === 'left' 
+    ? 'linear-gradient(to right, red, white, red)' 
+    : 'linear-gradient(to left, red, white, red)'};
+  background-size: 50px 100%;
+  animation: ${({ type }) => type === 'left' 
+    ? css`${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite` 
+    : css`${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite`};
+    transform: ${({ type }) => type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'} translateY(-5px); 
+    left: 100%;
+
+`;
 
 
 
@@ -151,6 +188,7 @@ function Game({
   const bonusIsLoading = useRef(false);
   const bonusValueRef = useRef();
   const racketHeightRef = useRef({left : RACKET_HEIGHT_10, right : RACKET_HEIGHT_10});
+  const laser = useRef({left: false, right: false} as any);
   const { gameData } = useSocketConnection(
     socket,
     keyStateRef,
@@ -161,7 +199,8 @@ function Game({
     setGameStarted,
     bonusIsLoading,
     bonusValueRef,
-    racketHeightRef
+    racketHeightRef,
+    laser 
   );
   const fail = useRef(false);
   const correctionFactor = useRef(0);
@@ -200,7 +239,6 @@ function Game({
     };
     upLoop();
     function upLoop() {
-      console.log(gameData.current.bonus);
       const currentTime = performance.now();
       let deltaTime = currentTime - lastTime;
       lastTime = currentTime;
@@ -260,8 +298,6 @@ function Game({
               newBall.vx = Math.sqrt(1 - newBall.vy*newBall.vy) * newBall.speed;
               newBall.vy *= newBall.speed;
               newBall.vx = -newBall.vx;
-          
-        
       }
         else if (oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS || oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS)
         {
@@ -270,8 +306,6 @@ function Game({
       
         newBall.x += newBall.vx * deltaTime;
         newBall.y += newBall.vy * deltaTime;
-        //console.log(gameData.current.ball);
-        //console.log(newBall);
 
         if (
           Math.sign(newBall.vx) === Math.sign(gameData.current.ball?.vx) ||
@@ -311,12 +345,14 @@ function Game({
           } else {
             lastGameInfo.current.win = false;
           }
+          lastGameInfo.current.looserName = gameData.current.player1Score;
         } else {
           if (gameData.current.winner === gameData.current.player1Username) {
             lastGameInfo.current.win = false;
           } else {
             lastGameInfo.current.win = true;
           }
+          lastGameInfo.current.looserName = gameData.current.player2Username;
         }
         setCurrentPage('finished');
       }
@@ -353,14 +389,19 @@ function Game({
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
       />
-      <Racket posY={posRacket.current.left} height={racketHeightRef.current.left} type="left" />
+      <Racket posY={posRacket.current.left} height={racketHeightRef.current.left} type={"left"}>
+  {laser.current.left && <Laser type={"left"}/>}
+</Racket>
       <Ball
         posX={ball.x * (gameDimensions.current.width / 1000)}
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
         {gameData.current.bonus &&  <Bonus posX={bonusPositionRef.current.x *  (gameDimensions.current.width / 1000)} posY={bonusPositionRef.current.y * (gameDimensions.current.height / 1000)} />}
-        <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>
-        <Laser/>
+        {gameData.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
+
+<Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={"right" } >
+  {laser.current.right && <Laser type={"right"} />}
+</Racket>
       <Racket posY={posRacket.current.right} height={racketHeightRef.current.right}type="right" />
     </div>
   );
@@ -413,7 +454,7 @@ function Pong() {
   }
   let pageContent;
   if (currentPage === 'lobby') {
-    pageContent = <Lobby setCurrentPage={setCurrentPage} />;
+    pageContent = <Lobby setCurrentPage={setCurrentPage} socket={socket} />;
   } else if (currentPage === 'finished') {
     pageContent = (
       <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />

@@ -24,11 +24,7 @@ function SearchingOpponent({
   setCurrentPage,
 }: Socket<ServerToClientEvents, ClientToServerEvents> &
   React.Dispatch<React.SetStateAction<string>>) {
-  socket.emit('userGameStatus', 'search',  (response) => {
-    if (response === 'error')
-    {
-      setCurrentPage('lobby');;
-       };})
+
   return (
     <SearchingWrapper>
       <DotWaitings />

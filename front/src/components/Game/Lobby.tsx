@@ -1,4 +1,10 @@
 import styled from 'styled-components';
+import { io, Socket } from 'socket.io-client';
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  SocketInterface,
+} from './Interface';
 
 export const StyledButton = styled.button`
   background-color: white;
@@ -20,20 +26,39 @@ const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   position: absolute;
 `;
 
 function Lobby({
-  setCurrentPage,
-}: React.Dispatch<React.SetStateAction<string>>) {
+  setCurrentPage, socket 
+}: React.Dispatch<React.SetStateAction<string>> &  Socket<ServerToClientEvents, ClientToServerEvents>) {
   return (
     <ButtonWrapper>
       <StyledButton
         onClick={() => {
+          
+          socket.emit('userGameStatus', 'searchNormal',  (response) => {
+            if (response === 'error')
+            {
+              setCurrentPage('lobby');;
+               };})
           setCurrentPage('searchOpponent');
         }}
       >
-        Search Oponent
+        Search Oponent Normal Mode
+      </StyledButton>
+      <StyledButton
+        onClick={() => {
+          socket.emit('userGameStatus', 'searchBonus',  (response) => {
+            if (response === 'error')
+            {
+              setCurrentPage('lobby');;
+               };})
+          setCurrentPage('searchOpponent');
+        }}
+      >
+        Search Oponent Bonus Mode
       </StyledButton>
     </ButtonWrapper>
   );

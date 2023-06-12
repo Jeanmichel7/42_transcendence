@@ -15,6 +15,7 @@ const useSocketConnection = (
   bonusIsLoading: any,
   bonusValueRef: any,
   racketHeightRef: any,
+  laser: any,
 ) => {
   const data = useRef({});
 
@@ -33,7 +34,9 @@ const useSocketConnection = (
         bonusPositionRef.current.x = GROUND_MAX_SIZE - serverData.bonus.x;
       }
       bonusIsLoading.current = serverData.bonusPlayer2Loading;
-      bonusValueRef.current = serverData.bonusPlayer2?.id;
+      bonusValueRef.current = serverData.bonusPlayer2;
+      laser.current.left = serverData.player2Laser;
+      laser.current.right = serverData.player1Laser;
       }
      else {
       racketHeightRef.current.left = serverData.racketLeftHeight;
@@ -43,7 +46,9 @@ const useSocketConnection = (
       posRacket.current.right = serverData.racketRight;
       bonusPositionRef.current = serverData.bonus;
       bonusIsLoading.current = serverData.bonusPlayer1Loading;
-      bonusValueRef.current = serverData.bonusPlayer1?.id;
+      bonusValueRef.current = serverData.bonusPlayer1;
+      laser.current.right = serverData.player2Laser;
+      laser.current.left = serverData.player1Laser;
     }
     gameId.current = serverData.gameId;
     return data.current;

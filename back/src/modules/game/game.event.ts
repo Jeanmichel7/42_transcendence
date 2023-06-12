@@ -101,13 +101,15 @@ export class GameEvents {
     if (!client.data.userId) {
       return 'error';
     }
+    console.log('userGameStatus: ' + message);
     if (message === 'cancel') {
       this.gameService.removeFromQueue(client.id);
       return;
-    } else if (message === 'search') {
+    } else if (message === 'searchNormal' || message === 'searchBonus') {
       const opponent = this.gameService.addToQueue(
         client.id,
         client.data.userId,
+        message === 'searchBonus'
       );
       console.log('searching opponent for: ' + client.id);
       if (opponent) {

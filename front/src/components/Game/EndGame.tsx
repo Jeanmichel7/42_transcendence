@@ -41,6 +41,8 @@ interface setCurrentPage {
   setLoose: React.Dispatch<React.SetStateAction<string>>;
 }
 
+
+
 function Loose({
   setCurrentPage,
   lastGameInfo,
@@ -55,6 +57,8 @@ function Loose({
       ) : (
         <StyledTitle>Perdu</StyledTitle>
       )}
+      <StyledTitle>Vainqueur: {lastGameInfo.current.winnerName}</StyledTitle>
+      <StyledTitle>Perdant: {lastGameInfo.current.looserName}</StyledTitle>
       <StyledRetryButton onClick={() => setCurrentPage('searchOpponent')}>Rejouer</StyledRetryButton>
     </LooseWrapper>
   );
