@@ -48,11 +48,11 @@ export class ChatGateway {
 
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
-    @MessageBody() data: { roomName: string; userId: string },
+    @MessageBody() data: { roomId: number },
     @ConnectedSocket() client: Socket,
   ) {
-    client.leave(data.roomName);
-    console.log('left private room', data.roomName);
+    client.leave(data.roomId.toString());
+    console.log('left private room', data.roomId);
   }
 
   emitMessage(message: ChatMsgInterface) {

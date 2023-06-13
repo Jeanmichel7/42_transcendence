@@ -65,7 +65,7 @@ export async function leaveRoom(
  ******************************/
 
 export async function sendChatMessage(
-  roomId: number,
+  roomId: string,
   data: any,
 ): Promise< ChatMsgInterface | ApiErrorResponse> {
   return apiRequest(
@@ -99,7 +99,7 @@ export async function deleteChatMessage(
 }
 
 export async function chatOldMessages(
-  roomId: number,
+  roomId: string,
   page: number,
   offset: number,
 ): Promise< ChatMsgInterface[] | ApiErrorResponse > {

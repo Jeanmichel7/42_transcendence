@@ -15,18 +15,16 @@ import { MessageInterface } from '../../../types/ChatTypes';
 import { BiPaperPlane } from 'react-icons/bi';
 import { TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 
 
 const PrivateConversation: React.FC = () => {
-  const location = useLocation();
-  const id = +(useParams<{ id: string }>().id || -1) ;
-  const login = (useParams<{ name: string }>().name || '') ;
+  const id = (useParams<{ id: string }>().id || '-1') ;
+  const login = (useParams<{ login: string }>().login || 'unknown') ;
+  const dispatch = useDispatch();
 
-  // const { id, login } = useParams<{ id: string, login: string }>();
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
@@ -36,122 +34,117 @@ const PrivateConversation: React.FC = () => {
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   
-  const dispatch = useDispatch();
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-
-
-  // connect socket
-  const connectSocket = useCallback(() => {
-    // if (id == -1) return;
-    if (userData.id == -1) return;
-    const socket = io('http://localhost:3000/messagerie', {
-      reconnectionDelayMax: 10000,
-      withCredentials: true,
-    });
-
-
-    //connect to room
-    socket.emit('joinPrivateRoom', {
-      user1Id: userData.id,
-      user2Id: id,
-    });
-
-    //listen on /message
-    socket.on('message', (message) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        message,
-      ]);
-      setOffsetPagniation((prev) => prev + 1);
-    });
-
-    socket.on('editMessage', (message) => {
-      setMessages((prevMessages) => {
-        const newMessages = prevMessages.map((msg) => {
-          if (msg.id === message.id) {
-            return { ...msg, text: message.text, updatedAt: message.updatedAt };
-          }
-          return msg;
-        });
-        return newMessages;
+  useEffect(() => {
+    const connectSocket = () => {
+      if (id == '-1' || userData.id == -1 ) return;
+      console.log('connectSocket user ', id);
+      const socket = io('http://localhost:3000/messagerie', {
+        reconnectionDelayMax: 10000,
+        withCredentials: true,
       });
-    });
-
-    socket.on('deleteMessage', (message) => {
-      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
-      setOffsetPagniation((prev) => prev - 1);
-    });
-
-    return () => {
-      socket.off('message');
-      socket.off('editMessage');
-      socket.off('deleteMessage');
-      socket.emit('leavePrivateRoom', {
+  
+      //listen on /message
+      socket.on('message', (message) => {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          message,
+        ]);
+        setOffsetPagniation((prev) => prev + 1);
+      });
+  
+      socket.on('editMessage', (message) => {
+        setMessages((prevMessages) => {
+          const newMessages = prevMessages.map((msg) => {
+            if (msg.id === message.id) {
+              return { ...msg, text: message.text, updatedAt: message.updatedAt };
+            }
+            return msg;
+          });
+          return newMessages;
+        });
+      });
+  
+      socket.on('deleteMessage', (message) => {
+        setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
+        setOffsetPagniation((prev) => prev - 1);
+      });
+  
+      socket.on('error', (error) => { console.log('erreur socket : ', error); });
+  
+      //connect to room
+      socket.emit('joinPrivateRoom', {
         user1Id: userData.id,
         user2Id: id,
       });
-      socket.disconnect();
+  
+      return () => {
+        socket.off('message');
+        socket.off('editMessage');
+        socket.off('deleteMessage');
+        socket.emit('leavePrivateRoom', {
+          user1Id: userData.id,
+          user2Id: id,
+        });
+        socket.disconnect();
+      };
     };
+    connectSocket();
   }, [userData.id, id]);
 
-  // get messages
-  const fetchOldMessages = useCallback(async () => {
-    setShouldScrollToBottom(false);
-
-    // setIsLoadingPagination(true);
-    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
-    // setIsLoadingPagination(false);
-
-    if ('error' in allMessages)
-      dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
-    else {
-      if (allMessages.length === 0) return;
-      //save pos scrool
-      const scrollContainer = document.querySelector('.overflow-y-auto');
-      if (!scrollContainer) return;
-      const oldScrollHeight = scrollContainer.scrollHeight;
-
-      if (pageDisplay === 1) {
-        setMessages(allMessages.reverse());
-        return;
+  useEffect(() => {
+    const fetchOldMessages = async () => {
+      console.log('fetchOldMessages');
+      if (id == '-1' || userData.id == -1 ) return;
+      setShouldScrollToBottom(false);
+  
+      // setIsLoadingPagination(true);
+      const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
+      // setIsLoadingPagination(false);
+  
+      if ('error' in allMessages)
+        dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
+      else {
+        if (allMessages.length === 0) return;
+        //save pos scrool
+        const scrollContainer = document.querySelector('.overflow-y-auto');
+        if (!scrollContainer) return;
+        const oldScrollHeight = scrollContainer.scrollHeight;
+  
+        if (pageDisplay === 1) {
+          setMessages(allMessages.reverse());
+        } else {
+          const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
+          setMessages((prev) => [...reversedMessageArray, ...prev]);
+        }
+  
+        //set pos scrool to top old messages
+        requestAnimationFrame(() => {
+          const newScrollHeight = scrollContainer.scrollHeight;
+          scrollContainer.scrollTop += newScrollHeight - oldScrollHeight;
+          setShouldScrollToBottom(true);
+        });
       }
-      const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-      setMessages((prev) => [...reversedMessageArray, ...prev]);
-
-      //set pos scrool to top old messages
-      requestAnimationFrame(() => {
-        const newScrollHeight = scrollContainer.scrollHeight;
-        scrollContainer.scrollTop += newScrollHeight - oldScrollHeight;
-        setShouldScrollToBottom(true);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, pageDisplay, dispatch]);
-
-
-
-  useEffect(() => {
-    connectSocket();
-  }, [connectSocket]);
-
-  useEffect(() => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
     fetchOldMessages();
-  }, [fetchOldMessages]);
+  }, [pageDisplay, id, userData.id]);
 
-  useEffect(() => {
-    console.log('location.pathname : ', location.pathname);
-    setMessages([]);
-    setShouldScrollToBottom(true);
-    setPageDisplay(1);
-  }, [location.pathname]);
+
+
+
+
+
+
 
   // scroll to bottom
   useEffect(() => {
     if (shouldScrollToBottom && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
+    console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
@@ -220,9 +213,12 @@ const PrivateConversation: React.FC = () => {
 
   return (
     <>
+      {/* { (id == '-1' || login == 'unknown' || userData.id == -1 ) ?
+       <CircularProgress className='mx-auto' />
+        : */}
       <div className="flex flex-col h-full justify-between">
         <div className="w-full text-lg text-blue text-center">
-          <p className='font-bold text-lg py-1'>{login?.toUpperCase()}</p>
+          <p className='font-bold text-lg py-1'>{login.toUpperCase()}</p>
         </div>
 
         <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
@@ -234,7 +230,6 @@ const PrivateConversation: React.FC = () => {
                 <MessageItem
                   key={message.id}
                   message={message}
-                  userDataId={userData.id}
                   isLoadingDeleteMsg={isLoadingDeleteMsg}
                   handleDeleteMessage={handleDeleteMessage}
                 />
@@ -281,6 +276,7 @@ const PrivateConversation: React.FC = () => {
         </div>
 
       </div>
+      {/* } */}
     </>
   );
 };

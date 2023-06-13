@@ -16,6 +16,7 @@ import ChannelSearch from '../components/Chat/Channel/ChannelSearchInterface';
 import ChannelConversation from '../components/Chat/Conversation/ChannelConversation';
 import PrivateConversation from '../components/Chat/Conversation/PrivateConversation';
 import FriendsSearch from '../components/Chat/Friends/FriendsSearchInterface';
+import ConversationWrapper from '../components/Chat/Conversation/ConversationWrapper';
 
 const HomeChat = () => {
   return (
@@ -32,11 +33,8 @@ const AppRoutes: React.FC = () => (
     <Route path='/home' element={<Home />} />
     <Route path='/chat' element={<Chat />} >
       <Route index element={<HomeChat />} />
-      <Route 
-        path='conv/:convId/:id/:login'
-        element={<PrivateConversation />} 
-      />
-      <Route path='channel/:convId/:id/:name' element={<ChannelConversation />} />
+      <Route path='conv/:convId/:id/:login' element={<ConversationWrapper />} />
+      <Route path='channel/:convId/:id/:name' element={<ConversationWrapper />} />
       <Route path='addFriends' element={<FriendsSearch />} />
       <Route path='createChannel' element={<CreateGroupInterface />} />
       <Route path='addChannels' element={<ChannelSearch />} />

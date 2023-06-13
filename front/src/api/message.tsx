@@ -5,7 +5,7 @@ import { HttpStatusCode } from 'axios';
 
 export async function sendMessage(
   message: string,
-  receiverId: number,
+  receiverId: string,
 ): Promise<MessageInterface | ApiErrorResponse> {
   return apiRequest<MessageInterface>(
     'post',
@@ -16,7 +16,7 @@ export async function sendMessage(
 }
 
 export async function getOldMessages(
-  userId: number,
+  userId: string,
   page: number,
   offset: number,
 ): Promise< MessageInterface[] | ApiErrorResponse > {

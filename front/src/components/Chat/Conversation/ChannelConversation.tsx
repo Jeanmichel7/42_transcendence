@@ -1,31 +1,26 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { useDispatch } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import MessageItem from './MessageItem';
 
 import { chatOldMessages, deleteChatMessage, sendChatMessage } from '../../../api/chat';
 
-import { ApiErrorResponse, UserInterface } from '../../../types';
+import { ApiErrorResponse } from '../../../types';
 import { ChatMsgInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
 import { Button, TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
-import { useLocation, useParams } from 'react-router-dom';
-
-
+import { useParams } from 'react-router-dom';
 
 const ChannelConversation: React.FC = () => {
-  const location = useLocation();
-  const id = parseInt(useParams<{ id: string }>().id || '') ;
-  const name = (useParams<{ name: string }>().name || '') ;
-
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const id = (useParams<{ id: string }>().id || '-1') ;
+  const name = (useParams<{ name: string }>().name || 'unknown') ;
   const dispatch = useDispatch();
+
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
@@ -88,28 +83,27 @@ const ChannelConversation: React.FC = () => {
       roomId: id,
     });
 
-        
-    // return () => {
-    //   socket.off('chat_message');
-    //   socket.off('chat_message_edit');
-    //   socket.off('chat_message_delete');
-    //   // socket.emit('leaveRoom', {
-    //   //   user1Id: userData.id,
-    //   //   user2Id: id,
-    //   // });
-    //   socket.disconnect();
-    // };
+    return () => {
+      socket.off('chat_message');
+      socket.off('chat_message_edit');
+      socket.off('chat_message_delete');
+      socket.emit('leaveRoom', {
+        roomId: id,
+      });
+      socket.disconnect();
+    };
 
   }, [id]);
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
+    if (id === '-1') return;
     setShouldScrollToBottom(false);
 
     // setIsLoadingPagination(true);
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
     // setIsLoadingPagination(false);
-    // console.log('allMessages fetched : ', allMessages);
+
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
@@ -135,7 +129,7 @@ const ChannelConversation: React.FC = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, pageDisplay, dispatch]);
+  }, [pageDisplay]);
 
   
   useEffect(() => {
@@ -145,16 +139,6 @@ const ChannelConversation: React.FC = () => {
   useEffect(() => {
     fetchOldMessages();
   }, [fetchOldMessages]);
-
-  useEffect(() => {
-    console.log('location.pathname : ', location.pathname);
-    console.log('room id : ', id);
-    console.log('room name : ', name);
-    console.log('messages reset : ', messages);
-    setMessages([]);
-    setShouldScrollToBottom(true);
-    setPageDisplay(1);
-  }, [location.pathname]);
 
   // scroll to bottom
   useEffect(() => {
@@ -269,7 +253,6 @@ const ChannelConversation: React.FC = () => {
                 <MessageItem
                   key={message.id}
                   message={message}
-                  userDataId={userData.id}
                   isLoadingDeleteMsg={isLoadingDeleteMsg}
                   handleDeleteMessage={handleDeleteMessage}
                 />

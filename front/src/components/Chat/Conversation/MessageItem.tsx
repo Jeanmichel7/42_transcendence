@@ -1,11 +1,11 @@
 import { useState, FC, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import { apiEditMessage } from '../../../api/message';
 
-import { ApiErrorResponse } from '../../../types';
+import { ApiErrorResponse, UserInterface } from '../../../types';
 import { ChatMsgInterface, MessageInterface } from '../../../types/ChatTypes';
 
 
@@ -15,21 +15,21 @@ import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { getTimeSince, isChatMsgInterface, isMsgInterface } from '../../../utils/utils';
 import { editChatMessage } from '../../../api/chat';
+import { RootState } from '../../../store';
 
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
-  userDataId: number;
   isLoadingDeleteMsg: boolean;
   handleDeleteMessage: (id: number) => void;
 }
 
 const MessageItem: FC<MessageItemProps> = ({
   message,
-  userDataId,
   isLoadingDeleteMsg,
   handleDeleteMessage,
 }) => {
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>(message.text);
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -170,7 +170,7 @@ const MessageItem: FC<MessageItemProps> = ({
             title="Edit message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
             <IconButton onClick={() => setEditMessage(true)} color='primary'>
               <EditOutlinedIcon />
@@ -181,7 +181,7 @@ const MessageItem: FC<MessageItemProps> = ({
             title="Delete message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
             <IconButton 
               onClick={handleDelete} 
