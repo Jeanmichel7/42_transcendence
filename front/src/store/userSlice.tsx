@@ -4,7 +4,6 @@ import { ApiErrorResponse, NotificationInterface, UserInterface } from '../types
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
-  notifications: NotificationInterface[];
   error: null | ApiErrorResponse;
   userFriends: UserInterface[],
   userBlocked: UserInterface[],
@@ -77,7 +76,6 @@ export const userSlice = createSlice({
   initialState: {
     isLogged: false,
     error: null,
-    notifications: localStorage.getItem('notifications') ? JSON.parse(localStorage.getItem('notifications') as string) : [] as NotificationInterface[],
     userFriends: [],
     userBlocked: [],
     waitingFriendsRequestReceived: [],
@@ -140,36 +138,6 @@ export const userSlice = createSlice({
       // state.waitingFriendsRequestSent = [];
     },
 
-
-
-
-
-
-
-
-    // manage notifications
-    reduxSetNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
-      state.notifications = action.payload;
-    },
-    reduxAddNotification: (state, action: PayloadAction<NotificationInterface>) => {
-      if (state.notifications === undefined)
-        state.notifications = [action.payload];
-      else
-        state.notifications = [...state.notifications, action.payload];
-    },
-    reduxRemoveNotification: (state, action: PayloadAction<NotificationInterface>) => {
-      console.log('remove notif : ', action.payload);
-      state.notifications = state.notifications
-        .filter((notif: NotificationInterface) => JSON.stringify(notif) !== JSON.stringify(action.payload));
-    },
-    reduxReadNotification: (state, action: PayloadAction<NotificationInterface>) => {
-      state.notifications = state.notifications
-        .map((notif: NotificationInterface) => {
-          if (JSON.stringify(notif) === JSON.stringify(action.payload))
-            return { ...notif, read: true };
-          return notif;
-        });
-    },
 
     // manage friends
     reduxSetFriends: (state, action: PayloadAction<UserInterface[]>) => {
@@ -241,7 +209,6 @@ export const {
   reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
   reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
   reduxAcceptedRequest, reduxDeclinedRequest,
-  reduxSetNotifications, reduxAddNotification, reduxRemoveNotification, reduxReadNotification,
   setError,
 } = userSlice.actions;
 

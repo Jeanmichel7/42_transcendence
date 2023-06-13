@@ -11,11 +11,14 @@ import { useState } from 'react';
 import FriendItem from './FriendItem';
 import { useNavigate } from 'react-router-dom';
 import { reduxAddConversationList } from '../../store/chatSlicer';
+import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
 const AllFriends = () => {
   const { userFriends } = useSelector((state: RootState) => state.user);
 
   const [isLoading, setIsLoading] = useState(false);
+  const { conversationsList } = useSelector((state: RootState) => state.chat);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -45,9 +48,12 @@ const AllFriends = () => {
     }
   };
 
-  const handleNavigateToChat = (user: UserInterface) => {
+  const handleNavigateToChat = async (user: UserInterface) => {
     dispatch(reduxAddConversationList(user));
-    navigate(`/chat?service=privateConversation&userId=${user.id}`);
+    let convId = getConvIdFromUserOrRoom(user, conversationsList);
+    if (convId === -1)
+      convId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
+    navigate(`/chat/conv/${convId}/${user.id}/${user.login}`);
   };
 
   return (

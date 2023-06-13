@@ -8,25 +8,13 @@ import { ConversationInterface } from '../../../types';
 import { isRoomInterface, isUserInterface } from '../../../utils/utils';
 import ConversationListRoomItem from './ConversationListItemRoom';
 
-interface ConvProps {
-  setServiceToCall: React.Dispatch<React.SetStateAction<string>>;
-  setConvSelectedId: React.Dispatch<React.SetStateAction<number>>;
-}
 
-const ConversationList: React.FC<ConvProps> = ({ 
-  setServiceToCall,
-  setConvSelectedId,
-}) => {
+const ConversationList: React.FC = () => {
   const { conversationsList } = useSelector((state: RootState) => state.chat);
-
-  // useEffect(() => {
-  //   console.log('convs : ', conversationsList);
-  // }, [conversationsList]);
 
   if (!conversationsList) {
     return <CircularProgress />;
   }
-
   return (
     <>
       <div className='w-full text-center transition-all overflow-auto  max-h-[calc(100vh-180px)]'>
@@ -39,8 +27,6 @@ const ConversationList: React.FC<ConvProps> = ({
                 <ConversationListUserItem
                   key={conv.id}
                   conv={conv}
-                  setConvSelectedId={setConvSelectedId}
-                  setServiceToCall={setServiceToCall}
                 />
               );
             } else if ( isRoomInterface(conv.room)) {
@@ -48,8 +34,6 @@ const ConversationList: React.FC<ConvProps> = ({
                 <ConversationListRoomItem 
                   key={conv.id}
                   conv={conv}
-                  setConvSelectedId={setConvSelectedId}
-                  setServiceToCall={setServiceToCall}
                 />
               );
             } else {

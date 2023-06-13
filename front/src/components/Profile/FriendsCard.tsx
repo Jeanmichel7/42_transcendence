@@ -26,7 +26,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   setFriends,
 }) => {
   const dispatch = useDispatch();
-  const { userData, userFriends } = useSelector((state: RootState) => state.user);
+  const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
   const badgeColor: 'success' | 'warning' | 'error'
   = friend.status === 'online' ? 'success' :
@@ -78,6 +78,10 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     return userFriends?.find((f: UserInterface) => f.id === friend.id);
   }
 
+  function isRequestFriendSent() {
+    return waitingFriendsRequestSent?.find((f: UserInterface) => f.id === friend.id);
+  }
+
 
   return (
     <Card key={friend.login} sx={{ maxWidth: 140, margin: '10px' }}>
@@ -123,7 +127,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
        * Bouton action
        **/}
       <CardActions className='flex flex-wrap items-center justify-between w-full'>
-
         <Tooltip
           title="Defier" arrow
           TransitionComponent={Zoom}
@@ -137,10 +140,10 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           </IconButton>
         </Tooltip>
 
-
         { !isMyFriend() &&
         <Tooltip
-          title="Add Friend" arrow
+          title={ isRequestFriendSent() ? 'Waiting accept' : 'Add friend' }
+          arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
@@ -148,9 +151,8 @@ const FriendCard:  React.FC<FriendCardProps> = ({
               sx={{ margin:0, padding:0 }}
               onClick={() => handleRequestAddFriend(friend.id)}
             >
-              <AddIcon color='primary'/>
+              <AddIcon color={ isRequestFriendSent() ? 'disabled' : 'primary' }/>
             </IconButton>
-
         </Tooltip> }
 
         {userData && userData.login == actualUserLogin &&
@@ -167,7 +169,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
                 <DeleteForeverIcon sx={{ color: red[800] }} />
               </IconButton>
             </Tooltip>
-
 
             <Tooltip
               title="Block user" arrow

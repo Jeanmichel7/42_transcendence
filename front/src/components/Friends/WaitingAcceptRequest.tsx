@@ -5,7 +5,8 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { UserInterface, ApiErrorResponse, UserRelation, NotificationInterface } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { reduxAddFriends, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxRemoveNotification } from '../../store/notificationSlice';
 import FriendItem from './FriendItem';
 
 import { reduxAddConversationList } from '../../store/chatSlicer';
@@ -13,7 +14,7 @@ import { reduxAddConversationList } from '../../store/chatSlicer';
 const WaitingAcceptRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { userData, waitingFriendsRequestReceived } = useSelector((state: RootState) => state.user);
-  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
+  const { notifications } = useSelector((state: RootState) => state.notification);
   const dispatch = useDispatch();
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {

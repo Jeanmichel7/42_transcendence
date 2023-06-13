@@ -1,25 +1,38 @@
-export function ButtonCreateGroup({ setServiceToCall }
-: { setServiceToCall: (service: string) => void }) {
+import { Button } from '@mui/material';
+
+export function ButtonCreateGroup() {
   return (
-    <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg
-        font-mono p-3 cursor-pointer hover:bg-gray-100`}
-      onClick={() => setServiceToCall('createChannel')}
+    <Button
+      variant="contained"
+      color="secondary"
+      sx={{ display: 'block', margin: '5px' }}
     >
-      <h2>Create Groupe</h2>
-    </div>
+      Create Channel
+    </Button>
   );
 }
 
 
-
-export function ButtonInterfaceAddGroups({ setServiceToCall }
-: { setServiceToCall: (service: string) => void }) {
+export function ButtonInterfaceAddGroups() {
   return (
-        <div className={`max-w-sm text-center border-2 rounded-xl shadow-lg
-            font-mono p-3 cursor-pointer hover:bg-gray-100`}
-          onClick={() => setServiceToCall('addChannels')}
-        >
-          <h2>Add Channel</h2>
-        </div>
+    <Button
+      variant="contained"
+      color="primary"
+      sx={{ display: 'block', margin: '5px' }}
+    >
+      Add Groups
+    </Button>
+  );
+}
+
+export function ButtonInterfaceAddFriends() {
+  return (
+    <Button
+      variant="contained"
+      color="primary"
+      sx={{ display: 'block', margin: 'auto' }}
+    >
+      Add Friends
+    </Button>
   );
 }

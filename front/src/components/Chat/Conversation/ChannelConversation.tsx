@@ -7,67 +7,62 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import MessageItem from './MessageItem';
 
-import { sendMessage, getOldMessages, apiDeleteMessage } from '../../../api/message';
+import { chatOldMessages, deleteChatMessage, sendChatMessage } from '../../../api/chat';
 
 import { ApiErrorResponse, UserInterface } from '../../../types';
-import { MessageInterface } from '../../../types/ChatTypes';
+import { ChatMsgInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { TextareaAutosize } from '@mui/material';
+import { Button, TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useLocation, useParams } from 'react-router-dom';
 
 
 
-const PrivateConversation: React.FC = () => {
+const ChannelConversation: React.FC = () => {
   const location = useLocation();
-  const id = +(useParams<{ id: string }>().id || -1) ;
-  const login = (useParams<{ name: string }>().name || '') ;
+  const id = parseInt(useParams<{ id: string }>().id || '') ;
+  const name = (useParams<{ name: string }>().name || '') ;
 
-  // const { id, login } = useParams<{ id: string, login: string }>();
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-
+  const dispatch = useDispatch();
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
-  const [messages, setMessages] = useState<MessageInterface[]>([]);
+  const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
   const [text, setText] = useState<string>('');
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
-  
-  const dispatch = useDispatch();
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-
-
   // connect socket
-  const connectSocket = useCallback(() => {
-    // if (id == -1) return;
-    if (userData.id == -1) return;
-    const socket = io('http://localhost:3000/messagerie', {
+  const connectSocketChat = useCallback(() => {
+    console.log('conection to socket room id : ', id);
+    const socket = io('http://localhost:3000/chat', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
 
-
-    //connect to room
-    socket.emit('joinPrivateRoom', {
-      user1Id: userData.id,
-      user2Id: id,
+    socket.on('room_joined', (message) => {
+      console.log('room joined ! ', message);
     });
 
     //listen on /message
-    socket.on('message', (message) => {
+    socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
+      console.log('new message : ', message);
       setMessages((prevMessages) => [
         ...prevMessages,
         message,
       ]);
       setOffsetPagniation((prev) => prev + 1);
+      acknowledge(true);
     });
 
-    socket.on('editMessage', (message) => {
+    socket.on('chat_message_edit', (message) => {
+      console.log('edit message : ', message);
       setMessages((prevMessages) => {
         const newMessages = prevMessages.map((msg) => {
           if (msg.id === message.id) {
@@ -79,46 +74,58 @@ const PrivateConversation: React.FC = () => {
       });
     });
 
-    socket.on('deleteMessage', (message) => {
+    socket.on('chat_message_delete', (message) => {
+      console.log('delete message : ', message);
+      // console.log('message id : ', message.id);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
       setOffsetPagniation((prev) => prev - 1);
     });
 
-    return () => {
-      socket.off('message');
-      socket.off('editMessage');
-      socket.off('deleteMessage');
-      socket.emit('leavePrivateRoom', {
-        user1Id: userData.id,
-        user2Id: id,
-      });
-      socket.disconnect();
-    };
-  }, [userData.id, id]);
+    socket.on('error', (error) => { console.log('erreur socket : ', error); });
+
+    //connect to room
+    socket.emit('joinRoom', {
+      roomId: id,
+    });
+
+        
+    // return () => {
+    //   socket.off('chat_message');
+    //   socket.off('chat_message_edit');
+    //   socket.off('chat_message_delete');
+    //   // socket.emit('leaveRoom', {
+    //   //   user1Id: userData.id,
+    //   //   user2Id: id,
+    //   // });
+    //   socket.disconnect();
+    // };
+
+  }, [id]);
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
     setShouldScrollToBottom(false);
 
     // setIsLoadingPagination(true);
-    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
+    const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
     // setIsLoadingPagination(false);
-
+    // console.log('allMessages fetched : ', allMessages);
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
       if (allMessages.length === 0) return;
+
       //save pos scrool
       const scrollContainer = document.querySelector('.overflow-y-auto');
       if (!scrollContainer) return;
       const oldScrollHeight = scrollContainer.scrollHeight;
 
-      if (pageDisplay === 1) {
+      if (pageDisplay === 1)
         setMessages(allMessages.reverse());
-        return;
+      else {
+        const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
+        setMessages((prev) => [...reversedMessageArray, ...prev]);
       }
-      const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-      setMessages((prev) => [...reversedMessageArray, ...prev]);
 
       //set pos scrool to top old messages
       requestAnimationFrame(() => {
@@ -130,11 +137,10 @@ const PrivateConversation: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, pageDisplay, dispatch]);
 
-
-
+  
   useEffect(() => {
-    connectSocket();
-  }, [connectSocket]);
+    connectSocketChat();
+  }, [connectSocketChat]);
 
   useEffect(() => {
     fetchOldMessages();
@@ -142,6 +148,9 @@ const PrivateConversation: React.FC = () => {
 
   useEffect(() => {
     console.log('location.pathname : ', location.pathname);
+    console.log('room id : ', id);
+    console.log('room name : ', name);
+    console.log('messages reset : ', messages);
     setMessages([]);
     setShouldScrollToBottom(true);
     setPageDisplay(1);
@@ -152,24 +161,20 @@ const PrivateConversation: React.FC = () => {
     if (shouldScrollToBottom && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
+    console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
 
 
-  //scrool top = fetch new page messages
-  const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
-    const element = e.target as HTMLDivElement;
-    if (element.scrollTop === 0) {
-      setPageDisplay((prev) => prev + 1);
-      //display waiting message
-    }
-  };
+
 
   // delete message
   const handleDeleteMessage = async (msgId: number) => {
+    // console.log('delete message : ', msgId);
     setIsLoadingDeleteMsg(true);
-    const res: HttpStatusCode | ApiErrorResponse = await apiDeleteMessage(msgId);
+    const res: HttpStatusCode | ApiErrorResponse = await deleteChatMessage(msgId);
+    // console.log('res : ', res);
     setIsLoadingDeleteMsg(false);
 
     if (typeof res === 'object' && 'error' in res)
@@ -179,7 +184,6 @@ const PrivateConversation: React.FC = () => {
       dispatch(setMsgSnackbar('Message deleted'));
     }
   };
-
 
   // send message
   const handleSubmit = () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -198,8 +202,9 @@ const PrivateConversation: React.FC = () => {
       return;
     }
     setStatusSendMsg('pending');
-
-    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, id);
+    const newMessage: ChatMsgInterface | ApiErrorResponse = await sendChatMessage(id, {
+      text: text,
+    });
     if ('error' in newMessage)
       setStatusSendMsg(newMessage.message);
     else
@@ -209,6 +214,9 @@ const PrivateConversation: React.FC = () => {
   };
 
 
+
+
+  
   /* set text input currying + callback */
   const handleChangeTextArea = useCallback(
     (setTextFn: React.Dispatch<React.SetStateAction<string>>) => (
@@ -218,19 +226,46 @@ const PrivateConversation: React.FC = () => {
     }, [],
   );
 
+
+  //scrool top = fetch new page messages
+  const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+    const element = e.target as HTMLDivElement;
+    if (element.scrollTop === 0) {
+      setPageDisplay((prev) => prev + 1);
+      //display waiting message
+    }
+  };
+
+
   return (
     <>
       <div className="flex flex-col h-full justify-between">
-        <div className="w-full text-lg text-blue text-center">
-          <p className='font-bold text-lg py-1'>{login?.toUpperCase()}</p>
+        <div className="w-full flex justify-between items-center text-lg text-blue text-center">
+          <div className="w-full text-center">
+            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+          </div>
+          <Button
+            className='text-blue-500'
+            onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
+            sx={{ mr: 2 }}
+          >
+            Invite
+          </Button>
+          <Button
+            className='text-blue-500'
+            onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
+            sx={{ mr: 2 }}
+          >
+            Adminitration
+          </Button>
         </div>
 
         <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
           {/* display messages */}
-          {messages &&
+          { messages &&
             <div className='text-lg m-1 p-2 '>
               {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
-              {messages.map((message: MessageInterface) => (
+              {messages.map((message: ChatMsgInterface) => (
                 <MessageItem
                   key={message.id}
                   message={message}
@@ -273,10 +308,7 @@ const PrivateConversation: React.FC = () => {
                 }
               </form>
 
-            </div>
-          }
-
-
+            </div> }
           <div ref={bottomRef}></div>
         </div>
 
@@ -285,7 +317,4 @@ const PrivateConversation: React.FC = () => {
   );
 };
 
-export default PrivateConversation;
-
-
-
+export default ChannelConversation;

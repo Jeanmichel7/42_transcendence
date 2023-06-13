@@ -13,6 +13,8 @@ import {
   Patch,
   Delete,
   HttpStatus,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -238,10 +240,22 @@ export class ChatController {
 
   @Get('rooms/:roomId/messages')
   async getMessages(
+    @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-  ): Promise<ChatRoomInterface> {
-    const messages: ChatRoomInterface =
-      await this.ChatService.getRoomAllMessages(roomId);
+    @Query('page', ParseIntPipe) page: number,
+    @Query('offset', ParseIntPipe) offset: number,
+  ): Promise<ChatMsgInterface[]> {
+    let messages: ChatMsgInterface[] = [];
+    if (page) {
+      messages = await this.ChatService.getRoomMessagesPaginate(
+        req.user.id,
+        roomId,
+        page,
+        offset,
+      );
+    } else {
+      messages = await this.ChatService.getRoomAllMessages(req.user.id, roomId);
+    }
     return messages;
   }
 
@@ -268,6 +282,7 @@ export class ChatController {
     @Param('messageId') messageId: bigint,
     @Body() data: ChatEditMsgDTO,
   ): Promise<ChatMsgInterface> {
+    console.log('edit message', messageId, data);
     const message: ChatMsgInterface = await this.ChatService.editMessage(
       req.user.id,
       messageId,
@@ -308,12 +323,12 @@ export class ChatController {
   }
 
   // @UseGuards(AuthAdmin)
-  @Get('rooms/:roomId/messages/all')
-  async getAllMessages(
-    @Param('roomId') roomId: bigint,
-  ): Promise<ChatRoomInterface> {
-    const messages: ChatRoomInterface =
-      await this.ChatService.getRoomAllMessages(roomId);
-    return messages;
-  }
+  // @Get('rooms/:roomId/messages/all')
+  // async getAllMessages(
+  //   @Param('roomId') roomId: bigint,
+  // ): Promise<ChatRoomInterface> {
+  //   const messages: ChatRoomInterface =
+  //     await this.ChatService.getRoomAllMessages(roomId);
+  //   return messages;
+  // }
 }

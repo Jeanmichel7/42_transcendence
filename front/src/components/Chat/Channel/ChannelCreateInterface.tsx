@@ -72,7 +72,7 @@ const CreateGroupInterface = () => {
     } else {
       dispatch(setMsgSnackbar('Channel created'));
 
-      console.log('room res : ', resCreateChannel);
+      // console.log('room res : ', resCreateChannel);
       dispatch(reduxAddConversationList(resCreateChannel));
       setForm({
         name: '',

@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
-import { reduxAddFriends, reduxReadNotification, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
 import { reduxAddConversationList } from '../../store/chatSlicer';
+import { reduxReadNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 
 
 interface NotificationItemProps {
@@ -25,7 +26,6 @@ const NotificationItem = ({
   const navigate = useNavigate();
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
-    console.log('userToAccept', userToAccept);
     setIsLoading(true);
     const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAccept.id);
     setIsLoading(false);

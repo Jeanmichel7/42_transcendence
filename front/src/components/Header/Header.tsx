@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddNotification, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
 import { reduxAddConversationList } from '../../store/chatSlicer';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
@@ -29,6 +29,7 @@ import MenuItem from '@mui/material/MenuItem';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import { reduxAddNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 
 
 
@@ -42,7 +43,7 @@ function Header() {
   /* redux */
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
-  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
+  const { notifications } = useSelector((state: RootState) => state.notification);
 
   const connectWebSocket = useCallback(() => {
     if (!userData.id) return;
@@ -54,11 +55,9 @@ function Header() {
     });
 
     socket.on('connect', () => {
-      console.log('connected general socket');
     });
 
     socket.on('disconnect', () => {
-      console.log('disconnected general socket');
     });
 
     //connect room

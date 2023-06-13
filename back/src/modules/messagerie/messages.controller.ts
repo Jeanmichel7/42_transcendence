@@ -46,6 +46,7 @@ export class MessageController {
     @Req() req: RequestWithUser,
     @Param('userIdDest', ParseIntPipe) userIdDest: bigint,
     @Query('page', ParseIntPipe) page: number,
+    @Query('offset', ParseIntPipe) offset: number,
   ): Promise<MessageBtwTwoUserInterface[]> {
     let result: MessageBtwTwoUserInterface[] = [];
     if (page) {
@@ -53,6 +54,7 @@ export class MessageController {
         req.user.id,
         userIdDest,
         page,
+        offset,
       );
     } else {
       result = await this.MessageService.getMessagesBetweenUsers(

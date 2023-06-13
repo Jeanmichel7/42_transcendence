@@ -3,7 +3,6 @@ import { UserInterface, RoomInterface, ConversationInterface } from '../types';
 import { isRoomInterface, isUserInterface } from '../utils/utils';
 
 
-
 export interface ChatState {
   conversationIdSelected: number,
   conversationsList: ConversationInterface[],

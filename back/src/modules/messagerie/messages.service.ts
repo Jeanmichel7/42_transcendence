@@ -94,9 +94,13 @@ export class MessageService {
     userIdFrom: bigint,
     userIdTo: bigint,
     page: number,
+    offset: number,
   ): Promise<MessageBtwTwoUserInterface[]> {
-    const skip = (page - 1) * limit;
-
+    const skip = (page - 1) * limit - offset;
+    if (skip < 0)
+      throw new NotFoundException(
+        `Page ${page} does not exist or offset ${offset} is too big`,
+      );
     const messages: MessageEntity[] = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.ownerUser', 'ownerUser')

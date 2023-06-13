@@ -11,14 +11,37 @@ import FakeConnection from '../pages/ConnectionFakeUser';
 import Profile from '../pages/Profile';
 import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
+import CreateGroupInterface from '../components/Chat/Channel/ChannelCreateInterface';
+import ChannelSearch from '../components/Chat/Channel/ChannelSearchInterface';
+import ChannelConversation from '../components/Chat/Conversation/ChannelConversation';
+import PrivateConversation from '../components/Chat/Conversation/PrivateConversation';
+import FriendsSearch from '../components/Chat/Friends/FriendsSearchInterface';
 
+const HomeChat = () => {
+  return (
+    <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
+      Select a user or a room to start a conversation
+    </div>
+  );
+};
 
 const AppRoutes: React.FC = () => (
   <Routes>
     <Route path='/' element={<Login />} />
     <Route path='/game' element={<Pong />} />
     <Route path='/home' element={<Home />} />
-    <Route path='/chat' element={<Chat />} />
+    <Route path='/chat' element={<Chat />} >
+      <Route index element={<HomeChat />} />
+      <Route 
+        path='conv/:convId/:id/:login'
+        element={<PrivateConversation />} 
+      />
+      <Route path='channel/:convId/:id/:name' element={<ChannelConversation />} />
+      <Route path='addFriends' element={<FriendsSearch />} />
+      <Route path='createChannel' element={<CreateGroupInterface />} />
+      <Route path='addChannels' element={<ChannelSearch />} />
+      <Route path='*' element={<HomeChat />} />
+    </Route>
     <Route path='/friends' element={<FriendsPage />} />
     <Route path='/connection' element={<ConnectPage />} />
     <Route path='/fakeconnection' element={<FakeConnection />} />

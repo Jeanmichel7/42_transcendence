@@ -72,7 +72,7 @@ function App() {
     <>
       <div className="flex flex-col h-screen min-h-md ">
         <Header />
-        <div className="relative flex-grow bg-[#eaeaff] w-full">
+        <div className="flex-grow bg-[#eaeaff] w-full">
           <div className="h-full">
             <AppRoutes />
           </div>

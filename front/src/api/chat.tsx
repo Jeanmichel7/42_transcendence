@@ -1,6 +1,15 @@
 import { ApiErrorResponse } from '../types';
 import { apiRequest } from './index';
-import { RoomInterface } from '../types/ChatTypes';
+import { ChatMsgInterface, RoomInterface } from '../types/ChatTypes';
+import { HttpStatusCode } from 'axios';
+
+
+
+/* ****************************
+ *                            *
+ *             ROOM           *
+ *                            *
+ ******************************/
 
 export async function createChannel(
   body: any,
@@ -43,3 +52,70 @@ export async function leaveRoom(
     'Failed to leave room: ',
   );
 }
+
+
+
+
+
+
+/******************************
+ *                            *
+ *            MESSAGE         *
+ *                            *
+ ******************************/
+
+export async function sendChatMessage(
+  roomId: number,
+  data: any,
+): Promise< ChatMsgInterface | ApiErrorResponse> {
+  return apiRequest(
+    'post',
+    'chat/rooms/' + roomId + '/messages/add',
+    'Failed to add message: ',
+    data,
+  );
+}
+
+export async function editChatMessage(
+  messageId: number,
+  data: any,
+): Promise< ChatMsgInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'chat/messages/' + messageId + '/edit',
+    'Failed to edit message: ',
+    { text: data },
+  );
+}
+
+export async function deleteChatMessage(
+  messageId: number,
+): Promise< HttpStatusCode | ApiErrorResponse> {
+  return apiRequest(
+    'delete',
+    'chat/messages/' + messageId + '/delete',
+    'Failed to delete message: ',
+  );
+}
+
+export async function chatOldMessages(
+  roomId: number,
+  page: number,
+  offset: number,
+): Promise< ChatMsgInterface[] | ApiErrorResponse > {
+  return apiRequest< ChatMsgInterface[] >(
+    'get',
+    'chat/rooms/' + roomId + '/messages?page=' + page + '&offset=' + offset,
+    'Failed to get old messages: ',
+  );
+}
+
+
+
+
+/* *****************************
+*                              *
+*          ADMIN ROOM          *
+*                              *
+* ******************************/
+

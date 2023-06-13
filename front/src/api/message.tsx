@@ -1,6 +1,7 @@
 import { ApiErrorResponse } from '../types';
 import { apiRequest } from './index';
 import { MessageInterface } from '../types/ChatTypes';
+import { HttpStatusCode } from 'axios';
 
 export async function sendMessage(
   message: string,
@@ -14,10 +15,14 @@ export async function sendMessage(
   );
 }
 
-export async function getOldMessages(userId: number, page: number): Promise< MessageInterface[] | ApiErrorResponse > {
+export async function getOldMessages(
+  userId: number,
+  page: number,
+  offset: number,
+): Promise< MessageInterface[] | ApiErrorResponse > {
   return apiRequest< MessageInterface[] >(
     'get',
-    'messages/users/' + userId + '?page=' + page,
+    'messages/users/' + userId + '?page=' + page + '&offset=' + offset,
     'Failed to get old messages: ',
   );
 }
@@ -34,7 +39,9 @@ export async function getOldMessages(userId: number, page: number): Promise< Mes
 //   }
 // }
 
-export async function apiDeleteMessage(messageId: number): Promise< any> {
+export async function apiDeleteMessage(
+  messageId: number,
+): Promise< HttpStatusCode | ApiErrorResponse> {
   return apiRequest(
     'delete',
     'messages/' + messageId,

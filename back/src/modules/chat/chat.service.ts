@@ -19,7 +19,9 @@ import { ChatRoomEntity, UserEntity, ChatMessageEntity } from 'config';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 
-import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
+import { ChatMessageEvent } from './event/chat.event';
+
+const limit = 20;
 
 @Injectable()
 export class ChatService {
@@ -29,6 +31,8 @@ export class ChatService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ChatRoomEntity)
     private readonly roomRepository: Repository<ChatRoomEntity>,
+    @InjectRepository(ChatMessageEntity)
+    private readonly messageRepository: Repository<ChatMessageEntity>,
   ) {}
 
   /* ************************************************ */
@@ -272,14 +276,36 @@ export class ChatService {
     //   .where('chat_rooms.id = :roomId', { roomId: room.id })
     //   .getOne();
 
-    const resultRoom: ChatRoomInterface = await this.getRoomAllMessages(
-      room.id,
-    );
+    const resultRoom: ChatRoomInterface = await this.roomRepository
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'users')
+      .select([
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
+      .getOne();
 
-    this.eventEmitter.emit(
-      'chat_room.join',
-      new ChatJoinRoomEvent(resultRoom, user.id.toString()),
-    );
+    // this.eventEmitter.emit(
+    //   'chat_room.join',
+    //   new ChatJoinRoomEvent(resultRoom, user.id.toString()),
+    // );
     return resultRoom;
   }
 
@@ -694,6 +720,107 @@ export class ChatService {
   /*                      MESSAGE                     */
   /* ************************************************ */
 
+  async getRoomAllMessages(
+    userId: bigint,
+    roomId: bigint,
+  ): Promise<ChatMsgInterface[]> {
+    const messages: ChatMessageEntity[] = await this.messageRepository
+      .createQueryBuilder('chat_messages')
+      .select([
+        'chat_messages.id',
+        'chat_messages.text',
+        'chat_messages.createdAt',
+        'chat_messages.updatedAt',
+      ])
+      .leftJoin('chat_messages.ownerUser', 'ownerUser')
+      .addSelect([
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+      ])
+      .leftJoin('chat_messages.room', 'room')
+      .addSelect(['room.id', 'room.type', 'room.name', 'room.isProtected'])
+      .leftJoin('room.users', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .where('room.id = :roomId', { roomId })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+
+    //check user is in room
+    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't see messages`,
+      );
+
+    return messages;
+  }
+
+  async getRoomMessagesPaginate(
+    userId: bigint,
+    roomId: bigint,
+    page: number,
+    offset: number,
+  ): Promise<ChatMsgInterface[]> {
+    const skip = (page - 1) * limit - offset;
+    if (skip < 0)
+      throw new NotFoundException(
+        `Page ${page} does not exist or offset ${offset} is too big`,
+      );
+
+    const messages: ChatMessageEntity[] = await this.messageRepository
+      .createQueryBuilder('chat_messages')
+      .select([
+        'chat_messages.id',
+        'chat_messages.text',
+        'chat_messages.createdAt',
+        'chat_messages.updatedAt',
+      ])
+      .leftJoin('chat_messages.ownerUser', 'ownerUser')
+      .addSelect([
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+      ])
+      .leftJoin('chat_messages.room', 'room')
+      .addSelect(['room.id', 'room.type', 'room.name', 'room.isProtected'])
+      .leftJoin('room.users', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .where('room.id = :roomId', { roomId })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getMany();
+
+    // console.log('tets users room : ', messages[0].room);
+    //check user is in room
+    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't see messages`,
+      );
+
+    return messages;
+  }
+
   async createMessage(
     newMessage: ChatCreateMsgDTO,
     userId: bigint,
@@ -701,14 +828,14 @@ export class ChatService {
   ): Promise<ChatMsgInterface> {
     const userSend: UserEntity = await UserEntity.findOne({
       where: { id: userId },
-      select: ['id', 'firstName', 'lastName', 'login'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['chatMessages'],
     });
-    console.error('userSend', userSend);
+    // console.log('userSend', userSend);
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },
-      select: ['id', 'type'],
+      select: ['id', 'type', 'name', 'isProtected'],
       relations: ['messages'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
@@ -726,7 +853,8 @@ export class ChatService {
     await userSend.save();
     room.messages = [...room.messages, message];
     await room.save();
-
+    console.log('message entity : ', message);
+    console.log('room entity : ', room);
     const messageToSave: ChatMsgInterface = {
       id: message.id,
       text: message.text,
@@ -736,19 +864,20 @@ export class ChatService {
         name: room.name,
         isProtected: room.isProtected,
       },
-      user: {
+      ownerUser: {
         id: userSend.id,
         firstName: userSend.firstName,
         lastName: userSend.lastName,
         login: userSend.login,
+        status: userSend.status,
+        avatar: userSend.avatar,
       },
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     };
-
     this.eventEmitter.emit(
       'chat_message.created',
-      new ChatMessageCreatedEvent(messageToSave),
+      new ChatMessageEvent(messageToSave),
     );
 
     return messageToSave;
@@ -759,15 +888,16 @@ export class ChatService {
     messageId: bigint,
     editMessage: ChatEditMsgDTO,
   ): Promise<ChatMsgInterface> {
+    console.log('jsuis in edit message');
     const message: ChatMessageEntity = await ChatMessageEntity.findOne({
       where: { id: messageId },
       select: ['id', 'text', 'createdAt', 'updatedAt'],
-      relations: ['user', 'room'],
+      relations: ['ownerUser', 'room'],
     });
 
     if (!message) throw new NotFoundException(`Message ${messageId} not found`);
 
-    if (message.user.id !== userId)
+    if (message.ownerUser.id !== userId)
       throw new ForbiddenException(
         `User ${userId} is not owner of message ${messageId}`,
       );
@@ -785,40 +915,45 @@ export class ChatService {
         name: message.room.name,
         isProtected: message.room.isProtected,
       },
-      user: {
-        id: message.user.id,
-        firstName: message.user.firstName,
-        lastName: message.user.lastName,
-        login: message.user.login,
+      ownerUser: {
+        id: message.ownerUser.id,
+        firstName: message.ownerUser.firstName,
+        lastName: message.ownerUser.lastName,
+        login: message.ownerUser.login,
+        status: message.ownerUser.status,
+        avatar: message.ownerUser.avatar,
       },
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     };
-
-    // this.eventEmitter.emit('chat_message.edited', new ChatMessageEditedEvent(resultMessage));
-
+    console.log("j'enoie");
+    this.eventEmitter.emit(
+      'chat_message.edited',
+      new ChatMessageEvent(resultMessage),
+    );
     return resultMessage;
   }
 
-  async deleteMessage(userId: bigint, messageId: bigint): Promise<any> {
+  async deleteMessage(userId: bigint, messageId: bigint): Promise<boolean> {
     const message: ChatMessageEntity = await ChatMessageEntity.findOne({
       where: { id: messageId },
-      select: ['id', 'text', 'createdAt', 'updatedAt'],
-      relations: ['user', 'room'],
+      relations: ['ownerUser', 'room'],
     });
 
     if (!message) throw new NotFoundException(`Message ${messageId} not found`);
 
-    if (message.user.id !== userId)
+    if (message.ownerUser.id !== userId)
       throw new ForbiddenException(
         `User ${userId} is not owner of message ${messageId}`,
       );
+    const result = await ChatMessageEntity.delete({ id: messageId });
+    if (!result) return false;
 
-    const result = await message.remove();
-    if (!result) return 0;
-
-    // this.eventEmitter.emit('chat_message.deleted', new ChatMessageDeletedEvent(messageId));
-    return 1;
+    this.eventEmitter.emit(
+      'chat_message.deleted',
+      new ChatMessageEvent(message),
+    );
+    return true;
   }
 
   async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
@@ -909,7 +1044,7 @@ export class ChatService {
       .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
       .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('chat_rooms.acceptedUsers', 'acceptedUsers')
-      .leftJoinAndSelect('messages.user', 'ownerMessage')
+      .leftJoinAndSelect('messages.ownerUser', 'ownerMessage')
       .select([
         'chat_rooms',
         'ownerUser.id',
@@ -947,31 +1082,5 @@ export class ChatService {
       .where('chat_rooms.id = :roomId', { roomId })
       .getOne();
     return room;
-  }
-
-  async getRoomAllMessages(roomId: bigint): Promise<ChatRoomInterface> {
-    const room: ChatRoomEntity = await this.roomRepository
-      .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.messages', 'messages')
-      .leftJoinAndSelect('messages.user', 'ownerMessage')
-      .select([
-        'chat_rooms.id',
-        'chat_rooms.type',
-        'chat_rooms.name',
-        'messages.id',
-        'messages.text',
-        'messages.createdAt',
-        'messages.updatedAt',
-        'ownerMessage.id',
-        'ownerMessage.firstName',
-        'ownerMessage.lastName',
-        'ownerMessage.login',
-      ])
-      .where('chat_rooms.id = :roomId', { roomId })
-      .orderBy('messages.createdAt', 'DESC')
-      .getOne();
-    if (!room) throw new NotFoundException(`Room ${roomId} does not exist`);
-    const result: ChatRoomInterface = { ...room };
-    return result;
   }
 }

@@ -15,6 +15,7 @@ import { faker } from '@faker-js/faker';
 export default function FakeConnection() {
   const [login, setLogin] = useState<string>('login1');
   const [password, setPassword] = useState<string>('Password1!');
+  const [usersCreated, setUsersCreated] = useState<UserInterface[]>([]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -62,7 +63,7 @@ export default function FakeConnection() {
 
 
   // fack user generator
-  async function createUser() {
+  async function createUser(): Promise<UserInterface | null> {
     
     const data = {
       'firstName': faker.person.firstName(),
@@ -77,14 +78,17 @@ export default function FakeConnection() {
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
-    } else {
-      console.log('user created');
-    }
+      return null;
+    } else
+      return res;
+
   }
 
   async function createUsers() {
     for (let i = 0; i < 10; i++) {
-      await createUser();
+      const res = await createUser();
+      if (!res) return;
+      setUsersCreated(prev => [...prev, res]);
     }
   }
 
@@ -149,6 +153,17 @@ export default function FakeConnection() {
 
         </Box>
       </div>
+
+      {usersCreated.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-bold">Users created</h2>
+          <ul>
+            {usersCreated.map((u, i) => (
+              <li key={i}>{u.login}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

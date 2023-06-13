@@ -35,7 +35,6 @@ export class MessagerieWebsocketService {
     @MessageBody() data: { user1Id: string; user2Id: string },
     @ConnectedSocket() client: Socket,
   ) {
-    // console.log('je suis : ', req.user);
     const privateRoomName = this.PrivateRoomName(data.user1Id, data.user2Id);
     client.join(privateRoomName);
     console.log('joined private room', privateRoomName, data);

@@ -7,40 +7,25 @@ import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { Link } from 'react-router-dom';
 // import { RootState } from '../../../store';
 
 interface ConvProps {
   conv: ConversationInterface,
-  setConvSelectedId: React.Dispatch<React.SetStateAction<number>>,
-  setServiceToCall: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ConversationListUserItem: React.FC<ConvProps> = ({
   conv,
-  setConvSelectedId,
-  setServiceToCall,
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   // const { conversationsList } = useSelector((state: RootState) => state.chat);
-
   async function handleCloseConv(
     e: React.MouseEvent<HTMLButtonElement>,
   ) {
     e.stopPropagation();
     dispatch(reduxRemoveConversationToList(conv));
-    setConvSelectedId(-1);
   }
-
-  // useEffect(() => {
-  //   console.log('conv: ', conv);
-  // }, [conv]);
-
-  const handleClickRaw = () => {
-    setServiceToCall('privateConversation');
-    setConvSelectedId(conv.id);
-  };
-
 
   return (
     <div>
@@ -48,15 +33,10 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
         cursor-pointer flex flex-row items-center text-left"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={handleClickRaw}
+        // onClick={handleClickRaw}
       >
-        <div className="flex flex-grow text-black m-2 items-center "
-          // onClick={() => {
-          //   setCurrentChatUserId(userFriend.id);
-          //   // setOpen(false);
-          //   setServiceToCall('privateConversation');
-          // }}
-        >
+        <Link to={'conv/' + conv.id + '/' + conv.user.id + '/' + conv.user.login} 
+          className="flex flex-grow text-black p-1 pl-2 items-center ">
           <Badge
             color={ 
               conv.user.status === 'online' ? 'success' :
@@ -92,7 +72,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
           >
             {conv.user.login.length > 15 ? conv.user.login.slice(0, 12) + '...' : conv.user.login}
           </Typography>
-        </div>
+        </Link>
 
         <Tooltip
           title="Close conversation" arrow

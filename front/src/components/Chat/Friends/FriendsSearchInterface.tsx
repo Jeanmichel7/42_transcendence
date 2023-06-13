@@ -23,6 +23,7 @@ export default function FriendsSearch() {
 
   useEffect(() => {
     async function fetchUsers() {
+      if ( !userData || !userFriends || !userBlocked || !waitingFriendsRequestSent ) return;
       setIsLoading(true);
       const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers();
       setIsLoading(false);
@@ -33,23 +34,19 @@ export default function FriendsSearch() {
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id &&
           !userFriends?.find((f: UserInterface) => f.id === u.id) &&
-          !userBlocked?.find((f: UserInterface) => f.id === u.id) &&
-          !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
+          !userBlocked?.find((f: UserInterface) => f.id === u.id),
         );
         setUsers(resFiltered);
       }
       setSelectedUser(null);
     }
     fetchUsers();
-  }, [dispatch,,
-    userData.id,
-    userFriends,
-    userBlocked,
-    waitingFriendsRequestSent,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, waitingFriendsRequestSent]);
 
 
   function isMyFriend(userId: number): boolean {
+    if (!userFriends) return false;
     return !!userFriends?.find((friend: UserInterface) => friend.id === userId);
   }
 
@@ -65,15 +62,9 @@ export default function FriendsSearch() {
       setSelectedUser(null);
     }
   };
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData || !users)
-    return <p>Loading...</p>;
-
 
   return (
-    <div className="h-full">
+    <>
       <div className='flex p-3 border'>
         <Autocomplete
           id="searchFriends"
@@ -91,10 +82,22 @@ export default function FriendsSearch() {
           onClick={() => handleRequestAddFriend(selectedUser)}
           variant="contained"
           color="primary"
-          sx={{ ml: 2, height: '40px', alignSelf: 'center' }}
+          sx={{ ml: 2, height: '40px', alignSelf: 'center',
+            visibility: !selectedUser || isMyFriend(selectedUser.id) ? 'hidden' : 'visible',
+          }}
         > Add </Button>
       </div>
-
+      { isLoading && 
+        <CircularProgress 
+          size={100}
+          color='primary'
+          sx={{
+            position: 'absolute',
+            top: '25%',
+            left: '50%',
+          }}
+        /> 
+      }
       <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
         {users.map((user: UserInterface) => {
           if (user.id != userData.id && !isMyFriend(user.id))
@@ -106,7 +109,6 @@ export default function FriendsSearch() {
             );
         })}
       </div>
-
-    </div>
+    </>
   );
 }

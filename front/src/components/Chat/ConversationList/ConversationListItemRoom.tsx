@@ -10,18 +10,19 @@ import { CircularProgress, IconButton, Tooltip, Typography, Zoom } from '@mui/ma
 import GroupIcon from '@mui/icons-material/Group';
 import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { Link } from 'react-router-dom';
 
 
 interface ConvProps {
   conv: ConversationInterface,
-  setConvSelectedId: React.Dispatch<React.SetStateAction<number>>,
-  setServiceToCall: React.Dispatch<React.SetStateAction<string>>
+  // setConvSelectedId: React.Dispatch<React.SetStateAction<number>>,
+  // setServiceToCall: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ConversationListRoomItem: React.FC<ConvProps> = ({
   conv,
-  setConvSelectedId,
-  setServiceToCall,
+  // setConvSelectedId,
+  // setServiceToCall,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -53,11 +54,6 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
     // }
   };
 
-  const handleClickRaw = () => {
-    setServiceToCall('channelConversation');
-    setConvSelectedId(conv.id);
-  };
-
   return (
     <div>
       <div className="border hover:bg-gray-100 transition-all 
@@ -65,8 +61,8 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="flex flex-grow text-black m-2 items-center "
-          onClick={handleClickRaw}
+        <Link to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name} 
+          className="flex flex-grow text-black p-1 pl-2 items-center "
         >
           <div className='flex flex-row items-center mr-2 bg-[#b2bdc3] rounded-full p-2'>
             <GroupIcon />
@@ -79,7 +75,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           >
             {conv.room.name.length > 15 ? conv.room.name.slice(0, 12) + '...' : conv.room.name}
           </Typography>
-        </div>
+        </Link>
 
 
         <Tooltip

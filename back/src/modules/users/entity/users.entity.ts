@@ -121,7 +121,7 @@ export class UserEntity extends BaseEntity {
   messagesReceive: MessageEntity[];
 
   /* chat */
-  @OneToMany(() => ChatMessageEntity, (message) => message.user, {
+  @OneToMany(() => ChatMessageEntity, (message) => message.ownerUser, {
     cascade: true,
   })
   chatMessages: ChatMessageEntity[];

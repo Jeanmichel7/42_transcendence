@@ -9,6 +9,15 @@ export interface MessageInterface {
   destUser: UserInterface;
 }
 
+export interface ChatMsgInterface {
+  id: number;
+  text: string;
+  room: RoomInterface;
+  ownerUser: UserInterface;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface RoomInterface {
   id: number;
   name: string;
@@ -26,14 +35,7 @@ export interface RoomInterface {
   acceptedUsers?: UserInterface[];
 }
 
-export interface ChatMsgInterface {
-  id: number;
-  text: string;
-  room: RoomInterface;
-  user: UserInterface;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+
 
 export interface ConversationInterface {
   id: number;
