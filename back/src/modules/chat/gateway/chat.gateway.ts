@@ -34,7 +34,7 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.join(data.roomId.toString());
-    console.log('joined chat room', data.roomId);
+    console.log('JOINED chat room', data.roomId);
     // client.emit('room_joined', `User joined room: ${data.roomId}`);
     // this.server.to(data.roomId.toString()).emit('room_joined', `User joined room`);
     // this.server.to(msg.room.id.toString()).emit('chat_message', msg, (ack) => {
@@ -52,7 +52,7 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.leave(data.roomId.toString());
-    console.log('left private room', data.roomId);
+    console.log('DISCONNECT TO room', data.roomId);
   }
 
   emitMessage(message: ChatMsgInterface) {

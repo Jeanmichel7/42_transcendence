@@ -96,11 +96,13 @@ export class MessageService {
     page: number,
     offset: number,
   ): Promise<MessageBtwTwoUserInterface[]> {
+    if (page < 1) page = 1;
+    if (offset < 0) offset = 0;
+    if (offset > limit) {
+      page = page + Math.floor(offset / limit);
+      offset = offset % limit;
+    }
     const skip = (page - 1) * limit - offset;
-    if (skip < 0)
-      throw new NotFoundException(
-        `Page ${page} does not exist or offset ${offset} is too big`,
-      );
     const messages: MessageEntity[] = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.ownerUser', 'ownerUser')
@@ -218,7 +220,6 @@ export class MessageService {
       },
       where: { id: newMessage.id },
     });
-    console.error('emet event message.created');
     this.eventEmitter.emit('message.created', new MessageCreatedEvent(result));
     return result;
   }
@@ -231,7 +232,6 @@ export class MessageService {
     const messageToUpdate = await this.findMsgWithRelationOwner(messageId);
     if (!messageToUpdate)
       throw new NotFoundException(`Message with id ${messageId} not found`);
-    console.log('messageToUpdate', messageToUpdate);
     if (messageToUpdate.ownerUser.id !== user.id && user.role !== 'admin')
       throw new ForbiddenException(`You can't update this message`);
 

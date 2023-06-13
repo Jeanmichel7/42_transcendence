@@ -43,7 +43,7 @@ export class ChatService {
     userId: bigint,
     roomToCreate: ChatCreateRoomDTO,
   ): Promise<ChatRoomInterface> {
-    console.log('data room creation : ', roomToCreate);
+    // console.log('data room creation : ', roomToCreate);
 
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
@@ -72,7 +72,7 @@ export class ChatService {
           return userAccepted;
         }),
       );
-      console.log('allUsersAccepted', allUsersAccepted);
+      // console.log('allUsersAccepted', allUsersAccepted);
     }
     let usersInRoom: UserEntity[] = [user];
     if (roomToCreate.acceptedUsers) {
@@ -217,7 +217,7 @@ export class ChatService {
     roomId: bigint,
     data: ChatJoinRoomDTO,
   ): Promise<ChatRoomInterface> {
-    console.log('data join room : ', data);
+    // console.log('data join room : ', data);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id'],
@@ -771,11 +771,13 @@ export class ChatService {
     page: number,
     offset: number,
   ): Promise<ChatMsgInterface[]> {
+    if (page < 1) page = 1;
+    if (offset < 0) offset = 0;
+    if (offset > limit) {
+      page = page + Math.floor(offset / limit);
+      offset = offset % limit;
+    }
     const skip = (page - 1) * limit - offset;
-    if (skip < 0)
-      throw new NotFoundException(
-        `Page ${page} does not exist or offset ${offset} is too big`,
-      );
 
     const messages: ChatMessageEntity[] = await this.messageRepository
       .createQueryBuilder('chat_messages')
@@ -811,7 +813,6 @@ export class ChatService {
       .take(limit)
       .getMany();
 
-    // console.log('tets users room : ', messages[0].room);
     //check user is in room
     if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
       throw new ForbiddenException(
@@ -853,8 +854,6 @@ export class ChatService {
     await userSend.save();
     room.messages = [...room.messages, message];
     await room.save();
-    console.log('message entity : ', message);
-    console.log('room entity : ', room);
     const messageToSave: ChatMsgInterface = {
       id: message.id,
       text: message.text,
@@ -888,7 +887,6 @@ export class ChatService {
     messageId: bigint,
     editMessage: ChatEditMsgDTO,
   ): Promise<ChatMsgInterface> {
-    console.log('jsuis in edit message');
     const message: ChatMessageEntity = await ChatMessageEntity.findOne({
       where: { id: messageId },
       select: ['id', 'text', 'createdAt', 'updatedAt'],
@@ -926,7 +924,6 @@ export class ChatService {
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     };
-    console.log("j'enoie");
     this.eventEmitter.emit(
       'chat_message.edited',
       new ChatMessageEvent(resultMessage),

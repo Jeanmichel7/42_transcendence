@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
@@ -22,16 +22,16 @@ const ChannelConversation: React.FC = () => {
   const dispatch = useDispatch();
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
+  const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
   const [text, setText] = useState<string>('');
-  const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
-
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   // connect socket
   const connectSocketChat = useCallback(() => {
@@ -83,16 +83,7 @@ const ChannelConversation: React.FC = () => {
       roomId: id,
     });
 
-    return () => {
-      socket.off('chat_message');
-      socket.off('chat_message_edit');
-      socket.off('chat_message_delete');
-      socket.emit('leaveRoom', {
-        roomId: id,
-      });
-      socket.disconnect();
-    };
-
+    socketRef.current = socket;
   }, [id]);
 
   // get messages
@@ -131,10 +122,23 @@ const ChannelConversation: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageDisplay]);
 
+
   
   useEffect(() => {
     connectSocketChat();
-  }, [connectSocketChat]);
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('chat_message');
+        socketRef.current.off('chat_message_edit');
+        socketRef.current.off('chat_message_delete');
+        socketRef.current.emit('leaveRoom', {
+          roomId: id,
+        });
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [connectSocketChat, id]);
 
   useEffect(() => {
     fetchOldMessages();
@@ -148,6 +152,7 @@ const ChannelConversation: React.FC = () => {
     console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
 
 
 

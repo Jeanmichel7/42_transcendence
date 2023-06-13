@@ -6,9 +6,8 @@ import { ConversationInterface } from '../../../types';
 import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import CloseIcon from '@mui/icons-material/Close';
 import { Link } from 'react-router-dom';
-// import { RootState } from '../../../store';
 
 interface ConvProps {
   conv: ConversationInterface,
@@ -80,10 +79,10 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
           TransitionProps={{ timeout: 600 }}
         >
           <IconButton 
-            onClick={(e) => handleCloseConv(e)} color='error'
+            onClick={(e) => handleCloseConv(e)} color='warning'
             sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
           >
-            <ExitToAppIcon />
+            <CloseIcon />
           </IconButton>
         </Tooltip>
 

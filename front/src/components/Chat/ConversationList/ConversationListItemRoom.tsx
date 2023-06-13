@@ -79,19 +79,6 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
 
 
         <Tooltip
-          title="Close group" arrow
-          TransitionComponent={Zoom}
-          TransitionProps={{ timeout: 600 }}
-        >
-          <IconButton 
-            onClick={(e) => handleCloseConv(e)} color='warning'
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip
           title="Leave room" arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
@@ -104,10 +91,20 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           </IconButton>
         </Tooltip>
 
+        <Tooltip
+          title="Close group" arrow
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 600 }}
+        >
+          <IconButton 
+            onClick={(e) => handleCloseConv(e)} color='warning'
+            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Tooltip>
 
         { isLoading && <CircularProgress />}
-
-
       </div>
     </div>
   );

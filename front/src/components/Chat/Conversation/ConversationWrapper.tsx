@@ -15,8 +15,8 @@ const ConversationWrapper = () => {
 
   return (
     <>
-    { login && <PrivateConversation key={convId} /> }
-    { name  && <ChannelConversation key={convId} /> }
+      { login && <PrivateConversation key={convId} /> }
+      { name  && <ChannelConversation key={convId} /> }
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
@@ -36,101 +36,106 @@ const PrivateConversation: React.FC = () => {
   
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
-  useEffect(() => {
-    const connectSocket = () => {
-      if (id == '-1' || userData.id == -1 ) return;
-      console.log('connectSocket user ', id);
-      const socket = io('http://localhost:3000/messagerie', {
-        reconnectionDelayMax: 10000,
-        withCredentials: true,
+  const fetchOldMessages = useCallback(async () => {
+    console.log('fetchOldMessages');
+    if (id == '-1' || userData.id == -1 ) return;
+    setShouldScrollToBottom(false);
+
+    // setIsLoadingPagination(true);
+    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
+    // setIsLoadingPagination(false);
+
+    if ('error' in allMessages)
+      dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
+    else {
+      if (allMessages.length === 0) return;
+      //save pos scrool
+      const scrollContainer = document.querySelector('.overflow-y-auto');
+      if (!scrollContainer) return;
+      const oldScrollHeight = scrollContainer.scrollHeight;
+
+      if (pageDisplay === 1) {
+        setMessages(allMessages.reverse());
+      } else {
+        const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
+        setMessages((prev) => [...reversedMessageArray, ...prev]);
+      }
+
+      //set pos scrool to top old messages
+      requestAnimationFrame(() => {
+        const newScrollHeight = scrollContainer.scrollHeight;
+        scrollContainer.scrollTop += newScrollHeight - oldScrollHeight;
+        setShouldScrollToBottom(true);
       });
-  
-      //listen on /message
-      socket.on('message', (message) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          message,
-        ]);
-        setOffsetPagniation((prev) => prev + 1);
-      });
-  
-      socket.on('editMessage', (message) => {
-        setMessages((prevMessages) => {
-          const newMessages = prevMessages.map((msg) => {
-            if (msg.id === message.id) {
-              return { ...msg, text: message.text, updatedAt: message.updatedAt };
-            }
-            return msg;
-          });
-          return newMessages;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userData.id, pageDisplay]);
+
+  const connectSocket = useCallback(() => {
+    if (id == '-1' || userData.id == -1 ) return;
+    console.log('connectSocket user ', id);
+    const socket = io('http://localhost:3000/messagerie', {
+      reconnectionDelayMax: 10000,
+      withCredentials: true,
+    });
+
+    //listen on /message
+    socket.on('message', (message) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        message,
+      ]);
+      setOffsetPagniation((prev) => prev + 1);
+    });
+
+    socket.on('editMessage', (message) => {
+      setMessages((prevMessages) => {
+        const newMessages = prevMessages.map((msg) => {
+          if (msg.id === message.id) {
+            return { ...msg, text: message.text, updatedAt: message.updatedAt };
+          }
+          return msg;
         });
+        return newMessages;
       });
-  
-      socket.on('deleteMessage', (message) => {
-        setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
-        setOffsetPagniation((prev) => prev - 1);
-      });
-  
-      socket.on('error', (error) => { console.log('erreur socket : ', error); });
-  
-      //connect to room
-      socket.emit('joinPrivateRoom', {
-        user1Id: userData.id,
-        user2Id: id,
-      });
-  
-      return () => {
-        socket.off('message');
-        socket.off('editMessage');
-        socket.off('deleteMessage');
-        socket.emit('leavePrivateRoom', {
-          user1Id: userData.id,
-          user2Id: id,
-        });
-        socket.disconnect();
-      };
-    };
-    connectSocket();
+    });
+
+    socket.on('deleteMessage', (message) => {
+      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
+      setOffsetPagniation((prev) => prev - 1);
+    });
+
+    socket.on('error', (error) => { console.log('erreur socket : ', error); });
+
+    socket.emit('joinPrivateRoom', {
+      user1Id: userData.id,
+      user2Id: id,
+    });
+
+    socketRef.current = socket;
   }, [userData.id, id]);
 
   useEffect(() => {
-    const fetchOldMessages = async () => {
-      console.log('fetchOldMessages');
-      if (id == '-1' || userData.id == -1 ) return;
-      setShouldScrollToBottom(false);
-  
-      // setIsLoadingPagination(true);
-      const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
-      // setIsLoadingPagination(false);
-  
-      if ('error' in allMessages)
-        dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
-      else {
-        if (allMessages.length === 0) return;
-        //save pos scrool
-        const scrollContainer = document.querySelector('.overflow-y-auto');
-        if (!scrollContainer) return;
-        const oldScrollHeight = scrollContainer.scrollHeight;
-  
-        if (pageDisplay === 1) {
-          setMessages(allMessages.reverse());
-        } else {
-          const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-          setMessages((prev) => [...reversedMessageArray, ...prev]);
-        }
-  
-        //set pos scrool to top old messages
-        requestAnimationFrame(() => {
-          const newScrollHeight = scrollContainer.scrollHeight;
-          scrollContainer.scrollTop += newScrollHeight - oldScrollHeight;
-          setShouldScrollToBottom(true);
-        });
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    connectSocket();
+    return () => {
+      console.log('disconnectSocket');
+      if (socketRef.current === null) return;
+      socketRef.current.off('message');
+      socketRef.current.off('editMessage');
+      socketRef.current.off('deleteMessage');
+      socketRef.current.emit('leavePrivateRoom', {
+        user1Id: userData.id,
+        user2Id: id,
+      });
+      socketRef.current.disconnect();
     };
+  }, [userData.id, id, connectSocket]);
+
+  useEffect(() => {
     fetchOldMessages();
-  }, [pageDisplay, id, userData.id]);
+  }, [pageDisplay, id, userData.id, fetchOldMessages]);
 
 
 
