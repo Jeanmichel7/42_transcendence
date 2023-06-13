@@ -30,7 +30,7 @@ function SearchingOpponent({
       <DotWaitings />
       <StyledButton
         onClick={() => {
-          socket.emit('searchOpponent', 'cancel',);
+          socket.emit('userGameStatus', 'cancel',);
           setCurrentPage('lobby');
         }}
       >

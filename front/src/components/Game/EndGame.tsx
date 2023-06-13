@@ -59,7 +59,7 @@ function Loose({
       )}
       <StyledTitle>Vainqueur: {lastGameInfo.current.winnerName}</StyledTitle>
       <StyledTitle>Perdant: {lastGameInfo.current.looserName}</StyledTitle>
-      <StyledRetryButton onClick={() => setCurrentPage('searchOpponent')}>Rejouer</StyledRetryButton>
+      <StyledRetryButton onClick={() => setCurrentPage('searchOpponent')}>Proposer une nouvelle partie</StyledRetryButton>
     </LooseWrapper>
   );
 }

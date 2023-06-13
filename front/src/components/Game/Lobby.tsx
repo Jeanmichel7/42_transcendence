@@ -46,7 +46,7 @@ function Lobby({
           setCurrentPage('searchOpponent');
         }}
       >
-        Search Oponent Normal Mode
+        Normal Mode
       </StyledButton>
       <StyledButton
         onClick={() => {
@@ -58,7 +58,7 @@ function Lobby({
           setCurrentPage('searchOpponent');
         }}
       >
-        Search Oponent Bonus Mode
+        Bonus Mode
       </StyledButton>
     </ButtonWrapper>
   );

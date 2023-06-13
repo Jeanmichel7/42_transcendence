@@ -103,7 +103,8 @@ export class GameEvents {
     }
     console.log('userGameStatus: ' + message);
     if (message === 'cancel') {
-      this.gameService.removeFromQueue(client.id);
+      console.log('canceling search for: ' + client.id);
+      this.gameService.removeFromQueue(client.data.userId);
       return;
     } else if (message === 'searchNormal' || message === 'searchBonus') {
       const opponent = this.gameService.addToQueue(

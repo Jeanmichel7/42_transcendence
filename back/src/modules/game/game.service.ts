@@ -6,7 +6,7 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 1;
+const SCORE_FOR_WIN = 5;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = 
@@ -123,10 +123,10 @@ export class Game {
       let x; 
       do 
       x = Math.random() * GROUND_MAX_SIZE;
-      while (x > RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 && x < RACKET_RIGHT_POS_X_10);
+      while (x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 || x > RACKET_RIGHT_POS_X_10);
       console.log('x : ', x);
       this.bonus = {
-        x: Math.random() * GROUND_MAX_SIZE,
+        x: x, 
         y: Math.random() * GROUND_MAX_SIZE,
         //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
         boxSize: 50,
@@ -279,7 +279,6 @@ export class Game {
     if(this.bonus === null && currentTime - this.bonusesLastGeneration > 20000) {  
       this.bonusesLastGeneration = currentTime;
       this.generateBonus();
-      console.log('generate bonus');
     }
     if (this.checkBonusCollision()){
       this.assignRandomBonus(); 
@@ -314,7 +313,6 @@ export class Game {
       this.ball.y <= this.racketLeft + this.racketLeftHeight &&
       !this.fail
     ) {
-      console.log('fail');
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
     
         const racketCenter = this.racketLeft + this.racketLeftHeight / 2 ;
@@ -357,14 +355,11 @@ export class Game {
         RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS - 200 &&
       !this.isOver
     ) {
-      if (this.player1Score > SCORE_FOR_WIN) {
+      this.player2Score += 1;
+      if (this.player2Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player1Username;
-        console.log('game over');
-        console.log(this.winner);
       } else {
-        this.player1Score += 1;
-        console.log(this.player1Score);
         this.ball.x = 500;
         this.ball.y = 500;
         this.ball.vx = INITIAL_BALL_SPEED;
@@ -378,13 +373,11 @@ export class Game {
       this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS + 200 &&
       !this.isOver
     ) {
-      if (this.player2Score > SCORE_FOR_WIN) {
+        this.player1Score += 1;
+      if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player2Username;
-        console.log('game over');
-        console.log(this.winner);
       } else {
-        this.player2Score += 1;
         this.ball.x = 500;
         this.ball.y = 500;
         this.ball.vy = 0;
@@ -491,7 +484,6 @@ export class GameService {
   }
   updateGame(game: Game) {
     game.updateBallPosition();
-    console.log(game.isOver );
     if (game.isOver) {
       this.games.delete(game.id);
     }
@@ -586,10 +578,14 @@ export class GameService {
   }
   }
 
-  removeFromQueue(SocketId: string) {
-    if (this.playerWaiting1Normal === SocketId) {
+  removeFromQueue(Username: string) {
+    if (this.playerWaiting1Normal?.username === Username) {
       this.playerWaiting1Normal = undefined;
-      console.log('player1 removed from queue');
+      console.log('remove from queue');
+    }
+    else if (this.playerWaiting1Bonus?.username === Username) {
+      this.playerWaiting1Bonus = undefined;
+      console.log('remove from queue');
     }
   }
 

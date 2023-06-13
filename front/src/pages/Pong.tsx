@@ -55,6 +55,7 @@ width: 10px;
 height: 10px;
 border : 1px solid red;
 position: absolute;
+transform: translate(-50%, -50%);
 left: ${(props) => props.posX}px;
 top: ${(props) => props.posY}px;
 `
@@ -345,7 +346,7 @@ function Game({
           } else {
             lastGameInfo.current.win = false;
           }
-          lastGameInfo.current.looserName = gameData.current.player1Score;
+          lastGameInfo.current.looserName = gameData.current.player1Username;
         } else {
           if (gameData.current.winner === gameData.current.player1Username) {
             lastGameInfo.current.win = false;
@@ -397,7 +398,7 @@ function Game({
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
         {gameData.current.bonus &&  <Bonus posX={bonusPositionRef.current.x *  (gameDimensions.current.width / 1000)} posY={bonusPositionRef.current.y * (gameDimensions.current.height / 1000)} />}
-        {gameData.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
+        {gameData.current.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
 
 <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={"right" } >
   {laser.current.right && <Laser type={"right"} />}
