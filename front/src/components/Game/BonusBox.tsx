@@ -4,6 +4,7 @@ import laser from '../../assets/laser.png';
 import slow from '../../assets/slow.png';
 import bigRacket from '../../assets/bigRacket.png';
 import spriteBonusSelection from '../../assets/spriteBonusSelection.png';
+import { pulsate } from './NeonStyle';
 
 // Précharger les images
 const images = [laser, slow, bigRacket];
@@ -62,6 +63,15 @@ const BonusBoxWrapper = styled.div`
   position: absolute;
   left: 25px;
   top: 25px;
+  border: 0.2rem solid #fff;
+  border-radius: 2rem;
+  padding: 0.4em;
+  box-shadow: 0 0 .2rem #fff,
+            0 0 .2rem #fff,
+            0 0 2rem #bc13fe,
+            0 0 0.8rem #bc13fe,
+            0 0 2.8rem #bc13fe,
+            inset 0 0 1.3rem #bc13fe; 
   background-image: ${props => props.isLoading ? `url(${spriteBonusSelection})` : getBonusImage(props.bonusName)};
   background-size: cover;
   ${props => props.isLoading && css`
