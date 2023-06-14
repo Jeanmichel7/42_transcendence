@@ -56,7 +56,7 @@ export class ChatController {
   @Get('rooms/:roomId')
   async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
-    console.log('return room : ', room);
+    // console.log('return room : ', room);
     return room;
   }
 

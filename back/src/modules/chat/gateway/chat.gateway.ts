@@ -9,6 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 // import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
 import { ChatMsgInterface } from '../interfaces/chat.message.interface';
+import { ChatRoomInterface } from '../interfaces/chat.room.interface';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -55,7 +56,7 @@ export class ChatGateway {
     console.log('DISCONNECT TO room', data.roomId);
   }
 
-  emitMessage(message: ChatMsgInterface) {
+  emitNewMessage(message: ChatMsgInterface) {
     console.log(
       'send to room : ',
       message.room.id.toString(),
@@ -73,6 +74,7 @@ export class ChatGateway {
       });
   }
 
+  /* MESSAGE */
   emitEditMessage(message: ChatMsgInterface) {
     this.server
       .to(message.room.id.toString())
@@ -85,5 +87,14 @@ export class ChatGateway {
       .to(message.room.id.toString())
       .emit('chat_message_delete', message);
     console.log('message deleted in room' + message.room.id, message);
+  }
+
+  /* ROOM */
+  emitLeaveRoom(roomId: bigint, userId: bigint, userLogin: string) {
+    console.log('emit leave room', roomId.toString(), userId, userLogin);
+    this.server
+      .to(roomId.toString())
+      .emit('room_leave', roomId, userId, userLogin);
+    console.log('user ' + userLogin + ' leave room ' + roomId);
   }
 }

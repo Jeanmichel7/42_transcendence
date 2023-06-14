@@ -19,7 +19,11 @@ import { ChatRoomEntity, UserEntity, ChatMessageEntity } from 'config';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 
-import { ChatMessageEvent } from './event/chat.event';
+import {
+  BotChatMessageEvent,
+  ChatMessageEvent,
+  ChatRoomEvent,
+} from './event/chat.event';
 
 const limit = 20;
 
@@ -321,7 +325,7 @@ export class ChatService {
   async leaveRoom(userId: bigint, roomId: bigint): Promise<ChatRoomInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers'],
     });
 
@@ -342,9 +346,9 @@ export class ChatService {
     user.roomUsers = user.roomUsers.filter((r) => r.id !== room.id);
     await user.save();
 
-    const resultRoom: ChatRoomInterface = await this.roomRepository
+    const resultRoom: ChatRoomEntity = await this.roomRepository
       .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoin('chat_rooms.ownerUser', 'ownerUser')
       .select([
         'chat_rooms',
         'ownerUser.id',
@@ -355,7 +359,23 @@ export class ChatService {
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
-    // this.eventEmitter.emit('chat_rooms.leave', new ChatLeaveRoomEvent(resultRoom, user.id.toString()));
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${user.login} has left the room`,
+    };
+
+    const res = await this.createMessage(newBotMessage, 0, roomId);
+    if (!res) throw new Error('Bot message not created');
+    this.eventEmitter.emit(
+      'chat_room.leave',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: user.id,
+        userLogin: user.login,
+        text: `${user.login} has left the room`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -1093,7 +1113,7 @@ export class ChatService {
         'ownerMessage.login',
         'ownerMessage.avatar',
         'ownerMessage.status',
-        'acceptedUsers',        //// a verfier ///
+        'acceptedUsers', //// a verfier ///
         'acceptedUsers.id',
         'acceptedUsers.firstName',
         'acceptedUsers.lastName',

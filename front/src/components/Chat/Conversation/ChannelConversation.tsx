@@ -9,7 +9,7 @@ import MessageItem from './MessageItem';
 import { chatOldMessages, deleteChatMessage, getRoomData, sendChatMessage } from '../../../api/chat';
 
 import { ApiErrorResponse } from '../../../types';
-import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
+import { ChatBotInterface, ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
 import { Button, TextareaAutosize } from '@mui/material';
@@ -32,12 +32,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
 
-
+  // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
   const [room, setRoom] = useState<RoomInterface | null>(null);
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
-  const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
+  const [messages, setMessages] = useState<(ChatMsgInterface | ChatBotInterface)[]>([]);
   const [text, setText] = useState<string>('');
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
@@ -57,9 +57,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     //   console.log('room joined ! ', message);
     // });
 
-    //listen on /message
+    /* MESSAGES */
     socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
-      // console.log('new message : ', message);
       setMessages((prevMessages) => [
         ...prevMessages,
         message,
@@ -69,7 +68,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     });
 
     socket.on('chat_message_edit', (message) => {
-      // console.log('edit message : ', message);
       setMessages((prevMessages) => {
         const newMessages = prevMessages.map((msg) => {
           if (msg.id === message.id) {
@@ -82,10 +80,22 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     });
 
     socket.on('chat_message_delete', (message) => {
-      // console.log('delete message : ', message);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
       setOffsetPagniation((prev) => prev - 1);
     });
+
+
+    /* ROOM */
+    socket.on('room_leave', (roomId, userId, userLogin) => {
+      setRoom((prev) => prev ? { ...prev,
+        users: prev.users?.filter((u) => u.id !== userId) } : null);
+    });
+
+
+
+
+
+
 
     socket.on('error', (error) => { console.log('erreur socket : ', error); });
 
