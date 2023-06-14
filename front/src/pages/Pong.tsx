@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, {keyframes, css} from 'styled-components';
 import EndGame from '../components/Game/EndGame';
 import Score from '../components/Game/Score';
-import { BiWindows } from 'react-icons/bi';
 import { io } from 'socket.io-client';
 import useSocketConnection from '../components/Game/useSocketConnection'; 
 import Lobby from '../components/Game/Lobby'; 
@@ -16,6 +15,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import {Overlay} from '../components/Game/Overlay';
 import CountDown from '../components/Game/CountDown';
 import BonusBox from '../components/Game/BonusBox';
+import spriteBonus from '../assets/spriteBonus.png';    
+import spriteBonusExplode from '../assets/spriteBonusExplode.png';
 
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
@@ -50,15 +51,71 @@ const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
-const Bonus = styled.div`
-width: 10px;
-height: 10px;
-border : 1px solid red;
-position: absolute;
+const animationBonus = keyframes`
+  0% { background-position: 0px; }
+  100% { background-position: -1200px; } // Ajustez en fonction de la taille de votre sprite
+`;
+
+const animationBonusExplode = keyframes`
+  0% { background-position: 0px; opacity: 1; }
+  100% { background-position: -2400px; opacity: 0;}
+  ` // Ajustez en fonction de la taille de votre sprite
+
+  const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+const BonusReady = styled.div`
+  width: 50px; // La largeur d'une image de sprite individuelle
+  height: 50px; // La hauteur de votre sprite
+  background: url(${spriteBonus}) repeat-x;
+  position: absolute;
 transform: translate(-50%, -50%);
 left: ${(props) => props.posX}px;
 top: ${(props) => props.posY}px;
+  animation: ${animationBonus} 1s steps(12) infinite,${fadeIn} 1s ease-in-out;
 `
+
+const BonusExplode = styled.div`
+  width: 200px; // La largeur d'une image de sprite individuelle
+  height: 200px; // La hauteur de votre sprite
+  background: url(${spriteBonusExplode}) repeat-x;
+  position: absolute;
+transform: translate(-50%, -50%);
+left: ${(props) => props.posX}px;
+top: ${(props) => props.posY}px;
+  animation: ${animationBonusExplode} 1s steps(12)  ;
+    animation-fill-mode: forwards;
+`
+  
+
+
+function Bonus({bonus, posX, posY}) {
+    const [isBonusVisible, setIsBonusVisible] = useState(false);
+    const [isBonusExplode, setBonusExplode] = useState(false);
+    const [position, setPosition] = useState([-1, -1]);
+    useEffect(() => {
+        if (bonus !== undefined  && bonus !== null) {
+          console.log('bonus detected', bonus);
+          setBonusExplode(false);
+            setIsBonusVisible(true);
+            setPosition([posX, posY]);
+        } else if (position[0] !== -1) {
+          console.log('bonus not detected');
+            setIsBonusVisible(false);
+            setBonusExplode(true);
+        }
+    }, [bonus]); 
+    return (<div> 
+    {isBonusVisible && <BonusReady posX={position[0]} posY={position[1]}/>}
+    {isBonusExplode && <BonusExplode posX={position[0]} posY={position[1]}/>}
+
+  </div>)
+}
 
 const explodeAnimation = keyframes`
   0% {opacity: 1; }
@@ -87,7 +144,6 @@ const StyledRacket = styled.div.attrs((props) => ({
 
 // Composant Raquette avec le Laser comme enfant
 const Racket = ({ posY, height, type,children }) => {
-  console.log(height);
   const oldheight = useRef(height);
   if (height !== oldheight.current && height !== 0) {
     oldheight.current = height;
@@ -397,8 +453,8 @@ function Game({
         posX={ball.x * (gameDimensions.current.width / 1000)}
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
-        {gameData.current.bonus &&  <Bonus posX={bonusPositionRef.current.x *  (gameDimensions.current.width / 1000)} posY={bonusPositionRef.current.y * (gameDimensions.current.height / 1000)} />}
-        {gameData.current.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
+        {gameData?.current.bonusMode && <Bonus bonus={gameData.current.bonus} posX={(bonusPositionRef?.current?.x ? bonusPositionRef.current.x * (gameDimensions.current.width / 1000) : -1)} posY={(bonusPositionRef?.current?.y ? bonusPositionRef.current.y * (gameDimensions.current.height / 1000) : -1)} />}
+        {gameData?.current.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
 
 <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={"right" } >
   {laser.current.right && <Laser type={"right"} />}

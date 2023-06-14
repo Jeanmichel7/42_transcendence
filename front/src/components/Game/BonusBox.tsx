@@ -3,6 +3,7 @@ import styled, { keyframes, css } from 'styled-components';
 import laser from '../../assets/laser.png';
 import slow from '../../assets/slow.png';
 import bigRacket from '../../assets/bigRacket.png';
+import spriteBonusSelection from '../../assets/spriteBonusSelection.png';
 
 // Précharger les images
 const images = [laser, slow, bigRacket];
@@ -12,20 +13,8 @@ images.forEach((imgSrc) => {
 });
 
 // Keyframes pour l'animation
-const ScrollImages = keyframes`
-  0% {
-    background-image: url(${laser});
-  }
-  33% {
-    background-image: url(${slow});
-  }
-  66% {
-    background-image: url(${bigRacket});
-  }
-  100% {
-    background-image: url(${laser});
-  }
-`;
+
+
 
 const getBonusImage = (bonusName) => {
   switch (bonusName) {
@@ -39,6 +28,32 @@ const getBonusImage = (bonusName) => {
       return null;
   }
 }
+const ScrollImages = keyframes`
+  0% {
+    background-position: 0 0;
+  }
+  33% {
+    background-position: 0 -75px;
+  }
+  66% {
+    background-position: 0 -150px;
+  }
+  100% {
+    background-position: 0 -225px;
+  }
+`;
+
+const WhiteBackground = keyframes`
+  0% {
+    background-color: white;
+  }
+  50% {
+    background-color: #f5f5f5;
+  } 
+  100% {
+    background-color: transparent;
+  }
+  `
 
 const BonusBoxWrapper = styled.div`
   width: 75px;
@@ -47,13 +62,31 @@ const BonusBoxWrapper = styled.div`
   position: absolute;
   left: 25px;
   top: 25px;
+  background-image: ${props => props.isLoading ? `url(${spriteBonusSelection})` : getBonusImage(props.bonusName)};
   background-size: cover;
-  background-image: ${props => props.isLoading ? 'none' : getBonusImage(props.bonusName)};
   ${props => props.isLoading && css`
-    animation: ${ScrollImages} 3s infinite;
+    animation: ${ScrollImages} 0.5s steps(24) infinite;
   `}
-`;
+  ${props =>  !props.isLoading &&  getBonusImage(props.bonusName) && css`
+    animation: ${WhiteBackground} 0.2s linear;
+  `}
 
+`;
+/*
+const BonusBoxWrapper = styled.div`
+  width: 75px;
+  height: 75px;
+  border: 1px solid white;
+  position: absolute;
+  left: 25px;
+  top: 25px;
+  background-repeat: no-repeat;
+  background-size: auto 75px;
+  background-image: ${props => props.isLoading ? `url(${spriteBonusSelection})` : getBonusImage(props.bonusName)};
+  ${props => props.isLoading && css`
+    animation: ${ScrollImages} 3s steps(3) infinite;
+  `}
+`;*/
 function BonusBox({ bonusIsLoading, bonusName}: any) {
   return (
     <BonusBoxWrapper isLoading={bonusIsLoading} bonusName={bonusName}>

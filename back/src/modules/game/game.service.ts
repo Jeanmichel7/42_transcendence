@@ -134,19 +134,23 @@ export class Game {
     }
   }
 
-  checkBonusCollision() {
+checkBonusCollision() {
   
-      if (this.bonus && 
-        this.ball.x + BALL_RADIUS > this.bonus.x &&
-        this.ball.x - BALL_RADIUS < this.bonus.x + this.bonus.boxSize &&
-        this.ball.y + BALL_RADIUS > this.bonus.y &&
-        this.ball.y - BALL_RADIUS < this.bonus.y + this.bonus.boxSize
-      ) {
+  if (this.bonus) {
+    const bonusRadius = this.bonus.boxSize / 2;
+
+    if (
+      this.ball.x + BALL_RADIUS > this.bonus.x - bonusRadius &&
+      this.ball.x - BALL_RADIUS < this.bonus.x + bonusRadius &&
+      this.ball.y + BALL_RADIUS > this.bonus.y - bonusRadius &&
+      this.ball.y - BALL_RADIUS < this.bonus.y + bonusRadius
+    ) {
       return true;
     }
-    return false;
   }
-   
+  
+  return false;
+}
   checkBonusDuration(currentTime: number) {
 
     let toDelete = -1;
