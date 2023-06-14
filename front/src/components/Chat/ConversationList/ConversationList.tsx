@@ -17,7 +17,7 @@ const ConversationList: React.FC = () => {
   }
   return (
     <>
-      <div className='w-full text-center transition-all overflow-auto  max-h-[calc(100vh-180px)]'>
+      <div className='max-h-[calc(100vh-355px)] text-center transition-all overflow-auto'>
         {conversationsList.length === 0 ?
           <p className="text-center">No friends yet</p>
           :
@@ -29,7 +29,7 @@ const ConversationList: React.FC = () => {
                   conv={conv}
                 />
               );
-            } else if ( isRoomInterface(conv.room)) {
+            } else if (isRoomInterface(conv.room)) {
               return (
                 <ConversationListRoomItem 
                   key={conv.id}

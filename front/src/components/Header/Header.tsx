@@ -344,27 +344,32 @@ function Header() {
           {/**
            * Display pages on large screen
            */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' } }}>
+          <Box sx={{ 
+            flexGrow: 1, 
+            display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' },
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}>
             <NavLink to="/game">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Play
               </Button>
             </NavLink>
 
             <NavLink to="/chat">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Chat
               </Button>
             </NavLink>
 
             <NavLink to="/friends">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Friends
               </Button>
             </NavLink>
 
             <NavLink to={'/profile/' + userData.login}>
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Profile
               </Button>
             </NavLink>

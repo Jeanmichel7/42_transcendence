@@ -1,3 +1,4 @@
+import { RoomInterface } from './ChatTypes';
 import { UserInterface } from './UserTypes';
 
 export interface SnackbarInterface {
@@ -16,9 +17,14 @@ export interface PutSnackbarInterface {
   horizontal?: 'left' | 'center' | 'right';
 }
 
-export interface ReduxActionInterface {
+export interface UserActionInterface {
   type: string;
   payload?: UserInterface | UserInterface[];
+}
+
+export interface RoomUserActionInterface {
+  type: string;
+  payload?: RoomInterface;
 }
 
 export interface NotificationInterface {

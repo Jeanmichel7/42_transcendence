@@ -2,7 +2,7 @@ import { Box, Button, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { loginFakeUser, registerFakeUser } from '../api/auth';
 import { useDispatch } from 'react-redux';
-import { ApiErrorResponse, AuthInterface, ReduxActionInterface, UserInterface } from '../types';
+import { ApiErrorResponse, AuthInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { getUserData } from '../api/user';
 import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from '../store/userSlice';
@@ -22,7 +22,7 @@ export default function FakeConnection() {
 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => ReduxActionInterface),
+    action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {

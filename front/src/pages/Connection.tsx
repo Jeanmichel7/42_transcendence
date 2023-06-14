@@ -9,7 +9,7 @@ import { getBlockedUsers, getFriends } from '../api/relation';
 import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice';
 import { FormControl, InputLabel, FormHelperText, Box, OutlinedInput, Button, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ReduxActionInterface, UserInterface } from '../types';
+import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 
 function ConnectPage() {
@@ -27,7 +27,7 @@ function ConnectPage() {
 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => ReduxActionInterface),
+    action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {

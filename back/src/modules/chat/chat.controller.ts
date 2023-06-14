@@ -53,6 +53,13 @@ export class ChatController {
     return rooms;
   }
 
+  @Get('rooms/:roomId')
+  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
+    const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
+    console.log('return room : ', room);
+    return room;
+  }
+
   @Post('rooms/add')
   async createRoom(
     @Req() req: RequestWithUser,
@@ -159,7 +166,7 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeMuted') userIdToBeMuted: bigint,
     @Body() data: ChatMuteUserDTO,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const muteDurationSec = data.muteDurationSec ? data.muteDurationSec : '10';
     const result: ChatRoomInterface = await this.ChatService.muteUser(
       roomId,
@@ -180,11 +187,11 @@ export class ChatController {
 
   // demute user
   @UseGuards(AdminRoomGuard)
-  @Patch('rooms/:roomId/users/:userIdToBeDemuted/demute')
+  @Patch('rooms/:roomId/users/:userIdToBeDemuted/unmute')
   async demuteUser(
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeDemuted') userIdToBeDemuted: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.demuteUser(
       roomId,
       userIdToBeDemuted,
@@ -198,7 +205,7 @@ export class ChatController {
   async kickUser(
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeKicked') userIdToBeKicked: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.kickUser(
       roomId,
       userIdToBeKicked,
@@ -309,26 +316,10 @@ export class ChatController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
+  // @UseGuards(AuthAdmin)
   @Get('rooms/all')
   async getAllRooms(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] = await this.ChatService.getAllRooms();
     return rooms;
   }
-
-  // @UseGuards(AuthAdmin)
-  @Get('rooms/:roomId')
-  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
-    const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
-    return room;
-  }
-
-  // @UseGuards(AuthAdmin)
-  // @Get('rooms/:roomId/messages/all')
-  // async getAllMessages(
-  //   @Param('roomId') roomId: bigint,
-  // ): Promise<ChatRoomInterface> {
-  //   const messages: ChatRoomInterface =
-  //     await this.ChatService.getRoomAllMessages(roomId);
-  //   return messages;
-  // }
 }

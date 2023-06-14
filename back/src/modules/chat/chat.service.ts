@@ -299,6 +299,15 @@ export class ChatService {
         'users.avatar',
         'users.status',
       ])
+      .leftJoin('chat_rooms.admins', 'admins')
+      .addSelect([
+        'admins.id',
+        'admins.firstName',
+        'admins.lastName',
+        'admins.login',
+        'admins.avatar',
+        'admins.status',
+      ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
@@ -641,7 +650,7 @@ export class ChatService {
     await userToBeBanned.save();
 
     room.bannedUsers = [...room.bannedUsers, userToBeBanned];
-    room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
+    // room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -1048,33 +1057,49 @@ export class ChatService {
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
         'users.id',
         'users.firstName',
         'users.lastName',
         'users.login',
+        'users.avatar',
+        'users.status',
         'admins.id',
         'admins.firstName',
         'admins.lastName',
         'admins.login',
+        'admins.avatar',
+        'admins.status',
         'bannedUsers.id',
         'bannedUsers.firstName',
         'bannedUsers.lastName',
         'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
         'mutedUsers.id',
         'mutedUsers.firstName',
         'mutedUsers.lastName',
         'mutedUsers.login',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
         'messages.id',
         'messages.text',
         'messages.createdAt',
+        'messages.updatedAt',
         'ownerMessage.id',
         'ownerMessage.firstName',
         'ownerMessage.lastName',
         'ownerMessage.login',
+        'ownerMessage.avatar',
+        'ownerMessage.status',
+        'acceptedUsers',        //// a verfier ///
         'acceptedUsers.id',
         'acceptedUsers.firstName',
         'acceptedUsers.lastName',
         'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId })
       .getOne();

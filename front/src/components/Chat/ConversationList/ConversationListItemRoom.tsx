@@ -61,19 +61,20 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name} 
+        <Link 
+          to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name} 
+          state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
           <div className='flex flex-row items-center mr-2 bg-[#b2bdc3] rounded-full p-2'>
             <GroupIcon />
           </div>
-          <Typography component="span"
-            sx={{ 
-              overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-            }}
+          <Typography 
+            component="span"
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap' }}
             title={conv.room.name}
           >
-            {conv.room.name.length > 15 ? conv.room.name.slice(0, 12) + '...' : conv.room.name}
+            {conv.room.name.length > 10 ? conv.room.name.slice(0, 7) + '...' : conv.room.name}
           </Typography>
         </Link>
 
@@ -85,7 +86,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         >
           <IconButton 
             onClick={(e) => handleLeaveRoom(e)} color='error'
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '0' }}
           >
             <ExitToAppIcon />
           </IconButton>
@@ -98,7 +99,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         >
           <IconButton 
             onClick={(e) => handleCloseConv(e)} color='warning'
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '1' }}
           >
             <CloseIcon />
           </IconButton>

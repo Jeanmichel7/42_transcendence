@@ -1,26 +1,39 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Socket, io } from 'socket.io-client';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import MessageItem from './MessageItem';
 
-import { chatOldMessages, deleteChatMessage, sendChatMessage } from '../../../api/chat';
+import { chatOldMessages, deleteChatMessage, getRoomData, sendChatMessage } from '../../../api/chat';
 
 import { ApiErrorResponse } from '../../../types';
-import { ChatMsgInterface } from '../../../types/ChatTypes';
+import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
 import { Button, TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useParams } from 'react-router-dom';
+import { RootState } from '../../../store';
+import SideBarAdmin from '../Channel/admin/SidebarAdmin';
 
-const ChannelConversation: React.FC = () => {
+interface ChannelConversationProps {
+  conv: ConversationInterface,
+}
+
+const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const id = (useParams<{ id: string }>().id || '-1') ;
   const name = (useParams<{ name: string }>().name || 'unknown') ;
   const dispatch = useDispatch();
 
+  const { userData } = useSelector((state: RootState) => state.user);
+
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
+
+
+  const [room, setRoom] = useState<RoomInterface | null>(null);
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
@@ -35,19 +48,18 @@ const ChannelConversation: React.FC = () => {
 
   // connect socket
   const connectSocketChat = useCallback(() => {
-    console.log('conection to socket room id : ', id);
     const socket = io('http://localhost:3000/chat', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
 
-    socket.on('room_joined', (message) => {
-      console.log('room joined ! ', message);
-    });
+    // socket.on('room_joined', (message) => {
+    //   console.log('room joined ! ', message);
+    // });
 
     //listen on /message
     socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
-      console.log('new message : ', message);
+      // console.log('new message : ', message);
       setMessages((prevMessages) => [
         ...prevMessages,
         message,
@@ -57,7 +69,7 @@ const ChannelConversation: React.FC = () => {
     });
 
     socket.on('chat_message_edit', (message) => {
-      console.log('edit message : ', message);
+      // console.log('edit message : ', message);
       setMessages((prevMessages) => {
         const newMessages = prevMessages.map((msg) => {
           if (msg.id === message.id) {
@@ -70,8 +82,7 @@ const ChannelConversation: React.FC = () => {
     });
 
     socket.on('chat_message_delete', (message) => {
-      console.log('delete message : ', message);
-      // console.log('message id : ', message.id);
+      // console.log('delete message : ', message);
       setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
       setOffsetPagniation((prev) => prev - 1);
     });
@@ -122,8 +133,25 @@ const ChannelConversation: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageDisplay]);
 
-
+  const fetchRoomData = useCallback(async () => {
+    if (!conv.room.id || conv.room.id === -1) return;
+    const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
+    if ('error' in roomData)
+      dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
+    else {
+      setRoom(roomData);
+      
+    }
+  }, [dispatch, conv]);
   
+  useEffect(() => {
+    if (!room || !userData) return;
+    if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
+  }, [room, userData]);
+
+
+
+
   useEffect(() => {
     connectSocketChat();
     return () => {
@@ -144,14 +172,36 @@ const ChannelConversation: React.FC = () => {
     fetchOldMessages();
   }, [fetchOldMessages]);
 
+  useEffect(() => {
+    fetchRoomData();
+  }, [fetchRoomData, id]);
+  
+  useEffect(() => {
+    console.log('conv : ', conv);
+  }, [conv]);
+
+  useEffect(() => {
+    console.log('room : ', room);
+  }, [room]);
+
+
+
+
+
+
   // scroll to bottom
   useEffect(() => {
     if (shouldScrollToBottom && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+      bottomRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest',
+      });
     }
-    console.log('messages : ', messages);
+    // console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
 
 
 
@@ -228,11 +278,9 @@ const ChannelConversation: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full w-full justify-between">
+
         <div className="w-full flex justify-between items-center text-lg text-blue text-center">
-          <div className="w-full text-center">
-            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
-          </div>
           <Button
             className='text-blue-500'
             onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
@@ -240,13 +288,11 @@ const ChannelConversation: React.FC = () => {
           >
             Invite
           </Button>
-          <Button
-            className='text-blue-500'
-            onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
-            sx={{ mr: 2 }}
-          >
-            Adminitration
-          </Button>
+          <div className="w-full text-center">
+            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+          </div>
+
+          { isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen}/> }
         </div>
 
         <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
@@ -260,6 +306,7 @@ const ChannelConversation: React.FC = () => {
                   message={message}
                   isLoadingDeleteMsg={isLoadingDeleteMsg}
                   handleDeleteMessage={handleDeleteMessage}
+                  isAdminMenuOpen={isAdminMenuOpen}
                 />
               ))}
 

@@ -77,6 +77,7 @@ const helperAddConversationList = (state: ChatState, action: PayloadAction<UserI
       type: action.payload.type,
       isProtected: action.payload.isProtected,
       users: action.payload.users,
+      admins: action.payload.admins,
       // lastMessage: conv.lastMessage,
       // lastMessageDate: conv.lastMessageDate,
     } as RoomInterface;

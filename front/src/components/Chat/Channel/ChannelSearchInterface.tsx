@@ -76,6 +76,7 @@ export default function ChannelSearch() {
         const roomsToFilter = allRooms
           .filter((r: RoomInterface) => !conversationsList.some(cv => isRoomInterface(cv) && cv.name === r.name));
         setRooms(roomsToFilter);
+        console.log(allRooms);
       }
       setSelectedRoom(null);
     }

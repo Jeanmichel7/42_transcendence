@@ -22,12 +22,14 @@ interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
   isLoadingDeleteMsg: boolean;
   handleDeleteMessage: (id: number) => void;
+  isAdminMenuOpen: boolean;
 }
 
 const MessageItem: FC<MessageItemProps> = ({
   message,
   isLoadingDeleteMsg,
   handleDeleteMessage,
+  isAdminMenuOpen,
 }) => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [editMessage, setEditMessage] = useState<boolean>(false);
@@ -170,7 +172,7 @@ const MessageItem: FC<MessageItemProps> = ({
             title="Edit message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && !isAdminMenuOpen && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
             <IconButton onClick={() => setEditMessage(true)} color='primary'>
               <EditOutlinedIcon />
@@ -181,7 +183,7 @@ const MessageItem: FC<MessageItemProps> = ({
             title="Delete message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && !isAdminMenuOpen && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
             <IconButton 
               onClick={handleDelete} 

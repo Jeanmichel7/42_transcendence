@@ -13,8 +13,6 @@ import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
 import CreateGroupInterface from '../components/Chat/Channel/ChannelCreateInterface';
 import ChannelSearch from '../components/Chat/Channel/ChannelSearchInterface';
-import ChannelConversation from '../components/Chat/Conversation/ChannelConversation';
-import PrivateConversation from '../components/Chat/Conversation/PrivateConversation';
 import FriendsSearch from '../components/Chat/Friends/FriendsSearchInterface';
 import ConversationWrapper from '../components/Chat/Conversation/ConversationWrapper';
 

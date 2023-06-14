@@ -18,7 +18,7 @@ import {
 } from './store/userSlice';
 import { ApiErrorResponse, UserInterface } from './types';
 import { useNavigate } from 'react-router-dom';
-import { ReduxActionInterface } from './types/utilsTypes';
+import { UserActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
@@ -36,7 +36,7 @@ function App() {
 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => ReduxActionInterface),
+    action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
