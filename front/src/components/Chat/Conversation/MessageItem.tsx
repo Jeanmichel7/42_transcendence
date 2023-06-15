@@ -151,7 +151,9 @@ const MessageItem: FC<MessageItemProps> = ({
               {messageTime}
             </span>
           </div>
-          <div className='' style={{ wordBreak: 'break-word' }} >
+          <div 
+            className={message.ownerUser.id == 0 ? 'text-center font-light' : ''} 
+            style={{ wordBreak: 'break-word' }} >
             { message.text.split('\n').map((line, index) => {
               return (
                 <span key={index}>

@@ -134,7 +134,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeAdmin') userIdToBeAdmin: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.addAdminToRoom(
       req.user.id,
       roomId,

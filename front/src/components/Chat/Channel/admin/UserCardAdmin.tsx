@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
-import { useDispatch } from 'react-redux';
-import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 
 import { Badge, Typography, Tooltip, Zoom, IconButton } from '@mui/material';
 import VolumeOffSharpIcon from '@mui/icons-material/VolumeOffSharp';
@@ -9,11 +9,14 @@ import VolumeMuteSharpIcon from '@mui/icons-material/VolumeMuteSharp';
 
 import ExitToAppSharpIcon from '@mui/icons-material/ExitToAppSharp';
 import RemoveCircleSharpIcon from '@mui/icons-material/RemoveCircleSharp';
+import AddCircleOutlineSharpIcon from '@mui/icons-material/AddCircleOutlineSharp';
 import RemoveCircleOutlineSharpIcon from '@mui/icons-material/RemoveCircleOutlineSharp';
+
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 
-import { banUser, kickUser, muteUser, unBanUser, unMuteUser } from '../../../../api/chat';
+import { addAdminToRoom, banUser, kickUser, muteUser, removeAdminFromRoom, unBanUser, unMuteUser } from '../../../../api/chat';
 import { PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../../../store';
 
 interface UserCardProps {
   user: UserInterface;
@@ -23,13 +26,25 @@ interface UserCardProps {
 const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const [ImIOwner, setImIOwner] = useState<boolean>(false);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isBanned, setIsBanned] = useState<boolean>(true);
+  const { userData } = useSelector((state: RootState) => state.user);
+  
 
-  const isOwner = room?.ownerUser?.id === user.id;
-  const isAdmin = room?.admins?.some((u) => u.id === user.id);
-  const [isMuted, setIsMuted] = useState(room?.mutedUsers?.some((u) => u.id === user.id));
-  const [isBanned, setIsBanned] = useState(room?.bannedUsers?.some((u) => u.id === user.id));
+  useEffect(() => {
+    if (!user || !room) return;
+    if (room.bannedUsers) setIsBanned(room.bannedUsers?.some((u) => u.id === user.id));
+    if (room.ownerUser) setIsOwner(room.ownerUser.id === user.id);
+    if (room.admins) setIsAdmin(room.admins.some((u) => u.id === user.id));
+    if (room.mutedUsers) setIsMuted(room.mutedUsers.some((u) => u.id === user.id));
+  }, [room, user, userData.id]);
 
-
+  useEffect(() => {
+    if (userData.id && room.ownerUser) setImIOwner(room.ownerUser.id === userData.id);
+  }, [userData.id, room]);
 
   const handleMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
   : Promise< void | PayloadAction<string> > => {
@@ -47,8 +62,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     }
   };
 
-
-
   const handleUnMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
   : Promise< void | PayloadAction<string>> => {
     e.stopPropagation();
@@ -65,12 +78,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     }
   };
 
-
-
-
-
-
-
   const handleKickuser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
   : Promise< void | PayloadAction<string> > => {
     e.stopPropagation();
@@ -83,7 +90,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
-      // modif user list room ?
       dispatch(setMsgSnackbar('User kicked'));
     }
   };
@@ -102,7 +108,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       setIsBanned(true);
-      // update room list user ? room.user ok mais room.bannedUsers ?
       dispatch(setMsgSnackbar('User banned'));
     }
   };
@@ -121,17 +126,44 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     }  else {
       setIsBanned(false);
-      // update room list user ? room.user ok mais room.bannedUsers ?
       dispatch(setMsgSnackbar('User unbanned'));
     }
   };
 
+  const handleAddAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
+  : Promise< void | PayloadAction<string> > => {
+    e.stopPropagation();
+    e.preventDefault();
 
+    if (isBanned) return dispatch(setErrorSnackbar('You can\'t add admin to a banned user'));
+    if (isOwner) return dispatch(setErrorSnackbar('You can\'t add admin to the owner'));
+    if (isAdmin) return dispatch(setErrorSnackbar('User already admin'));
 
+    const result: RoomInterface | ApiErrorResponse = await addAdminToRoom(room.id, user.id);
+    if ('error' in result) {
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+    } else {
+      setIsAdmin(true);
+      dispatch(setMsgSnackbar('User admin added'));
+    }
+  };
 
+  const handleRemoveAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
+  : Promise< void | PayloadAction<string> > => {
+    e.stopPropagation();
+    e.preventDefault();
 
+    if (isOwner) return dispatch(setErrorSnackbar('You can\'t remove admin to the owner'));
+    if (!isAdmin) return dispatch(setErrorSnackbar('User not admin'));
 
-
+    const result: RoomInterface | ApiErrorResponse = await removeAdminFromRoom(room.id, user.id);
+    if ('error' in result) {
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+    } else {
+      setIsAdmin(false);
+      dispatch(setMsgSnackbar('User admin removed'));
+    }
+  };
 
   return (
     <div>
@@ -178,6 +210,39 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
           </Typography>
         </Link>
+
+
+        {/* Add admin */}
+        { ImIOwner && !isOwner && !isAdmin &&
+          <Tooltip
+            title="Add admin" arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+          >
+            <IconButton
+              onClick={handleAddAdmin} color='primary'
+              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            >
+              <AddCircleOutlineSharpIcon color='success' />
+            </IconButton>
+          </Tooltip>
+        }
+
+        {/* Remove admin */}
+        { ImIOwner && !isOwner && isAdmin &&
+          <Tooltip
+            title="Remove admin" arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+          >
+            <IconButton
+              onClick={handleRemoveAdmin} color='warning'
+              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            >
+              <RemoveCircleOutlineSharpIcon color='error' />
+            </IconButton>
+          </Tooltip>
+        }
 
         {/* Mute user limited time*/}
         {!isMuted ?
@@ -251,9 +316,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             </IconButton>
           </Tooltip>
         }
-
-
-        {/* Remove Admin */}
 
       </div>
     </div >

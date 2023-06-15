@@ -20,6 +20,28 @@ export async function createChannel(
   );
 }
 
+export async function editChannel(
+  roomId: number,
+  data: any,
+): Promise< RoomInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'chat/rooms/' + roomId,
+    'Failed to edit room: ',
+    data,
+  );
+}
+
+export async function deleteChannel(
+  roomId: number,
+): Promise< RoomInterface | ApiErrorResponse> {
+  return apiRequest(
+    'delete',
+    'chat/rooms/' + roomId,
+    'Failed to delete room: ',
+  );
+}
+
 export async function getAllPublicRooms(
 ): Promise< RoomInterface[] | ApiErrorResponse> {
   return apiRequest(
@@ -125,10 +147,28 @@ export async function unBanUser(
   );
 }
 
+/* ADMIN ROOM */
+export async function addAdminToRoom(
+  roomId: number,
+  userIdToBeAdmin: number,
+): Promise< RoomInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'chat/rooms/' + roomId + '/users/' + userIdToBeAdmin + '/admins/add',
+    'Failed to add admin to room: ',
+  );
+}
 
-
-
-
+export async function removeAdminFromRoom(
+  roomId: number,
+  userIdToBeRemoved: number,
+): Promise< RoomInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'chat/rooms/' + roomId + '/users/' + userIdToBeRemoved + '/admins/remove',
+    'Failed to remove admin from room: ',
+  );
+}
 
 
 

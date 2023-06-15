@@ -22,7 +22,7 @@ import { ChatRoomInterface } from './interfaces/chat.room.interface';
 import {
   BotChatMessageEvent,
   ChatMessageEvent,
-  ChatRoomEvent,
+  ChatUserRoomEvent,
 } from './event/chat.event';
 
 const limit = 20;
@@ -224,7 +224,7 @@ export class ChatService {
     // console.log('data join room : ', data);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'], // a verifier
       relations: ['roomUsers'],
     });
 
@@ -315,10 +315,30 @@ export class ChatService {
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
-    // this.eventEmitter.emit(
-    //   'chat_room.join',
-    //   new ChatJoinRoomEvent(resultRoom, user.id.toString()),
-    // );
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${user.login} has join the room`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.join',
+      new ChatUserRoomEvent(room.id, {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        login: user.login,
+        avatar: user.avatar,
+        status: user.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -363,13 +383,18 @@ export class ChatService {
       text: `${user.login} has left the room`,
     };
 
-    const res = await this.createMessage(newBotMessage, 0, roomId);
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
     if (!res) throw new Error('Bot message not created');
     this.eventEmitter.emit(
       'chat_room.leave',
       new BotChatMessageEvent({
         roomId: room.id,
-        userId: user.id,
+        userId: user.id as bigint,
         userLogin: user.login,
         text: `${user.login} has left the room`,
         createdAt: new Date(),
@@ -380,7 +405,7 @@ export class ChatService {
   }
 
   async addAdminToRoom(
-    userId: bigint,
+    userId: bigint, //owner room guard donc pas besoin ?
     roomId: bigint,
     userIdToBeAdmin: bigint,
   ): Promise<ChatRoomInterface> {
@@ -428,6 +453,18 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    this.eventEmitter.emit(
+      'chat_room.admin.added',
+      new ChatUserRoomEvent(room.id, {
+        id: newAdmin.id,
+        firstName: newAdmin.firstName,
+        lastName: newAdmin.lastName,
+        login: newAdmin.login,
+        avatar: newAdmin.avatar,
+        status: newAdmin.status,
+      }),
+    );
     return resultRoom;
   }
 
@@ -485,6 +522,18 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    this.eventEmitter.emit(
+      'chat_room.admin.removed',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: adminToDel.id,
+        userLogin: adminToDel.login,
+        text: `${adminToDel.login} is no longer admin of room`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -505,7 +554,7 @@ export class ChatService {
 
     const userToBeMuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeMuted },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -534,6 +583,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeMuted.login} has been muted this idiot`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.muted',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeMuted.id,
+        firstName: userToBeMuted.firstName,
+        lastName: userToBeMuted.lastName,
+        login: userToBeMuted.login,
+        avatar: userToBeMuted.avatar,
+        status: userToBeMuted.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -554,7 +628,7 @@ export class ChatService {
 
     const userToBeDemuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeDemuted },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -587,7 +661,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
-    console.log('user demuted');
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeDemuted.login} has been unmuted`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.unmuted',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeDemuted.id,
+        firstName: userToBeDemuted.firstName,
+        lastName: userToBeDemuted.lastName,
+        login: userToBeDemuted.login,
+        avatar: userToBeDemuted.avatar,
+        status: userToBeDemuted.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -608,7 +706,7 @@ export class ChatService {
 
     const userToBeKicked: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeKicked },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -639,6 +737,30 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeKicked.login} has been kicked`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.kicked',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: userToBeKicked.id,
+        userLogin: userToBeKicked.login,
+        text: `${userToBeKicked.login} has been kicked`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -659,7 +781,7 @@ export class ChatService {
 
     const userToBeBanned: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeBanned },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomBannedUsers'],
     });
 
@@ -689,6 +811,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeBanned.login} has been banned`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.banned',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeBanned.id,
+        firstName: userToBeBanned.firstName,
+        lastName: userToBeBanned.lastName,
+        login: userToBeBanned.login,
+        avatar: userToBeBanned.avatar,
+        status: userToBeBanned.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -709,7 +856,7 @@ export class ChatService {
 
     const userToBeUnbanned: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeUnbanned },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomBannedUsers'],
     });
 
@@ -742,6 +889,30 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeUnbanned.login} has been unbanned`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.unbanned',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: userToBeUnbanned.id,
+        userLogin: userToBeUnbanned.login,
+        text: `${userToBeUnbanned.login} has been unbanned`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 

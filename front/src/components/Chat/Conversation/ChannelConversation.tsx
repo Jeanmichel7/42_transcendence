@@ -2,31 +2,32 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Socket, io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setWarningSnackbar } from '../../../store/snackbarSlice';
 
 import MessageItem from './MessageItem';
 
 import { chatOldMessages, deleteChatMessage, getRoomData, sendChatMessage } from '../../../api/chat';
 
 import { ApiErrorResponse } from '../../../types';
-import { ChatBotInterface, ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
+import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { Button, TextareaAutosize } from '@mui/material';
+import { Badge, Button, TextareaAutosize, Typography } from '@mui/material';
 import { HttpStatusCode } from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
+import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
 }
 
 const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
-  const id = (useParams<{ id: string }>().id || '-1') ;
-  const name = (useParams<{ name: string }>().name || 'unknown') ;
+  const id = (useParams<{ id: string }>().id || '-1');
+  const name = (useParams<{ name: string }>().name || 'unknown');
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const { userData } = useSelector((state: RootState) => state.user);
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -37,7 +38,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
-  const [messages, setMessages] = useState<(ChatMsgInterface | ChatBotInterface)[]>([]);
+  const [messages, setMessages] = useState<(ChatMsgInterface)[]>([]);
   const [text, setText] = useState<string>('');
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
@@ -86,16 +87,127 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
     /* ROOM */
-    socket.on('room_leave', (roomId, userId, userLogin) => {
-      setRoom((prev) => prev ? { ...prev,
-        users: prev.users?.filter((u) => u.id !== userId) } : null);
+
+    socket.on('room_join', (roomId, user) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        users: prev.users ? [...prev.users, user] : [user],
+      } : null);
     });
 
+    socket.on('room_leave', (roomId, userId) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        users: prev.users?.filter((u) => u.id !== userId),
+      } : null);
+      setRoom((prev) => prev ? {
+        ...prev,
+        admins: prev.admins?.filter((u) => u.id !== userId),
+      } : null);
+      //accepted user ?
+      // setRoom((prev) => prev ? { ...prev,
+      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== userId) } : null);
+    });
 
+    socket.on('room_muted', (roomId, user) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        mutedUsers: prev.mutedUsers ? [...prev.mutedUsers, user] : [user],
+      } : null);
+    });
 
+    socket.on('room_unmuted', (roomId, userId) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        mutedUsers: prev.mutedUsers?.filter((u) => u.id !== userId),
+      } : null);
+    });
 
+    socket.on('room_kicked', (roomId, userId) => {
+      console.log('room_kicked : ', roomId, userId);
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        users: prev.users?.filter((u) => u.id !== userId),
+      } : null);
+      setRoom((prev) => prev ? {
+        ...prev,
+        admins: prev.admins?.filter((u) => u.id !== userId),
+      } : null);
+      if (userData.id === userId) {
+        socket.emit('leaveRoom', {
+          roomId: id,
+        });
+        dispatch(reduxRemoveConversationToList(conv));
+        navigate('/chat/channel');
+        dispatch(setWarningSnackbar('You have been kicked from the room ' + conv.room.name));
+      }
+      //accepted user ?
+      // setRoom((prev) => prev ? { ...prev,
+      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);  
+    });
 
+    socket.on('room_banned', (roomId, user) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        bannedUsers: prev.bannedUsers ? [...prev.bannedUsers, user] : [user],
+      } : null);
+      // setRoom((prev) => prev ? { ...prev,
+      // users: prev.users?.filter((u) => u.id !== user.id) } : null);
+      setRoom((prev) => prev ? {
+        ...prev,
+        admins: prev.admins?.filter((u) => u.id !== user.id),
+      } : null);
+      //accepted user ?
+      // setRoom((prev) => prev ? { ...prev,
+      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);
+      if (userData.id === user.id) {
+        socket.emit('leaveRoom', {
+          roomId: id,
+        });
+        dispatch(reduxRemoveConversationToList(conv));
+        navigate('/chat/channel');
+        dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
+      }
+    });
 
+    socket.on('room_unbanned', (roomId, userId) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        bannedUsers: prev.bannedUsers?.filter((u) => u.id !== userId),
+      } : null);
+    });
+
+    /* ROOM ADMIN */
+    socket.on('room_admin_added', (roomId, user) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        admins: prev.admins ? [...prev.admins, user] : [user],
+      } : null);
+      if (userData.id === user.id) {
+        // setIsAdmin(true);
+        dispatch(setMsgSnackbar('You are now admin of the room ' + conv.room.name));
+      }
+    });
+
+    socket.on('room_admin_removed', (roomId, userId) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        admins: prev.admins?.filter((u) => u.id !== userId),
+      } : null);
+      if (userData.id === userId) {
+        // setIsAdmin(false);
+        dispatch(setWarningSnackbar('You are no longer admin of the room ' + conv.room.name));
+      }
+    });
 
     socket.on('error', (error) => { console.log('erreur socket : ', error); });
 
@@ -150,10 +262,10 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
       setRoom(roomData);
-      
+
     }
   }, [dispatch, conv]);
-  
+
   useEffect(() => {
     if (!room || !userData) return;
     if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
@@ -163,6 +275,15 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
   useEffect(() => {
+    if (!room || !userData.id || !room.bannedUsers) return;
+    if (room?.bannedUsers?.some((u) => u.id === userData.id)) {
+      socketRef.current?.emit('leaveRoom', {
+        roomId: id,
+      });
+      dispatch(reduxRemoveConversationToList(conv));
+      navigate('/chat/channel');
+      dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
+    }
     connectSocketChat();
     return () => {
       if (socketRef.current) {
@@ -176,7 +297,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socketRef.current = null;
       }
     };
-  }, [connectSocketChat, id]);
+  }, [connectSocketChat, id, room, userData.id, room?.bannedUsers, dispatch, conv, navigate]);
 
   useEffect(() => {
     fetchOldMessages();
@@ -185,7 +306,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   useEffect(() => {
     fetchRoomData();
   }, [fetchRoomData, id]);
-  
+
   useEffect(() => {
     console.log('conv : ', conv);
   }, [conv]);
@@ -202,7 +323,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   // scroll to bottom
   useEffect(() => {
     if (shouldScrollToBottom && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ 
+      bottomRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
@@ -265,7 +386,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
 
-  
+
   /* set text input currying + callback */
   const handleChangeTextArea = useCallback(
     (setTextFn: React.Dispatch<React.SetStateAction<string>>) => (
@@ -288,9 +409,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   return (
     <>
-      <div className="flex flex-col h-full w-full justify-between">
-
+      <div className="flex flex-col h-full justify-between">
         <div className="w-full flex justify-between items-center text-lg text-blue text-center">
+
           <Button
             className='text-blue-500'
             onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
@@ -302,61 +423,106 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
             <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
           </div>
 
-          { isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen}/> }
+          {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} />}
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
-          {/* display messages */}
-          { messages &&
-            <div className='text-lg m-1 p-2 '>
-              {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
-              {messages.map((message: ChatMsgInterface) => (
-                <MessageItem
-                  key={message.id}
-                  message={message}
-                  isLoadingDeleteMsg={isLoadingDeleteMsg}
-                  handleDeleteMessage={handleDeleteMessage}
-                  isAdminMenuOpen={isAdminMenuOpen}
-                />
-              ))}
+        <div className='flex'>
+          <div className="flex-grow overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
+            {/* display messages */}
+            {messages &&
+              <div className='text-lg m-1 p-2 '>
+                {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
+                {messages.map((message: ChatMsgInterface) => (
+                  <MessageItem
+                    key={message.id}
+                    message={message}
+                    isLoadingDeleteMsg={isLoadingDeleteMsg}
+                    handleDeleteMessage={handleDeleteMessage}
+                    isAdminMenuOpen={isAdminMenuOpen}
+                  />
+                ))}
 
-              {/* display form message */}
-              <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
-                <TextareaAutosize
-                  ref={textareaRef}
-                  name="text"
-                  value={text}
-                  onChange={handleChangeTextArea(setText)}
-                  onKeyDown={handleSubmit()}
-                  placeholder="Enter your text here..."
-                  className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
-                />
-                <button className='flex justify-center items-center'
-                  onClick={handleSubmit()}
-                >
-                  <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
-                </button>
+                {/* display form message */}
+                <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
+                  <TextareaAutosize
+                    ref={textareaRef}
+                    name="text"
+                    value={text}
+                    onChange={handleChangeTextArea(setText)}
+                    onKeyDown={handleSubmit()}
+                    placeholder="Enter your text here..."
+                    className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
+                  />
+                  <button className='flex justify-center items-center'
+                    onClick={handleSubmit()}
+                  >
+                    <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
+                  </button>
 
-                {/* display status send message */}
-                {statusSendMsg !== '' &&
-                  <span className={`
+                  {/* display status send message */}
+                  {statusSendMsg !== '' &&
+                    <span className={`
                   ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
                   bottom-16 
                   text-white
                   p-2
                   rounded-xl
                   shadow-lg`}
-                    onClick={() => setStatusSendMsg('')}
+                      onClick={() => setStatusSendMsg('')}
+                    >
+                      {statusSendMsg}
+                    </span>
+                  }
+                </form>
+
+              </div>}
+            <div ref={bottomRef}></div>
+          </div>
+          <div className='w-[150px]'>
+            {room && room.users &&
+              <h3> MEMBRES - {room.users.length} </h3>
+              && room.users.map((user) => (
+                <Link to={'/profile/' + user.login}
+                  className="flex flex-grow text-black p-1 pl-2 items-center ">
+                  <Badge
+                    color={
+                      user.status === 'online' ? 'success' :
+                        user.status === 'absent' ? 'warning' :
+                          'error'
+                    }
+                    overlap="circular"
+                    badgeContent=" "
+                    variant="dot"
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
                   >
-                    {statusSendMsg}
-                  </span>
-                }
-              </form>
-
-            </div> }
-          <div ref={bottomRef}></div>
+                    <img
+                      className="w-10 h-10 rounded-full object-cover mr-2 "
+                      src={'http://localhost:3000/avatars/' + user.avatar}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                      }}
+                      alt="avatar"
+                    />
+                  </Badge>
+                  <Typography component="span"
+                    sx={{
+                      overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
+                      color: user.status === 'online' ? 'success' : 'error',
+                    }}
+                    title={user.login}
+                  >
+                    {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
+                  </Typography>
+                </Link>
+              ))}
+          </div>
         </div>
-
       </div>
     </>
   );

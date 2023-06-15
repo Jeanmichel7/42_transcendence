@@ -7,9 +7,8 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-// import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
 import { ChatMsgInterface } from '../interfaces/chat.message.interface';
-import { ChatRoomInterface } from '../interfaces/chat.room.interface';
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -90,11 +89,51 @@ export class ChatGateway {
   }
 
   /* ROOM */
-  emitLeaveRoom(roomId: bigint, userId: bigint, userLogin: string) {
-    console.log('emit leave room', roomId.toString(), userId, userLogin);
+  emitJoinRoom(roomId: bigint, user: UserInterface) {
+    this.server.to(roomId.toString()).emit('room_join', roomId, user);
+    console.log('user join room ' + roomId);
+  }
+
+  emitLeaveRoom(roomId: bigint, userId: bigint) {
+    this.server.to(roomId.toString()).emit('room_leave', roomId, userId);
+    console.log('user leave room ' + roomId);
+  }
+
+  emitMutedRoom(roomId: bigint, user: UserInterface) {
+    this.server.to(roomId.toString()).emit('room_muted', roomId, user);
+    console.log('user muted in room ' + roomId);
+  }
+
+  emitUnmutedRoom(roomId: bigint, user: UserInterface) {
+    this.server.to(roomId.toString()).emit('room_unmuted', roomId, user);
+    console.log('user unmuted in room ' + roomId);
+  }
+
+  emitKickedRoom(roomId: bigint, userId: bigint) {
+    this.server.to(roomId.toString()).emit('room_kicked', roomId, userId);
+    console.log('user kicked from room ' + roomId);
+  }
+
+  emitBannedRoom(roomId: bigint, user: UserInterface) {
+    this.server.to(roomId.toString()).emit('room_banned', roomId, user);
+    console.log('user banned from room ' + roomId);
+  }
+
+  emitUnbannedRoom(roomId: bigint, userId: bigint) {
+    this.server.to(roomId.toString()).emit('room_unbanned', roomId, userId);
+    console.log('user unbanned from room ' + roomId);
+  }
+
+  /* ROOM ADMIN */
+  emitAdminAddedRoom(roomId: bigint, user: UserInterface) {
+    this.server.to(roomId.toString()).emit('room_admin_added', roomId, user);
+    console.log('user added as admin in room ' + roomId);
+  }
+
+  emitAdminRemovedRoom(roomId: bigint, userId: bigint) {
     this.server
       .to(roomId.toString())
-      .emit('room_leave', roomId, userId, userLogin);
-    console.log('user ' + userLogin + ' leave room ' + roomId);
+      .emit('room_admin_removed', roomId, userId);
+    console.log('user removed as admin in room ' + roomId);
   }
 }

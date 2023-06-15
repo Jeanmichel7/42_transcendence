@@ -25,6 +25,7 @@ import { reduxAddConversationList } from '../../../store/chatSlicer';
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const channelType = ['public', 'private'];
   const [form, setForm] = useState({
     name: '',
     type: 'public',
@@ -34,7 +35,6 @@ const CreateGroupInterface = () => {
   
   const { userFriends } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const channelType = ['public', 'private'];
 
   const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }> ) => {
     const { name, value } = e.target as HTMLInputElement;
