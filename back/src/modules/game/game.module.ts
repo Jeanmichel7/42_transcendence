@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { GameEvents } from './game.event';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
+import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameEntity } from './entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
@@ -10,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GameEntity, UserEntity])],
-  providers: [GameService, GameEvents, JwtService],
   controllers: [GameController],
+  providers: [GameService, GameEvents, ConfigService, JwtService],
 })
 export class GameModule {}

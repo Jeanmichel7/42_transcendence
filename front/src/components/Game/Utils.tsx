@@ -13,8 +13,6 @@ const dotAnimation = keyframes`
 const DotWrapper = styled.div`
   display: flex;
   justify-content: center;
-  transform: translate(-50%, -50%);
-  align-items: center;
   padding-bottom: 2rem;
 `;
 
