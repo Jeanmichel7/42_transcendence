@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxRemoveFriends, reduxAddUserBlocked } from '../../store/userSlice';
+import { reduxRemoveFriends, reduxAddUserBlocked, reduxAddWaitingFriendsSent } from '../../store/userSlice';
 import { RootState } from '../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { Link } from 'react-router-dom';
@@ -27,6 +27,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
 }) => {
   const dispatch = useDispatch();
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
+  // const [ isFriendRequestSent, setIsFriendRequestSent ] = useState(false);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
   const badgeColor: 'success' | 'warning' | 'error'
   = friend.status === 'online' ? 'success' :
@@ -37,12 +38,19 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   };
 
 
+  
+  function isRequestFriendSent() {
+    return waitingFriendsRequestSent?.some((f: UserInterface) => f.id === friend.id);
+  }
+
   const handleRequestAddFriend = async (userIdToAdd: number) => {
     // const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
+    if (isRequestFriendSent()) return;
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(userIdToAdd);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
+      dispatch(reduxAddWaitingFriendsSent(friend));
       dispatch(setMsgSnackbar('Request sent'));
     }
   };
@@ -78,9 +86,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     return userFriends?.find((f: UserInterface) => f.id === friend.id);
   }
 
-  function isRequestFriendSent() {
-    return waitingFriendsRequestSent?.find((f: UserInterface) => f.id === friend.id);
-  }
 
 
   return (
@@ -147,12 +152,15 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
+          <div>
             <IconButton aria-label="add friend" 
               sx={{ margin:0, padding:0 }}
               onClick={() => handleRequestAddFriend(friend.id)}
-            >
+              disabled={ isRequestFriendSent() }
+              >
               <AddIcon color={ isRequestFriendSent() ? 'disabled' : 'primary' }/>
             </IconButton>
+          </div>
         </Tooltip> }
 
         {userData && userData.login == actualUserLogin &&

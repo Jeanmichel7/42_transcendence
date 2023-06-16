@@ -118,7 +118,12 @@ export class AuthController {
         },
       });
     } else {
-      res.status(200).send({ is2FAactived: false, user: null });
+      res.status(200).send({
+        is2FAactived: false,
+        user: {
+          id: jwtCookie.split(':')[1],
+        },
+      });
     }
   }
 

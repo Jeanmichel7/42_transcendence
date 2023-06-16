@@ -275,8 +275,6 @@ const PrivateConversation: React.FC = () => {
 
             </div>
           }
-
-
           <div ref={bottomRef}></div>
         </div>
 

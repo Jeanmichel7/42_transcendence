@@ -83,27 +83,28 @@ function ConnectPage() {
     }
   }
 
+  const fetchAndSetIs2FAactived = useCallback(async () => {
+    const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+    console.log('res : ', res);
+    if ('error' in res) {
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+    } else {
+      if (res.is2FAactived) {
+        setIs2FAactiv(res.is2FAactived);
+        setUserId(res.user.id);
+      } else {
+        await saveUserData(res.user.id);
+        // await new Promise(r => setTimeout(r, 10000)); //wait 10s
+        navigate('/home');
+      }
+    }
+  }, [dispatch, navigate, saveUserData]);
 
   //check if 2FA is activated
   useEffect(() => {
-    async function fetchAndSetIs2FAactived() {
-      const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-      console.log('res : ', res);
-      if ('error' in res) {
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
-      } else {
-        if (res.is2FAactived) {
-          setIs2FAactiv(res.is2FAactived);
-          setUserId(res.user.id);
-        } else {
-          await saveUserData(res.user.id);
-          // await new Promise(r => setTimeout(r, 10000)); //wait 10s
-          navigate('/home');
-        }
-      }
-    }
+    
     fetchAndSetIs2FAactived();
-  }, [dispatch, navigate, saveUserData]);
+  }, [dispatch, fetchAndSetIs2FAactived, navigate, saveUserData]);
 
 
   return (

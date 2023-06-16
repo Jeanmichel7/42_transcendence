@@ -61,7 +61,6 @@ function App() {
       await fetchData(getBlockedUsers, reduxSetUserBlocked);
       await fetchData(getFriendRequests, reduxSetWaitingFriends);
       await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
-      console.log('userId', userId);
       dispatch(reduxSetNotifications(
         localStorage.getItem('notifications' + userId)
           ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
@@ -75,6 +74,7 @@ function App() {
 
     } else {
       dispatch(setLogged(false));
+      setUserId(-1);
       // navigate('/');
     }
   }, [dispatch, fetchData, userId]);

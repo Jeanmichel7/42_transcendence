@@ -33,7 +33,6 @@ export default function ChannelSearch() {
     if (!room)
       return;
     if (isConvAlreadyExist(room, conversationsList)) {
-      // dispatch(reduxAddConversationList(room));
       return dispatch(setErrorSnackbar('Room already in conversation list'));
     }
     if (room.isProtected && !displayInputPwd)

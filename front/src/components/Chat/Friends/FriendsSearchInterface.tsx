@@ -100,7 +100,7 @@ export default function FriendsSearch() {
       }
       <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
         {users.map((user: UserInterface) => {
-          if (user.id != userData.id && !isMyFriend(user.id))
+          if (user.id != userData.id && user.id != 0 && !isMyFriend(user.id))
             return (
               <FriendCard
                 key={user.id}

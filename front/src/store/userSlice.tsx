@@ -5,22 +5,22 @@ export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
   error: null | ApiErrorResponse;
-  userFriends: UserInterface[],
-  userBlocked: UserInterface[],
-  waitingFriendsRequestReceived: UserInterface[],
-  waitingFriendsRequestSent: UserInterface[],
+  userFriends: UserInterface[] | null,
+  userBlocked: UserInterface[] | null,
+  waitingFriendsRequestReceived: UserInterface[] | null,
+  waitingFriendsRequestSent: UserInterface[] | null,
 }
 
 // Friends management
 const addFriend = (state: UserState, user: UserInterface) => {
-  if (state.userFriends === undefined)
+  if (!state.userFriends)
     state.userFriends = [user];
   else
     state.userFriends = [...state.userFriends, user];
 };
 
 const removeFriend = (state: UserState, user: UserInterface) => {
-  if (state.userFriends === undefined)
+  if (!state.userFriends)
     return;
   state.userFriends = state.userFriends
     .filter((friend: UserInterface) => friend.id !== user.id);
@@ -28,14 +28,14 @@ const removeFriend = (state: UserState, user: UserInterface) => {
 
 // User blocked management
 const addUserBlocked = (state: UserState, user: UserInterface) => {
-  if (state.userBlocked === undefined)
+  if (!state.userBlocked)
     state.userBlocked = [user];
   else
     state.userBlocked = [...state.userBlocked, user];
 };
 
 const removeUserBlocked = (state: UserState, user: UserInterface) => {
-  if (state.userBlocked === undefined)
+  if (!state.userBlocked)
     return;
   state.userBlocked = state.userBlocked
     .filter((userBlocked: UserInterface) => userBlocked.id !== user.id);
@@ -43,14 +43,14 @@ const removeUserBlocked = (state: UserState, user: UserInterface) => {
 
 // Waiting friends request management
 const addWaitingFriends = (state: UserState, user: UserInterface) => {
-  if (state.waitingFriendsRequestReceived === undefined)
+  if (!state.waitingFriendsRequestReceived)
     state.waitingFriendsRequestReceived = [user];
   else
     state.waitingFriendsRequestReceived = [...state.waitingFriendsRequestReceived, user];
 };
 
 const removeWaitingFriends = (state: UserState, user: UserInterface) => {
-  if (state.waitingFriendsRequestReceived === undefined)
+  if (!state.waitingFriendsRequestReceived)
     return;
   state.waitingFriendsRequestReceived = state.waitingFriendsRequestReceived
     .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
@@ -58,14 +58,14 @@ const removeWaitingFriends = (state: UserState, user: UserInterface) => {
 
 // Waiting friends request sent management
 const addWaitingFriendsSent = (state: UserState, user: UserInterface) => {
-  if (state.waitingFriendsRequestSent === undefined)
+  if (!state.waitingFriendsRequestSent)
     state.waitingFriendsRequestSent = [user];
   else
     state.waitingFriendsRequestSent = [...state.waitingFriendsRequestSent, user];
 };
 
 const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
-  if (state.waitingFriendsRequestSent === undefined)
+  if (!state.waitingFriendsRequestSent)
     return;
   state.waitingFriendsRequestSent = state.waitingFriendsRequestSent
     .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
@@ -76,10 +76,10 @@ export const userSlice = createSlice({
   initialState: {
     isLogged: false,
     error: null,
-    userFriends: [],
-    userBlocked: [],
-    waitingFriendsRequestReceived: [],
-    waitingFriendsRequestSent: [],
+    userFriends: null,
+    userBlocked: null,
+    waitingFriendsRequestReceived: null,
+    waitingFriendsRequestSent: null,
     userData: {
       id: -1,
       login: '',
@@ -107,10 +107,6 @@ export const userSlice = createSlice({
       state.userData.role = action.payload.role;
       state.userData.description = action.payload.description;
       state.userData.is2FAEnabled = action.payload.is2FAEnabled;
-      // state.userFriends = action.payload.friends;
-      // state.userBlocked = action.payload.userBlocked;
-      // state.waitingFriendsRequestReceived = action.payload.waitingFriendsRequestReceived;
-      // state.waitingFriendsRequestSent = action.payload.waitingFriendsRequestSent;
       state.isLogged = true;
       state.error = null;
     },

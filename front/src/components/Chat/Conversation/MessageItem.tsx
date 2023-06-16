@@ -22,7 +22,7 @@ interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
   isLoadingDeleteMsg: boolean;
   handleDeleteMessage: (id: number) => void;
-  isAdminMenuOpen: boolean;
+  isAdminMenuOpen?: boolean;
 }
 
 const MessageItem: FC<MessageItemProps> = ({
