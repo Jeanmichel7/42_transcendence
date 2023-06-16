@@ -7,14 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
-import { deleteChannel, editChannel } from '../../../../api/chat';
+import { editChannel } from '../../../../api/chat';
 
 interface SideBarProps {
   room: RoomInterface;
   setIsAdminMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleDeleteChannel: () => void;
 }
 
-const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen }) => {
+const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handleDeleteChannel }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -30,8 +31,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen }) => {
   const { userData } = useSelector((state: RootState) => state.user);
   const ref = useRef(document.createElement('div'));
   const dispatch = useDispatch();
-  
-
 
   useEffect(() => {
     if (room.ownerUser && userData.id && room.ownerUser.id === userData.id) setIsOwner(true);
@@ -94,17 +93,18 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen }) => {
     console.log(form);
   };
 
-  const handleDeleteChannel = async () => {
-    const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
-    console.log('resDeleteChannel : ', resDeleteChannel);
-    if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
-      dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
-    else {
-      setOpenDialog(false);
-      dispatch(setMsgSnackbar('Channel deleted'));
-      setIsAdminMenuOpen(false);
-    }
-  };
+  // const handleDeleteChannel = async () => {
+  //   const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
+  //   console.log('resDeleteChannel : ', resDeleteChannel);
+  //   if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
+  //     dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
+  //   else {
+  //     setOpenDialog(false);
+  //     dispatch(setMsgSnackbar('Channel deleted'));
+  //     setIsAdminMenuOpen(false);
+  //     navigate('/chat');
+  //   }
+  // };
 
   return (
     <div className="absolute right-0 top-[64px]">

@@ -35,7 +35,7 @@ export class GameEvents {
     private gameService: GameService,
     private configService: ConfigService,
     private jwtService: JwtService,
-  ) { 
+  ) {
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
       games.forEach(async (game) => {
@@ -51,11 +51,12 @@ export class GameEvents {
   async handleConnection(client: Socket) {
     //const token = client.handshake.headers.cookies['jwt'];
 
-    let cookieArray = client.handshake.headers.cookie.split(';');
+    const cookieArray = client.handshake.headers.cookie.split(';');
+    console.log(cookieArray);
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
-      let cookieParts = cookie.split('=');
-      if (cookieParts[0] === 'jwt') {
+      const cookieParts = cookie.split('=');
+      if (cookieParts[0] === 'jwt' || cookieParts[0] === ' jwt') {
         jwtToken = cookieParts[1];
       }
     });
@@ -110,16 +111,15 @@ export class GameEvents {
       const opponent = await this.gameService.addToQueue(
         client.id,
         client.data.userId,
-        message === 'searchBonus'
+        message === 'searchBonus',
       );
       console.log('searching opponent for: ' + client.id);
       if (opponent) {
         console.log('opponent found: ' + opponent);
         if (message === 'searchBonus') {
-        this.server.to(client.id).emit('userGameStatus', 'foundBonus');
-        this.server.to(opponent).emit('userGameStatus', 'foundBonus');
-        }
-        else {
+          this.server.to(client.id).emit('userGameStatus', 'foundBonus');
+          this.server.to(opponent).emit('userGameStatus', 'foundBonus');
+        } else {
           this.server.to(client.id).emit('userGameStatus', 'foundNormal');
           this.server.to(opponent).emit('userGameStatus', 'foundNormal');
         }
@@ -135,17 +135,17 @@ export class GameEvents {
     this.gameService.updateClientData(data, client.id);
   }
 
-  @SubscribeMessage('ballPosition')
-  handleBallPosition(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-  ) {}
+  // @SubscribeMessage('ballPosition')
+  // handleBallPosition(
+  //   @MessageBody() data: string,
+  //   @ConnectedSocket() client: Socket,
+  // ) {}
 
-  @SubscribeMessage('gameEnd')
-  handleGameEnd(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-  ) {}
+  // @SubscribeMessage('gameEnd')
+  // handleGameEnd(
+  //   @MessageBody() data: string,
+  //   @ConnectedSocket() client: Socket,
+  // ) {}
 
   @SubscribeMessage('message')
   handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {

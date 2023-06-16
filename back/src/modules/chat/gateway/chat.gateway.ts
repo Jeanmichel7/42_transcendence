@@ -136,4 +136,9 @@ export class ChatGateway {
       .emit('room_admin_removed', roomId, userId);
     console.log('user removed as admin in room ' + roomId);
   }
+
+  emitDeletedRoom(roomId: bigint) {
+    this.server.to(roomId.toString()).emit('room_owner_deleted', roomId);
+    console.log('room deleted ' + roomId);
+  }
 }

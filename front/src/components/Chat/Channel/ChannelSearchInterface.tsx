@@ -76,15 +76,15 @@ export default function ChannelSearch() {
         const roomsToFilter = allRooms
           .filter((r: RoomInterface) => !conversationsList.some(cv => isRoomInterface(cv) && cv.name === r.name));
         setRooms(roomsToFilter);
-        console.log(allRooms);
+        // console.log(allRooms);
       }
       setSelectedRoom(null);
     }
     fetchUsers();
   }, [conversationsList, dispatch]);
 
-  if (!conversationsList || !rooms)
-    return <p>Loading...</p>;
+  // if (!conversationsList || !rooms)
+  //   return <p>Loading...</p>;
   return (
     <div className="h-full">
       <div className='flex p-3 border'>
@@ -155,8 +155,6 @@ export default function ChannelSearch() {
         </div>
       )}
       
-      { isLoading && <CircularProgress />}
-
       <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
         {rooms.map((r: RoomInterface) => {
           return (

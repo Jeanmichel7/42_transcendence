@@ -4,14 +4,14 @@ import { useSelector } from 'react-redux';
 import AccountProfile from '../components/Account/AccountProfile';
 import ProfileFriends from '../components/Profile/ProfileFriends';
 import HistoryGame from '../components/Profile/HistoryGame';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 
 export default function Account() {
   const { userData } = useSelector((state: RootState) => state.user);
   
-  useEffect(() => {
-    console.log('userData', userData);
-  }, [userData]);
+  // useEffect(() => {
+  //   console.log('userData', userData);
+  // }, [userData]);
   return (
     <>
       {userData && userData.id !== -1 &&

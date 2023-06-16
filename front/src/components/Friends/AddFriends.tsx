@@ -26,7 +26,6 @@ const AddFriends = () => {
     if ('error' in allUsersFetched)
       dispatch(setErrorSnackbar(allUsersFetched.error + allUsersFetched.message ? ': ' + allUsersFetched.message : ''));
     else {
-      console.log('allUsersFetched', allUsersFetched);
       const resFiltered = allUsersFetched.filter((u: UserInterface) =>
         u.id != 0 && u.id != userData.id &&
         !userFriends?.find((f: UserInterface) => f.id === u.id) &&

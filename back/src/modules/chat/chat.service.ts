@@ -209,10 +209,9 @@ export class ChatService {
       relations: ['users', 'ownerUser', 'admins', 'bannedUsers', 'mutedUsers'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
-
     const result: ChatRoomEntity = await room.remove();
-
-    //retour room delete or all rooms ?
+    if (!result) throw new Error('Room not deleted');
+    this.eventEmitter.emit('chat_room.deleted', roomId);
     return result;
   }
 
@@ -355,6 +354,10 @@ export class ChatService {
       relations: ['users', 'ownerUser', 'admins'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
+
+    //check si owner leave
+    if (room.ownerUser.id === user.id)
+      throw new ConflictException(`Owner ${userId} can't leave room ${roomId}`);
 
     // check si user est dans la room
     if (!room.users.some((u) => u.id === user.id))

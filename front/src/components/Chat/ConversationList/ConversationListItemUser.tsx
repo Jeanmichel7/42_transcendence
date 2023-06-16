@@ -7,7 +7,7 @@ import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 
 interface ConvProps {
@@ -17,14 +17,17 @@ interface ConvProps {
 const ConversationListUserItem: React.FC<ConvProps> = ({
   conv,
 }) => {
-  const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const { userData } = useSelector((state: RootState) => state.user);
+  const { convId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // const { conversationsList } = useSelector((state: RootState) => state.chat);
   async function handleCloseConv(
     e: React.MouseEvent<HTMLButtonElement>,
   ) {
+    if (conv.id === parseInt(convId as string)) navigate('/chat');
     e.stopPropagation();
     dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
   }

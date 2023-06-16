@@ -25,6 +25,7 @@ const PrivateConversation: React.FC = () => {
   const dispatch = useDispatch();
 
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
@@ -39,7 +40,6 @@ const PrivateConversation: React.FC = () => {
   const socketRef = useRef<Socket | null>(null);
 
   const fetchOldMessages = useCallback(async () => {
-    console.log('fetchOldMessages');
     if (id == '-1' || userData.id == -1 ) return;
     setShouldScrollToBottom(false);
 
@@ -75,7 +75,6 @@ const PrivateConversation: React.FC = () => {
 
   const connectSocket = useCallback(() => {
     if (id == '-1' || userData.id == -1 ) return;
-    console.log('connectSocket user ', id);
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -120,7 +119,6 @@ const PrivateConversation: React.FC = () => {
   useEffect(() => {
     connectSocket();
     return () => {
-      console.log('disconnectSocket');
       if (socketRef.current === null) return;
       socketRef.current.off('message');
       socketRef.current.off('editMessage');
@@ -149,7 +147,7 @@ const PrivateConversation: React.FC = () => {
     if (shouldScrollToBottom && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
-    console.log('messages : ', messages);
+    // console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 

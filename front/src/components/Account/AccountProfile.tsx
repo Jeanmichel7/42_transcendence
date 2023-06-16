@@ -41,7 +41,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
     <>
       <h2 className="text-3xl text-center">Account</h2>
 
-      { user && user.avatar && user.description && user.is2FAEnabled != undefined &&
+      { user &&
       <Box className="flex justify-between" >
         <div className="w-1/4">
           <img
@@ -121,15 +121,15 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
               value="********"
             />
 
-            <AccountItem
+            { user.description && <AccountItem
               keyName="description"
               value={user.description}
-            />
+            /> }
 
-            <AccountItem
+            { user.is2FAEnabled && <AccountItem
               keyName="Active 2FA"
               value={user.is2FAEnabled}
-            />
+            /> }
 
           </div>
         </div>

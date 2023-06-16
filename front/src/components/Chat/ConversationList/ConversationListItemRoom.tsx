@@ -10,7 +10,7 @@ import { CircularProgress, IconButton, Tooltip, Typography, Zoom } from '@mui/ma
 import GroupIcon from '@mui/icons-material/Group';
 import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 
 
@@ -25,15 +25,20 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   // setConvSelectedId,
   // setServiceToCall,
 }) => {
+
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const dispatch = useDispatch();
   const { userData } = useSelector((state: RootState) => state.user);
+
+  const { convId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleCloseConv = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     dispatch(setMsgSnackbar('Conv Close'));
     dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+    if (conv.id === parseInt(convId as string)) navigate('/chat');
   };
 
   const handleLeaveRoom = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -47,6 +52,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
     else {
       dispatch(setMsgSnackbar('Leaved room'));
       dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      if (conv.id === parseInt(convId as string)) navigate('/chat');
     }
 
     //redirect to home if currentChatUserId is the user removed

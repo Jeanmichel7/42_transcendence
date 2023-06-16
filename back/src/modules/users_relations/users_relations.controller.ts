@@ -56,18 +56,13 @@ export class UsersRelationsController {
     @Param('friendId', ParseIntPipe) friendId: bigint,
   ): Promise<UserRelationInterface> {
     try {
-      console.log('requestAddFriend controler');
-      console.log('req.user.id : ', req.user.id);
-      console.log('friendId : ', friendId);
       const result: UserRelationInterface =
         await this.usersRelationsService.requestAddFriend(
           req.user.id,
           friendId,
         );
-      console.log('result : ', result);
       return result;
     } catch (error) {
-      console.log('error : ', error);
       throw error;
     }
   }

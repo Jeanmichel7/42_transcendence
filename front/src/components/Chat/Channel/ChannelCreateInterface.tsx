@@ -160,8 +160,8 @@ const CreateGroupInterface = () => {
 
           { form.type === 'private' &&
             <FormGroup>
-              { userFriends.length === 0 && <p className='ml-4 mb-4'>Add friends to invited him</p>}
-              { userFriends.map((user: UserInterface) => (
+              { userFriends?.length === 0 && <p className='ml-4 mb-4'>Add friends to invited him</p>}
+              { userFriends?.map((user: UserInterface) => (
                  <FormControlLabel 
                   key={user.id}
                   control={

@@ -6,7 +6,7 @@ import { setErrorSnackbar, setMsgSnackbar, setWarningSnackbar } from '../../../s
 
 import MessageItem from './MessageItem';
 
-import { chatOldMessages, deleteChatMessage, getRoomData, sendChatMessage } from '../../../api/chat';
+import { chatOldMessages, deleteChannel, deleteChatMessage, getRoomData, sendChatMessage } from '../../../api/chat';
 
 import { ApiErrorResponse } from '../../../types';
 import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
@@ -34,7 +34,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
 
   // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
-  const [room, setRoom] = useState<RoomInterface | null>(null);
+  const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
@@ -49,6 +49,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   // connect socket
   const connectSocketChat = useCallback(() => {
+    if (!userData) return;
     const socket = io('http://localhost:3000/chat', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -87,7 +88,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
     /* ROOM */
-
     socket.on('room_join', (roomId, user) => {
       if (roomId !== id) return;
       setRoom((prev) => prev ? {
@@ -111,6 +111,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== userId) } : null);
     });
 
+    /* ROOM ADMIN */
     socket.on('room_muted', (roomId, user) => {
       if (roomId !== id) return;
       setRoom((prev) => prev ? {
@@ -128,7 +129,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     });
 
     socket.on('room_kicked', (roomId, userId) => {
-      console.log('room_kicked : ', roomId, userId);
       if (roomId !== id) return;
       setRoom((prev) => prev ? {
         ...prev,
@@ -209,6 +209,28 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       }
     });
 
+    /* OWNER */
+    socket.on('room_owner_added', (roomId, user) => {
+      if (roomId !== id) return;
+      setRoom((prev) => prev ? {
+        ...prev,
+        owner: user,
+      } : null);
+      if (userData.id === user.id) {
+        dispatch(setMsgSnackbar('You are now owner of the room ' + conv.room.name));
+      }
+    });
+
+    socket.on('room_owner_deleted', (roomId) => {
+      if (roomId !== id) return;
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      navigate('/chat/channel');
+      dispatch(setWarningSnackbar('The room ' + conv.room.name + ' has been deleted'));
+    });
+
+    /* ROOM USER */
+    // socket.on('room_user_accepted', (roomId, user) => {
+
     socket.on('error', (error) => { console.log('erreur socket : ', error); });
 
     //connect to room
@@ -221,7 +243,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
-    if (id === '-1') return;
+    if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
 
     // setIsLoadingPagination(true);
@@ -256,6 +278,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   }, [pageDisplay]);
 
   const fetchRoomData = useCallback(async () => {
+    if (conv == null) {
+      dispatch(setErrorSnackbar('Nop'));
+      navigate('/chat/channel');
+      return;
+    }
     if (!conv.room.id || conv.room.id === -1) return;
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
     if (roomData && 'error' in roomData)
@@ -275,7 +302,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
   useEffect(() => {
-    if (!room || !userData.id || !room.bannedUsers) return;
+    if (room == undefined || !userData.id || !room.bannedUsers) return;
     if (room?.bannedUsers?.some((u) => u.id === userData.id)) {
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
@@ -307,13 +334,13 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     fetchRoomData();
   }, [fetchRoomData, id]);
 
-  useEffect(() => {
-    console.log('conv : ', conv);
-  }, [conv]);
+  // useEffect(() => {
+  //   console.log('conv : ', conv);
+  // }, [conv]);
 
-  useEffect(() => {
-    console.log('room : ', room);
-  }, [room]);
+  // useEffect(() => {
+  //   console.log('room : ', room);
+  // }, [room]);
 
 
 
@@ -406,6 +433,20 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
   };
 
+  const handleDeleteChannel = async () => {
+    if (!room) return;
+    const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
+    console.log('resDeleteChannel : ', resDeleteChannel);
+    if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
+      dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
+    else {
+      dispatch(setMsgSnackbar('Channel deleted'));
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      setIsAdminMenuOpen(false);
+      navigate('/chat');
+    }
+  };
+
 
   return (
     <>
@@ -423,7 +464,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
             <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
           </div>
 
-          {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} />}
+          {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} handleDeleteChannel={handleDeleteChannel} />}
         </div>
 
         <div className='flex h-full'>

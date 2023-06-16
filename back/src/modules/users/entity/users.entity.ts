@@ -217,7 +217,6 @@ export class UserEntity extends BaseEntity {
   }
 
   get blocked(): UserEntity[] {
-    console.log('execution get blocked users');
     return [...this.initiatedRelations, ...this.relatedRelations]
       .filter((relation) => relation.relationType === 'blocked')
       .map((relation) =>

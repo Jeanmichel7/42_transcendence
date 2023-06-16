@@ -289,7 +289,6 @@ export class ChatController {
     @Param('messageId') messageId: bigint,
     @Body() data: ChatEditMsgDTO,
   ): Promise<ChatMsgInterface> {
-    console.log('edit message', messageId, data);
     const message: ChatMsgInterface = await this.ChatService.editMessage(
       req.user.id,
       messageId,

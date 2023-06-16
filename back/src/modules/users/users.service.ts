@@ -317,7 +317,7 @@ export class UsersService {
       'users_avatars',
       avatarName,
     );
-    console.log('path : ', localImagePath);
+    // console.log('path : ', localImagePath);
 
     if (!existsSync(join(__dirname, '../../../..', 'uploads', 'users_avatars')))
       mkdirSync(join(__dirname, '../../../..', 'uploads', 'users_avatars'));
