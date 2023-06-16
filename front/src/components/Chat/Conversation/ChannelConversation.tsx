@@ -17,7 +17,7 @@ import { HttpStatusCode } from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxAddConversationList, reduxRemoveConversationToList } from '../../../store/chatSlicer';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
@@ -278,19 +278,37 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   }, [pageDisplay]);
 
   const fetchRoomData = useCallback(async () => {
-    if (conv == null) {
-      dispatch(setErrorSnackbar('Nop'));
+    // if (conv == null) {
+    //   dispatch(setErrorSnackbar('Nop'));
+    //   navigate('/chat/channel');
+    //   return;
+    // }
+    
+    // if (!conv.room.id || conv.room.id === -1) return;
+    const roomData: RoomInterface | ApiErrorResponse = await getRoomData(id);
+    console.log('roomData : ', roomData);
+    if (!roomData) {
+      dispatch(setErrorSnackbar('Room not found'));
       navigate('/chat/channel');
       return;
     }
-    if (!conv.room.id || conv.room.id === -1) return;
-    const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
     if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
+      if (conv == null) {
+        if (roomData.users?.some((u) => u.id === userData.id) ||
+          roomData.acceptedUsers?.some((u) => u.id === userData.id)) {
+          dispatch(reduxAddConversationList({ item: roomData, userId: userData.id }));
+          dispatch(setMsgSnackbar('You are now in the room ' + roomData.name));
+        } else {
+          dispatch(setErrorSnackbar('Room is private '));
+          navigate('/chat/channel');
+        }
+      }
       setRoom(roomData);
-      if (roomData.users) {
-        const isUserInRoom = roomData.users.some((u) => u.id === userData.id);
+      if (roomData.users && roomData.acceptedUsers) {
+        const isUserInRoom = roomData.users.some((u) => u.id === userData.id) 
+          || roomData.acceptedUsers.some((u) => u.id === userData.id);
         if (!isUserInRoom) {
           socketRef.current?.emit('leaveRoom', {
             roomId: id,
@@ -306,6 +324,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
         dispatch(setWarningSnackbar('Room wa deleted ' + conv.room.name));
         navigate('/chat/channel');
+      } else if (!roomData) {
+        console.log('NO room Data : ', roomData);
       }
     }
   }, [conv, dispatch, id, navigate, userData]);

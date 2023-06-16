@@ -1040,9 +1040,21 @@ export class ChatService {
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },
       select: ['id', 'type', 'name', 'isProtected'],
-      relations: ['messages'],
+      relations: ['messages', 'users', 'acceptedUsers'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
+    console.log('room', room);
+    //check if userSend is in room or in acceptedUser
+    if (
+      room.users.some((u) => u.id === userSend.id) ||
+      room.acceptedUsers.some((u) => u.id === userSend.id)
+    ) {
+      console.log('userSend is in room');
+    } else {
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't send message`,
+      );
+    }
 
     // const chatMessageEntity: ChatMessageEntity = new ChatMessageEntity();
     // chatMessageEntity.text = newMessage.text;
