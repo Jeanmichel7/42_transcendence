@@ -140,5 +140,11 @@ export class ChatGateway {
   emitDeletedRoom(roomId: bigint) {
     this.server.to(roomId.toString()).emit('room_owner_deleted', roomId);
     console.log('room deleted ' + roomId);
+
+    this.server.of('/chat').sockets.forEach((socket) => {
+      if (socket.rooms.has(roomId.toString())) {
+        socket.leave(roomId.toString());
+      }
+    });
   }
 }

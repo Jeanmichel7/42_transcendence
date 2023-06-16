@@ -224,8 +224,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     socket.on('room_owner_deleted', (roomId) => {
       if (roomId !== id) return;
       dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-      navigate('/chat/channel');
       dispatch(setWarningSnackbar('The room ' + conv.room.name + ' has been deleted'));
+      navigate('/chat/channel');
     });
 
     /* ROOM USER */
@@ -289,9 +289,26 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
       setRoom(roomData);
-
+      if (roomData.users) {
+        const isUserInRoom = roomData.users.some((u) => u.id === userData.id);
+        if (!isUserInRoom) {
+          socketRef.current?.emit('leaveRoom', {
+            roomId: id,
+          });
+          dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+          dispatch(setWarningSnackbar('You are not in the room ' + conv.room.name));
+          navigate('/chat/channel');
+        }
+      } else if (!roomData.users) {
+        socketRef.current?.emit('leaveRoom', {
+          roomId: id,
+        });
+        dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+        dispatch(setWarningSnackbar('Room wa deleted ' + conv.room.name));
+        navigate('/chat/channel');
+      }
     }
-  }, [dispatch, conv]);
+  }, [conv, dispatch, id, navigate, userData]);
 
   useEffect(() => {
     if (!room || !userData) return;
@@ -300,10 +317,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
 
-
   useEffect(() => {
-    if (room == undefined || !userData.id || !room.bannedUsers) return;
-    if (room?.bannedUsers?.some((u) => u.id === userData.id)) {
+    if (!room || !userData.id || !room.bannedUsers) return;
+    if (room.bannedUsers.some((u) => u.id === userData.id)) {
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
       });
@@ -331,8 +347,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   }, [fetchOldMessages]);
 
   useEffect(() => {
+    if (!userData.id || userData.id == -1) return;
     fetchRoomData();
-  }, [fetchRoomData, id]);
+  }, [fetchRoomData, id, userData.id]);
 
   // useEffect(() => {
   //   console.log('conv : ', conv);
@@ -356,7 +373,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         inline: 'nearest',
       });
     }
-    // console.log('messages : ', messages);
+    console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 

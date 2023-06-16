@@ -1035,7 +1035,7 @@ export class ChatService {
       select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['chatMessages'],
     });
-    // console.log('userSend', userSend);
+    console.log('userSend', userSend);
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },

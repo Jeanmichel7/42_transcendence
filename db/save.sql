@@ -398,6 +398,48 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 26	Hi	2023-06-16 02:56:22.168557	2023-06-16 02:56:22.168557	15	1
 27	Demond47 has join the room	2023-06-16 02:57:11.521615	2023-06-16 02:57:11.521615	0	1
 28	Demond47 has join the room	2023-06-16 02:57:20.624199	2023-06-16 02:57:20.624199	0	2
+33	jrasser has join the room	2023-06-16 15:05:47.220875	2023-06-16 15:05:47.220875	0	3
+124	login1 has left the room	2023-06-16 17:59:01.252862	2023-06-16 17:59:01.252862	0	17
+34	jrasser has join the room	2023-06-16 15:05:50.590774	2023-06-16 15:05:50.590774	0	4
+115	login1 has join the room	2023-06-16 17:21:48.258918	2023-06-16 17:21:48.258918	0	17
+35	dsa s sdd sa ddasd	2023-06-16 15:05:55.285379	2023-06-16 15:05:55.285379	22	4
+36	coucou	2023-06-16 15:05:57.274366	2023-06-16 15:05:57.274366	22	4
+74	ds	2023-06-16 16:12:09.451958	2023-06-16 16:12:09.451958	6	4
+116	Marion_Donnelly53 has join the room	2023-06-16 17:21:50.721723	2023-06-16 17:21:50.721723	0	17
+62	dfsfdfsddf	2023-06-16 16:11:46.57305	2023-06-16 16:11:46.57305	22	4
+39	jrasser has left the room	2023-06-16 15:11:34.659481	2023-06-16 15:11:34.659481	0	4
+40	jrasser has join the room	2023-06-16 15:26:58.142869	2023-06-16 15:26:58.142869	0	1
+41	jrasser has join the room	2023-06-16 15:28:19.663775	2023-06-16 15:28:19.663775	0	2
+117	lll	2023-06-16 17:32:22.71818	2023-06-16 17:32:22.71818	6	18
+42	jrasser has join the room	2023-06-16 15:28:22.396552	2023-06-16 15:28:22.396552	0	4
+43	jrasser has left the room	2023-06-16 15:28:48.693325	2023-06-16 15:28:48.693325	0	3
+63	but post ?	2023-06-16 16:12:05.697503	2023-06-16 16:12:05.697503	6	4
+44	jrasser has join the room	2023-06-16 15:29:08.876751	2023-06-16 15:29:08.876751	0	3
+45	jrasser has left the room	2023-06-16 15:29:44.751388	2023-06-16 15:29:44.751388	0	3
+46	jrasser has join the room	2023-06-16 15:32:39.424504	2023-06-16 15:32:39.424504	0	3
+75	f 	2023-06-16 16:12:09.644951	2023-06-16 16:12:09.644951	6	4
+47	jrasser has left the room	2023-06-16 15:32:43.99702	2023-06-16 15:32:43.99702	0	3
+118	jrasser has join the room	2023-06-16 17:32:28.915555	2023-06-16 17:32:28.915555	0	18
+64	dfsdfd	2023-06-16 16:12:07.228305	2023-06-16 16:12:07.228305	6	4
+65	 fsd	2023-06-16 16:12:07.444549	2023-06-16 16:12:07.444549	6	4
+125	ljhjhv	2023-06-16 18:00:27.230745	2023-06-16 18:00:27.230745	1	17
+66	fd	2023-06-16 16:12:07.660977	2023-06-16 16:12:07.660977	6	4
+76	f	2023-06-16 16:12:09.81274	2023-06-16 16:12:09.81274	6	4
+67	fds dsf	2023-06-16 16:12:08.26814	2023-06-16 16:12:08.26814	6	4
+68	sd	2023-06-16 16:12:08.444659	2023-06-16 16:12:08.444659	6	4
+77	sdf	2023-06-16 16:12:10.014811	2023-06-16 16:12:10.014811	6	4
+69	f	2023-06-16 16:12:08.573282	2023-06-16 16:12:08.573282	6	4
+70	sd	2023-06-16 16:12:08.732079	2023-06-16 16:12:08.732079	6	4
+71	f sd	2023-06-16 16:12:08.919515	2023-06-16 16:12:08.919515	6	4
+78	merdeeeee	2023-06-16 16:12:15.47144	2023-06-16 16:12:15.47144	6	4
+72	f 	2023-06-16 16:12:09.101163	2023-06-16 16:12:09.101163	6	4
+140	login1 has join the room	2023-06-16 18:12:59.248075	2023-06-16 18:12:59.248075	0	22
+73	dsf	2023-06-16 16:12:09.284015	2023-06-16 16:12:09.284015	6	4
+141	sdfsdsdf	2023-06-16 18:13:03.302684	2023-06-16 18:13:03.302684	1	22
+143	Marion_Donnelly53 has left the room	2023-06-16 18:30:33.033881	2023-06-16 18:30:33.033881	0	22
+142	Marion_Donnelly53 has join the room	2023-06-16 18:28:05.099565	2023-06-16 18:28:05.099565	0	22
+139	fff	2023-06-16 18:12:51.50845	2023-06-16 18:12:51.50845	6	17
+144	login1 has left the room	2023-06-16 18:34:11.430664	2023-06-16 18:34:11.430664	0	22
 \.
 
 
@@ -410,6 +452,9 @@ COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "u
 2	public	t	room	$2b$10$1Pax7awjdOKSmN.GXcf/wuBnKtN5yk895FQPJJpZ5jAAepAs5DTOy	2023-06-16 00:39:39.710572	2023-06-16 00:39:39.710572	16
 3	public	f	Channel	\N	2023-06-16 00:39:45.772039	2023-06-16 00:39:45.772039	16
 4	public	t	Room	$2b$10$ww4P4kTdWTGeEhPaJJk1bu.Fc2nxEBNS0srFQ3H8SgP68HSzEWP3e	2023-06-16 02:37:02.064434	2023-06-16 02:37:02.064434	11
+17	public	f	BLIBLI	\N	2023-06-16 17:21:41.966945	2023-06-16 17:21:41.966945	22
+18	public	f	l;;	\N	2023-06-16 17:32:02.358744	2023-06-16 17:32:02.358744	6
+22	public	f	aaaaaaaaa	\N	2023-06-16 18:12:56.963259	2023-06-16 18:12:56.963259	22
 \.
 
 
@@ -429,6 +474,9 @@ COPY public.chat_rooms_admins_users ("chatRoomsId", "usersId") FROM stdin;
 1	1
 2	16
 3	16
+17	22
+18	6
+22	22
 \.
 
 
@@ -474,6 +522,14 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 2	12
 3	12
 4	12
+1	22
+2	22
+4	22
+17	22
+17	6
+18	6
+18	22
+22	22
 \.
 
 
@@ -482,6 +538,7 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 --
 
 COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "player1Id", "player2Id", "winnerId") FROM stdin;
+1	finished	2023-06-16 14:47:45.417	2023-06-16 14:48:16.343	2023-06-16 14:47:45.420437	5	5	2	2	1
 \.
 
 
@@ -591,6 +648,7 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 133	dr gfd ggdf f gfdg	2023-06-16 02:49:25.25588	2023-06-16 02:49:25.25588	7	6
 99	67	2023-06-16 02:44:23.05101	2023-06-16 02:44:23.05101	16	1
 100	68	2023-06-16 02:44:24.002626	2023-06-16 02:44:24.002626	16	1
+165	coucou	2023-06-16 17:01:15.050103	2023-06-16 17:01:15.050103	1	6
 143	fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f 	2023-06-16 02:49:57.385859	2023-06-16 02:49:57.385859	7	1
 101	69	2023-06-16 02:44:24.891974	2023-06-16 02:44:24.891974	16	1
 134	dsf sd sdf	2023-06-16 02:49:48.291477	2023-06-16 02:49:48.291477	7	1
@@ -646,6 +704,21 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 156	xcvxcvxcvcxvxcvxcvcxvcxvcxvxcvc	2023-06-16 02:54:41.023028	2023-06-16 02:54:41.023028	4	6
 157	ds fdsf fdsdfdgfh fgh fghg fg fgh gfh fgfg hgf	2023-06-16 02:56:17.301644	2023-06-16 02:56:17.301644	15	1
 158	asdfghjkl;	2023-06-16 02:58:36.784571	2023-06-16 02:58:36.784571	12	1
+159	helo	2023-06-16 15:12:45.084314	2023-06-16 15:12:45.084314	22	1
+160	cc	2023-06-16 15:12:49.010182	2023-06-16 15:12:49.010182	1	22
+161	lkjlkl	2023-06-16 15:17:48.302031	2023-06-16 15:17:48.302031	11	1
+162	sdfdf	2023-06-16 15:22:05.755841	2023-06-16 15:22:05.755841	6	22
+163	sdfsdf	2023-06-16 15:22:09.14293	2023-06-16 15:22:09.14293	22	6
+164	sdfsdff	2023-06-16 16:45:07.861791	2023-06-16 16:45:07.861791	22	12
+166	wtf	2023-06-16 17:01:25.440609	2023-06-16 17:01:25.440609	6	22
+167	rien rien	2023-06-16 17:01:28.670056	2023-06-16 17:01:28.670056	22	6
+168	mouahahahaha	2023-06-16 17:01:31.782761	2023-06-16 17:01:31.782761	1	6
+169	heu	2023-06-16 17:01:35.813625	2023-06-16 17:01:35.813625	1	6
+170	d'accord	2023-06-16 17:01:38.745864	2023-06-16 17:01:38.745864	1	6
+171	sdsad	2023-06-16 17:02:02.865932	2023-06-16 17:02:02.865932	1	6
+172	TEST	2023-06-16 17:02:13.767655	2023-06-16 17:02:13.767655	1	6
+173	drg	2023-06-16 17:08:53.681591	2023-06-16 17:08:53.681591	6	22
+174	dfg	2023-06-16 17:08:55.879323	2023-06-16 17:08:55.879323	22	6
 \.
 
 
@@ -667,15 +740,16 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 7	Rod	Koss	Ike.Stanton11	Kolby24@yahoo.com	$2b$10$.5zQvYQVcdD1P9dc0M9IE.2tY/XThLorIh5OgDmF1FYXV5/B41F4e	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/232.jpg	A enim doloribus magni labore incidunt neque voluptatem.	f	offline	\N	2023-06-15 23:05:12.116236	2023-06-16 02:50:59.409	2023-06-16 02:50:59.403
 8	Gracie	Stracke	Timmy_Marquardt28	Esther64@yahoo.com	$2b$10$fQYmwBqFAMC0gChq2Tkfi.ttIjutckc8.pwIhJ8Lb1SyJ4lHiATGe	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/750.jpg	Ipsam excepturi a eaque quibusdam cumque doloremque magnam magnam.	f	offline	\N	2023-06-15 23:05:12.195326	2023-06-16 02:48:45.895	2023-06-16 02:48:45.89
 14	Toby	Bernier	Kamren_Smitham98	Terrence_Carroll37@yahoo.com	$2b$10$zdjEq8161iFgV2qlyJxEquYKoutKSXS8KB9l8UsIruy/jpeEaI716	user	https://avatars.githubusercontent.com/u/5596822	Blanditiis quos vel hic fugiat fuga eligendi quo dolore.	f	offline	\N	2023-06-15 23:23:19.21863	2023-06-16 02:34:47.899	2023-06-16 02:34:47.894
-11	Colin	Johnston	Aleen_Stamm11	Laney.Schmeler0@gmail.com	$2b$10$kS9/kIkLOVoQt87AG21qRuabFu14kwLEkMRB5Rad4PL.57YW/7C7q	user	https://avatars.githubusercontent.com/u/35595372	Ipsa distinctio magni non repellendus.	f	offline	\N	2023-06-15 23:23:18.979132	2023-06-16 02:39:35.267	2023-06-16 02:39:35.256
-1	Julio	Kessler	login1	Tia.Moen61@hotmail.com	$2b$10$jXoNqYAMQ/3tti1B2K8iVe3uR.EVtpFof.jGe8JAXIQkFeIvez8QK	user	https://avatars.githubusercontent.com/u/48230799	Iste quam quae eaque occaecati nihil voluptates voluptatibus ipsum.	f	online	\N	2023-06-15 23:05:11.194982	2023-06-16 03:24:46.105	2023-06-16 03:26:21.296
 16	Brooks	Stark	Jonatan79	Presley_OReilly52@gmail.com	$2b$10$/3a3HMGPsWoj3jj6QgaLu..VKjIoN/puuDGjqCWOByBMWajPgcUrS	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1148.jpg	Eaque ratione id architecto at.	f	offline	\N	2023-06-15 23:23:19.357497	2023-06-16 02:46:56.543	2023-06-16 02:46:56.537
 10	Nicklaus	Steuber	Lloyd25	Ashley91@yahoo.com	$2b$10$KFuAhpr0pMACmc2gbkzvNO.YHf8JO/K/mTjWxzsF6oWhOLQxTIx.W	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/775.jpg	Excepturi eos perferendis ullam.	f	offline	\N	2023-06-15 23:23:18.916448	2023-06-16 02:51:53.358	2023-06-16 02:51:53.352
-6	Adolphus	Rodriguez	Marion_Donnelly53	Allen78@gmail.com	$2b$10$x1Q0PD3Iql9nlEZQGzf/buSpYAN9CMduduYQUKKbRCjX1tCx2VNJa	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/433.jpg	Facilis occaecati voluptates modi voluptatibus repellat voluptatum vel enim deleniti.	f	offline	\N	2023-06-15 23:05:12.046586	2023-06-16 02:41:44.892	2023-06-16 02:41:44.886
 5	Rosemary	Breitenberg	Davin.Wunsch32	Jakob.Stark60@gmail.com	$2b$10$ThBR9XyHGy5aRv9dpzQOnOxp/MMS7oh1adg8Pak7aYx0YuTo2IanC	user	https://avatars.githubusercontent.com/u/44420470	Impedit minus quia vitae iure aliquid dolor.	f	offline	\N	2023-06-15 23:05:11.983213	2023-06-16 02:53:05.443	2023-06-16 02:53:05.437
 12	Trudie	Koelpin	Demond47	Terrill59@yahoo.com	$2b$10$BQdu.uyMPgU9Gbny6.VQJuIbj.022TeNwEMWhG.1wGJkGH9q.KZGG	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1186.jpg	Officiis sapiente doloremque nobis magnam sunt laborum totam a.	f	offline	\N	2023-06-15 23:23:19.074919	2023-06-16 02:58:39.179	2023-06-16 02:58:39.175
 4	Antoinette	Rippin	Lyric12	Marshall.Bins@yahoo.com	$2b$10$PqdsWOTH56DG00Wvsn/4z.IiSCwgp6gBd4qqtzqhOQDJb.X2fS/02	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/424.jpg	Recusandae voluptas officia quaerat neque nisi.	f	offline	\N	2023-06-15 23:05:11.907128	2023-06-16 02:55:47.185	2023-06-16 02:55:47.181
-0	Bot	Bot	Bot	botmail@mail.com	\N	user	\N	Description de bot	t	absent	\N	2023-06-15 23:05:11.194982	2023-06-16 03:26:10.219	2023-06-15 23:05:11.194982
+11	Colin	Johnston	Aleen_Stamm11	Laney.Schmeler0@gmail.com	$2b$10$kS9/kIkLOVoQt87AG21qRuabFu14kwLEkMRB5Rad4PL.57YW/7C7q	user	https://avatars.githubusercontent.com/u/35595372	Ipsa distinctio magni non repellendus.	f	offline	\N	2023-06-15 23:23:18.979132	2023-06-16 15:18:12.594	2023-06-16 15:18:12.585
+1	Julio	Kessler	login1	Tia.Moen61@hotmail.com	$2b$10$jXoNqYAMQ/3tti1B2K8iVe3uR.EVtpFof.jGe8JAXIQkFeIvez8QK	user	https://avatars.githubusercontent.com/u/48230799	Iste quam quae eaque occaecati nihil voluptates voluptatibus ipsum.	f	offline	\N	2023-06-15 23:05:11.194982	2023-06-16 15:18:26.049	2023-06-16 18:34:11.734
+0	Bot	Bot	Bot	botmail@mail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	Description de bot	t	absent	\N	2023-06-15 23:05:11.194982	2023-06-16 18:36:02.478	2023-06-15 23:05:11.194982
+6	Adolphus	Rodriguez	Marion_Donnelly53	Allen78@gmail.com	$2b$10$x1Q0PD3Iql9nlEZQGzf/buSpYAN9CMduduYQUKKbRCjX1tCx2VNJa	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/433.jpg	Facilis occaecati voluptates modi voluptatibus repellat voluptatum vel enim deleniti.	f	absent	\N	2023-06-15 23:05:12.046586	2023-06-16 16:10:48.795	2023-06-16 18:30:33.133
+22	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1686926700265-120853.jpg	\N	f	absent	\N	2023-06-16 14:45:00.350129	2023-06-16 16:26:48.813	2023-06-16 18:35:22.898
 \.
 
 
@@ -749,6 +823,11 @@ COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", 
 41	friend	f	2023-06-16 02:40:48.413735	2023-06-16 02:58:21.997	6	12
 55	friend	f	2023-06-16 02:52:23.639124	2023-06-16 02:58:22.254	5	12
 66	friend	f	2023-06-16 02:54:29.637679	2023-06-16 02:58:22.536	4	12
+68	pending	f	2023-06-16 15:03:17.060546	2023-06-16 15:03:17.060546	22	12
+70	pending	f	2023-06-16 15:03:17.997908	2023-06-16 15:03:17.997908	22	16
+67	friend	f	2023-06-16 15:03:16.429334	2023-06-16 15:12:39.984	22	1
+69	friend	f	2023-06-16 15:03:17.558076	2023-06-16 15:21:03.045	22	6
+71	pending	f	2023-06-16 17:02:18.929864	2023-06-16 17:02:18.929864	6	10
 \.
 
 
@@ -756,42 +835,42 @@ COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", 
 -- Name: chat_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_messages_id_seq', 32, true);
+SELECT pg_catalog.setval('public.chat_messages_id_seq', 144, true);
 
 
 --
 -- Name: chat_rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_rooms_id_seq', 4, true);
+SELECT pg_catalog.setval('public.chat_rooms_id_seq', 22, true);
 
 
 --
 -- Name: games_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.games_id_seq', 1, false);
+SELECT pg_catalog.setval('public.games_id_seq', 1, true);
 
 
 --
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_id_seq', 158, true);
+SELECT pg_catalog.setval('public.messages_id_seq', 174, true);
 
 
 --
 -- Name: users-relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."users-relation_id_seq"', 66, true);
+SELECT pg_catalog.setval('public."users-relation_id_seq"', 71, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 21, true);
+SELECT pg_catalog.setval('public.users_id_seq', 22, true);
 
 
 --
