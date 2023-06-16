@@ -374,7 +374,7 @@ checkBonusCollision() {
       this.player2Score += 1;
       if (this.player2Score >= SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = this.player1Username;
+        this.winner = this.player2Username;
       } else {
         this.ball.x = 500;
         this.ball.y = 500;
@@ -392,7 +392,7 @@ checkBonusCollision() {
         this.player1Score += 1;
       if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
-        this.winner = this.player2Username;
+        this.winner = this.player1Username;
         // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
           // async saveEndGame(
           //   gameId: bigint,
@@ -517,11 +517,13 @@ export class GameService {
   async updateGame(game: Game) {
     game.updateBallPosition();
     if (game.isOver) {
+    
+
     await this.saveEndGame(
         game.id,
         game.winner,
         game.player1Score,
-        game.player1Score
+        game.player2Score
       )
       this.games.delete(game.id);
     }
@@ -564,15 +566,15 @@ export class GameService {
           username: username,
         };
       } else if (
-        this.playerWaiting2Bonus === undefined // &&
-        // this.playerWaiting1Bonus.username !== username
+        this.playerWaiting2Bonus === undefined  &&
+        this.playerWaiting1Bonus !== username
       ) {
         this.playerWaiting2Bonus = {
           socketId: socketId,
           username: username,
         };
         console.log('Game created');
-        const res = await this.saveNewGame(this.playerWaiting1Bonus, this.playerWaiting2Bonus);
+        const res = await this.saveNewGame(this.playerWaiting1Bonus.username, this.playerWaiting2Bonus.username);
         if (!res)
           throw new BadRequestException('erreur save start game')
         const game: Game = new Game(
@@ -584,7 +586,7 @@ export class GameService {
           true
         );
         this.games.set(game.id, game);
-        this.playerWaiting1Bonus = undefined;
+        this.playerWaiting1Bonus = undefined; 
         this.playerWaiting2Bonus = undefined;
         
         //res.id game
@@ -599,15 +601,15 @@ export class GameService {
         username: username,
       };
     } else if (
-      this.playerWaiting2Normal === undefined // &&
-      // this.playerWaiting1Normal.username !== username
+      this.playerWaiting2Normal === undefined  &&
+      this.playerWaiting1Normal.username !== username
     ) {
       this.playerWaiting2Normal = {
         socketId: socketId,
         username: username,
       };
       console.log('Game created');
-      const res = await this.saveNewGame(this.playerWaiting1Bonus, this.playerWaiting2Bonus);
+      const res = await this.saveNewGame(this.playerWaiting1Bonus.username, this.playerWaiting2Bonus.username);
       if (!res)
         throw new BadRequestException('erreur save start game')
       const game = new Game(

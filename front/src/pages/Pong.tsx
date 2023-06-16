@@ -100,7 +100,6 @@ function Bonus({ bonus, posX, posY }) {
   const [position, setPosition] = useState([-1, -1]);
   useEffect(() => {
     if (bonus !== undefined && bonus !== null) {
-      console.log('bonus detected', bonus);
       setBonusExplode(false);
       setIsBonusVisible(true);
       setPosition([posX, posY]);
@@ -394,7 +393,6 @@ function Game({
           Math.abs(newBall.x - gameData.current.ball?.x) > POSITION_THRESHOLD ||
           Math.abs(newBall.y - gameData.current.ball?.y) > POSITION_THRESHOLD
         ) {
-          console.log('correction');
           fail.current = false;
           newBall.x = gameData.current.ball?.x;
           newBall.y = gameData.current.ball?.y;
@@ -403,6 +401,7 @@ function Game({
           newBall.speed = gameData.current.ball?.speed;
         }
 
+        console.log('speed', newBall.speed);
         return newBall;
       });
       if (gameData.current.winner == null) {
