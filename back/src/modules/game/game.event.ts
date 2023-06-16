@@ -17,7 +17,7 @@ interface clientUpdate {
   posRacket: number;
   ArrowDown: boolean;
   ArrowUp: boolean;
-  gameId: string;
+  gameId: bigint;
   useBonus: boolean;
 }
 
@@ -35,11 +35,11 @@ export class GameEvents {
     private gameService: GameService,
     private configService: ConfigService,
     private jwtService: JwtService,
-  ) {
+  ) { 
     setInterval(() => {
-      const games: Map<string, Game> = this.gameService.getGames();
-      games.forEach((game) => {
-        const update = this.gameService.updateGame(game);
+      const games: Map<bigint, Game> = this.gameService.getGames();
+      games.forEach(async (game) => {
+        const update = await this.gameService.updateGame(game);
         this.server.to(game.socketPlayer1Id).emit('gameUpdate', update);
         update.isPlayerRight = true;
         this.server.to(game.socketPlayer2Id).emit('gameUpdate', update);
@@ -94,7 +94,7 @@ export class GameEvents {
   }
 
   @SubscribeMessage('userGameStatus')
-  handleSearchOpponent(
+  async handleSearchOpponent(
     @MessageBody() message: string,
     @ConnectedSocket() client: Socket,
   ) {
@@ -107,7 +107,7 @@ export class GameEvents {
       this.gameService.removeFromQueue(client.data.userId);
       return;
     } else if (message === 'searchNormal' || message === 'searchBonus') {
-      const opponent = this.gameService.addToQueue(
+      const opponent = await this.gameService.addToQueue(
         client.id,
         client.data.userId,
         message === 'searchBonus'
@@ -115,8 +115,14 @@ export class GameEvents {
       console.log('searching opponent for: ' + client.id);
       if (opponent) {
         console.log('opponent found: ' + opponent);
-        this.server.to(client.id).emit('userGameStatus', 'found');
-        this.server.to(opponent).emit('userGameStatus', 'found');
+        if (message === 'searchBonus') {
+        this.server.to(client.id).emit('userGameStatus', 'foundBonus');
+        this.server.to(opponent).emit('userGameStatus', 'foundBonus');
+        }
+        else {
+          this.server.to(client.id).emit('userGameStatus', 'foundNormal');
+          this.server.to(opponent).emit('userGameStatus', 'foundNormal');
+        }
       }
     }
   }

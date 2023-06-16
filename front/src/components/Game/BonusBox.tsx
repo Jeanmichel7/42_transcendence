@@ -4,7 +4,7 @@ import laser from '../../assets/laser.png';
 import slow from '../../assets/slow.png';
 import bigRacket from '../../assets/bigRacket.png';
 import spriteBonusSelection from '../../assets/spriteBonusSelection.png';
-import { pulsate } from './NeonStyle';
+import { pulsate } from './Animation';
 
 // Précharger les images
 const images = [laser, slow, bigRacket];

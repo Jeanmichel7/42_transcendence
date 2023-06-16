@@ -163,8 +163,13 @@ const Racket = ({ posY, height, type,children }) => {
 
 // Dans le rendu de votre jeu
 
+interface BallProps {
+  posX: number,
+  posY: number, 
+};
 
-const Ball = styled.div.attrs((props) => {
+
+const Ball = styled.div.attrs<BallProps>((props) => {
   return {
     style: {
       transform: `translate(${props.posX - BALL_RADIUS}px, ${
@@ -172,7 +177,7 @@ const Ball = styled.div.attrs((props) => {
       }px)`,
     },
   };
-})`
+})<BallProps>`
   width: ${BALL_DIAMETER}px;
   height: ${BALL_DIAMETER}px;
   background-color: white;
@@ -197,9 +202,12 @@ const laserFlowLeft = keyframes`
   0% { background-position: 50px 0; }
   100% { background-position: 0 0; }
 `;
+interface LaserProps {
+  type: 'left' | 'right';
+}
 
 // Utilisez les animations dans votre composant
-const Laser = styled.div`
+const Laser = styled.div<LaserProps>`
   position: absolute;
 
   width: ${({ type }) => type === 'left' ? '10000px' : '10000px'};
@@ -224,10 +232,12 @@ function Game({
   socket,
   lastGameInfo,
   setCurrentPage,
+  bonus, 
 }: {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   lastGameInfo: any;
   setCurrentPage: any;
+  bonus: boolean;
 }) {
   const posRacket = useRef({
     left: 500 - RACKET_HEIGHT_10 / 2,
@@ -460,7 +470,7 @@ function Game({
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
         {gameData?.current.bonusMode && <Bonus bonus={gameData.current.bonus} posX={(bonusPositionRef?.current?.x ? bonusPositionRef.current.x * (gameDimensions.current.width / 1000) : -1)} posY={(bonusPositionRef?.current?.y ? bonusPositionRef.current.y * (gameDimensions.current.height / 1000) : -1)} />}
-        {gameData?.current.bonusMode && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
+        {(bonus || gameData?.current.bonusMode) && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current}/>}
 
 <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={"right" } >
   {laser.current.right && <Laser type={"right"} />}
@@ -476,6 +486,7 @@ function Pong() {
   const [currentPage, setCurrentPage] = useState('lobby');
   const userData: any = useSelector((state: any) => state.user.userData);
   const lastGameInfo = useRef({} as any);
+  const [bonus, setBonus] = useState(false);
   useEffect(() => {
     const socket = io('http://localhost:3000/game', {
       withCredentials: true,
@@ -494,8 +505,13 @@ function Pong() {
 
     socket.on('userGameStatus', (message) => {
       console.log('Pong status updtae', message);
-      if (message === 'found') {
+      if (message === 'foundNormal') {
         setCurrentPage('game');
+        setBonus(false);
+      }
+      if (message === 'foundBonus') {
+        setCurrentPage('game');
+        setBonus(true);
       }
       if (message === 'alreadyInGame') {
         setCurrentPage('game');
@@ -528,6 +544,7 @@ function Pong() {
         socket={socket}
         lastGameInfo={lastGameInfo}
         setCurrentPage={setCurrentPage}
+        bonus={bonus}
       />
     );
   } else if (currentPage === 'searchOpponent') {

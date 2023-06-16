@@ -46,7 +46,7 @@ const ButtonWrapper = styled.div`
 `;
 
 function Lobby({
-  setCurrentPage, socket 
+  setCurrentPage, socket
 }: React.Dispatch<React.SetStateAction<string>> &  Socket<ServerToClientEvents, ClientToServerEvents>) {
   return (
     <ButtonWrapper>

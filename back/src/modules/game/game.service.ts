@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { GameEntity } from './entity/game.entity';
 
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
@@ -26,10 +28,10 @@ interface clientUpdate {
   posRacket: number;
   ArrowDown: boolean;
   ArrowUp: boolean;
-  gameId: string;
+  gameId: bigint;
   useBonus: boolean;
 }
-
+  
 export class Game {
   ball: { x: number; y: number; vx: number; vy: number; speed: number };
   racketLeft: number;
@@ -47,7 +49,7 @@ export class Game {
   player2ArrowUp: boolean;
   player2ArrowDown: boolean;
   lastTime: number;
-  id: string;
+  id: bigint;
   gameStart: boolean;
   startTime: number;
   fail: boolean;
@@ -76,6 +78,7 @@ export class Game {
     player1Username: string,
     socketPlayer2Id: string,
     player2Username: string,
+    gameId: bigint,
     bonusMode: boolean = false,
   ) {
     this.isOver = false;
@@ -92,7 +95,6 @@ export class Game {
     this.player2Username = player2Username;
     this.winner = null;
     this.lastTime = performance.now();
-    this.id = Math.random().toString(36).substr(2, 9);
     this.player1Score = 0;
     this.player2Score = 0;
     this.racketLeft = 500 - RACKET_HEIGHT_10 / 2;
@@ -115,7 +117,17 @@ export class Game {
     this.player1Laser = false;
     this.player2Laser = false;
     this.bonusMode = bonusMode;
+    // this.initIdGame();
+    this.id = gameId;
+    
   }
+  
+  // async initIdGame() {
+  //   console.log('ksuis lancee');
+  //   const res = await this.gameRepository.saveNewGame(this.player1Username, this.player2Username); 
+  //   this.id = res.id.toString();
+  //   console.log('id game " ', this.id);
+  // }
 
   generateBonus() {
     if (this.bonus === null)
@@ -381,6 +393,14 @@ checkBonusCollision() {
       if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player2Username;
+        // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+          // async saveEndGame(
+          //   gameId: bigint,
+          //   winnerId: bigint,
+          //   scorePlayer1: number,
+          //   scorePlayer2: number,
+          // ): Promise<GameInterface> {
+          
       } else {
         this.ball.x = 500;
         this.ball.y = 500;
@@ -453,17 +473,25 @@ bonusPlayer2: this.bonusesPlayer2?.length > 0 && this.bonusesPlayer2[this.bonuse
  * - *
  * - *
  */
-import { InjectRepository } from '@nestjs/typeorm';
+
+// import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { GameEntity } from './entity/game.entity';
+// import { GameEntity } from './entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { GameInterface } from './interfaces/game.interface';
+import {
+  BadRequestException,
+  // HttpException,
+  // Injectable,
+  // NotFoundException,
+  // UnauthorizedException,
+} from '@nestjs/common';
 
 @Injectable()
 export class GameService {
-  games: Map<string, Game>;
+  games: Map<bigint, Game>;
   playerWaiting1Normal: any;
   playerWaiting2Normal: any;
   playerWaiting1Bonus: any;
@@ -476,22 +504,28 @@ export class GameService {
     private readonly userRepository: Repository<UserEntity>,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    this.games = new Map<string, Game>();
+    this.games = new Map<bigint, Game>();
   }
 
   /** **********************
    *        YANN PART
    *********************** */
 
-  getGames(): Map<string, Game> {
+  getGames(): Map<bigint, Game> {
     return this.games;
   }
-  updateGame(game: Game) {
+  async updateGame(game: Game) {
     game.updateBallPosition();
     if (game.isOver) {
+    await this.saveEndGame(
+        game.id,
+        game.winner,
+        game.player1Score,
+        game.player1Score
+      )
       this.games.delete(game.id);
     }
-    return game.getState();
+    return game.getState(); 
   }
   checkAlreadyInGame(username: string): boolean {
     try {
@@ -521,7 +555,7 @@ export class GameService {
     });
   }
 
-  addToQueue(socketId: string, username: string, bonusMode: boolean = false) {
+  async addToQueue(socketId: string, username: string, bonusMode: boolean = false) {
     if (this.checkAlreadyInGame(username)) return;
     if (bonusMode) {
       if (this.playerWaiting1Bonus === undefined) {
@@ -538,16 +572,22 @@ export class GameService {
           username: username,
         };
         console.log('Game created');
-        const game = new Game(
+        const res = await this.saveNewGame(this.playerWaiting1Bonus, this.playerWaiting2Bonus);
+        if (!res)
+          throw new BadRequestException('erreur save start game')
+        const game: Game = new Game(
           this.playerWaiting1Bonus.socketId,
           this.playerWaiting1Bonus.username,
           this.playerWaiting2Bonus.socketId,
           this.playerWaiting2Bonus.username,
+          res.id,  // conversion foireuse
           true
         );
         this.games.set(game.id, game);
         this.playerWaiting1Bonus = undefined;
         this.playerWaiting2Bonus = undefined;
+        
+        //res.id game
         return game.socketPlayer1Id;
       }
     }
@@ -567,11 +607,15 @@ export class GameService {
         username: username,
       };
       console.log('Game created');
+      const res = await this.saveNewGame(this.playerWaiting1Bonus, this.playerWaiting2Bonus);
+      if (!res)
+        throw new BadRequestException('erreur save start game')
       const game = new Game(
         this.playerWaiting1Normal.socketId,
         this.playerWaiting1Normal.username,
         this.playerWaiting2Normal.socketId,
         this.playerWaiting2Normal.username,
+        res.id,  // conversion foireuse
         false
       );
       this.games.set(game.id, game);
@@ -603,13 +647,13 @@ export class GameService {
    *********************** */
 
   // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
-  async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
+  async saveNewGame(userlogin1: string, userlogin2: string): Promise<GameInterface> {
     const newGame = new GameEntity();
     newGame.player1 = await this.userRepository.findOne({
-      where: { id: userId1 },
+      where: { login: userlogin1 },
     });
     newGame.player2 = await this.userRepository.findOne({
-      where: { id: userId2 },
+      where: { login: userlogin2 },
     });
     newGame.status = 'playing';
     newGame.createdAt = new Date();
@@ -621,20 +665,20 @@ export class GameService {
   }
 
   async saveEndGame(
-    gameId: bigint,
-    winnerId: bigint,
+    gameId:   bigint, 
+    winnerId: string  ,
     scorePlayer1: number,
     scorePlayer2: number,
   ): Promise<GameInterface> {
     const game: GameEntity = await this.gameRepository.findOne({
       where: { id: gameId },
-    });
+    }); 
     game.status = 'finished';
     game.finishAt = new Date();
     game.scorePlayer1 = scorePlayer1;
     game.scorePlayer2 = scorePlayer2;
     game.winner = await this.userRepository.findOne({
-      where: { id: winnerId },
+      where: { login: winnerId },
     });
     await this.gameRepository.save(game);
 
