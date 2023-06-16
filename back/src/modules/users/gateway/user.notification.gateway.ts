@@ -46,6 +46,7 @@ export class NotificationGateway {
   }
 
   emitNotificationFriendRequest(data: NotificationInterface) {
+    console.log('emitNotificationFriendRequest', data);
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_friend_request', data);

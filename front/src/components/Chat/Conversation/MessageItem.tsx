@@ -1,42 +1,48 @@
-import { useState, memo, FC, useEffect, useCallback } from 'react';
+import { useState, FC, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
-import { apiEditMessage } from '../../api/chat';
+import { apiEditMessage } from '../../../api/message';
 
-import { ApiErrorResponse } from '../../types';
-import { MessageInterface } from '../../types/ChatTypes';
+import { ApiErrorResponse, UserInterface } from '../../../types';
+import { ChatMsgInterface, MessageInterface } from '../../../types/ChatTypes';
 
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
+import { CircularProgress, FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { getTimeSince } from '../../utils/utils';
+import { getTimeSince, isChatMsgInterface, isMsgInterface } from '../../../utils/utils';
+import { editChatMessage } from '../../../api/chat';
+import { RootState } from '../../../store';
 
 
 interface MessageItemProps {
-  message: MessageInterface;
-  userDataId: number;
+  message: MessageInterface | ChatMsgInterface;
+  isLoadingDeleteMsg: boolean;
   handleDeleteMessage: (id: number) => void;
+  isAdminMenuOpen: boolean;
 }
 
-const MessageItem: FC<MessageItemProps> = memo(({
+const MessageItem: FC<MessageItemProps> = ({
   message,
-  userDataId,
+  isLoadingDeleteMsg,
   handleDeleteMessage,
+  isAdminMenuOpen,
 }) => {
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>(message.text);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messageTime, setMessageTime] = useState<string>(getTimeSince(message.createdAt));
   const dispatch = useDispatch();
 
 
   const handleEdit = (id: number) => async (e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (e === null) return;
-
+    
     if ('key' in e) {
       if (e.shiftKey && e.key === 'Enter') {
         setInputMessage((prev) => prev + '\n');
@@ -47,12 +53,25 @@ const MessageItem: FC<MessageItemProps> = memo(({
     if (inputMessage.trim() === '') return;
     e.stopPropagation();
     e.preventDefault();
-
+    
     if (inputMessage === message.text) {
       setEditMessage(false);
       return;
     }
-    const res: MessageInterface | ApiErrorResponse = await apiEditMessage(id, inputMessage);
+
+    setIsLoading(true);
+    let res: (MessageInterface | ChatMsgInterface) | ApiErrorResponse;
+    if (isMsgInterface(message) ) {
+      // console.log('edit message type MessageInterface');
+      res = await apiEditMessage(id, inputMessage);
+    } else if (isChatMsgInterface(message)) {
+      // console.log('edit message type ChatMsgInterface');
+      res = await editChatMessage(id, inputMessage);
+    } else {
+      throw new Error('message type not supported');
+    }
+    setIsLoading(false);
+
     if ('error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
@@ -91,7 +110,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
   useEffect(() => {
     const fctTime = setInterval(() => {
       setMessageTime(getTimeSince(message.createdAt));
-    }, 1000 * 1); //10sec
+    }, 1000 * 10); //10sec
     return () => {
       clearInterval(fctTime);
     };
@@ -101,18 +120,18 @@ const MessageItem: FC<MessageItemProps> = memo(({
     <div key={message.id}>
       <div
         // ref={index === messages.length - 1 ? bottomRef : null}
-        className={`w-full flex my-2 ${isHovered ? 'bg-blue-100 rounded-lg' : ''}`}
+        className={`w-full flex ${isHovered && 'bg-[#e7e7f7] rounded-lg'}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {/**
         * Display message
         */}
-        <div className='flex-none w-14 '>
+        <div className='flex-none w-14 mr-2'>
           <Link to={'/profile/' + message.ownerUser.login}>
             <img
               className="w-10 h-10 rounded-full m-2 object-cover "
-              src={'http://localhost:3000/avatars/' + message.ownerUser.avatar}
+              src={message.ownerUser.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
@@ -132,7 +151,9 @@ const MessageItem: FC<MessageItemProps> = memo(({
               {messageTime}
             </span>
           </div>
-          <div className='' style={{ wordBreak: 'break-word' }} >
+          <div 
+            className={message.ownerUser.id == 0 ? 'text-center font-light' : ''} 
+            style={{ wordBreak: 'break-word' }} >
             { message.text.split('\n').map((line, index) => {
               return (
                 <span key={index}>
@@ -153,7 +174,7 @@ const MessageItem: FC<MessageItemProps> = memo(({
             title="Edit message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && !isAdminMenuOpen && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
             <IconButton onClick={() => setEditMessage(true)} color='primary'>
               <EditOutlinedIcon />
@@ -164,9 +185,13 @@ const MessageItem: FC<MessageItemProps> = memo(({
             title="Delete message" arrow
             TransitionComponent={Zoom}
             TransitionProps={{ timeout: 600 }}
-            sx={{ visibility: isHovered && message.ownerUser.id === userDataId ? 'visible' : 'hidden' }}
+            sx={{ visibility: isHovered && !isAdminMenuOpen && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
           >
-            <IconButton onClick={handleDelete} color='warning'>
+            <IconButton 
+              onClick={handleDelete} 
+              color='warning'
+              disabled={ isLoadingDeleteMsg }
+            >
               <CloseIcon />
             </IconButton>
           </Tooltip>
@@ -190,7 +215,12 @@ const MessageItem: FC<MessageItemProps> = memo(({
             />
           </FormControl>
 
-          <IconButton onClick={handleEdit(message.id)} color='primary'>
+          <IconButton 
+            onClick={handleEdit(message.id)}
+            color='primary'
+            disabled={ isLoading }
+          >
+            { isLoading && <CircularProgress />}
             <BiPaperPlane />
           </IconButton>
 
@@ -201,11 +231,12 @@ const MessageItem: FC<MessageItemProps> = memo(({
       }
     </div>
   );
-}, (prevProps, nextProps) => {
-  if (prevProps.message.id !== nextProps.message.id) return false;
-  if (prevProps.message.text !== nextProps.message.text) return false;
-  if (prevProps.message.updatedAt !== nextProps.message.updatedAt) return false;
-  return true;
-});
+};
+//  (prevProps, nextProps) => {
+//   if (prevProps.message.id !== nextProps.message.id) return true;
+//   if (prevProps.message.text !== nextProps.message.text) return false;
+//   if (prevProps.message.updatedAt !== nextProps.message.updatedAt) return false;
+//   return true;
+// });
 
 export default MessageItem;

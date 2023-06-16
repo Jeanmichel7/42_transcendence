@@ -7,9 +7,8 @@
 # **/crypto/*.pem
 
 
-back/uploads/*
-
-
+back/uploads/users_avatars/*
+!back/uploads/users_avatars/defaultAvatar.png
 
 
 # Logs

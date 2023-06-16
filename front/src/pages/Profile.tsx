@@ -20,7 +20,7 @@ import { Button } from '@mui/material';
 
 function Profile() {
   const { pseudo } = useParams();
-  const { userData } = useSelector((state: RootState) => state.user);
+  const { userData, userFriends } = useSelector((state: RootState) => state.user);
   const [userProfile, setUserProfile] = useState<UserInterface>({
     id: -1,
     login: '',
@@ -63,7 +63,7 @@ function Profile() {
         <div className="w-1/4">
           {userProfile.avatar &&
             <img
-              src={'http://localhost:3000/avatars/' + userProfile.avatar}
+              src={userProfile.avatar}
               className="text-center mb-2 w-full rounded-[16px]"
               alt="avatar"
               onError={(e) => {
@@ -80,10 +80,10 @@ function Profile() {
           <h2 className="text-3xl text-center mb-5">
             {userProfile.firstName + ' ' + userProfile.lastName}
           </h2>
-          { userData && userData.friends && 
-            !userData.friends.find(u => u.id === userProfile.id) &&
-            userData.id != userProfile.id &&
-            <Button variant="contained" color="primary" 
+          { userData.id && userFriends 
+            && !userFriends.find(u => u.id === userProfile.id)
+            && userData.id != userProfile.id &&
+            <Button variant="contained" color="primary"
               onClick={() => handleAddFriend()}
               sx={{ display: 'block', margin: 'auto' }}
             >

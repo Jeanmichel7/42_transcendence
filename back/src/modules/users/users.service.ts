@@ -170,8 +170,7 @@ export class UsersService {
     newUser.email = data.email;
     newUser.description = data.description;
     const avatarName: string = await this.uploadAndSaveAvatar(data.image.link);
-    newUser.avatar = avatarName;
-
+    newUser.avatar = 'http://localhost:3000/avatars/' + avatarName;
     const user: UserEntity = await this.userRepository.save(newUser);
     if (!user) throw new NotFoundException(`User ${newUser.login} not created`);
     const result: UserInterface = { ...user };

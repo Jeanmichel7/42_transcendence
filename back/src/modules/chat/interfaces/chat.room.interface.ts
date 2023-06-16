@@ -17,3 +17,11 @@ export interface ChatRoomInterface {
   mutedUsers?: UserInterface[];
   acceptedUsers?: UserInterface[];
 }
+
+export interface ChatBotInterface {
+  roomId: bigint;
+  userId: bigint; // number pour 0 pour bot
+  userLogin: string;
+  text: string;
+  createdAt?: Date;
+}

@@ -19,7 +19,13 @@ import { ChatRoomEntity, UserEntity, ChatMessageEntity } from 'config';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 
-import { ChatJoinRoomEvent, ChatMessageCreatedEvent } from './event/chat.event';
+import {
+  BotChatMessageEvent,
+  ChatMessageEvent,
+  ChatUserRoomEvent,
+} from './event/chat.event';
+
+const limit = 20;
 
 @Injectable()
 export class ChatService {
@@ -29,6 +35,8 @@ export class ChatService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ChatRoomEntity)
     private readonly roomRepository: Repository<ChatRoomEntity>,
+    @InjectRepository(ChatMessageEntity)
+    private readonly messageRepository: Repository<ChatMessageEntity>,
   ) {}
 
   /* ************************************************ */
@@ -39,7 +47,7 @@ export class ChatService {
     userId: bigint,
     roomToCreate: ChatCreateRoomDTO,
   ): Promise<ChatRoomInterface> {
-    console.log('data room creation : ', roomToCreate);
+    // console.log('data room creation : ', roomToCreate);
 
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
@@ -57,43 +65,24 @@ export class ChatService {
     let allUsersAccepted: UserEntity[] = [];
     if (roomToCreate.type === 'private' && roomToCreate.acceptedUsers) {
       allUsersAccepted = await Promise.all(
-        roomToCreate.acceptedUsers.map(async (userLogin) => {
+        roomToCreate.acceptedUsers.map(async (userId) => {
           const userAccepted: UserEntity = await this.userRepository.findOne({
-            where: { login: userLogin },
+            where: { id: userId },
             select: ['id'],
             relations: ['roomUsers'],
           });
           if (!userAccepted)
-            throw new NotFoundException(`User ${userLogin} not found`);
+            throw new NotFoundException(`User ${user.login} not found`);
           return userAccepted;
         }),
       );
-      console.log('allUsersAccepted', allUsersAccepted);
+      // console.log('allUsersAccepted', allUsersAccepted);
     }
     let usersInRoom: UserEntity[] = [user];
     if (roomToCreate.acceptedUsers) {
-      usersInRoom = [...usersInRoom, ...allUsersAccepted];
-    } else {
-      //get all users
-      const users: UserEntity[] = await this.userRepository.find({
-        select: [
-          'id',
-          'firstName',
-          'lastName',
-          'login',
-          'email',
-          'status',
-          'description',
-          'avatar',
-        ],
-      });
-
-      //ajoute tout les users...
-      usersInRoom = [...usersInRoom, ...users];
-
-      //sauf l'user qui a cree la room
-      usersInRoom = usersInRoom.filter((u) => u.id !== user.id);
+      usersInRoom = [user, ...allUsersAccepted];
     }
+
     const room: ChatRoomEntity = await ChatRoomEntity.save({
       ownerUser: user,
       users: usersInRoom,
@@ -232,15 +221,16 @@ export class ChatService {
     roomId: bigint,
     data: ChatJoinRoomDTO,
   ): Promise<ChatRoomInterface> {
+    // console.log('data join room : ', data);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'], // a verifier
       relations: ['roomUsers'],
     });
 
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
-      select: ['id', 'type', 'password', 'isProtected'],
+      select: ['id', 'name', 'type', 'password', 'isProtected'],
       relations: [
         'users',
         'ownerUser',
@@ -269,12 +259,13 @@ export class ChatService {
 
     // compare les hashs des passwords
     if (room.isProtected) {
-      if (!data.password)
-        throw new ForbiddenException(`Room ${roomId} is private`);
-
+      if (data.password === null)
+        throw new ForbiddenException(
+          `Room ${roomId} is private and need password`,
+        );
       const isMatch = await bcrypt.compare(data.password, room.password);
       if (!isMatch)
-        throw new ForbiddenException(`Room ${roomId} password is invalid`);
+        throw new ForbiddenException(`Room ${room.name} password is invalid`);
     }
 
     room.users = [...room.users, user];
@@ -289,21 +280,72 @@ export class ChatService {
     //   .where('chat_rooms.id = :roomId', { roomId: room.id })
     //   .getOne();
 
-    const resultRoom: ChatRoomInterface = await this.getRoomAllMessages(
-      room.id,
-    );
+    const resultRoom: ChatRoomInterface = await this.roomRepository
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'users')
+      .select([
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .leftJoin('chat_rooms.admins', 'admins')
+      .addSelect([
+        'admins.id',
+        'admins.firstName',
+        'admins.lastName',
+        'admins.login',
+        'admins.avatar',
+        'admins.status',
+      ])
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
+      .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${user.login} has join the room`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
 
     this.eventEmitter.emit(
       'chat_room.join',
-      new ChatJoinRoomEvent(resultRoom, user.id.toString()),
+      new ChatUserRoomEvent(room.id, {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        login: user.login,
+        avatar: user.avatar,
+        status: user.status,
+      }),
     );
+
     return resultRoom;
   }
 
   async leaveRoom(userId: bigint, roomId: bigint): Promise<ChatRoomInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers'],
     });
 
@@ -324,9 +366,9 @@ export class ChatService {
     user.roomUsers = user.roomUsers.filter((r) => r.id !== room.id);
     await user.save();
 
-    const resultRoom: ChatRoomInterface = await this.roomRepository
+    const resultRoom: ChatRoomEntity = await this.roomRepository
       .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoin('chat_rooms.ownerUser', 'ownerUser')
       .select([
         'chat_rooms',
         'ownerUser.id',
@@ -337,12 +379,33 @@ export class ChatService {
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
-    // this.eventEmitter.emit('chat_rooms.leave', new ChatLeaveRoomEvent(resultRoom, user.id.toString()));
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${user.login} has left the room`,
+    };
+
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+    this.eventEmitter.emit(
+      'chat_room.leave',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: user.id as bigint,
+        userLogin: user.login,
+        text: `${user.login} has left the room`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
   async addAdminToRoom(
-    userId: bigint,
+    userId: bigint, //owner room guard donc pas besoin ?
     roomId: bigint,
     userIdToBeAdmin: bigint,
   ): Promise<ChatRoomInterface> {
@@ -390,6 +453,18 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    this.eventEmitter.emit(
+      'chat_room.admin.added',
+      new ChatUserRoomEvent(room.id, {
+        id: newAdmin.id,
+        firstName: newAdmin.firstName,
+        lastName: newAdmin.lastName,
+        login: newAdmin.login,
+        avatar: newAdmin.avatar,
+        status: newAdmin.status,
+      }),
+    );
     return resultRoom;
   }
 
@@ -447,6 +522,18 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    this.eventEmitter.emit(
+      'chat_room.admin.removed',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: adminToDel.id,
+        userLogin: adminToDel.login,
+        text: `${adminToDel.login} is no longer admin of room`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -467,7 +554,7 @@ export class ChatService {
 
     const userToBeMuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeMuted },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -496,6 +583,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeMuted.login} has been muted this idiot`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.muted',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeMuted.id,
+        firstName: userToBeMuted.firstName,
+        lastName: userToBeMuted.lastName,
+        login: userToBeMuted.login,
+        avatar: userToBeMuted.avatar,
+        status: userToBeMuted.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -516,7 +628,7 @@ export class ChatService {
 
     const userToBeDemuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeDemuted },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -549,7 +661,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
-    console.log('user demuted');
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeDemuted.login} has been unmuted`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.unmuted',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeDemuted.id,
+        firstName: userToBeDemuted.firstName,
+        lastName: userToBeDemuted.lastName,
+        login: userToBeDemuted.login,
+        avatar: userToBeDemuted.avatar,
+        status: userToBeDemuted.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -570,7 +706,7 @@ export class ChatService {
 
     const userToBeKicked: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeKicked },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
 
@@ -601,6 +737,30 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeKicked.login} has been kicked`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.kicked',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: userToBeKicked.id,
+        userLogin: userToBeKicked.login,
+        text: `${userToBeKicked.login} has been kicked`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -621,7 +781,7 @@ export class ChatService {
 
     const userToBeBanned: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeBanned },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomBannedUsers'],
     });
 
@@ -632,7 +792,7 @@ export class ChatService {
     await userToBeBanned.save();
 
     room.bannedUsers = [...room.bannedUsers, userToBeBanned];
-    room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
+    // room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -651,6 +811,31 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeBanned.login} has been banned`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.banned',
+      new ChatUserRoomEvent(room.id, {
+        id: userToBeBanned.id,
+        firstName: userToBeBanned.firstName,
+        lastName: userToBeBanned.lastName,
+        login: userToBeBanned.login,
+        avatar: userToBeBanned.avatar,
+        status: userToBeBanned.status,
+      }),
+    );
+
     return resultRoom;
   }
 
@@ -671,7 +856,7 @@ export class ChatService {
 
     const userToBeUnbanned: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeUnbanned },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: ['roomUsers', 'roomBannedUsers'],
     });
 
@@ -704,12 +889,138 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `${userToBeUnbanned.login} has been unbanned`,
+    };
+
+    // pour eviter de convertir un bigint en number
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+    const res = await this.createMessage(newBotMessage, userBot.id, roomId);
+    if (!res) throw new Error('Bot message not created');
+
+    this.eventEmitter.emit(
+      'chat_room.unbanned',
+      new BotChatMessageEvent({
+        roomId: room.id,
+        userId: userToBeUnbanned.id,
+        userLogin: userToBeUnbanned.login,
+        text: `${userToBeUnbanned.login} has been unbanned`,
+        createdAt: new Date(),
+      }),
+    );
+
     return resultRoom;
   }
 
   /* ************************************************ */
   /*                      MESSAGE                     */
   /* ************************************************ */
+
+  async getRoomAllMessages(
+    userId: bigint,
+    roomId: bigint,
+  ): Promise<ChatMsgInterface[]> {
+    const messages: ChatMessageEntity[] = await this.messageRepository
+      .createQueryBuilder('chat_messages')
+      .select([
+        'chat_messages.id',
+        'chat_messages.text',
+        'chat_messages.createdAt',
+        'chat_messages.updatedAt',
+      ])
+      .leftJoin('chat_messages.ownerUser', 'ownerUser')
+      .addSelect([
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+      ])
+      .leftJoin('chat_messages.room', 'room')
+      .addSelect(['room.id', 'room.type', 'room.name', 'room.isProtected'])
+      .leftJoin('room.users', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .where('room.id = :roomId', { roomId })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .getMany();
+
+    //check user is in room
+    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't see messages`,
+      );
+
+    return messages;
+  }
+
+  async getRoomMessagesPaginate(
+    userId: bigint,
+    roomId: bigint,
+    page: number,
+    offset: number,
+  ): Promise<ChatMsgInterface[]> {
+    if (page < 1) page = 1;
+    if (offset < 0) offset = 0;
+    if (offset > limit) {
+      page = page + Math.floor(offset / limit);
+      offset = offset % limit;
+    }
+    const skip = (page - 1) * limit - offset;
+
+    const messages: ChatMessageEntity[] = await this.messageRepository
+      .createQueryBuilder('chat_messages')
+      .select([
+        'chat_messages.id',
+        'chat_messages.text',
+        'chat_messages.createdAt',
+        'chat_messages.updatedAt',
+      ])
+      .leftJoin('chat_messages.ownerUser', 'ownerUser')
+      .addSelect([
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+      ])
+      .leftJoin('chat_messages.room', 'room')
+      .addSelect(['room.id', 'room.type', 'room.name', 'room.isProtected'])
+      .leftJoin('room.users', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .where('room.id = :roomId', { roomId })
+      .orderBy('chat_messages.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getMany();
+
+    //check user is in room
+    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't see messages`,
+      );
+
+    return messages;
+  }
 
   async createMessage(
     newMessage: ChatCreateMsgDTO,
@@ -718,14 +1029,14 @@ export class ChatService {
   ): Promise<ChatMsgInterface> {
     const userSend: UserEntity = await UserEntity.findOne({
       where: { id: userId },
-      select: ['id', 'firstName', 'lastName', 'login'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['chatMessages'],
     });
-    console.error('userSend', userSend);
+    // console.log('userSend', userSend);
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },
-      select: ['id', 'type'],
+      select: ['id', 'type', 'name', 'isProtected'],
       relations: ['messages'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
@@ -743,7 +1054,6 @@ export class ChatService {
     await userSend.save();
     room.messages = [...room.messages, message];
     await room.save();
-
     const messageToSave: ChatMsgInterface = {
       id: message.id,
       text: message.text,
@@ -753,19 +1063,20 @@ export class ChatService {
         name: room.name,
         isProtected: room.isProtected,
       },
-      user: {
+      ownerUser: {
         id: userSend.id,
         firstName: userSend.firstName,
         lastName: userSend.lastName,
         login: userSend.login,
+        status: userSend.status,
+        avatar: userSend.avatar,
       },
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     };
-
     this.eventEmitter.emit(
       'chat_message.created',
-      new ChatMessageCreatedEvent(messageToSave),
+      new ChatMessageEvent(messageToSave),
     );
 
     return messageToSave;
@@ -779,12 +1090,12 @@ export class ChatService {
     const message: ChatMessageEntity = await ChatMessageEntity.findOne({
       where: { id: messageId },
       select: ['id', 'text', 'createdAt', 'updatedAt'],
-      relations: ['user', 'room'],
+      relations: ['ownerUser', 'room'],
     });
 
     if (!message) throw new NotFoundException(`Message ${messageId} not found`);
 
-    if (message.user.id !== userId)
+    if (message.ownerUser.id !== userId)
       throw new ForbiddenException(
         `User ${userId} is not owner of message ${messageId}`,
       );
@@ -802,40 +1113,44 @@ export class ChatService {
         name: message.room.name,
         isProtected: message.room.isProtected,
       },
-      user: {
-        id: message.user.id,
-        firstName: message.user.firstName,
-        lastName: message.user.lastName,
-        login: message.user.login,
+      ownerUser: {
+        id: message.ownerUser.id,
+        firstName: message.ownerUser.firstName,
+        lastName: message.ownerUser.lastName,
+        login: message.ownerUser.login,
+        status: message.ownerUser.status,
+        avatar: message.ownerUser.avatar,
       },
       createdAt: message.createdAt,
       updatedAt: message.updatedAt,
     };
-
-    // this.eventEmitter.emit('chat_message.edited', new ChatMessageEditedEvent(resultMessage));
-
+    this.eventEmitter.emit(
+      'chat_message.edited',
+      new ChatMessageEvent(resultMessage),
+    );
     return resultMessage;
   }
 
-  async deleteMessage(userId: bigint, messageId: bigint): Promise<any> {
+  async deleteMessage(userId: bigint, messageId: bigint): Promise<boolean> {
     const message: ChatMessageEntity = await ChatMessageEntity.findOne({
       where: { id: messageId },
-      select: ['id', 'text', 'createdAt', 'updatedAt'],
-      relations: ['user', 'room'],
+      relations: ['ownerUser', 'room'],
     });
 
     if (!message) throw new NotFoundException(`Message ${messageId} not found`);
 
-    if (message.user.id !== userId)
+    if (message.ownerUser.id !== userId)
       throw new ForbiddenException(
         `User ${userId} is not owner of message ${messageId}`,
       );
+    const result = await ChatMessageEntity.delete({ id: messageId });
+    if (!result) return false;
 
-    const result = await message.remove();
-    if (!result) return 0;
-
-    // this.eventEmitter.emit('chat_message.deleted', new ChatMessageDeletedEvent(messageId));
-    return 1;
+    this.eventEmitter.emit(
+      'chat_message.deleted',
+      new ChatMessageEvent(message),
+    );
+    return true;
   }
 
   async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
@@ -853,39 +1168,44 @@ export class ChatService {
         'chat_rooms.name',
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
+        'chat_rooms.isProtected',
+        'chat_rooms.password',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
         'ownerUser.avatar',
+        'ownerUser.status',
         'users.id',
         'users.firstName',
         'users.lastName',
         'users.login',
         'users.avatar',
+        'users.status',
         'admins.id',
         'admins.firstName',
         'admins.lastName',
         'admins.login',
         'admins.avatar',
+        'admins.status',
         'bannedUsers.id',
         'bannedUsers.firstName',
         'bannedUsers.lastName',
         'bannedUsers.login',
         'bannedUsers.avatar',
+        'bannedUsers.status',
         'mutedUsers.id',
         'mutedUsers.firstName',
         'mutedUsers.lastName',
         'mutedUsers.login',
         'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .getMany();
 
-    const result: ChatRoomInterface[] = rooms
-      .map((room: ChatRoomEntity) => {
-        return { ...room };
-      })
-      .filter((room) => room.type === 'public');
+    const result: ChatRoomInterface[] = rooms.filter(
+      (room) => room.type === 'public',
+    );
     return result;
   }
 
@@ -921,55 +1241,39 @@ export class ChatService {
       .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
       .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('chat_rooms.acceptedUsers', 'acceptedUsers')
-      .leftJoinAndSelect('messages.user', 'ownerMessage')
+      .leftJoinAndSelect('messages.ownerUser', 'ownerMessage')
       .select([
         'chat_rooms',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
         'users.id',
         'users.firstName',
         'users.lastName',
         'users.login',
+        'users.avatar',
+        'users.status',
         'admins.id',
         'admins.firstName',
         'admins.lastName',
         'admins.login',
+        'admins.avatar',
+        'admins.status',
         'bannedUsers.id',
         'bannedUsers.firstName',
         'bannedUsers.lastName',
         'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
         'mutedUsers.id',
         'mutedUsers.firstName',
         'mutedUsers.lastName',
         'mutedUsers.login',
-        'messages.id',
-        'messages.text',
-        'messages.createdAt',
-        'ownerMessage.id',
-        'ownerMessage.firstName',
-        'ownerMessage.lastName',
-        'ownerMessage.login',
-        'acceptedUsers.id',
-        'acceptedUsers.firstName',
-        'acceptedUsers.lastName',
-        'acceptedUsers.login',
-      ])
-      .where('chat_rooms.id = :roomId', { roomId })
-      .getOne();
-    return room;
-  }
-
-  async getRoomAllMessages(roomId: bigint): Promise<ChatRoomInterface> {
-    const room: ChatRoomEntity = await this.roomRepository
-      .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.messages', 'messages')
-      .leftJoinAndSelect('messages.user', 'ownerMessage')
-      .select([
-        'chat_rooms.id',
-        'chat_rooms.type',
-        'chat_rooms.name',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
         'messages.id',
         'messages.text',
         'messages.createdAt',
@@ -978,12 +1282,18 @@ export class ChatService {
         'ownerMessage.firstName',
         'ownerMessage.lastName',
         'ownerMessage.login',
+        'ownerMessage.avatar',
+        'ownerMessage.status',
+        'acceptedUsers', //// a verfier ///
+        'acceptedUsers.id',
+        'acceptedUsers.firstName',
+        'acceptedUsers.lastName',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId })
-      .orderBy('messages.createdAt', 'DESC')
       .getOne();
-    if (!room) throw new NotFoundException(`Room ${roomId} does not exist`);
-    const result: ChatRoomInterface = { ...room };
-    return result;
+    return room;
   }
 }

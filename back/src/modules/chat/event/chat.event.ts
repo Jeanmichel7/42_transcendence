@@ -1,13 +1,25 @@
 import { ChatMsgInterface } from 'src/modules/chat/interfaces/chat.message.interface';
-import { ChatRoomInterface } from 'src/modules/chat/interfaces/chat.room.interface';
+import {
+  ChatBotInterface,
+  ChatRoomInterface,
+} from '../interfaces/chat.room.interface';
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
-export class ChatMessageCreatedEvent {
+export class ChatMessageEvent {
   constructor(public readonly message: ChatMsgInterface) {}
 }
 
-export class ChatJoinRoomEvent {
+export class ChatRoomEvent {
+  constructor(public readonly room: ChatRoomInterface) {}
+}
+
+export class BotChatMessageEvent {
+  constructor(public readonly botMessage: ChatBotInterface) {}
+}
+
+export class ChatUserRoomEvent {
   constructor(
-    public readonly room: ChatRoomInterface,
-    public readonly userId: string,
+    public readonly roomId: bigint,
+    public readonly user: UserInterface,
   ) {}
 }

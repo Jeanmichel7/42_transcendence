@@ -49,6 +49,7 @@ const tabMap = {
 
 
 export default function FriendsPage() {
+  // const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState<number>(0);
   const [onlineCount, setOnlineCount] = useState<number>(0);
   const [friendsCount, setFriendsCount] = useState<number>(0);
@@ -58,7 +59,7 @@ export default function FriendsPage() {
   
   const location = useLocation();
   const navigate = useNavigate();
-  const userData = useSelector((state: RootState) => state.user.userData);
+  const { userData, userFriends, userBlocked, waitingFriendsRequestReceived, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   
   //check query params
   useEffect(() => {
@@ -79,26 +80,26 @@ export default function FriendsPage() {
 
 
   useEffect(() => {
-    if (userData.friends) {
-      setFriendsCount(userData.friends.length);
-      setOnlineCount(userData.friends.filter((f) => f.status !== 'offline').length);
+    if (userFriends) {
+      setFriendsCount(userFriends.length);
+      setOnlineCount(userFriends.filter((f) => f.status !== 'offline').length);
     }
-  }, [userData.friends]);
+  }, [userFriends]);
 
   useEffect(() => {
-    if (userData.waitingFriendsRequestReceived)
-      setWaitingRequestCount(userData.waitingFriendsRequestReceived.length);
-  }, [userData.waitingFriendsRequestReceived]);
+    if (waitingFriendsRequestReceived)
+      setWaitingRequestCount(waitingFriendsRequestReceived.length);
+  }, [waitingFriendsRequestReceived]);
 
   useEffect(() => {
-    if (userData.waitingFriendsRequestSent)
-      setWaitingSentCount(userData.waitingFriendsRequestSent.length);
-  }, [userData.waitingFriendsRequestSent]);
+    if (waitingFriendsRequestSent)
+      setWaitingSentCount(waitingFriendsRequestSent.length);
+  }, [waitingFriendsRequestSent]);
 
   useEffect(() => {
-    if (userData.userBlocked)
-      setBlockedCount(userData.userBlocked.length);
-  }, [userData.userBlocked]);
+    if (userBlocked)
+      setBlockedCount(userBlocked.length);
+  }, [userBlocked]);
   
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -139,8 +140,8 @@ export default function FriendsPage() {
           </Toolbar>
         </AppBar>
 
-        <TabPanel value={value} index={0}> <OnLineFriends /> </TabPanel>
-        <TabPanel value={value} index={1}> <AllFriends /> </TabPanel>
+        <TabPanel value={value} index={0}> <OnLineFriends userDataId={userData.id}/> </TabPanel>
+        <TabPanel value={value} index={1}> <AllFriends userDataId={userData.id}/> </TabPanel>
         <TabPanel value={value} index={2}> <WaitingAcceptRequest /> </TabPanel>
         <TabPanel value={value} index={3}> <WaitingRequestSent /> </TabPanel>
         <TabPanel value={value} index={4}> <BlockedUser /> </TabPanel>

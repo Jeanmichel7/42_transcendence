@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
 import { getAllUsers } from '../../../api/user';
 import { requestAddFriend } from '../../../api/relation';
@@ -10,19 +11,19 @@ import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
 
 import FriendCard from '../../Profile/FriendsCard';
 
-import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material';
-import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
+import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material';
 
 export default function FriendsSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState<UserInterface[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userData, userFriends, userBlocked, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
     async function fetchUsers() {
+      if ( !userData || !userFriends || !userBlocked || !waitingFriendsRequestSent ) return;
       setIsLoading(true);
       const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers();
       setIsLoading(false);
@@ -32,25 +33,21 @@ export default function FriendsSearch() {
       else {
         const resFiltered = allUsers.filter((u: UserInterface) =>
           u.id != userData.id &&
-          !userData.friends?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.userBlocked?.find((f: UserInterface) => f.id === u.id) &&
-          !userData.waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
+          !userFriends?.find((f: UserInterface) => f.id === u.id) &&
+          !userBlocked?.find((f: UserInterface) => f.id === u.id),
         );
         setUsers(resFiltered);
       }
       setSelectedUser(null);
     }
     fetchUsers();
-  }, [userData.id,
-    userData.friends,
-    dispatch,
-    userData.userBlocked,
-    userData.waitingFriendsRequestSent,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, waitingFriendsRequestSent]);
 
 
   function isMyFriend(userId: number): boolean {
-    return !!userData.friends?.find((friend: UserInterface) => friend.id === userId);
+    if (!userFriends) return false;
+    return !!userFriends?.find((friend: UserInterface) => friend.id === userId);
   }
 
   const handleRequestAddFriend = async (user: UserInterface | null) => {
@@ -65,17 +62,11 @@ export default function FriendsSearch() {
       setSelectedUser(null);
     }
   };
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData || !users)
-    return <p>Loading...</p>;
-  
 
   return (
-    <div className="m-5 p-5 h-full">
-      <div className='flex'>
-      <Autocomplete
+    <>
+      <div className='flex p-3 border'>
+        <Autocomplete
           id="searchFriends"
           fullWidth
           options={users}
@@ -90,25 +81,34 @@ export default function FriendsSearch() {
         <Button
           onClick={() => handleRequestAddFriend(selectedUser)}
           variant="contained"
+          color="primary"
+          sx={{ ml: 2, height: '40px', alignSelf: 'center',
+            visibility: !selectedUser || isMyFriend(selectedUser.id) ? 'hidden' : 'visible',
+          }}
         > Add </Button>
       </div>
-
-
-      <div className='h-full'>
-        <h2 className="text-2xl font-bold">Users</h2>
-        <div className="flex flex-wrap overflow-auto max-h-[calc(100vh-520px)]">
-          {users.map((user: UserInterface) => {
-            if (user.id != userData.id && !isMyFriend(user.id))
-              return (
-                <FriendCard
-                  key={user.id}
-                  friend={user}
-                />
-              );
-          })}
-        </div>
+      { isLoading && 
+        <CircularProgress 
+          size={100}
+          color='primary'
+          sx={{
+            position: 'absolute',
+            top: '25%',
+            left: '50%',
+          }}
+        /> 
+      }
+      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
+        {users.map((user: UserInterface) => {
+          if (user.id != userData.id && !isMyFriend(user.id))
+            return (
+              <FriendCard
+                key={user.id}
+                friend={user}
+              />
+            );
+        })}
       </div>
-
-    </div>
+    </>
   );
 }

@@ -5,7 +5,7 @@ export interface ChatMsgInterface {
   id: bigint;
   text: string;
   room: ChatRoomInterface;
-  user: UserInterface;
+  ownerUser: UserInterface;
   createdAt?: Date;
   updatedAt?: Date;
 }

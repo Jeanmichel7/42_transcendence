@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddNotification, reduxAddUserBlocked, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveNotification, reduxRemoveUserBlocked, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
+import { reduxAddConversationList } from '../../store/chatSlicer';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -28,6 +29,7 @@ import MenuItem from '@mui/material/MenuItem';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import { reduxAddNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 
 
 
@@ -41,7 +43,7 @@ function Header() {
   /* redux */
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
-  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
+  const { notifications } = useSelector((state: RootState) => state.notification);
 
   const connectWebSocket = useCallback(() => {
     if (!userData.id) return;
@@ -53,11 +55,9 @@ function Header() {
     });
 
     socket.on('connect', () => {
-      console.log('connected general socket');
     });
 
     socket.on('disconnect', () => {
-      console.log('disconnected general socket');
     });
 
     //connect room
@@ -77,6 +77,9 @@ function Header() {
     socket.on('notification_friend_request_accepted', (notification: NotificationInterface) => {
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
       dispatch(reduxAcceptedRequest(notification));
+      dispatch(reduxAddConversationList({ item: notification.sender, userId: userData.id }));
+
+
     });
 
     socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
@@ -156,8 +159,9 @@ function Header() {
   
   useEffect(() => {
     // console.log('setnotifications localstorage', notifications);
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-  }, [notifications]);
+    if (userData.id === undefined || userData.id == -1) return;
+    localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
+  }, [notifications, userData.id]);
   
 
   const renderMobileNotification = (
@@ -343,27 +347,32 @@ function Header() {
           {/**
            * Display pages on large screen
            */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' } }}>
+          <Box sx={{ 
+            flexGrow: 1, 
+            display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' },
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}>
             <NavLink to="/game">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Play
               </Button>
             </NavLink>
 
             <NavLink to="/chat">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Chat
               </Button>
             </NavLink>
 
             <NavLink to="/friends">
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Friends
               </Button>
             </NavLink>
 
             <NavLink to={'/profile/' + userData.login}>
-              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Profile
               </Button>
             </NavLink>
@@ -403,7 +412,7 @@ function Header() {
                   color="inherit"
                 >
                   {userData.avatar &&
-                    <Avatar alt="avatar" src={'http://localhost:3000/avatars/' + userData.avatar}
+                    <Avatar alt="avatar" src={userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;

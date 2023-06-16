@@ -9,8 +9,10 @@ import { getBlockedUsers, getFriends } from '../api/relation';
 import { setUser, setLogged, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice';
 import { FormControl, InputLabel, FormHelperText, Box, OutlinedInput, Button, CircularProgress } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ReduxActionInterface, UserInterface } from '../types';
+import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
+import { reduxSetNotifications } from '../store/notificationSlice';
+import { reduxSetConversationList } from '../store/chatSlicer';
 
 function ConnectPage() {
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ function ConnectPage() {
 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => ReduxActionInterface),
+    action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
@@ -36,34 +38,25 @@ function ConnectPage() {
       dispatch(action(result));
     }
   }, [dispatch]);
-  
+
   //save user data in redux
-  const saveUserData = useCallback( async function () {
+  const saveUserData = useCallback( async function (id: number) {
     dispatch(setLogged(true));
+    dispatch(reduxSetNotifications(
+      localStorage.getItem('notifications' + id)
+        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
+        : [] as NotificationInterface[],
+    ));
+    dispatch(reduxSetConversationList(
+      localStorage.getItem('conversationsList' + id)
+        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string) 
+        : [] as ConversationInterface[],
+    ));
     await fetchData(getUserData, setUser);
     await fetchData(getFriends, reduxSetFriends);
     await fetchData(getBlockedUsers, reduxSetUserBlocked);
   }, [dispatch, fetchData]);
 
-  //check if 2FA is activated
-  useEffect(() => {
-    async function fetchAndSetIs2FAactived() {
-      const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-      if ('error' in res) {
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
-      } else {
-        if (res.is2FAactived) {
-          setIs2FAactiv(res.is2FAactived);
-          setUserId(res.user.id);
-        } else {
-          await saveUserData();
-          // await new Promise(r => setTimeout(r, 10000)); wait 10s
-          navigate('/home');
-        }
-      }
-    }
-    fetchAndSetIs2FAactived();
-  }, [dispatch, navigate, saveUserData]);
 
   //send code to server
   async function handleSendCode() {
@@ -85,10 +78,32 @@ function ConnectPage() {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       setError(false);
-      await saveUserData();
+      await saveUserData(userId);
       navigate('/home');
     }
   }
+
+
+  //check if 2FA is activated
+  useEffect(() => {
+    async function fetchAndSetIs2FAactived() {
+      const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+      console.log('res : ', res);
+      if ('error' in res) {
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      } else {
+        if (res.is2FAactived) {
+          setIs2FAactiv(res.is2FAactived);
+          setUserId(res.user.id);
+        } else {
+          await saveUserData(res.user.id);
+          // await new Promise(r => setTimeout(r, 10000)); //wait 10s
+          navigate('/home');
+        }
+      }
+    }
+    fetchAndSetIs2FAactived();
+  }, [dispatch, navigate, saveUserData]);
 
 
   return (

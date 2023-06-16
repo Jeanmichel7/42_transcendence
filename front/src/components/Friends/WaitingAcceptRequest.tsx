@@ -5,13 +5,16 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { UserInterface, ApiErrorResponse, UserRelation, NotificationInterface } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { reduxAddFriends, reduxRemoveNotification, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
+import { reduxRemoveNotification } from '../../store/notificationSlice';
 import FriendItem from './FriendItem';
+
+import { reduxAddConversationList } from '../../store/chatSlicer';
 
 const WaitingAcceptRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const notifications: NotificationInterface[] = useSelector((state: RootState) => state.user.notifications);
+  const { userData, waitingFriendsRequestReceived } = useSelector((state: RootState) => state.user);
+  const { notifications } = useSelector((state: RootState) => state.notification);
   const dispatch = useDispatch();
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
@@ -24,6 +27,7 @@ const WaitingAcceptRequest = () => {
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
+      dispatch(reduxAddConversationList({ item: userToAccept, userId: userData.id }));
 
       //search notif ans delete
       const notif: NotificationInterface = notifications.find((n) => 
@@ -55,17 +59,11 @@ const WaitingAcceptRequest = () => {
     }
   };
 
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
-  
   return (
     <>
-      { userData.waitingFriendsRequestReceived?.length === 0 && <p> No waiting request received</p> }
-      { userData.waitingFriendsRequestReceived?.map((user) => (
+      { !waitingFriendsRequestReceived && <p>Loading...</p>}
+      { waitingFriendsRequestReceived?.length === 0 && <p> No waiting request received</p> }
+      { waitingFriendsRequestReceived?.map((user) => (
         <FriendItem 
           key={user.id}
           user={user} 
@@ -75,6 +73,7 @@ const WaitingAcceptRequest = () => {
           ]}
         />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };

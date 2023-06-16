@@ -37,7 +37,7 @@ export class ChatMessageEntity extends BaseEntity {
   @ManyToOne(() => UserEntity, (user) => user.chatMessages, {
     onDelete: 'CASCADE',
   })
-  user: UserEntity;
+  ownerUser: UserEntity;
 
   @ManyToOne(() => ChatRoomEntity, (room) => room.messages, {
     onDelete: 'CASCADE',

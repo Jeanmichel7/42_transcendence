@@ -70,8 +70,28 @@ export class UsersRelationsService {
       await this.userRelationRepository
         .createQueryBuilder('user-relation')
         .select('user-relation')
-        .leftJoinAndSelect('user-relation.userInitiateur', 'userInitiateur')
-        .leftJoinAndSelect('user-relation.userRelation', 'userRelation')
+        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .addSelect([
+          'userInitiateur.id',
+          'userInitiateur.login',
+          'userInitiateur.email',
+          'userInitiateur.firstName',
+          'userInitiateur.lastName',
+          'userInitiateur.description',
+          'userInitiateur.avatar',
+          'userInitiateur.status',
+        ])
+        .leftJoin('user-relation.userRelation', 'userRelation')
+        .addSelect([
+          'userRelation.id',
+          'userRelation.login',
+          'userRelation.email',
+          'userRelation.firstName',
+          'userRelation.lastName',
+          'userRelation.description',
+          'userRelation.avatar',
+          'userRelation.status',
+        ])
         .where('user-relation.relationType = :relationType', {
           relationType: 'friend',
         })
@@ -121,8 +141,28 @@ export class UsersRelationsService {
           'user-relation.createdAt',
           'user-relation.updatedAt',
         ])
-        .leftJoinAndSelect('user-relation.userInitiateur', 'userInitiateur')
-        .leftJoinAndSelect('user-relation.userRelation', 'userRelation')
+        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .addSelect([
+          'userInitiateur.id',
+          'userInitiateur.login',
+          'userInitiateur.email',
+          'userInitiateur.firstName',
+          'userInitiateur.lastName',
+          'userInitiateur.description',
+          'userInitiateur.avatar',
+          'userInitiateur.status',
+        ])
+        .leftJoin('user-relation.userRelation', 'userRelation')
+        .addSelect([
+          'userRelation.id',
+          'userRelation.login',
+          'userRelation.email',
+          'userRelation.firstName',
+          'userRelation.lastName',
+          'userRelation.description',
+          'userRelation.avatar',
+          'userRelation.status',
+        ])
         .where('user-relation.relationType = :relationType', {
           relationType: 'friend',
         })
@@ -172,8 +212,28 @@ export class UsersRelationsService {
           'user-relation.createdAt',
           'user-relation.updatedAt',
         ])
-        .leftJoinAndSelect('user-relation.userInitiateur', 'userInitiateur')
-        .leftJoinAndSelect('user-relation.userRelation', 'userRelation')
+        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .addSelect([
+          'userInitiateur.id',
+          'userInitiateur.login',
+          'userInitiateur.email',
+          'userInitiateur.firstName',
+          'userInitiateur.lastName',
+          'userInitiateur.description',
+          'userInitiateur.avatar',
+          'userInitiateur.status',
+        ])
+        .leftJoin('user-relation.userRelation', 'userRelation')
+        .addSelect([
+          'userRelation.id',
+          'userRelation.login',
+          'userRelation.email',
+          'userRelation.firstName',
+          'userRelation.lastName',
+          'userRelation.description',
+          'userRelation.avatar',
+          'userRelation.status',
+        ])
         .where('user-relation.relationType = :relationType', {
           relationType: 'blocked',
         })
@@ -241,14 +301,14 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'login'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
     });
     if (!userToUpdate)
       throw new NotFoundException(`User with id ${userId} not found`);
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
-      select: ['id', 'login'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
     });
     if (!userFriend)
       throw new NotFoundException(`User friend with id ${friendId} not found`);
@@ -342,16 +402,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userToUpdate)
@@ -359,16 +410,7 @@ export class UsersRelationsService {
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userFriend)
@@ -448,16 +490,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userToUpdate)
@@ -465,16 +498,7 @@ export class UsersRelationsService {
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userFriend)
@@ -543,16 +567,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userToUpdate)
@@ -560,16 +575,7 @@ export class UsersRelationsService {
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userFriend)
@@ -643,7 +649,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
 
@@ -652,7 +658,7 @@ export class UsersRelationsService {
 
     const userBlocked: UserEntity = await this.userRepository.findOne({
       where: { id: blockedId },
-      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
 
@@ -776,16 +782,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userToUpdate)
@@ -793,16 +790,7 @@ export class UsersRelationsService {
 
     const userBlocked: UserEntity = await this.userRepository.findOne({
       where: { id: blockedId },
-      select: [
-        'id',
-        'login',
-        'email',
-        'firstName',
-        'lastName',
-        'description',
-        'avatar',
-        'status',
-      ],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userBlocked)
@@ -903,7 +891,7 @@ export class UsersRelationsService {
     // check users
     const userToUpdate: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userToUpdate)
@@ -911,7 +899,7 @@ export class UsersRelationsService {
 
     const userFriend: UserEntity = await this.userRepository.findOne({
       where: { id: friendId },
-      select: ['id', 'login', 'email', 'firstName', 'lastName'],
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['initiatedRelations', 'relatedRelations'],
     });
     if (!userFriend)

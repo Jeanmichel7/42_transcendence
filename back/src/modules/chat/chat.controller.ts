@@ -13,6 +13,8 @@ import {
   Patch,
   Delete,
   HttpStatus,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,11 +46,18 @@ export class ChatController {
   /*                       ROOM                       */
   /* ************************************************ */
 
-  @Get('rooms/allRoomsToDisplay')
+  @Get('rooms/public')
   async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] =
       await this.ChatService.getAllRoomsToDisplay();
     return rooms;
+  }
+
+  @Get('rooms/:roomId')
+  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
+    const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
+    // console.log('return room : ', room);
+    return room;
   }
 
   @Post('rooms/add')
@@ -96,7 +105,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
     @Body() data: ChatJoinRoomDTO,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.joinRoom(
       req.user.id,
       roomId,
@@ -110,7 +119,7 @@ export class ChatController {
   async leaveRoom(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.leaveRoom(
       req.user.id,
       roomId,
@@ -125,7 +134,7 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeAdmin') userIdToBeAdmin: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.addAdminToRoom(
       req.user.id,
       roomId,
@@ -157,7 +166,7 @@ export class ChatController {
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeMuted') userIdToBeMuted: bigint,
     @Body() data: ChatMuteUserDTO,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const muteDurationSec = data.muteDurationSec ? data.muteDurationSec : '10';
     const result: ChatRoomInterface = await this.ChatService.muteUser(
       roomId,
@@ -178,11 +187,11 @@ export class ChatController {
 
   // demute user
   @UseGuards(AdminRoomGuard)
-  @Patch('rooms/:roomId/users/:userIdToBeDemuted/demute')
+  @Patch('rooms/:roomId/users/:userIdToBeDemuted/unmute')
   async demuteUser(
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeDemuted') userIdToBeDemuted: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.demuteUser(
       roomId,
       userIdToBeDemuted,
@@ -196,7 +205,7 @@ export class ChatController {
   async kickUser(
     @Param('roomId') roomId: bigint,
     @Param('userIdToBeKicked') userIdToBeKicked: bigint,
-  ) {
+  ): Promise<ChatRoomInterface> {
     const result: ChatRoomInterface = await this.ChatService.kickUser(
       roomId,
       userIdToBeKicked,
@@ -238,10 +247,22 @@ export class ChatController {
 
   @Get('rooms/:roomId/messages')
   async getMessages(
+    @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,
-  ): Promise<ChatRoomInterface> {
-    const messages: ChatRoomInterface =
-      await this.ChatService.getRoomAllMessages(roomId);
+    @Query('page', ParseIntPipe) page: number,
+    @Query('offset', ParseIntPipe) offset: number,
+  ): Promise<ChatMsgInterface[]> {
+    let messages: ChatMsgInterface[] = [];
+    if (page) {
+      messages = await this.ChatService.getRoomMessagesPaginate(
+        req.user.id,
+        roomId,
+        page,
+        offset,
+      );
+    } else {
+      messages = await this.ChatService.getRoomAllMessages(req.user.id, roomId);
+    }
     return messages;
   }
 
@@ -268,6 +289,7 @@ export class ChatController {
     @Param('messageId') messageId: bigint,
     @Body() data: ChatEditMsgDTO,
   ): Promise<ChatMsgInterface> {
+    console.log('edit message', messageId, data);
     const message: ChatMsgInterface = await this.ChatService.editMessage(
       req.user.id,
       messageId,
@@ -294,26 +316,10 @@ export class ChatController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
+  // @UseGuards(AuthAdmin)
   @Get('rooms/all')
   async getAllRooms(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] = await this.ChatService.getAllRooms();
     return rooms;
-  }
-
-  // @UseGuards(AuthAdmin)
-  @Get('rooms/:roomId')
-  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
-    const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
-    return room;
-  }
-
-  // @UseGuards(AuthAdmin)
-  @Get('rooms/:roomId/messages/all')
-  async getAllMessages(
-    @Param('roomId') roomId: bigint,
-  ): Promise<ChatRoomInterface> {
-    const messages: ChatRoomInterface =
-      await this.ChatService.getRoomAllMessages(roomId);
-    return messages;
   }
 }

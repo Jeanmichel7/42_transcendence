@@ -23,7 +23,6 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
     fetchAndSetFriendsProfile();
   }, [user, dispatch]);
 
-
   return (
     <>
       <h2 className="text-3xl text-center mb-5">Friends</h2>

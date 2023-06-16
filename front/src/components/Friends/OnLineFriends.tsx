@@ -8,12 +8,20 @@ import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { CircularProgress } from '@mui/material';
 import FriendItem from './FriendItem';
 import { useNavigate } from 'react-router-dom';
+import { reduxAddConversationList } from '../../store/chatSlicer';
+import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
-const OnLineFriends = () => {
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+interface OnLineFriendsProps {
+  userDataId: number;
+}
+
+const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
+  const { userFriends } = useSelector((state: RootState) => state.user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { conversationsList } = useSelector((state: RootState) => state.chat);
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
@@ -42,20 +50,19 @@ const OnLineFriends = () => {
   };
 
   const handleNavigateToChat = (user: UserInterface) => {
-    navigate(`/chat?service=chat&userId=${user.id}`);
+    dispatch(reduxAddConversationList({ item: user, userId: userDataId }));
+    let convId = getConvIdFromUserOrRoom(user, conversationsList);
+    if (convId === -1)
+      convId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
+    navigate(`/chat/conv/${convId}/${user.id}/${user.login}`);
+    
   };
-
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <>
-    { userData.friends?.length === 0 && <p> No friends</p> }
-    { userData.friends?.filter(u => u.status != 'offline')
+    { !userFriends && <p>Loading...</p>}
+    { userFriends?.length === 0 && <p> No friends</p> }
+    { userFriends?.filter(u => u.status != 'offline')
       .map((user) => (
         <FriendItem
           key={user.id}
@@ -67,6 +74,7 @@ const OnLineFriends = () => {
           ]}
         />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };

@@ -26,7 +26,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   setFriends,
 }) => {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state: RootState) => state.user);
+  const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
   const badgeColor: 'success' | 'warning' | 'error'
   = friend.status === 'online' ? 'success' :
@@ -43,10 +43,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      // send event to socket
-      // dispatch(reduxAddFriends(friend));
-      // if (userData.login == actualUserLogin && setFriends )
-      //   setFriends((prev: UserInterface[]) => [...prev, friend]);
       dispatch(setMsgSnackbar('Request sent'));
     }
   };
@@ -79,7 +75,11 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   function isMyFriend() {
     if (userData.login == friend.login) // if it's own profile
       return true;
-    return userData.friends?.find((f: UserInterface) => f.id === friend.id);
+    return userFriends?.find((f: UserInterface) => f.id === friend.id);
+  }
+
+  function isRequestFriendSent() {
+    return waitingFriendsRequestSent?.find((f: UserInterface) => f.id === friend.id);
   }
 
 
@@ -94,7 +94,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           >
             <CardMedia
               component="img"
-              image={'http://localhost:3000/avatars/' + friend.avatar}
+              image={friend.avatar}
               alt={friend.login}
               sx={{ height: 130, objectFit: 'cover' }}
               onError={(e) => {
@@ -127,7 +127,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
        * Bouton action
        **/}
       <CardActions className='flex flex-wrap items-center justify-between w-full'>
-
         <Tooltip
           title="Defier" arrow
           TransitionComponent={Zoom}
@@ -141,10 +140,10 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           </IconButton>
         </Tooltip>
 
-
         { !isMyFriend() &&
         <Tooltip
-          title="Add Friend" arrow
+          title={ isRequestFriendSent() ? 'Waiting accept' : 'Add friend' }
+          arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
@@ -152,9 +151,8 @@ const FriendCard:  React.FC<FriendCardProps> = ({
               sx={{ margin:0, padding:0 }}
               onClick={() => handleRequestAddFriend(friend.id)}
             >
-              <AddIcon color='primary'/>
+              <AddIcon color={ isRequestFriendSent() ? 'disabled' : 'primary' }/>
             </IconButton>
-
         </Tooltip> }
 
         {userData && userData.login == actualUserLogin &&
@@ -171,7 +169,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
                 <DeleteForeverIcon sx={{ color: red[800] }} />
               </IconButton>
             </Tooltip>
-
 
             <Tooltip
               title="Block user" arrow

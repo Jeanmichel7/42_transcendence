@@ -10,7 +10,7 @@ import { reduxRemoveUserBlocked } from '../../store/userSlice';
 import FriendItem from './FriendItem';
 
 const BlockedUser = () => {
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userBlocked } = useSelector((state: RootState) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
@@ -28,17 +28,11 @@ const BlockedUser = () => {
     }
   };
 
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  if (!userData) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <>
-      { userData.userBlocked?.length === 0 && <p>No blocked users</p> }
-      { userData.userBlocked?.map((user) => (
+      { !userBlocked && <p>Loading...</p>}
+      { userBlocked?.length === 0 && <p>No blocked users</p> }
+      { userBlocked?.map((user) => (
         <FriendItem
           key={user.id}
           user={user}
@@ -47,6 +41,7 @@ const BlockedUser = () => {
           ]}
         />
       ))}
+      { isLoading && <CircularProgress />}
     </>
   );
 };
