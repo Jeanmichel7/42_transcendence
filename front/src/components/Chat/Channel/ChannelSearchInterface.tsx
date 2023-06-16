@@ -23,6 +23,7 @@ export default function ChannelSearch() {
   const [displayInputPwd, setDisplayInputPwd] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomInterface | null>(null);
   const { conversationsList } = useSelector((state: RootState) => state.chat);
+  const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -49,7 +50,7 @@ export default function ChannelSearch() {
 
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
-        dispatch(reduxAddConversationList(room));
+        dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         if (isConvAlreadyExist(room, conversationsList))
           dispatch(setErrorSnackbar('Room already in conversation list jtevois toi ?'));
         else
@@ -58,7 +59,7 @@ export default function ChannelSearch() {
         dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setMsgSnackbar('Room joint'));
-      dispatch(reduxAddConversationList(room));
+      dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
     }

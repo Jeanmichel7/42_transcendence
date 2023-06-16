@@ -77,7 +77,9 @@ function Header() {
     socket.on('notification_friend_request_accepted', (notification: NotificationInterface) => {
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
       dispatch(reduxAcceptedRequest(notification));
-      dispatch(reduxAddConversationList(notification.sender));
+      dispatch(reduxAddConversationList({ item: notification.sender, userId: userData.id }));
+
+
     });
 
     socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
@@ -157,8 +159,9 @@ function Header() {
   
   useEffect(() => {
     // console.log('setnotifications localstorage', notifications);
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-  }, [notifications]);
+    if (userData.id === undefined || userData.id == -1) return;
+    localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
+  }, [notifications, userData.id]);
   
 
   const renderMobileNotification = (
@@ -409,7 +412,7 @@ function Header() {
                   color="inherit"
                 >
                   {userData.avatar &&
-                    <Avatar alt="avatar" src={'http://localhost:3000/avatars/' + userData.avatar}
+                    <Avatar alt="avatar" src={userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;

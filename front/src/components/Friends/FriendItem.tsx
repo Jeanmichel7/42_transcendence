@@ -38,7 +38,7 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
           { user.avatar && 
             <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
-            src={'http://localhost:3000/avatars/' + user.avatar}
+            src={user.avatar}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;

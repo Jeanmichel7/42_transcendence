@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // import { ImBlocked } from 'react-icons/im';
 import { ConversationInterface } from '../../../types';
@@ -8,6 +8,7 @@ import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link } from 'react-router-dom';
+import { RootState } from '../../../store';
 
 interface ConvProps {
   conv: ConversationInterface,
@@ -18,12 +19,14 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
 }) => {
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
+  const { userData } = useSelector((state: RootState) => state.user);
+
   // const { conversationsList } = useSelector((state: RootState) => state.chat);
   async function handleCloseConv(
     e: React.MouseEvent<HTMLButtonElement>,
   ) {
     e.stopPropagation();
-    dispatch(reduxRemoveConversationToList(conv));
+    dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
   }
 
   return (
@@ -53,7 +56,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
           >
             <img
               className="w-10 h-10 rounded-full object-cover mr-2 "
-              src={'http://localhost:3000/avatars/' + conv.user.avatar}
+              src={conv.user.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;

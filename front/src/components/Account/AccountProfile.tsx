@@ -1,8 +1,8 @@
 import React, { useState, createRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { setUser } from '../../store/userSlice';
-import { RootState } from '../../store';
+// import { RootState } from '../../store';
 
 import AccountItem from './AccountItem';
 
@@ -12,9 +12,12 @@ import { UserInterface, ApiErrorResponse } from '../../types';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 
+interface AccountProfileProps {
+  user: UserInterface;
+}
 
-export default function AccountProfile() {
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
+  // const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
   const dispatch = useDispatch();
   const fileInputRef = createRef<HTMLInputElement>();
@@ -28,7 +31,7 @@ export default function AccountProfile() {
     if ('error' in updatedUser) {
       dispatch(setErrorSnackbar(updatedUser.error + updatedUser.message ? ': ' + updatedUser.message : ''));
     } else {
-      dispatch(setUser({ ...userData, avatar: updatedUser.avatar }));
+      dispatch(setUser({ ...user, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
       dispatch(setMsgSnackbar('Updated!'));
     }
@@ -38,11 +41,11 @@ export default function AccountProfile() {
     <>
       <h2 className="text-3xl text-center">Account</h2>
 
+      { user && user.avatar && user.description && user.is2FAEnabled != undefined &&
       <Box className="flex justify-between" >
         <div className="w-1/4">
-          { userData && userData.avatar && 
           <img
-            src={'http://localhost:3000/avatars/' + userData.avatar}
+            src={user.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
@@ -51,7 +54,6 @@ export default function AccountProfile() {
               target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
           />
-          }
           <div className='flex justify-center' >
             <Button 
               variant="contained" 
@@ -88,7 +90,7 @@ export default function AccountProfile() {
             </div>
           }
           <p className='mt-5 font-bold'> Description : </p>
-          <p className='mt-1'> {userData.description ? userData.description : 'No description'} </p>
+          <p className='mt-1'> {user.description ? user.description : 'No description'} </p>
         </div>
 
         <div className="w-3/4 m-5 border-2px ">
@@ -96,22 +98,22 @@ export default function AccountProfile() {
 
             <AccountItem
               keyName="login"
-              value={userData.login}
+              value={user.login}
             />
 
             <AccountItem
               keyName="email"
-              value={userData.email}
+              value={user.email}
             />
 
             <AccountItem
               keyName="firstName"
-              value={userData.firstName}
+              value={user.firstName}
             />
 
             <AccountItem
               keyName="lastName"
-              value={userData.lastName}
+              value={user.lastName}
             />
 
             <AccountItem
@@ -121,18 +123,21 @@ export default function AccountProfile() {
 
             <AccountItem
               keyName="description"
-              value={userData.description}
+              value={user.description}
             />
 
             <AccountItem
               keyName="Active 2FA"
-              value={userData.is2FAEnabled}
+              value={user.is2FAEnabled}
             />
 
           </div>
         </div>
       </Box>
+          }
+
     </>
 
   );
-}
+};
+export default AccountProfile;

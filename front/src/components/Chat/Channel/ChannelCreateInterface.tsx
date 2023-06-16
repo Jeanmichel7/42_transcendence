@@ -34,6 +34,7 @@ const CreateGroupInterface = () => {
   });
   
   const { userFriends } = useSelector((state: RootState) => state.user);
+  const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }> ) => {
@@ -54,8 +55,8 @@ const CreateGroupInterface = () => {
 
   const handleValidateForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (form.name.length < 3)
-      return dispatch(setErrorSnackbar('Name must be at least 3 characters'));
+    if (form.name.length < 2)
+      return dispatch(setErrorSnackbar('Name must be at least 2 characters'));
 
     const data = {
       name: form.name,
@@ -73,7 +74,7 @@ const CreateGroupInterface = () => {
       dispatch(setMsgSnackbar('Channel created'));
 
       // console.log('room res : ', resCreateChannel);
-      dispatch(reduxAddConversationList(resCreateChannel));
+      dispatch(reduxAddConversationList({ item: resCreateChannel, userId: userData.id }));
       setForm({
         name: '',
         type: 'public',

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
@@ -11,6 +11,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Link } from 'react-router-dom';
+import { RootState } from '../../../store';
 
 
 interface ConvProps {
@@ -27,11 +28,12 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const dispatch = useDispatch();
+  const { userData } = useSelector((state: RootState) => state.user);
 
   const handleCloseConv = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     dispatch(setMsgSnackbar('Conv Close'));
-    dispatch(reduxRemoveConversationToList(conv));
+    dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
   };
 
   const handleLeaveRoom = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,7 +46,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
       dispatch(setErrorSnackbar(resLeaveRoom.error + resLeaveRoom.message ? ': ' + resLeaveRoom.message : ''));
     else {
       dispatch(setMsgSnackbar('Leaved room'));
-      dispatch(reduxRemoveConversationToList(conv));
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
     }
 
     //redirect to home if currentChatUserId is the user removed

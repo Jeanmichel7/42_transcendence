@@ -140,8 +140,8 @@ export default function FriendsPage() {
           </Toolbar>
         </AppBar>
 
-        <TabPanel value={value} index={0}> <OnLineFriends /> </TabPanel>
-        <TabPanel value={value} index={1}> <AllFriends /> </TabPanel>
+        <TabPanel value={value} index={0}> <OnLineFriends userDataId={userData.id}/> </TabPanel>
+        <TabPanel value={value} index={1}> <AllFriends userDataId={userData.id}/> </TabPanel>
         <TabPanel value={value} index={2}> <WaitingAcceptRequest /> </TabPanel>
         <TabPanel value={value} index={3}> <WaitingRequestSent /> </TabPanel>
         <TabPanel value={value} index={4}> <BlockedUser /> </TabPanel>

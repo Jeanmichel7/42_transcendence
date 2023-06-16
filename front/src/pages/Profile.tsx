@@ -63,7 +63,7 @@ function Profile() {
         <div className="w-1/4">
           {userProfile.avatar &&
             <img
-              src={'http://localhost:3000/avatars/' + userProfile.avatar}
+              src={userProfile.avatar}
               className="text-center mb-2 w-full rounded-[16px]"
               alt="avatar"
               onError={(e) => {

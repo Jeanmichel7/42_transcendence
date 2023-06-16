@@ -4,12 +4,13 @@ import { useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
 import { reduxAddConversationList } from '../../store/chatSlicer';
 import { reduxReadNotification, reduxRemoveNotification } from '../../store/notificationSlice';
+import { RootState } from '../../store';
 
 
 interface NotificationItemProps {
@@ -24,6 +25,7 @@ const NotificationItem = ({
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
@@ -35,7 +37,7 @@ const NotificationItem = ({
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
-      dispatch(reduxAddConversationList(userToAccept));
+      dispatch(reduxAddConversationList({ item: userToAccept, userId: userData.id }));
       dispatch(setMsgSnackbar('Friend request accepted'));
       return true;
     }

@@ -25,74 +25,74 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
   });
 }
 
-const helperSetConversationList = (state: ChatState, action: PayloadAction<ConversationInterface[]>) => {
-  state.conversationsList = action.payload.map((conv) => {
-    if (isRoomInterface(conv.room)) {
-      return {
-        id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
-        room: {
-          id: conv.room.id,
-          name: conv.room.name,
-          type: conv.room.type,
-          isProtected: conv.room.isProtected,
-          users: conv.room.users,
-          // lastMessage: conv.lastMessage,
-          // lastMessageDate: conv.lastMessageDate,
-        },
-        user: {} as UserInterface,
-      };
-    } else if (isUserInterface(conv.user)) {
-      return {
-        id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
-        user: {
-          id: conv.user.id,
-          login: conv.user.login,
-          email: conv.user.email,
-          firstName: conv.user.firstName,
-          lastName: conv.user.lastName,
-          avatar: conv.user.avatar,
-          status: conv.user.status,
-          // lastMessage: conv.lastMessage,
-          // lastMessageDate: conv.lastMessageDate,
-        },
-        room: {} as RoomInterface,
-      };
-    } else {
-      throw new Error("action.payload n'est ni de type RoomInterface, ni de type UserInterface");
-    }
-  });
-};
+// const helperSetConversationList = (state: ChatState, action: PayloadAction<ConversationInterface[]>) => {
+//   state.conversationsList = action.payload.map((conv) => {
+//     if (isRoomInterface(conv.room)) {
+//       return {
+//         id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
+//         room: {
+//           id: conv.room.id,
+//           name: conv.room.name,
+//           type: conv.room.type,
+//           isProtected: conv.room.isProtected,
+//           users: conv.room.users,
+//           // lastMessage: conv.lastMessage,
+//           // lastMessageDate: conv.lastMessageDate,
+//         },
+//         user: {} as UserInterface,
+//       };
+//     } else if (isUserInterface(conv.user)) {
+//       return {
+//         id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
+//         user: {
+//           id: conv.user.id,
+//           login: conv.user.login,
+//           email: conv.user.email,
+//           firstName: conv.user.firstName,
+//           lastName: conv.user.lastName,
+//           avatar: conv.user.avatar,
+//           status: conv.user.status,
+//           // lastMessage: conv.lastMessage,
+//           // lastMessageDate: conv.lastMessageDate,
+//         },
+//         room: {} as RoomInterface,
+//       };
+//     } else {
+//       throw new Error("action.payload n'est ni de type RoomInterface, ni de type UserInterface");
+//     }
+//   });
+// };
 
-const helperAddConversationList = (state: ChatState, action: PayloadAction<UserInterface | RoomInterface>) => {
+const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
   //create new conversation
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
     user: {} as UserInterface,
   };
-  if (isRoomInterface(action.payload)) {
+  if (isRoomInterface(item)) {
     newConversation.room = {
-      id: action.payload.id,
-      name: action.payload.name,
-      type: action.payload.type,
-      isProtected: action.payload.isProtected,
-      users: action.payload.users,
-      admins: action.payload.admins,
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      isProtected: item.isProtected,
+      users: item.users,
+      admins: item.admins,
       // lastMessage: conv.lastMessage,
       // lastMessageDate: conv.lastMessageDate,
     } as RoomInterface;
-  } else if (isUserInterface(action.payload)) {
+  } else if (isUserInterface(item)) {
     newConversation.user = {
-      id: action.payload.id,
-      login: action.payload.login,
-      // email: action.payload.email,
-      // firstName: action.payload.firstName,
-      // lastName: action.payload.lastName,
-      avatar: action.payload.avatar,
-      status: action.payload.status,
+      id: item.id,
+      login: item.login,
+      // email: item.email,
+      // firstName: item.firstName,
+      // lastName: item.lastName,
+      avatar: item.avatar,
+      status: item.status,
     } as UserInterface;
   } else {
-    throw new Error("action.payload n'est ni de type RoomInterface, ni de type UserInterface");
+    throw new Error("item n'est ni de type RoomInterface, ni de type UserInterface");
   }
   if (isConversationExists(state.conversationsList, newConversation)) {
     console.log('redux conv already exist');
@@ -111,35 +111,34 @@ const helperAddConversationList = (state: ChatState, action: PayloadAction<UserI
 export const chatSlice = createSlice({
   name: 'chat',
   initialState: {
-    conversationIdSelected: -1,
-    conversationsList: localStorage.getItem('conversationsList') ? JSON.parse(localStorage.getItem('conversationsList') as string) : [] as ConversationInterface[],
+    // conversationIdSelected: -1,
+    conversationsList: [] as ConversationInterface[],
   } as ChatState,
 
   reducers: {
     // manage conversation
-    reduxSetCurrentConversationList: (state, action: PayloadAction<number>) => {
-      state.conversationIdSelected = action.payload;
-    },
+    // reduxSetCurrentConversationList: (state, action: PayloadAction<number>) => {
+    //   state.conversationIdSelected = action.payload;
+    // },
 
     reduxSetConversationList: (state, action: PayloadAction<ConversationInterface[]>) => {
-      helperSetConversationList(state, action);
-      localStorage.setItem('conversationsList', JSON.stringify(state.conversationsList));
+      state.conversationsList = action.payload;
     },
-
-    reduxAddConversationList: (state, action: PayloadAction<UserInterface | RoomInterface>) => {
-      helperAddConversationList(state, action);
-      localStorage.setItem('conversationsList', JSON.stringify(state.conversationsList));
+    reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {
+      const { item, userId } = action.payload;
+      helperAddConversationList(state, item as UserInterface | RoomInterface);
+      localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
-    reduxRemoveConversationToList: (state, action: PayloadAction<ConversationInterface>) => {
+    reduxRemoveConversationToList: (state, action: PayloadAction<{ item: ConversationInterface, userId: number }>) => {
+      const { item, userId } = action.payload;
       state.conversationsList = state.conversationsList
-        .filter((conv: ConversationInterface) => conv.id !== action.payload.id);
-      localStorage.setItem('conversationsList', JSON.stringify(state.conversationsList));
+        .filter((conv: ConversationInterface) => conv.id !== item.id);
+      localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
   },
 });
 
 export const {
-  reduxSetCurrentConversationList,
   reduxSetConversationList,
   reduxAddConversationList,
   reduxRemoveConversationToList,

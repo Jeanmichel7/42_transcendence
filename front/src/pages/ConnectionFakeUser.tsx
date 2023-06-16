@@ -2,7 +2,7 @@ import { Box, Button, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { loginFakeUser, registerFakeUser } from '../api/auth';
 import { useDispatch } from 'react-redux';
-import { ApiErrorResponse, AuthInterface, UserActionInterface, UserInterface } from '../types';
+import { ApiErrorResponse, AuthInterface, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { getUserData } from '../api/user';
 import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from '../store/userSlice';
@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
+import { reduxSetNotifications } from '../store/notificationSlice';
+import { reduxSetConversationList } from '../store/chatSlicer';
 
 export default function FakeConnection() {
   const [login, setLogin] = useState<string>('login1');
@@ -33,11 +35,22 @@ export default function FakeConnection() {
   }, [dispatch]);
 
   //save user data in redux
-  const saveUserData = useCallback(async function () {
+  const saveUserData = useCallback(async function (id: number) {
     dispatch(setLogged(true));
     await fetchData(getUserData, setUser);
     await fetchData(getFriends, reduxSetFriends);
     await fetchData(getBlockedUsers, reduxSetUserBlocked);
+    dispatch(reduxSetNotifications(
+      localStorage.getItem('notifications' + id)
+        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
+        : [] as NotificationInterface[],
+    ));
+    dispatch(reduxSetConversationList(
+      localStorage.getItem('conversationsList' + id)
+        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string) 
+        : [] as ConversationInterface[],
+    ));
+
   }, [dispatch, fetchData]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,18 +66,14 @@ export default function FakeConnection() {
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      await saveUserData();
+      await saveUserData(res.user.id);
       navigate('/home');
     }
   };
 
 
-
-
-
   // fack user generator
   async function createUser(): Promise<UserInterface | null> {
-    
     const data = {
       'firstName': faker.person.firstName(),
       'lastName': faker.person.lastName(),
@@ -72,7 +81,7 @@ export default function FakeConnection() {
       'email': faker.internet.email(),
       'password': 'Password1!',
       'description': faker.lorem.sentence(),
-      'avatar': 'defaultAvatar.png',
+      'avatar': faker.image.avatar(),
     };
 
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);

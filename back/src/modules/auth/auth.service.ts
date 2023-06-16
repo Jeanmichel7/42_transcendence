@@ -36,7 +36,6 @@ export class AuthService {
     // console.log('JWT_SECRET:', configService.get<string>('JWT_SECRET'));
   }
 
-  // renvoi tout user mais osef on va te suprimer
   async login(data: UserLoginDTO): Promise<AuthInterface> {
     const user: UserEntity = await this.userRepository.findOneBy({
       login: data.login,
@@ -47,7 +46,7 @@ export class AuthService {
     if (!isMatch) throw new BadRequestException(`Wrong password`);
 
     const res: AuthInterface = {
-      accessToken: '',
+      accessToken: `need2FA,userId:${user.id}`,
       user: user,
     };
     if (user.is2FAEnabled) return res;

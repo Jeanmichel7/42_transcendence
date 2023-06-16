@@ -13,7 +13,12 @@ import { useNavigate } from 'react-router-dom';
 import { reduxAddConversationList } from '../../store/chatSlicer';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
-const AllFriends = () => {
+interface AllFriendsProps {
+  userDataId: number;
+}
+
+const AllFriends = ({ userDataId }: AllFriendsProps ) => {
+  // const { userData } = useSelector((state: RootState) => state.user);
   const { userFriends } = useSelector((state: RootState) => state.user);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +54,7 @@ const AllFriends = () => {
   };
 
   const handleNavigateToChat = async (user: UserInterface) => {
-    dispatch(reduxAddConversationList(user));
+    dispatch(reduxAddConversationList({ item: user, userId: userDataId }));
     let convId = getConvIdFromUserOrRoom(user, conversationsList);
     if (convId === -1)
       convId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;

@@ -131,7 +131,7 @@ const MessageItem: FC<MessageItemProps> = ({
           <Link to={'/profile/' + message.ownerUser.login}>
             <img
               className="w-10 h-10 rounded-full m-2 object-cover "
-              src={'http://localhost:3000/avatars/' + message.ownerUser.avatar}
+              src={message.ownerUser.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;

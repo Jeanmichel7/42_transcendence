@@ -27,7 +27,7 @@ const WaitingAcceptRequest = () => {
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
-      dispatch(reduxAddConversationList(userToAccept));
+      dispatch(reduxAddConversationList({ item: userToAccept, userId: userData.id }));
 
       //search notif ans delete
       const notif: NotificationInterface = notifications.find((n) => 

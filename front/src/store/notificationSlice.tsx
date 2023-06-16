@@ -8,7 +8,7 @@ export interface NotificationState {
 export const notificationSlice = createSlice({
   name: 'notification',
   initialState: {
-    notifications: localStorage.getItem('notifications') ? JSON.parse(localStorage.getItem('notifications') as string) : [] as NotificationInterface[],
+    notifications: [] as NotificationInterface[],
   } as NotificationState,
 
   reducers: {

@@ -94,7 +94,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           >
             <CardMedia
               component="img"
-              image={'http://localhost:3000/avatars/' + friend.avatar}
+              image={friend.avatar}
               alt={friend.login}
               sx={{ height: 130, objectFit: 'cover' }}
               onError={(e) => {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
@@ -16,18 +16,21 @@ import {
   setLogged,
   setUser,
 } from './store/userSlice';
-import { ApiErrorResponse, UserInterface } from './types';
+import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
 import { useNavigate } from 'react-router-dom';
-import { UserActionInterface } from './types/utilsTypes';
+import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
+import { reduxSetNotifications } from './store/notificationSlice';
+import { reduxSetConversationList } from './store/chatSlicer';
 
 
 
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [userId, setUserId] = useState(-1);
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
   const handleClose = () => {
@@ -39,9 +42,11 @@ function App() {
     action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
+    
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
+      if ( !Array.isArray(result) && apiFunction === getUserData) setUserId(result.id);
       dispatch(action(result));
     }
   }, [dispatch]);
@@ -56,12 +61,23 @@ function App() {
       await fetchData(getBlockedUsers, reduxSetUserBlocked);
       await fetchData(getFriendRequests, reduxSetWaitingFriends);
       await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
+      console.log('userId', userId);
+      dispatch(reduxSetNotifications(
+        localStorage.getItem('notifications' + userId)
+          ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
+          : [] as NotificationInterface[],
+      ));
+      dispatch(reduxSetConversationList(
+        localStorage.getItem('conversationsList' + userId)
+          ? JSON.parse(localStorage.getItem('conversationsList' + userId) as string) 
+          : [] as ConversationInterface[],
+      ));
 
     } else {
       dispatch(setLogged(false));
       // navigate('/');
     }
-  }, [dispatch, fetchData]);
+  }, [dispatch, fetchData, userId]);
 
 
   useEffect(() => {

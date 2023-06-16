@@ -22,6 +22,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const [displayInputPwd, setDisplayInputPwd] = useState(false);
 
   const { conversationsList } = useSelector((state: RootState) => state.chat);
+  const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -31,7 +32,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
     if (!room)
       return;
     if (isConvAlreadyExist(room, conversationsList)) {
-      // dispatch(reduxAddConversationList(room));
       return dispatch(setErrorSnackbar('Room already in conversation list'));
     }
     if (room.isProtected && !displayInputPwd)
@@ -48,7 +48,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
 
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
-        dispatch(reduxAddConversationList(room));
+        dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         if (isConvAlreadyExist(room, conversationsList))
           dispatch(setErrorSnackbar('Room already in conversation list jtevois toi ?'));
         else
@@ -57,7 +57,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
         dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setMsgSnackbar('Room joint'));
-      dispatch(reduxAddConversationList(room));
+      dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
     }

@@ -47,4 +47,7 @@ restart:
 logs:
 	docker-compose logs -f postgres nestjs
 
+dbsave:
+	docker exec -t postgres pg_dump -U postgres pong_db > db/save.sql
+
 .PHONY	: all build down re clean fclean

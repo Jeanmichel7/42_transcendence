@@ -142,7 +142,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socket.emit('leaveRoom', {
           roomId: id,
         });
-        dispatch(reduxRemoveConversationToList(conv));
+        dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
         navigate('/chat/channel');
         dispatch(setWarningSnackbar('You have been kicked from the room ' + conv.room.name));
       }
@@ -170,7 +170,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socket.emit('leaveRoom', {
           roomId: id,
         });
-        dispatch(reduxRemoveConversationToList(conv));
+        dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
         navigate('/chat/channel');
         dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
       }
@@ -258,7 +258,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const fetchRoomData = useCallback(async () => {
     if (!conv.room.id || conv.room.id === -1) return;
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
-    if ('error' in roomData)
+    if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
       setRoom(roomData);
@@ -280,7 +280,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
       });
-      dispatch(reduxRemoveConversationToList(conv));
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
       navigate('/chat/channel');
       dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
     }
@@ -409,8 +409,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   return (
     <>
-      <div className="flex flex-col h-full justify-between">
-        <div className="w-full flex justify-between items-center text-lg text-blue text-center">
+      <div className="flex flex-col h-full">
+        <div className="w-full flex text-lg text-blue">
 
           <Button
             className='text-blue-500'
@@ -426,8 +426,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
           {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} />}
         </div>
 
-        <div className='flex'>
-          <div className="flex-grow overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
+        <div className='flex h-full'>
+         <div className="flex-grow self-end overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8] " onScroll={handleScroll}>
             {/* display messages */}
             {messages &&
               <div className='text-lg m-1 p-2 '>
@@ -441,7 +441,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
                     isAdminMenuOpen={isAdminMenuOpen}
                   />
                 ))}
-
                 {/* display form message */}
                 <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
                   <TextareaAutosize
@@ -479,11 +478,13 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
             <div ref={bottomRef}></div>
           </div>
           <div className='w-[150px]'>
-            {room && room.users &&
-              <h3> MEMBRES - {room.users.length} </h3>
+            {room && room.users && <h3> MEMBRES - {room.users.length} </h3>
               && room.users.map((user) => (
-                <Link to={'/profile/' + user.login}
-                  className="flex flex-grow text-black p-1 pl-2 items-center ">
+                <Link 
+                  key={user.id} 
+                  to={'/profile/' + user.login}
+                  className="flex flex-grow text-black p-1 pl-2 items-center "
+                >
                   <Badge
                     color={
                       user.status === 'online' ? 'success' :
@@ -501,7 +502,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
                   >
                     <img
                       className="w-10 h-10 rounded-full object-cover mr-2 "
-                      src={'http://localhost:3000/avatars/' + user.avatar}
+                      src={user.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
