@@ -97,7 +97,7 @@ export class ChatController {
   }
 
   //invite user
-  @Patch('rooms/:roomId/user/:userId/invite')
+  @Patch('rooms/:roomId/users/:userId/invite')
   async inviteUser(
     @Req() req: RequestWithUser,
     @Param('roomId') roomId: bigint,

@@ -12,13 +12,14 @@ import { ApiErrorResponse } from '../../../types';
 import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { Button, TextareaAutosize } from '@mui/material';
+import { TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
 import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
 import ChatMembers from './Members';
+import InvitationRoom from '../Channel/admin/InvitationRoom';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
@@ -33,6 +34,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
+  // const [isInvitMenuOpen, setIsInvitMenuOpen] = useState<boolean>(false);
 
   // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
   const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
@@ -94,6 +96,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users ? [...prev.users, user] : [user],
+        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
       } : null);
     });
 
@@ -102,9 +105,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users?.filter((u) => u.id !== userId),
-      } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== userId),
       } : null);
       //accepted user ?
@@ -134,9 +134,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users?.filter((u) => u.id !== userId),
-      } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== userId),
       } : null);
       if (userData.id === userId) {
@@ -157,16 +154,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         bannedUsers: prev.bannedUsers ? [...prev.bannedUsers, user] : [user],
-      } : null);
-      // setRoom((prev) => prev ? { ...prev,
-      // users: prev.users?.filter((u) => u.id !== user.id) } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== user.id),
+        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
       } : null);
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);
       if (userData.id === user.id) {
         socket.emit('leaveRoom', {
           roomId: id,
@@ -484,20 +474,18 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     <>
       {!room ? <p>loading...</p> :
         <div className="flex flex-col h-full">
-          <div className="w-full flex text-lg text-blue">
+          <div className="w-full flex text-lg text-blue justify-between">
 
-            <Button
-              className='text-blue-500'
-              onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
-              sx={{ mr: 2 }}
-            >
-              Invite
-            </Button>
-            <div className="w-full text-center">
+            {isAdmin && room && <InvitationRoom room={room} setRoom={setRoom} /> }
+            {/* <div className="w-full text-center"> */}
               <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
-            </div>
-
-            {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} handleDeleteChannel={handleDeleteChannel} />}
+            {/* </div> */}
+            {isAdmin && room && 
+              <SideBarAdmin
+                room={room}
+                setIsAdminMenuOpen={setIsAdminMenuOpen}
+                handleDeleteChannel={handleDeleteChannel}
+              />}
           </div>
 
           <div className='flex h-full'>

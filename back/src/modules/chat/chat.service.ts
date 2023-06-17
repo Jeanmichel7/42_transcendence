@@ -257,7 +257,7 @@ export class ChatService {
         `User ${userToInvite.login} is already accepted in room`,
       );
 
-    room.acceptedUsers = [...room.acceptedUsers, user];
+    room.acceptedUsers = [...room.acceptedUsers, userToInvite];
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
