@@ -58,11 +58,14 @@ const CreateGroupInterface = () => {
     if (form.name.length < 2)
       return dispatch(setErrorSnackbar('Name must be at least 2 characters'));
 
+    const acceptedUsersFormated = form.acceptedUsers 
+      ? form.acceptedUsers.map(u => u.id)
+      : null;
     const data = {
       name: form.name,
       type: form.type,
       password: form.password ? form.password : null,
-      acceptedUsers: form.acceptedUsers ? form.acceptedUsers.map(u => u.id) : null,
+      acceptedUsers: acceptedUsersFormated,
     };
     setIsLoading(true);
     const resCreateChannel: RoomInterface | ApiErrorResponse = await createChannel(data);

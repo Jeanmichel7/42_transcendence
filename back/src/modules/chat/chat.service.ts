@@ -61,7 +61,7 @@ export class ChatService {
       hashPassword = await bcrypt.hash(roomToCreate.password, salt);
     }
 
-    // si private et accepted users[] => checher chaque user dans la bdd et ajouter dans la room
+    //set accepted users
     let allUsersAccepted: UserEntity[] = [];
     if (roomToCreate.type === 'private' && roomToCreate.acceptedUsers) {
       allUsersAccepted = await Promise.all(
@@ -76,16 +76,16 @@ export class ChatService {
           return userAccepted;
         }),
       );
-      // console.log('allUsersAccepted', allUsersAccepted);
-    }
-    let usersInRoom: UserEntity[] = [user];
-    if (roomToCreate.acceptedUsers) {
-      usersInRoom = [user, ...allUsersAccepted];
+      const userBot: UserEntity = await this.userRepository.findOne({
+        where: { login: 'Bot' },
+        select: ['id', 'login', 'avatar'],
+      });
+      allUsersAccepted = [...allUsersAccepted, userBot];
     }
 
     const room: ChatRoomEntity = await ChatRoomEntity.save({
       ownerUser: user,
-      users: usersInRoom,
+      users: [user],
       admins: [user],
       bannedUsers: [],
       mutedUsers: [],
@@ -116,6 +116,29 @@ export class ChatService {
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
+
+    const newBotMessage: ChatCreateMsgDTO = {
+      text: `Invitation link http://localhost:3006/chat/channel/invitation/${room.id}/${room.name}`,
+    };
+
+    const userBot: UserEntity = await this.userRepository.findOne({
+      where: { login: 'Bot' },
+      select: ['id', 'login'],
+    });
+
+    const res = await this.createMessage(newBotMessage, userBot.id, room.id);
+    // if (!res) throw new Error('Bot message not created');
+    // this.eventEmitter.emit(
+    //   'chat_room.leave',
+    //   new BotChatMessageEvent({
+    //     roomId: room.id,
+    //     userId: user.id as bigint,
+    //     userLogin: user.login,
+    //     text: `${user.login} has left the room`,
+    //     createdAt: new Date(),
+    //   }),
+    // );
+
     return resultRoom;
   }
 
@@ -199,6 +222,76 @@ export class ChatService {
     return resultRoom;
   }
 
+  async inviteUser(
+    userId: bigint,
+    roomId: bigint,
+    userIdToInvite: bigint,
+  ): Promise<ChatRoomInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'login'],
+    });
+    if (!user) throw new NotFoundException(`User ${userId} not found`);
+
+    const room: ChatRoomEntity = await this.roomRepository.findOne({
+      where: { id: roomId },
+      select: ['id', 'type'],
+      relations: ['acceptedUsers', 'admins'],
+    });
+    if (!room) throw new NotFoundException(`Room ${roomId} not found`);
+
+    //check if user is admin of private room
+    if (room.type === 'private' && !room.admins.some((u) => u.id === user.id))
+      throw new ForbiddenException(`User ${userId} is not admin of room`);
+
+    const userToInvite: UserEntity = await this.userRepository.findOne({
+      where: { id: userIdToInvite },
+      select: ['id', 'login'],
+      relations: ['roomUsers'],
+    });
+    if (!userToInvite)
+      throw new NotFoundException(`User ${userIdToInvite} not found`);
+
+    if (room.acceptedUsers.some((u) => u.id === userIdToInvite))
+      throw new ConflictException(
+        `User ${userToInvite.login} is already accepted in room`,
+      );
+
+    room.acceptedUsers = [...room.acceptedUsers, user];
+    await room.save();
+
+    const resultRoom: ChatRoomInterface = await this.roomRepository
+      .createQueryBuilder('chat_rooms')
+      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .select([
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
+        'ownerUser.id',
+        'ownerUser.firstName',
+        'ownerUser.lastName',
+        'ownerUser.login',
+      ])
+      .where('chat_rooms.id = :roomId', { roomId: room.id })
+      .getOne();
+
+    // this.eventEmitter.emit(
+    //   'chat_room.invite',
+    //   new ChatUserRoomEvent(room.id, {
+    //     id: user.id,
+    //     firstName: user.firstName,
+    //     lastName: user.lastName,
+    //     login: user.login,
+    //     avatar: user.avatar,
+    //     status: user.status,
+    //   }),
+    // );
+
+    return resultRoom;
+  }
+
   // del room
   //retour room delete or all rooms ?
   // cascade ?
@@ -268,6 +361,7 @@ export class ChatService {
     }
 
     room.users = [...room.users, user];
+    room.acceptedUsers = room.acceptedUsers.filter((u) => u.id !== user.id);
     await room.save();
 
     user.roomUsers = [...user.roomUsers, room];
@@ -1035,7 +1129,7 @@ export class ChatService {
       select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
       relations: ['chatMessages'],
     });
-    console.log('userSend', userSend);
+    // console.log('userSend', userSend);
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },
@@ -1043,14 +1137,13 @@ export class ChatService {
       relations: ['messages', 'users', 'acceptedUsers'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
-    console.log('room', room);
+    // console.log('room', room);
     //check if userSend is in room or in acceptedUser
     if (
-      room.users.some((u) => u.id === userSend.id) ||
-      room.acceptedUsers.some((u) => u.id === userSend.id)
+      !userSend.id &&
+      !room.users.some((u) => u.id === userSend.id) &&
+      !room.acceptedUsers.some((u) => u.id === userSend.id)
     ) {
-      console.log('userSend is in room');
-    } else {
       throw new ForbiddenException(
         `User ${userId} is not in room ${roomId} and can't send message`,
       );
@@ -1246,7 +1339,7 @@ export class ChatService {
     return result;
   }
 
-  async getRoom(roomId: bigint): Promise<ChatRoomInterface> {
+  async getRoom(userId: bigint, roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
       .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
@@ -1307,8 +1400,17 @@ export class ChatService {
         'acceptedUsers.avatar',
         'acceptedUsers.status',
       ])
-      .where('chat_rooms.id = :roomId', { roomId })
+      .where('chat_rooms.id = :roomId', { roomId: roomId })
       .getOne();
+
+    // check user is in room or in waiting list
+    if (
+      !room.users.some((u) => u.id == userId) &&
+      !room.acceptedUsers.some((u) => u.id == userId)
+    )
+      throw new ForbiddenException(
+        `User ${userId} is not in room ${roomId} and can't see room`,
+      );
     return room;
   }
 }
