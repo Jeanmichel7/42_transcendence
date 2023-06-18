@@ -65,7 +65,7 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
 
 const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
   //create new conversation
-  console.log('redux conv list : ', item);
+  // console.log('redux conv list : ', item);
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
@@ -92,7 +92,7 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
     throw new Error("item n'est ni de type RoomInterface, ni de type UserInterface");
   }
   if (isConversationExists(state.conversationsList, newConversation)) {
-    console.log('redux conv already exist');
+    // console.log('redux conv already exist');
     return;
   } else {
     if (state.conversationsList == undefined) {
@@ -101,6 +101,17 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
       state.conversationsList = [...state.conversationsList, newConversation]; // order ?
     }
   }
+};
+
+const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => {
+  //edit conversation
+  // console.log('redux conv list : ', item);
+  const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === item.id);
+  if (indexConvToUpdate !== -1) {
+    state.conversationsList[indexConvToUpdate].room = item;
+    return true;
+  }
+  return false;
 };
 
 //check si ID est unique sinon random...
@@ -119,7 +130,6 @@ export const chatSlice = createSlice({
     // },
 
     reduxSetConversationList: (state, action: PayloadAction<ConversationInterface[]>) => {
-      console.log('DEMARRAGE CONV LIST : ', action.payload);
       state.conversationsList = action.payload;
     },
     reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {
@@ -133,6 +143,11 @@ export const chatSlice = createSlice({
         .filter((conv: ConversationInterface) => conv.id !== item.id);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
+    reduxUpdateRoomConvList: (state, action: PayloadAction<{ item: RoomInterface, userId: number }>) => {
+      const { item, userId } = action.payload;
+      if (helperUpdateConversationList(state, item))
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+    },
   },
 });
 
@@ -140,6 +155,7 @@ export const {
   reduxSetConversationList,
   reduxAddConversationList,
   reduxRemoveConversationToList,
+  reduxUpdateRoomConvList,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

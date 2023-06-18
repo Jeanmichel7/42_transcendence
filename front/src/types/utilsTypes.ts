@@ -46,3 +46,11 @@ export interface NotificationInterface {
   sender: UserInterface;
   invitationLink?: string;
 }
+
+export interface UserStatusInterface {
+  id: number;
+  status: 'online' | 'offline' | 'absent';
+  login?: string;
+  avatar?: string;
+  updatedAt?: Date;
+}

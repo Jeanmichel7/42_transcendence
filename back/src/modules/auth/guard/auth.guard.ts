@@ -56,7 +56,17 @@ export class AuthGuard implements CanActivate {
       id: request.user.id,
     });
     if (!user) throw new UnauthorizedException('User not found');
+
     user.lastActivity = new Date();
+    if (user.status !== 'online') {
+      console.log(
+        'update user status to online, ',
+        user.id,
+        user.login,
+        user.status,
+      );
+      user.status = 'online';
+    }
     await this.userRepository.save(user);
 
     return true;

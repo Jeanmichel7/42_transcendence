@@ -55,7 +55,7 @@ export class NotificationService {
         ])
         .orderBy('notifications.createdAt', 'DESC')
         .getMany();
-    console.log('notifications : ', notifications);
+    // console.log('notifications : ', notifications);
 
     return notifications;
   }
@@ -66,7 +66,7 @@ export class NotificationService {
     const savedNotification = await this.notificationRepository.save(
       newNotification,
     );
-    console.log('savedNotification : ', savedNotification);
+    // console.log('savedNotification : ', savedNotification);
 
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,

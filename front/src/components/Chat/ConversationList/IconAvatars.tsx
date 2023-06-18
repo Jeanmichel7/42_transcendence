@@ -9,12 +9,11 @@ interface ConversationListRoomItemIconsProps {
 
 const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsProps) => {
 
-  const [usersToDisplay, setUsersToDisplay] = useState<UserInterface[] | null>(null);
+  // useEffect(() => {
+  //   console.log('room : ', room);
+  // }, [room]);
 
-  useEffect(() => {
-    console.log('usersToDisplay la : ', usersToDisplay);
-    // console.log('room : ', room);
-  }, [usersToDisplay, room]);
+  const [usersToDisplay, setUsersToDisplay] = useState<UserInterface[] | null>(null);
 
   const getRandAdmin = useCallback(() => {
     if (!room || !room.ownerUser || (room.admins == undefined)) return;
@@ -30,14 +29,12 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
     if (exceptedUser)
       users = users.filter((u) => u.id !== exceptedUser.id);
     const rand: number = (Math.floor(Math.random() * 100)) % users.length;
-    console.log('users : ', users, ', rand : ', rand);
     return users[rand];
   }, [room]);
 
   useEffect(() => {
-    if (room && room.ownerUser) {
+    if (room && room.ownerUser && (usersToDisplay == null || usersToDisplay.length < 2)) {
       const adminSelected: UserInterface | undefined = getRandAdmin();
-      console.log('adminSelected : ', adminSelected);
       if (adminSelected) {
         setUsersToDisplay([adminSelected]);
         const userSelected: UserInterface | undefined = getRandUser(adminSelected);
@@ -45,7 +42,6 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
           setUsersToDisplay((prev) => prev ? [...prev, userSelected] : [userSelected]);
       } else {
         const userSelected: UserInterface | undefined = getRandUser(null);
-        console.log('userSelected : ', userSelected);
         if (userSelected) {
           setUsersToDisplay([userSelected]);
           const userSelected2: UserInterface | undefined = getRandUser(userSelected);
@@ -94,7 +90,12 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
           }}
           title={room.name}
         >
-          {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name}
+          <div className='flex flex-col'>
+            <p> {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name} </p>
+            <span className='m-0 p-0 text-xs text-gray-400'>{
+              room.users?.length ? room.users.length != 1 ? room.users.length + ' Members' : '1 Member' : 'No Member'
+            } </span>
+          </div>
         </Typography>
       </div>
     </>

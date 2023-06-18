@@ -52,7 +52,7 @@ export class GameEvents {
     //const token = client.handshake.headers.cookies['jwt'];
 
     const cookieArray = client.handshake.headers.cookie.split(';');
-    console.log(cookieArray);
+    // console.log(cookieArray);
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
       const cookieParts = cookie.split('=');
@@ -75,7 +75,7 @@ export class GameEvents {
 
       // Par exemple, si vous avez l'ID de l'utilisateur dans le payload :
       client.data.userId = payload.login;
-      console.log(client.data);
+      // console.log(client.data);
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }

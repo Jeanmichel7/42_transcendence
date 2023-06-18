@@ -25,18 +25,27 @@ import { UserCreateDTO } from './dto/user.create.dto';
 import axios from 'axios';
 import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserUpdateEvent } from '../notification/events/notification.event';
 
 @Injectable()
 export class UsersService {
+  private intervalId: NodeJS.Timeout;
+
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
-    setInterval(() => {
+    this.intervalId = setInterval(() => {
       // console.log('check user status');
       this.checkUserStatus(absentDuration);
     }, 60000);
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.intervalId);
   }
 
   async findUser(id: bigint): Promise<UserInterface> {
@@ -363,14 +372,33 @@ export class UsersService {
 
   async checkUserStatus(absentDuration: number): Promise<void> {
     const users: UserEntity[] = await this.userRepository.find({
-      select: ['id', 'lastActivity', 'status'],
+      select: ['id', 'lastActivity', 'login', 'avatar', 'status'],
     });
     // console.log('users before: ', users);
     for (const user of users) {
       if (user.status === 'offline') continue;
       const inactivityDuration =
         Date.now() - new Date(user.lastActivity).getTime();
-      if (inactivityDuration > absentDuration) {
+
+      if (inactivityDuration > 4 * absentDuration) {
+        await this.userRepository.update(
+          { id: user.id },
+          {
+            status: 'offline',
+            updatedAt: new Date(),
+          },
+        );
+
+        const userUpdated = new UserUpdateEvent({
+          id: user.id,
+          status: 'offline',
+          login: user.login,
+          avatar: user.avatar,
+          updatedAt: new Date(),
+        });
+        // console.log('userUpdated offline: ', userUpdated);
+        this.eventEmitter.emit('user_status.updated', userUpdated);
+      } else if (inactivityDuration > absentDuration) {
         await this.userRepository.update(
           { id: user.id },
           {
@@ -378,6 +406,17 @@ export class UsersService {
             updatedAt: new Date(),
           },
         );
+        // console.log('res update status user: ', res);
+
+        const userUpdated = new UserUpdateEvent({
+          id: user.id,
+          status: 'absent',
+          login: user.login,
+          avatar: user.avatar,
+          updatedAt: new Date(),
+        });
+        // console.log('userUpdated absent: ', userUpdated);
+        this.eventEmitter.emit('user_status.updated', userUpdated);
       }
     }
     // console.log('users after: ', users);

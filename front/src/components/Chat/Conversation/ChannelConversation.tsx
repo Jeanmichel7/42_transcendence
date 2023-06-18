@@ -17,7 +17,7 @@ import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
-import { reduxRemoveConversationToList } from '../../../store/convListSlice';
+import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
 
@@ -289,6 +289,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
       setRoom(roomData);
+      dispatch(reduxUpdateRoomConvList({ item: roomData, userId: userData.id }));
 
       //check if user is accepted in room
       if (roomData.users && roomData.acceptedUsers) {

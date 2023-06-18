@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiErrorResponse, NotificationInterface, UserInterface } from '../types';
+import { ApiErrorResponse, NotificationInterface, UserInterface, UserStatusInterface } from '../types';
 
 export interface UserState {
   userData: UserInterface;
@@ -71,6 +71,41 @@ const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
     .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
 };
 
+const helperUpdateUserStatus = (state: UserState, userStatus: UserStatusInterface) => {
+  // userFriends
+  if (state.userFriends) {
+    const userFriend = state.userFriends.find((u) => u.id === userStatus.id);
+    if (userFriend)
+      userFriend.status = userStatus.status;
+  }
+
+  // userBlocked
+  if (state.userBlocked) {
+    const userBlocked = state.userBlocked.find((u) => u.id === userStatus.id);
+    if (userBlocked)
+      userBlocked.status = userStatus.status;
+  }
+
+  // waitingFriendsRequestReceived
+  if (state.waitingFriendsRequestReceived) {
+    const waitingFriendsRequestReceived = state.waitingFriendsRequestReceived.find((u) => u.id === userStatus.id);
+    if (waitingFriendsRequestReceived)
+      waitingFriendsRequestReceived.status = userStatus.status;
+  }
+
+  // waitingFriendsRequestSent
+  if (state.waitingFriendsRequestSent) {
+    const waitingFriendsRequestSent = state.waitingFriendsRequestSent.find((u) => u.id === userStatus.id);
+    if (waitingFriendsRequestSent)
+      waitingFriendsRequestSent.status = userStatus.status;
+  }
+
+  // if me
+  if (state.userData.id === userStatus.id)
+    state.userData.status = userStatus.status;
+};
+
+
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -134,6 +169,10 @@ export const userSlice = createSlice({
       // state.waitingFriendsRequestSent = [];
     },
 
+    // status
+    reduxUpdateUserStatus: (state, action: PayloadAction<UserStatusInterface>) => {
+      helperUpdateUserStatus(state, action.payload);
+    },
 
     // manage friends
     reduxSetFriends: (state, action: PayloadAction<UserInterface[]>) => {
@@ -200,6 +239,7 @@ export const userSlice = createSlice({
 
 export const {
   setUser, setLogged, setLogout,
+  reduxUpdateUserStatus,
   reduxSetFriends, reduxAddFriends, reduxRemoveFriends,
   reduxSetUserBlocked, reduxAddUserBlocked, reduxRemoveUserBlocked,
   reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,

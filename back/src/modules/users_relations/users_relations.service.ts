@@ -383,7 +383,10 @@ export class UsersRelationsService {
             receiver: userFriend,
             sender: userToUpdate,
           } as NotificationCreateDTO);
-        console.log('newNotif : ', newNotif);
+        if (!newNotif)
+          throw new InternalServerErrorException(
+            `Can't create notification for user ${userFriend.login}`,
+          );
 
         return createdRelation;
       } catch (e) {
@@ -454,7 +457,10 @@ export class UsersRelationsService {
               receiver: userFriend,
               sender: userToUpdate,
             } as NotificationCreateDTO);
-          console.log('newNotif : ', newNotif);
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${userFriend.login}`,
+            );
 
           return updatedRelation;
         } catch (e) {
@@ -478,7 +484,7 @@ export class UsersRelationsService {
           `You can't accept ${userFriend.login}, you are blocked`,
         );
     } else {
-      console.log('relationExist type non gere... qu;est ce que tu fou ?');
+      console.error('relationExist type non gere... qu;est ce que tu fou ?');
     }
   }
 
@@ -535,7 +541,10 @@ export class UsersRelationsService {
               receiver: userFriend,
               sender: userToUpdate,
             } as NotificationCreateDTO);
-          console.log('newNotif : ', newNotif);
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${userFriend.login}`,
+            );
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't decline ${friendId}`,
@@ -609,7 +618,10 @@ export class UsersRelationsService {
               receiver: userFriend,
               sender: userToUpdate,
             } as NotificationCreateDTO);
-          console.log('newNotif : ', newNotif);
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${userFriend.login}`,
+            );
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't cancel ${friendId}`,
@@ -687,7 +699,10 @@ export class UsersRelationsService {
               receiver: userBlocked,
               sender: userToUpdate,
             } as NotificationCreateDTO);
-          console.log('newNotif : ', newNotif);
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${userBlocked.login}`,
+            );
 
           return updatedRelation;
         } catch (e) {
@@ -723,7 +738,10 @@ export class UsersRelationsService {
                 receiver: userBlocked,
                 sender: userToUpdate,
               } as NotificationCreateDTO);
-            console.log('newNotif : ', newNotif);
+            if (!newNotif)
+              throw new InternalServerErrorException(
+                `Can't create notification for user ${userBlocked.login}`,
+              );
 
             return updatedRelation;
           } catch (e) {
@@ -734,7 +752,7 @@ export class UsersRelationsService {
           }
         }
       } else {
-        console.log('relationExist type non gere... qu;est ce que tu fou ?');
+        console.error('relationExist type non gere... qu;est ce que tu fou ?');
       }
     } else {
       const newRelation: Partial<UserRelationEntity> = {
@@ -843,7 +861,10 @@ export class UsersRelationsService {
               receiver: userBlocked,
               sender: userToUpdate,
             } as NotificationCreateDTO);
-          console.log('newNotif : ', newNotif);
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${userBlocked.login}`,
+            );
         } catch (e) {
           throw new InternalServerErrorException(
             `Error while deleting relation between user ${userId} and user friend ${blockedId}`,
@@ -856,7 +877,7 @@ export class UsersRelationsService {
         );
       }
     } else {
-      console.log('relationExist type non gere... qu;est ce que tu fou ?');
+      console.error('relationExist type non gere... qu;est ce que tu fou ?');
     }
   }
 
@@ -915,6 +936,9 @@ export class UsersRelationsService {
         receiver: userFriend,
         sender: userToUpdate,
       } as NotificationCreateDTO);
-    console.log('newNotif : ', newNotif);
+    if (!newNotif)
+      throw new InternalServerErrorException(
+        `Can't create notification for user ${userFriend.login}`,
+      );
   }
 }

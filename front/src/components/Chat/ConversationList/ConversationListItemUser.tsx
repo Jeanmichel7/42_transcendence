@@ -58,7 +58,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
             <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
+              className="w-10 h-10 rounded-full object-cover mr-2 border border-[#5f616f]"
               src={conv.user.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;

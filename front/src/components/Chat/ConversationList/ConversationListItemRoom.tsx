@@ -6,7 +6,7 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { leaveRoom } from '../../../api/chat';
 import { ApiErrorResponse, ConversationInterface, RoomInterface } from '../../../types';
 
-import { CircularProgress, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
+import { CircularProgress, IconButton, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -25,7 +25,6 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   // setConvSelectedId,
   // setServiceToCall,
 }) => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { userData } = useSelector((state: RootState) => state.user);
@@ -68,12 +67,8 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
-          {/* <div className='flex flex-row items-center mr-2 bg-[#b2bdc3] rounded-full'> */}
-            < ConversationListRoomItemIcons room={conv.room} />
-          {/* </div> */}
-          
+          <ConversationListRoomItemIcons room={conv.room} />
         </Link>
-
 
         <Tooltip
           title="Leave room" arrow
