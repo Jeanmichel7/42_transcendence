@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // import { ImBlocked } from 'react-icons/im';
 import { ConversationInterface } from '../../../types';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';

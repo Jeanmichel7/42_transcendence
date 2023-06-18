@@ -10,7 +10,7 @@ import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
 import { useState } from 'react';
 import FriendItem from './FriendItem';
 import { useNavigate } from 'react-router-dom';
-import { reduxAddConversationList } from '../../store/chatSlicer';
+import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
 interface AllFriendsProps {

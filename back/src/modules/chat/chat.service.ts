@@ -115,9 +115,8 @@ export class ChatService {
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
         'ownerUser.id',
-        'ownerUser.firstName',
-        'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();

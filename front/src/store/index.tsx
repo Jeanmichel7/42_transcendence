@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
-import chatReducer from './chatSlicer';
+import chatReducer from './convListSlice';
 import snackarReducer from './snackbarSlice';
 import notificationReducer from './notificationSlice';
 

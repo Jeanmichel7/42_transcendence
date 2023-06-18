@@ -17,7 +17,7 @@ import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
 
@@ -94,6 +94,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     /* ROOM */
     socket.on('room_join', (roomId, user) => {
       if (roomId !== id) return;
+      console.log('usr add ws : ', user);
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users ? [...prev.users, user] : [user],
@@ -237,7 +238,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const fetchOldMessages = useCallback(async () => {
     if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
-    console.log('fetch old messages');
 
     // setIsLoadingPagination(true);
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
@@ -278,7 +278,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
     if (!conv.room.id || conv.room.id === -1) return;
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
-    console.log('roomData : ', roomData);
     if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
       socketRef.current?.emit('leaveRoom', {
@@ -313,12 +312,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socketRef.current?.emit('leaveRoom', {
           roomId: id,
         });
-        console.log('room delete, conv : ', conv);
         dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
         dispatch(setWarningSnackbar('Room ' + conv.room.name + ' was deleted'));
         navigate('/chat/channel');
       } else {
-        console.log('WTF ?');
+        console.error('WTF ?');
       }
     }
   }, [conv, dispatch, id, navigate, userData]);
@@ -333,7 +331,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   useEffect(() => {
     if (!room || !userData.id ) return;
     if (room.bannedUsers?.some((u) => u.id === userData.id)) {
-      console.log('kick user');
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
       });
@@ -387,7 +384,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         inline: 'nearest',
       });
     }
-    console.log('messages : ', messages);
+    // console.log('messages : ', messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
@@ -467,7 +464,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const handleDeleteChannel = async () => {
     if (!room) return;
     const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
-    console.log('resDeleteChannel : ', resDeleteChannel);
     if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
       dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
     else {
@@ -485,10 +481,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         <div className="flex flex-col h-full">
           <div className="w-full flex text-lg text-blue justify-between">
 
-            {isAdmin && room && <InvitationRoom room={room} setRoom={setRoom} /> }
-            {/* <div className="w-full text-center"> */}
-              <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
-            {/* </div> */}
+            {isAdmin && room && 
+              <InvitationRoom room={room} setRoom={setRoom} 
+            /> }
+            
+            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+            
             {isAdmin && room && 
               <SideBarAdmin
                 room={room}

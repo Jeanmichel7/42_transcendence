@@ -12,7 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { reduxSetNotifications } from '../store/notificationSlice';
-import { reduxSetConversationList } from '../store/chatSlicer';
+import { reduxSetConversationList } from '../store/convListSlice';
 
 function ConnectPage() {
   const navigate = useNavigate();

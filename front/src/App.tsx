@@ -23,7 +23,7 @@ import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
-import { reduxSetConversationList } from './store/chatSlicer';
+import { reduxSetConversationList } from './store/convListSlice';
 import { getNotifsNotRead } from './api/notification';
 
 
@@ -85,7 +85,6 @@ function App() {
         if (notifsNotReadFiltered.length > 0)
           dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
       }
-
     } else {
       dispatch(setLogged(false));
       setUserId(-1);

@@ -91,7 +91,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
       });
     }
     setIsLoading(false);
-    console.log(form);
   };
 
   return (
@@ -175,9 +174,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
                         </div>
                       </Box>
                     }
-
-
-
 
 
                     {!isOpenRenameMenu &&

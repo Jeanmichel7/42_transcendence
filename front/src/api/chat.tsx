@@ -87,8 +87,6 @@ export async function leaveRoom(
 export async function getRoomData(
   roomId: string,
 ): Promise< RoomInterface | ApiErrorResponse> {
-  console.log('roomId : ', roomId, typeof(roomId));
-  console.log('roomIdNumber : ', roomId, typeof(roomId));
   return apiRequest(
     'get',
     'chat/rooms/' + roomId,

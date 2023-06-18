@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { RoomInterface, ApiErrorResponse } from '../../../types';
 import { joinRoom } from '../../../api/chat';
-import { reduxAddConversationList } from '../../../store/chatSlicer';
+import { reduxAddConversationList } from '../../../store/convListSlice';
 import { isConvAlreadyExist } from '../../../utils/utils';
 import { RootState } from '../../../store';
 

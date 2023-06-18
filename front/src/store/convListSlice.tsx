@@ -65,6 +65,7 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
 
 const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
   //create new conversation
+  console.log('redux conv list : ', item);
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
@@ -76,18 +77,14 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
       name: item.name,
       type: item.type,
       isProtected: item.isProtected,
-      users: item.users,
+      ownerUser: item.ownerUser,
       admins: item.admins,
-      // lastMessage: conv.lastMessage,
-      // lastMessageDate: conv.lastMessageDate,
+      users: item.users,
     } as RoomInterface;
   } else if (isUserInterface(item)) {
     newConversation.user = {
       id: item.id,
       login: item.login,
-      // email: item.email,
-      // firstName: item.firstName,
-      // lastName: item.lastName,
       avatar: item.avatar,
       status: item.status,
     } as UserInterface;
@@ -122,6 +119,7 @@ export const chatSlice = createSlice({
     // },
 
     reduxSetConversationList: (state, action: PayloadAction<ConversationInterface[]>) => {
+      console.log('DEMARRAGE CONV LIST : ', action.payload);
       state.conversationsList = action.payload;
     },
     reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {

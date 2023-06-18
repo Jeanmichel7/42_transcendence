@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import { leaveRoom } from '../../../api/chat';
 import { ApiErrorResponse, ConversationInterface, RoomInterface } from '../../../types';
 
 import { CircularProgress, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
-import GroupIcon from '@mui/icons-material/Group';
 import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
+import ConversationListRoomItemIcons from './IconAvatars';
 
 
 interface ConvProps {
@@ -54,12 +54,6 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
       dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
       if (conv.id === parseInt(convId as string)) navigate('/chat');
     }
-
-    //redirect to home if currentChatUserId is the user removed
-    // if (currentChatUserId === userToRemove.id) {
-    //   setCurrentChatUserId(-1);
-    //   setServiceToCall('home');
-    // }
   };
 
   return (
@@ -74,16 +68,10 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
-          <div className='flex flex-row items-center mr-2 bg-[#b2bdc3] rounded-full p-2'>
-            <GroupIcon />
-          </div>
-          <Typography 
-            component="span"
-            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap' }}
-            title={conv.room.name}
-          >
-            {conv.room.name.length > 10 ? conv.room.name.slice(0, 7) + '...' : conv.room.name}
-          </Typography>
+          {/* <div className='flex flex-row items-center mr-2 bg-[#b2bdc3] rounded-full'> */}
+            < ConversationListRoomItemIcons room={conv.room} />
+          {/* </div> */}
+          
         </Link>
 
 

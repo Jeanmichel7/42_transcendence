@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
-import { reduxAddConversationList } from '../../store/chatSlicer';
+import { reduxAddConversationList } from '../../store/convListSlice';
 import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -166,7 +166,7 @@ function Header() {
   }, [connectWebSocket]);
   
   useEffect(() => {
-    console.log('setnotifications localstorage', notifications);
+    // console.log('setnotifications localstorage', notifications);
     if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
     localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
   }, [notifications, userData.id]);
