@@ -25,6 +25,7 @@ interface UserCardProps {
 
 const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [ImIOwner, setImIOwner] = useState<boolean>(false);
   const [isOwner, setIsOwner] = useState<boolean>(false);
@@ -52,7 +53,8 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     e.preventDefault();
     if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t mute an admin or owner'));
     if (isMuted) return dispatch(setErrorSnackbar('User already muted'));
-
+    
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await muteUser(room.id, user.id, 20); //20sec
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
@@ -60,6 +62,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       setIsMuted(true);
       dispatch(setMsgSnackbar('User muted'));
     }
+    setIsLoading(false);
   };
 
   const handleUnMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
@@ -69,6 +72,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t unmute an admin or owner'));
     if (!isMuted) return dispatch(setErrorSnackbar('User not muted'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await unMuteUser(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
@@ -76,22 +80,24 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       setIsMuted(false);
       dispatch(setMsgSnackbar('User unmuted'));
     }
+    setIsLoading(false);
   };
 
   const handleKickuser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
   : Promise< void | PayloadAction<string> > => {
     e.stopPropagation();
     e.preventDefault();
-
     if (isOwner) return dispatch(setErrorSnackbar('You can\'t kick the owner'));
     if (isAdmin) return dispatch(setErrorSnackbar('You can\'t kick an admin'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await kickUser(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       dispatch(setMsgSnackbar('User kicked'));
     }
+    setIsLoading(false);
   };
 
   const handleBanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
@@ -103,6 +109,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (isAdmin) return dispatch(setErrorSnackbar('You can\'t ban an admin'));
     if (isBanned) return dispatch(setErrorSnackbar('User already banned'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await banUser(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
@@ -110,6 +117,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       setIsBanned(true);
       dispatch(setMsgSnackbar('User banned'));
     }
+    setIsLoading(false);
   };
 
   const handleUnbanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
@@ -121,6 +129,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (isAdmin) return dispatch(setErrorSnackbar('You can\'t unban an admin'));
     if (!isBanned) return dispatch(setErrorSnackbar('User not banned'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await unBanUser(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
@@ -128,6 +137,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       setIsBanned(false);
       dispatch(setMsgSnackbar('User unbanned'));
     }
+    setIsLoading(false);
   };
 
   const handleAddAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
@@ -139,13 +149,16 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (isOwner) return dispatch(setErrorSnackbar('You can\'t add admin to the owner'));
     if (isAdmin) return dispatch(setErrorSnackbar('User already admin'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await addAdminToRoom(room.id, user.id);
+    console.log('result : ', result);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {
       setIsAdmin(true);
       dispatch(setMsgSnackbar('User admin added'));
     }
+    setIsLoading(false);
   };
 
   const handleRemoveAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
@@ -156,6 +169,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (isOwner) return dispatch(setErrorSnackbar('You can\'t remove admin to the owner'));
     if (!isAdmin) return dispatch(setErrorSnackbar('User not admin'));
 
+    setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await removeAdminFromRoom(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
@@ -163,6 +177,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
       setIsAdmin(false);
       dispatch(setMsgSnackbar('User admin removed'));
     }
+    setIsLoading(false);
   };
 
   return (
@@ -222,6 +237,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleAddAdmin} color='primary'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <AddCircleOutlineSharpIcon color='success' />
             </IconButton>
@@ -238,6 +254,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleRemoveAdmin} color='warning'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <RemoveCircleOutlineSharpIcon color='error' />
             </IconButton>
@@ -254,6 +271,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleMuteUser} color='warning'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <VolumeOffSharpIcon color='primary'/>
             </IconButton>
@@ -267,6 +285,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleUnMuteUser} color='warning'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <VolumeMuteSharpIcon color='secondary' />
             </IconButton>
@@ -282,6 +301,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
           <IconButton
             onClick={handleKickuser} color='warning'
             sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+            disabled={isLoading}
           >
             <ExitToAppSharpIcon color='warning' />
           </IconButton>
@@ -298,6 +318,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleBanUser} color='warning'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <RemoveCircleSharpIcon color='error' />
             </IconButton>
@@ -311,6 +332,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             <IconButton
               onClick={handleUnbanUser} color='warning'
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+              disabled={isLoading}
             >
               <RemoveCircleOutlineSharpIcon color='error' />
             </IconButton>

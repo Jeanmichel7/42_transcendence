@@ -24,7 +24,7 @@ import { UserCreateDTO } from './dto/user.create.dto';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilInterface } from './interfaces/profil.interface';
-import { RequestWithUser } from './interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 // import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 import { UserPatchDTO } from './dto/user.patch.dto';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';

@@ -92,4 +92,11 @@ export class NotificationGateway {
   //   this.server.to(roomId).emit('join-room', `${userId} join the room`);
   //   console.log('user joined room' + roomId);
   // }
+
+  /* ROOM */
+  emitNotificationRoomInvite(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_room_invite', data);
+  }
 }

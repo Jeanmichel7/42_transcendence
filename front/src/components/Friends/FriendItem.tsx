@@ -8,9 +8,14 @@ interface FriendItemProps {
     name: string;
     callback: (user: UserInterface) => void;
   }[];
+  isLoading: boolean;
 }
 
-const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
+const FriendItem: React.FC<FriendItemProps> = ({ 
+  user,
+  actions,
+  isLoading,
+}) => {
   const navigate = useNavigate();
   
   return (
@@ -70,12 +75,14 @@ const FriendItem: React.FC<FriendItemProps> = ({ user, actions }) => {
                 key={index}
                 variant='outlined'
                 onClick={() => action.callback(user)}
+                disabled={isLoading}
                 color={
-                  action.name === 'Delete' ||
-                  action.name === 'Cancel' ||
-                  action.name === 'Decline' ? 'error' 
-                    : action.name === 'Block' ? 'warning' 
-                      : 'primary' }
+                  isLoading ? 'secondary' :
+                    action.name === 'Delete' ||
+                    action.name === 'Cancel' ||
+                    action.name === 'Decline' ? 'error'
+                      : action.name === 'Block' ? 'warning'
+                        : 'primary' }
                 sx={{ marginRight: '10px' }}
               >
                 {action.name}

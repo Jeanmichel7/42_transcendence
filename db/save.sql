@@ -235,6 +235,46 @@ ALTER SEQUENCE public.messages_id_seq OWNED BY public.messages.id;
 
 
 --
+-- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notifications (
+    id bigint NOT NULL,
+    type text NOT NULL,
+    content text NOT NULL,
+    read boolean DEFAULT false NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT now(),
+    "updatedAt" timestamp without time zone DEFAULT now(),
+    "senderId" bigint,
+    "receiverId" bigint,
+    "invitationLink" text
+);
+
+
+ALTER TABLE public.notifications OWNER TO postgres;
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notifications_id_seq OWNER TO postgres;
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -348,6 +388,13 @@ ALTER TABLE ONLY public.messages ALTER COLUMN id SET DEFAULT nextval('public.mes
 
 
 --
+-- Name: notifications id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -366,80 +413,101 @@ ALTER TABLE ONLY public."users-relation" ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "roomId") FROM stdin;
-1	Hello	2023-06-15 23:30:44.363329	2023-06-15 23:30:44.363329	1	1
-29	Demond47 has join the room	2023-06-16 02:57:22.008299	2023-06-16 02:57:22.008299	0	3
-2	login1 has join the room	2023-06-16 02:02:05.981758	2023-06-16 02:02:05.981758	0	2
-3	login1 has join the room	2023-06-16 02:02:07.69278	2023-06-16 02:02:07.69278	0	3
-4	Ike.Stanton11 has join the room	2023-06-16 02:02:54.663438	2023-06-16 02:02:54.663438	0	1
-30	Demond47 has join the room	2023-06-16 02:57:25.770543	2023-06-16 02:57:25.770543	0	4
-5	Aleen_Stamm11 has join the room	2023-06-16 02:36:52.35372	2023-06-16 02:36:52.35372	0	1
-6	login1 has join the room	2023-06-16 02:37:12.895748	2023-06-16 02:37:12.895748	0	4
-7	Hello	2023-06-16 02:37:54.74358	2023-06-16 02:37:54.74358	11	4
-31	rextcfyvgbhnji.udsrehzxcj Eetjrydjkjg mhdjyt f kyjyrdx jtrytdujtrd jtfdjy dj   jydjydjydjytr sthesztjez jtx	2023-06-16 02:58:04.546932	2023-06-16 02:58:04.546932	12	1
-8	Coucou	2023-06-16 02:38:00.492618	2023-06-16 02:38:00.492618	1	4
-9	Aleen_Stamm11 has join the room	2023-06-16 02:38:12.323763	2023-06-16 02:38:12.323763	0	2
-10	Aleen_Stamm11 has join the room	2023-06-16 02:38:14.043948	2023-06-16 02:38:14.043948	0	3
-32	/	2023-06-16 02:58:09.234661	2023-06-16 02:58:09.234661	12	1
-11	Aleen_Stamm11 has left the room	2023-06-16 02:38:17.671113	2023-06-16 02:38:17.671113	0	2
-12	Aleen_Stamm11 has left the room	2023-06-16 02:38:34.317614	2023-06-16 02:38:34.317614	0	4
-13	et bah	2023-06-16 02:38:41.848204	2023-06-16 02:38:41.848204	1	4
-14	Aleen_Stamm11 has join the room	2023-06-16 02:38:45.092456	2023-06-16 02:38:45.092456	0	4
-15	Ike.Stanton11 has join the room	2023-06-16 02:49:37.98404	2023-06-16 02:49:37.98404	0	2
-16	Lloyd25 has join the room	2023-06-16 02:51:51.280817	2023-06-16 02:51:51.280817	0	1
-17	Davin.Wunsch32 has join the room	2023-06-16 02:52:45.222721	2023-06-16 02:52:45.222721	0	1
-18	Lyric12 has join the room	2023-06-16 02:55:26.871271	2023-06-16 02:55:26.871271	0	1
-19	Lyric12 has join the room	2023-06-16 02:55:28.503797	2023-06-16 02:55:28.503797	0	3
-20	coucou	2023-06-16 02:55:33.32543	2023-06-16 02:55:33.32543	4	1
-21	dfdsd dfd dssdfsfsddf dssd fd fdsf fdsf 	2023-06-16 02:55:38.305028	2023-06-16 02:55:38.305028	4	1
-22	dsfdsff	2023-06-16 02:55:39.861344	2023-06-16 02:55:39.861344	4	1
-23	sdfsdfds sdf sfds dsfsf	2023-06-16 02:55:41.967916	2023-06-16 02:55:41.967916	4	1
-24	Perry83 has join the room	2023-06-16 02:56:02.514708	2023-06-16 02:56:02.514708	0	1
-25	Perry83 has join the room	2023-06-16 02:56:05.828038	2023-06-16 02:56:05.828038	0	2
-26	Hi	2023-06-16 02:56:22.168557	2023-06-16 02:56:22.168557	15	1
-27	Demond47 has join the room	2023-06-16 02:57:11.521615	2023-06-16 02:57:11.521615	0	1
-28	Demond47 has join the room	2023-06-16 02:57:20.624199	2023-06-16 02:57:20.624199	0	2
-33	jrasser has join the room	2023-06-16 15:05:47.220875	2023-06-16 15:05:47.220875	0	3
-124	login1 has left the room	2023-06-16 17:59:01.252862	2023-06-16 17:59:01.252862	0	17
-34	jrasser has join the room	2023-06-16 15:05:50.590774	2023-06-16 15:05:50.590774	0	4
-115	login1 has join the room	2023-06-16 17:21:48.258918	2023-06-16 17:21:48.258918	0	17
-35	dsa s sdd sa ddasd	2023-06-16 15:05:55.285379	2023-06-16 15:05:55.285379	22	4
-36	coucou	2023-06-16 15:05:57.274366	2023-06-16 15:05:57.274366	22	4
-74	ds	2023-06-16 16:12:09.451958	2023-06-16 16:12:09.451958	6	4
-116	Marion_Donnelly53 has join the room	2023-06-16 17:21:50.721723	2023-06-16 17:21:50.721723	0	17
-62	dfsfdfsddf	2023-06-16 16:11:46.57305	2023-06-16 16:11:46.57305	22	4
-39	jrasser has left the room	2023-06-16 15:11:34.659481	2023-06-16 15:11:34.659481	0	4
-40	jrasser has join the room	2023-06-16 15:26:58.142869	2023-06-16 15:26:58.142869	0	1
-41	jrasser has join the room	2023-06-16 15:28:19.663775	2023-06-16 15:28:19.663775	0	2
-117	lll	2023-06-16 17:32:22.71818	2023-06-16 17:32:22.71818	6	18
-42	jrasser has join the room	2023-06-16 15:28:22.396552	2023-06-16 15:28:22.396552	0	4
-43	jrasser has left the room	2023-06-16 15:28:48.693325	2023-06-16 15:28:48.693325	0	3
-63	but post ?	2023-06-16 16:12:05.697503	2023-06-16 16:12:05.697503	6	4
-44	jrasser has join the room	2023-06-16 15:29:08.876751	2023-06-16 15:29:08.876751	0	3
-45	jrasser has left the room	2023-06-16 15:29:44.751388	2023-06-16 15:29:44.751388	0	3
-46	jrasser has join the room	2023-06-16 15:32:39.424504	2023-06-16 15:32:39.424504	0	3
-75	f 	2023-06-16 16:12:09.644951	2023-06-16 16:12:09.644951	6	4
-47	jrasser has left the room	2023-06-16 15:32:43.99702	2023-06-16 15:32:43.99702	0	3
-118	jrasser has join the room	2023-06-16 17:32:28.915555	2023-06-16 17:32:28.915555	0	18
-64	dfsdfd	2023-06-16 16:12:07.228305	2023-06-16 16:12:07.228305	6	4
-65	 fsd	2023-06-16 16:12:07.444549	2023-06-16 16:12:07.444549	6	4
-125	ljhjhv	2023-06-16 18:00:27.230745	2023-06-16 18:00:27.230745	1	17
-66	fd	2023-06-16 16:12:07.660977	2023-06-16 16:12:07.660977	6	4
-76	f	2023-06-16 16:12:09.81274	2023-06-16 16:12:09.81274	6	4
-67	fds dsf	2023-06-16 16:12:08.26814	2023-06-16 16:12:08.26814	6	4
-68	sd	2023-06-16 16:12:08.444659	2023-06-16 16:12:08.444659	6	4
-77	sdf	2023-06-16 16:12:10.014811	2023-06-16 16:12:10.014811	6	4
-69	f	2023-06-16 16:12:08.573282	2023-06-16 16:12:08.573282	6	4
-70	sd	2023-06-16 16:12:08.732079	2023-06-16 16:12:08.732079	6	4
-71	f sd	2023-06-16 16:12:08.919515	2023-06-16 16:12:08.919515	6	4
-78	merdeeeee	2023-06-16 16:12:15.47144	2023-06-16 16:12:15.47144	6	4
-72	f 	2023-06-16 16:12:09.101163	2023-06-16 16:12:09.101163	6	4
-140	login1 has join the room	2023-06-16 18:12:59.248075	2023-06-16 18:12:59.248075	0	22
-73	dsf	2023-06-16 16:12:09.284015	2023-06-16 16:12:09.284015	6	4
-141	sdfsdsdf	2023-06-16 18:13:03.302684	2023-06-16 18:13:03.302684	1	22
-143	Marion_Donnelly53 has left the room	2023-06-16 18:30:33.033881	2023-06-16 18:30:33.033881	0	22
-142	Marion_Donnelly53 has join the room	2023-06-16 18:28:05.099565	2023-06-16 18:28:05.099565	0	22
-139	fff	2023-06-16 18:12:51.50845	2023-06-16 18:12:51.50845	6	17
-144	login1 has left the room	2023-06-16 18:34:11.430664	2023-06-16 18:34:11.430664	0	22
+46	Joana.Cartwright has left the room	2023-06-18 01:42:36.416579	2023-06-18 01:42:36.416579	0	5
+23	Joana.Cartwright has been banned	2023-06-18 01:26:08.938347	2023-06-18 01:26:08.938347	0	5
+24	Joana.Cartwright has been unbanned	2023-06-18 01:26:28.373818	2023-06-18 01:26:28.373818	0	5
+25	cc	2023-06-18 01:26:36.115048	2023-06-18 01:26:36.115048	3	5
+47	Joana.Cartwright has left the room	2023-06-18 01:42:38.074764	2023-06-18 01:42:38.074764	0	6
+26	yeah	2023-06-18 01:26:44.751196	2023-06-18 01:26:44.751196	3	5
+27	Joana.Cartwright has been muted this idiot	2023-06-18 01:26:56.596153	2023-06-18 01:26:56.596153	0	5
+64	6	2023-06-18 01:43:32.891414	2023-06-18 01:43:32.891414	12	5
+28	Joana.Cartwright has been unmuted	2023-06-18 01:27:16.633578	2023-06-18 01:27:16.633578	0	5
+48	1	2023-06-18 01:43:25.016493	2023-06-18 01:43:25.016493	12	5
+29	ok	2023-06-18 01:27:27.871763	2023-06-18 01:27:27.871763	3	5
+30	Invitation link http://localhost:3006/chat/channel/invitation/6/priv	2023-06-18 01:31:26.602769	2023-06-18 01:31:26.602769	0	6
+31	Joana.Cartwright has join the room	2023-06-18 01:31:40.434886	2023-06-18 01:31:40.434886	0	6
+49	2	2023-06-18 01:43:25.378065	2023-06-18 01:43:25.378065	12	5
+32	Benjamin50 has join the room	2023-06-18 01:31:48.338361	2023-06-18 01:31:48.338361	0	6
+11	Invitation link http://localhost:3006/chat/channel/invitation/5/Test	2023-06-18 00:12:03.972985	2023-06-18 00:12:03.972985	0	5
+12	Joana.Cartwright has join the room	2023-06-18 00:13:15.599035	2023-06-18 00:13:15.599035	0	5
+33	Benjamin50 has been muted this idiot	2023-06-18 01:32:10.35982	2023-06-18 01:32:10.35982	0	6
+13	coucou	2023-06-18 00:13:25.003197	2023-06-18 00:13:25.003197	3	5
+14	Joana.Cartwright has been muted this idiot	2023-06-18 01:05:51.751128	2023-06-18 01:05:51.751128	0	5
+75	27	2023-06-18 01:43:38.41399	2023-06-18 01:43:38.41399	12	5
+15	Joana.Cartwright has been unmuted	2023-06-18 01:05:52.243547	2023-06-18 01:05:52.243547	0	5
+34	Benjamin50 has been kicked	2023-06-18 01:32:17.098288	2023-06-18 01:32:17.098288	0	6
+16	Joana.Cartwright has been kicked	2023-06-18 01:06:03.320986	2023-06-18 01:06:03.320986	0	5
+17	coucou	2023-06-18 01:16:53.170602	2023-06-18 01:16:53.170602	12	5
+50	3	2023-06-18 01:43:25.80136	2023-06-18 01:43:25.80136	12	5
+18	Joana.Cartwright has join the room	2023-06-18 01:25:46.229101	2023-06-18 01:25:46.229101	0	5
+35	Benjamin50 has been unmuted	2023-06-18 01:32:30.392121	2023-06-18 01:32:30.392121	0	6
+19	Joana.Cartwright has been kicked	2023-06-18 01:25:50.568675	2023-06-18 01:25:50.568675	0	5
+20	Joana.Cartwright has join the room	2023-06-18 01:25:59.707656	2023-06-18 01:25:59.707656	0	5
+21	Joana.Cartwright has left the room	2023-06-18 01:26:03.709465	2023-06-18 01:26:03.709465	0	5
+36	Jon.Torp has join the room	2023-06-18 01:32:52.558153	2023-06-18 01:32:52.558153	0	6
+22	Joana.Cartwright has join the room	2023-06-18 01:26:05.445344	2023-06-18 01:26:05.445344	0	5
+65	17	2023-06-18 01:43:33.367959	2023-06-18 01:43:33.367959	12	5
+37	Benjamin50 has join the room	2023-06-18 01:32:57.634583	2023-06-18 01:32:57.634583	0	6
+51	4	2023-06-18 01:43:26.170688	2023-06-18 01:43:26.170688	12	5
+38	coucou	2023-06-18 01:34:05.602233	2023-06-18 01:34:05.602233	2	6
+39	wtf	2023-06-18 01:41:10.19689	2023-06-18 01:41:10.19689	3	6
+40	oups	2023-06-18 01:41:14.410132	2023-06-18 01:41:14.410132	2	6
+52	5	2023-06-18 01:43:26.514279	2023-06-18 01:43:26.514279	12	5
+41	slt	2023-06-18 01:41:38.010341	2023-06-18 01:41:38.010341	12	5
+42	cc	2023-06-18 01:41:40.069879	2023-06-18 01:41:40.069879	3	5
+43	Benjamin50 has join the room	2023-06-18 01:41:47.5899	2023-06-18 01:41:47.5899	0	5
+53	6	2023-06-18 01:43:26.813635	2023-06-18 01:43:26.813635	12	5
+44	hey	2023-06-18 01:41:51.016476	2023-06-18 01:41:51.016476	2	5
+45	blabla	2023-06-18 01:41:54.256781	2023-06-18 01:41:54.256781	2	5
+66	18	2023-06-18 01:43:33.826429	2023-06-18 01:43:33.826429	12	5
+54	7	2023-06-18 01:43:27.119916	2023-06-18 01:43:27.119916	12	5
+83	Invitation link http://localhost:3006/chat/channel/invitation/12/gdffg	2023-06-18 02:50:54.551492	2023-06-18 02:50:54.551492	0	12
+55	8	2023-06-18 01:43:27.424058	2023-06-18 01:43:27.424058	12	5
+67	9	2023-06-18 01:43:34.280418	2023-06-18 01:43:34.280418	12	5
+56	9	2023-06-18 01:43:27.758937	2023-06-18 01:43:27.758937	12	5
+57	10	2023-06-18 01:43:28.521641	2023-06-18 01:43:28.521641	12	5
+76	28	2023-06-18 01:43:38.898014	2023-06-18 01:43:38.898014	12	5
+58	1	2023-06-18 01:43:28.952666	2023-06-18 01:43:28.952666	12	5
+68	20	2023-06-18 01:43:34.830862	2023-06-18 01:43:34.830862	12	5
+59	11	2023-06-18 01:43:29.975638	2023-06-18 01:43:29.975638	12	5
+60	12	2023-06-18 01:43:30.716245	2023-06-18 01:43:30.716245	12	5
+61	13	2023-06-18 01:43:31.523295	2023-06-18 01:43:31.523295	12	5
+69	21	2023-06-18 01:43:35.281596	2023-06-18 01:43:35.281596	12	5
+62	14	2023-06-18 01:43:31.971669	2023-06-18 01:43:31.971669	12	5
+63	5	2023-06-18 01:43:32.452275	2023-06-18 01:43:32.452275	12	5
+80	Invitation link http://localhost:3006/chat/channel/invitation/9/aaaa	2023-06-18 02:44:01.172022	2023-06-18 02:44:01.172022	0	9
+70	22	2023-06-18 01:43:35.739892	2023-06-18 01:43:35.739892	12	5
+77	30	2023-06-18 01:43:40.86487	2023-06-18 01:43:40.86487	12	5
+71	23	2023-06-18 01:43:36.174213	2023-06-18 01:43:36.174213	12	5
+72	24	2023-06-18 01:43:36.631152	2023-06-18 01:43:36.631152	12	5
+73	2	2023-06-18 01:43:37.036865	2023-06-18 01:43:37.036865	12	5
+78	Invitation link http://localhost:3006/chat/channel/invitation/7/dgdgf	2023-06-18 02:40:03.510255	2023-06-18 02:40:03.510255	0	7
+74	26	2023-06-18 01:43:37.92011	2023-06-18 01:43:37.92011	12	5
+82	Invitation link http://localhost:3006/chat/channel/invitation/11/qaqaqaqaq	2023-06-18 02:49:56.289324	2023-06-18 02:49:56.289324	0	11
+79	Invitation link http://localhost:3006/chat/channel/invitation/8/dddddddd	2023-06-18 02:40:57.499292	2023-06-18 02:40:57.499292	0	8
+81	Invitation link http://localhost:3006/chat/channel/invitation/10/vvvvvvvvvvvv	2023-06-18 02:45:51.660511	2023-06-18 02:45:51.660511	0	10
+84	Invitation link http://localhost:3006/chat/channel/invitation/13/gdgffdfgddgddfg	2023-06-18 02:51:05.609892	2023-06-18 02:51:05.609892	0	13
+85	Invitation link http://localhost:3006/chat/channel/invitation/14/wwwwww	2023-06-18 02:53:10.965823	2023-06-18 02:53:10.965823	0	14
+86	Joana.Cartwright has join the room	2023-06-18 02:53:21.612228	2023-06-18 02:53:21.612228	0	14
+87	dfsddf	2023-06-18 02:53:25.82364	2023-06-18 02:53:25.82364	3	14
+88	Invitation link http://localhost:3006/chat/channel/invitation/15/BLIBLIB	2023-06-18 03:06:09.942512	2023-06-18 03:06:09.942512	0	15
+89	Invitation link http://localhost:3006/chat/channel/invitation/16/Mouahahaa	2023-06-18 03:22:48.512074	2023-06-18 03:22:48.512074	0	16
+91	jrasser has join the room	2023-06-18 03:32:45.319554	2023-06-18 03:32:45.319554	0	17
+90	Invitation link http://localhost:3006/chat/channel/invitation/17/zxzxzzxzzxxzx	2023-06-18 03:32:14.978619	2023-06-18 03:32:14.978619	0	17
+92	Invitation link http://localhost:3006/chat/channel/invitation/18/BLIBLIBLIB	2023-06-18 03:33:06.04664	2023-06-18 03:33:06.04664	0	18
+93	jrasser has join the room	2023-06-18 03:33:11.125878	2023-06-18 03:33:11.125878	0	18
+94	Invitation link http://localhost:3006/chat/channel/invitation/19/BLBALBA	2023-06-18 03:33:26.092744	2023-06-18 03:33:26.092744	0	19
+95	coucou	2023-06-18 03:33:31.879734	2023-06-18 03:33:31.879734	2	19
+96	Invitation link http://localhost:3006/chat/channel/invitation/20/:OUAHA	2023-06-18 03:38:25.024657	2023-06-18 03:38:25.024657	0	20
+97	Joana.Cartwright has join the room	2023-06-18 03:38:30.808871	2023-06-18 03:38:30.808871	0	20
+98	Invitation link http://localhost:3006/chat/channel/invitation/21/iiiiiii	2023-06-18 03:40:00.651244	2023-06-18 03:40:00.651244	0	21
+99	Invitation link http://localhost:3006/chat/channel/invitation/22/ccccccc	2023-06-18 03:40:54.248808	2023-06-18 03:40:54.248808	0	22
+100	Invitation link http://localhost:3006/chat/channel/invitation/23/zzzzzzzzzz	2023-06-18 03:42:28.107831	2023-06-18 03:42:28.107831	0	23
+101	Invitation link http://localhost:3006/chat/channel/invitation/24/aaaaaaa	2023-06-18 03:43:52.985776	2023-06-18 03:43:52.985776	0	24
+102	Invitation link http://localhost:3006/chat/channel/invitation/25/uuuuuuu	2023-06-18 03:45:05.90628	2023-06-18 03:45:05.90628	0	25
+103	jrasser has join the room	2023-06-18 03:45:40.053687	2023-06-18 03:45:40.053687	0	25
+104	Invitation link http://localhost:3006/chat/channel/invitation/26/ttttt	2023-06-18 04:00:04.529106	2023-06-18 04:00:04.529106	0	26
+105	jrasser has join the room	2023-06-18 04:00:17.060426	2023-06-18 04:00:17.060426	0	26
 \.
 
 
@@ -448,13 +516,28 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 --
 
 COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
-1	public	f	42	\N	2023-06-15 23:30:40.081569	2023-06-15 23:30:40.081569	1
-2	public	t	room	$2b$10$1Pax7awjdOKSmN.GXcf/wuBnKtN5yk895FQPJJpZ5jAAepAs5DTOy	2023-06-16 00:39:39.710572	2023-06-16 00:39:39.710572	16
-3	public	f	Channel	\N	2023-06-16 00:39:45.772039	2023-06-16 00:39:45.772039	16
-4	public	t	Room	$2b$10$ww4P4kTdWTGeEhPaJJk1bu.Fc2nxEBNS0srFQ3H8SgP68HSzEWP3e	2023-06-16 02:37:02.064434	2023-06-16 02:37:02.064434	11
-17	public	f	BLIBLI	\N	2023-06-16 17:21:41.966945	2023-06-16 17:21:41.966945	22
-18	public	f	l;;	\N	2023-06-16 17:32:02.358744	2023-06-16 17:32:02.358744	6
-22	public	f	aaaaaaaaa	\N	2023-06-16 18:12:56.963259	2023-06-16 18:12:56.963259	22
+5	public	f	Test	\N	2023-06-18 00:12:03.948883	2023-06-18 00:12:03.948883	12
+6	private	f	priv	\N	2023-06-18 01:31:26.573986	2023-06-18 01:31:26.573986	12
+7	private	f	dgdgf	\N	2023-06-18 02:40:03.478945	2023-06-18 02:40:03.478945	12
+8	private	f	dddddddd	\N	2023-06-18 02:40:57.454858	2023-06-18 02:40:57.454858	12
+9	private	f	aaaa	\N	2023-06-18 02:44:01.136797	2023-06-18 02:44:01.136797	12
+10	private	f	vvvvvvvvvvvv	\N	2023-06-18 02:45:51.632504	2023-06-18 02:45:51.632504	12
+11	private	f	qaqaqaqaq	\N	2023-06-18 02:49:56.254996	2023-06-18 02:49:56.254996	12
+12	private	f	gdffg	\N	2023-06-18 02:50:54.520614	2023-06-18 02:50:54.520614	12
+13	private	f	gdgffdfgddgddfg	\N	2023-06-18 02:51:05.58809	2023-06-18 02:51:05.58809	12
+14	private	f	wwwwww	\N	2023-06-18 02:53:10.914591	2023-06-18 02:53:10.914591	12
+15	private	f	BLIBLIB	\N	2023-06-18 03:06:09.877129	2023-06-18 03:06:09.877129	3
+16	private	f	Mouahahaa	\N	2023-06-18 03:22:48.480043	2023-06-18 03:22:48.480043	3
+17	private	f	zxzxzzxzzxxzx	\N	2023-06-18 03:32:14.949403	2023-06-18 03:32:14.949403	2
+18	private	f	BLIBLIBLIB	\N	2023-06-18 03:33:06.024342	2023-06-18 03:33:06.024342	2
+19	private	f	BLBALBA	\N	2023-06-18 03:33:26.072906	2023-06-18 03:33:26.072906	2
+20	private	f	:OUAHA	\N	2023-06-18 03:38:24.997267	2023-06-18 03:38:24.997267	2
+21	private	f	iiiiiii	\N	2023-06-18 03:40:00.630688	2023-06-18 03:40:00.630688	2
+22	private	f	ccccccc	\N	2023-06-18 03:40:54.221807	2023-06-18 03:40:54.221807	2
+23	private	f	zzzzzzzzzz	\N	2023-06-18 03:42:28.082713	2023-06-18 03:42:28.082713	2
+24	private	f	aaaaaaa	\N	2023-06-18 03:43:52.966746	2023-06-18 03:43:52.966746	2
+25	private	f	uuuuuuu	\N	2023-06-18 03:45:05.879602	2023-06-18 03:45:05.879602	2
+26	private	f	ttttt	\N	2023-06-18 04:00:04.498838	2023-06-18 04:00:04.498838	2
 \.
 
 
@@ -463,6 +546,45 @@ COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "u
 --
 
 COPY public.chat_rooms_accepted_users_users ("chatRoomsId", "usersId") FROM stdin;
+6	0
+7	3
+7	6
+7	0
+8	3
+8	6
+8	0
+9	6
+9	3
+9	0
+11	3
+11	6
+11	0
+13	3
+13	0
+14	6
+14	0
+15	6
+15	12
+15	2
+15	0
+16	12
+16	0
+17	0
+18	0
+19	12
+19	0
+20	12
+20	0
+21	12
+21	0
+22	12
+22	0
+23	12
+23	0
+24	12
+24	0
+25	0
+26	0
 \.
 
 
@@ -471,12 +593,28 @@ COPY public.chat_rooms_accepted_users_users ("chatRoomsId", "usersId") FROM stdi
 --
 
 COPY public.chat_rooms_admins_users ("chatRoomsId", "usersId") FROM stdin;
-1	1
-2	16
-3	16
-17	22
-18	6
-22	22
+5	12
+6	12
+7	12
+8	12
+9	12
+10	12
+11	12
+12	12
+13	12
+14	12
+15	3
+16	3
+17	2
+18	2
+19	2
+20	2
+21	2
+22	2
+23	2
+24	2
+25	2
+26	2
 \.
 
 
@@ -501,35 +639,37 @@ COPY public.chat_rooms_muted_users_users ("chatRoomsId", "usersId") FROM stdin;
 --
 
 COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
-1	1
-2	16
-3	16
-2	1
-3	1
-1	7
-1	11
-4	1
-3	11
-4	11
-2	7
-1	10
-1	5
-1	4
-3	4
-1	15
-2	15
-1	12
-2	12
-3	12
-4	12
-1	22
-2	22
-4	22
-17	22
-17	6
-18	6
-18	22
-22	22
+5	12
+6	12
+6	6
+6	2
+5	2
+7	12
+8	12
+9	12
+10	12
+11	12
+12	12
+13	12
+14	12
+14	3
+15	3
+16	3
+17	2
+17	12
+18	2
+18	12
+19	2
+20	2
+20	3
+21	2
+22	2
+23	2
+24	2
+25	2
+25	12
+26	2
+26	12
 \.
 
 
@@ -538,7 +678,6 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 --
 
 COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "player1Id", "player2Id", "winnerId") FROM stdin;
-1	finished	2023-06-16 14:47:45.417	2023-06-16 14:48:16.343	2023-06-16 14:47:45.420437	5	5	2	2	1
 \.
 
 
@@ -547,178 +686,45 @@ COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlaye
 --
 
 COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUserId") FROM stdin;
-32	fgdf df dfgfdg	2023-06-16 02:43:08.171977	2023-06-16 02:43:08.171977	16	1
-1	Hello	2023-06-16 02:33:55.642475	2023-06-16 02:33:55.642475	14	1
-2	Salut	2023-06-16 02:34:14.938351	2023-06-16 02:34:14.938351	1	14
-54	22	2023-06-16 02:43:37.914514	2023-06-16 02:43:37.914514	1	16
-3	ca va ?	2023-06-16 02:34:18.269823	2023-06-16 02:34:18.269823	14	1
-33	1	2023-06-16 02:43:21.962712	2023-06-16 02:43:21.962712	1	16
-4	Hello	2023-06-16 02:41:06.487029	2023-06-16 02:41:06.487029	6	1
-5	fgfd	2023-06-16 02:42:23.468901	2023-06-16 02:42:23.468901	16	1
-6	gd dfg dfg dfd	2023-06-16 02:42:24.381802	2023-06-16 02:42:24.381802	16	1
-34	2	2023-06-16 02:43:22.609953	2023-06-16 02:43:22.609953	1	16
-7	 fg	2023-06-16 02:42:24.60646	2023-06-16 02:42:24.60646	16	1
-8	df 	2023-06-16 02:42:24.805173	2023-06-16 02:42:24.805173	16	1
-9	g fd	2023-06-16 02:42:25.093179	2023-06-16 02:42:25.093179	16	1
-35	3	2023-06-16 02:43:23.155602	2023-06-16 02:43:23.155602	1	16
-10	fgd 	2023-06-16 02:42:25.976561	2023-06-16 02:42:25.976561	16	1
-11	 dfgfd gf dg dfgfdfd gf fdhgjgj g	2023-06-16 02:42:31.79109	2023-06-16 02:42:31.79109	1	16
-55	23	2023-06-16 02:43:38.943507	2023-06-16 02:43:38.943507	1	16
-12	hhhh	2023-06-16 02:42:33.93041	2023-06-16 02:42:33.93041	16	1
-36	4	2023-06-16 02:43:23.755427	2023-06-16 02:43:23.755427	1	16
-13	 gdfg dfgdf	2023-06-16 02:42:36.14269	2023-06-16 02:42:36.14269	1	16
-14	df	2023-06-16 02:42:36.328379	2023-06-16 02:42:36.328379	1	16
-15	df gdf fdgd	2023-06-16 02:42:36.931081	2023-06-16 02:42:36.931081	1	16
-37	5	2023-06-16 02:43:24.378533	2023-06-16 02:43:24.378533	1	16
-16	dfg gffdfdgdf ggfd dfg fdg fdgf dfgdf dgfdg gd fdgfd gfd dfgfd gdfg	2023-06-16 02:42:40.88067	2023-06-16 02:42:40.88067	1	16
-17	fd df fgfdgdfgdf fd fg dfg df fdgd dfg dfgfdf hfhdf fdg fgfdgdfgd gfdg fd fdg f dgfd df fdg fdg g	2023-06-16 02:42:46.924085	2023-06-16 02:42:46.924085	1	16
-18	f fdg	2023-06-16 02:42:47.533493	2023-06-16 02:42:47.533493	1	16
-38	6	2023-06-16 02:43:24.954244	2023-06-16 02:43:24.954244	1	16
-19	fdg df 	2023-06-16 02:42:48.206157	2023-06-16 02:42:48.206157	1	16
-20	fdg fdg	2023-06-16 02:42:49.62772	2023-06-16 02:42:49.62772	1	16
-56	24	2023-06-16 02:43:39.861125	2023-06-16 02:43:39.861125	1	16
-21	dfgfd	2023-06-16 02:42:51.589691	2023-06-16 02:42:51.589691	16	1
-39	7	2023-06-16 02:43:25.604875	2023-06-16 02:43:25.604875	1	16
-22	 fd	2023-06-16 02:42:51.864372	2023-06-16 02:42:51.864372	16	1
-23	gfdgfdg fdg	2023-06-16 02:42:52.978771	2023-06-16 02:42:52.978771	16	1
-24	fdgfgdfd	2023-06-16 02:42:53.705172	2023-06-16 02:42:53.705172	16	1
-40	8	2023-06-16 02:43:26.250339	2023-06-16 02:43:26.250339	1	16
-25	g	2023-06-16 02:42:54.260686	2023-06-16 02:42:54.260686	16	1
-26	ggfgdf gdf fdgfdg	2023-06-16 02:42:55.636719	2023-06-16 02:42:55.636719	16	1
-68	36	2023-06-16 02:43:54.194738	2023-06-16 02:43:54.194738	16	1
-27	df gf	2023-06-16 02:42:56.148317	2023-06-16 02:42:56.148317	16	1
-41	9	2023-06-16 02:43:26.834206	2023-06-16 02:43:26.834206	1	16
-28	 fdgfd dfg	2023-06-16 02:42:57.26107	2023-06-16 02:42:57.26107	16	1
-29	dsfs ds f sdf	2023-06-16 02:43:00.479407	2023-06-16 02:43:00.479407	1	16
-57	25	2023-06-16 02:43:40.64596	2023-06-16 02:43:40.64596	1	16
-30	sd sd sd d dsf dsf d ssfsdf dsfdfdsfdsf ds sdf	2023-06-16 02:43:04.834835	2023-06-16 02:43:04.834835	1	16
-42	10	2023-06-16 02:43:27.608929	2023-06-16 02:43:27.608929	1	16
-31	dsf 	2023-06-16 02:43:05.580885	2023-06-16 02:43:05.580885	1	16
-43	11	2023-06-16 02:43:28.707438	2023-06-16 02:43:28.707438	1	16
-58	26	2023-06-16 02:43:41.540941	2023-06-16 02:43:41.540941	1	16
-44	12	2023-06-16 02:43:29.709303	2023-06-16 02:43:29.709303	1	16
-45	13	2023-06-16 02:43:30.548168	2023-06-16 02:43:30.548168	1	16
-76	44	2023-06-16 02:44:00.731156	2023-06-16 02:44:00.731156	16	1
-46	14	2023-06-16 02:43:31.466707	2023-06-16 02:43:31.466707	1	16
-59	27	2023-06-16 02:43:42.40319	2023-06-16 02:43:42.40319	1	16
-47	15	2023-06-16 02:43:32.246591	2023-06-16 02:43:32.246591	1	16
-48	16	2023-06-16 02:43:33.048713	2023-06-16 02:43:33.048713	1	16
-69	37	2023-06-16 02:43:54.948331	2023-06-16 02:43:54.948331	16	1
-49	17	2023-06-16 02:43:33.835028	2023-06-16 02:43:33.835028	1	16
-60	28	2023-06-16 02:43:43.291148	2023-06-16 02:43:43.291148	1	16
-50	18	2023-06-16 02:43:34.596865	2023-06-16 02:43:34.596865	1	16
-51	19	2023-06-16 02:43:35.427417	2023-06-16 02:43:35.427417	1	16
-52	20	2023-06-16 02:43:36.27234	2023-06-16 02:43:36.27234	1	16
-61	29	2023-06-16 02:43:44.17034	2023-06-16 02:43:44.17034	1	16
-53	21	2023-06-16 02:43:37.100223	2023-06-16 02:43:37.100223	1	16
-70	38	2023-06-16 02:43:55.719777	2023-06-16 02:43:55.719777	16	1
-62	30	2023-06-16 02:43:45.029035	2023-06-16 02:43:45.029035	1	16
-63	31	2023-06-16 02:43:49.357579	2023-06-16 02:43:49.357579	16	1
-81	49	2023-06-16 02:44:05.03225	2023-06-16 02:44:05.03225	16	1
-64	32	2023-06-16 02:43:50.50337	2023-06-16 02:43:50.50337	16	1
-71	39	2023-06-16 02:43:56.608943	2023-06-16 02:43:56.608943	16	1
-65	33	2023-06-16 02:43:51.462193	2023-06-16 02:43:51.462193	16	1
-66	34	2023-06-16 02:43:52.65982	2023-06-16 02:43:52.65982	16	1
-77	45	2023-06-16 02:44:01.596193	2023-06-16 02:44:01.596193	16	1
-67	35	2023-06-16 02:43:53.382235	2023-06-16 02:43:53.382235	16	1
-72	40	2023-06-16 02:43:57.387402	2023-06-16 02:43:57.387402	16	1
-73	41	2023-06-16 02:43:58.231837	2023-06-16 02:43:58.231837	16	1
-74	42	2023-06-16 02:43:59.041515	2023-06-16 02:43:59.041515	16	1
-78	46	2023-06-16 02:44:02.444953	2023-06-16 02:44:02.444953	16	1
-75	43	2023-06-16 02:43:59.798096	2023-06-16 02:43:59.798096	16	1
-84	52	2023-06-16 02:44:07.82253	2023-06-16 02:44:07.82253	16	1
-79	47	2023-06-16 02:44:03.324117	2023-06-16 02:44:03.324117	16	1
-82	50	2023-06-16 02:44:05.930373	2023-06-16 02:44:05.930373	16	1
-80	48	2023-06-16 02:44:04.127794	2023-06-16 02:44:04.127794	16	1
-83	51	2023-06-16 02:44:06.950288	2023-06-16 02:44:06.950288	16	1
-85	53	2023-06-16 02:44:08.760241	2023-06-16 02:44:08.760241	16	1
-86	54	2023-06-16 02:44:09.705431	2023-06-16 02:44:09.705431	16	1
-87	55	2023-06-16 02:44:10.517744	2023-06-16 02:44:10.517744	16	1
-88	56	2023-06-16 02:44:11.488629	2023-06-16 02:44:11.488629	16	1
-89	57	2023-06-16 02:44:12.261714	2023-06-16 02:44:12.261714	16	1
-90	58	2023-06-16 02:44:13.031025	2023-06-16 02:44:13.031025	16	1
-91	59	2023-06-16 02:44:14.065684	2023-06-16 02:44:14.065684	16	1
-92	60	2023-06-16 02:44:15.459498	2023-06-16 02:44:15.459498	16	1
-93	61	2023-06-16 02:44:16.731889	2023-06-16 02:44:16.731889	16	1
-94	62	2023-06-16 02:44:17.651365	2023-06-16 02:44:17.651365	16	1
-95	63	2023-06-16 02:44:18.57692	2023-06-16 02:44:18.57692	16	1
-96	64	2023-06-16 02:44:19.891087	2023-06-16 02:44:19.891087	16	1
-97	65	2023-06-16 02:44:20.818834	2023-06-16 02:44:20.818834	16	1
-98	66	2023-06-16 02:44:22.188639	2023-06-16 02:44:22.188639	16	1
-133	dr gfd ggdf f gfdg	2023-06-16 02:49:25.25588	2023-06-16 02:49:25.25588	7	6
-99	67	2023-06-16 02:44:23.05101	2023-06-16 02:44:23.05101	16	1
-100	68	2023-06-16 02:44:24.002626	2023-06-16 02:44:24.002626	16	1
-165	coucou	2023-06-16 17:01:15.050103	2023-06-16 17:01:15.050103	1	6
-143	fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f 	2023-06-16 02:49:57.385859	2023-06-16 02:49:57.385859	7	1
-101	69	2023-06-16 02:44:24.891974	2023-06-16 02:44:24.891974	16	1
-134	dsf sd sdf	2023-06-16 02:49:48.291477	2023-06-16 02:49:48.291477	7	1
-102	70	2023-06-16 02:44:25.733637	2023-06-16 02:44:25.733637	16	1
-103	71	2023-06-16 02:44:28.418977	2023-06-16 02:44:28.418977	1	16
-104	72	2023-06-16 02:44:29.256169	2023-06-16 02:44:29.256169	1	16
-135	f	2023-06-16 02:49:49.159721	2023-06-16 02:49:49.159721	7	1
-105	73	2023-06-16 02:44:30.268764	2023-06-16 02:44:30.268764	1	16
-106	74	2023-06-16 02:44:31.280522	2023-06-16 02:44:31.280522	1	16
-107	75	2023-06-16 02:44:32.403765	2023-06-16 02:44:32.403765	1	16
-136	sd	2023-06-16 02:49:49.394883	2023-06-16 02:49:49.394883	7	1
-108	6	2023-06-16 02:44:33.357393	2023-06-16 02:44:33.357393	1	16
-109	78	2023-06-16 02:44:34.375724	2023-06-16 02:44:34.375724	1	16
-144	fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f 	2023-06-16 02:49:59.13433	2023-06-16 02:49:59.13433	7	1
-110	79	2023-06-16 02:44:35.386315	2023-06-16 02:44:35.386315	1	16
-111	80	2023-06-16 02:44:37.709598	2023-06-16 02:44:37.709598	1	16
-112	81	2023-06-16 02:44:42.011713	2023-06-16 02:44:42.011713	16	1
-113	82	2023-06-16 02:44:43.282296	2023-06-16 02:44:43.282296	16	1
-148	fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f\nfsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f\nfsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f\nfsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f\nfsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f\n	2023-06-16 02:50:37.005766	2023-06-16 02:50:37.005766	7	1
-114	83	2023-06-16 02:44:44.132818	2023-06-16 02:44:44.132818	16	1
-138	dsf fsd sd	2023-06-16 02:49:50.126722	2023-06-16 02:49:50.126722	7	1
-115	84	2023-06-16 02:44:45.386513	2023-06-16 02:44:45.386513	16	1
-137	dsf f	2023-06-16 02:49:49.984414	2023-06-16 02:49:49.984414	\N	\N
-116	85	2023-06-16 02:44:46.640113	2023-06-16 02:44:46.640113	16	1
-117	86	2023-06-16 02:44:47.971589	2023-06-16 02:44:47.971589	16	1
-118	87	2023-06-16 02:44:49.163419	2023-06-16 02:44:49.163419	16	1
-139	sdf	2023-06-16 02:49:50.461142	2023-06-16 02:49:50.461142	7	1
-119	88	2023-06-16 02:44:50.246947	2023-06-16 02:44:50.246947	16	1
-120	89	2023-06-16 02:44:51.284268	2023-06-16 02:44:51.284268	16	1
-121	90	2023-06-16 02:44:52.315275	2023-06-16 02:44:52.315275	16	1
-140	sdfsdf 	2023-06-16 02:49:50.656964	2023-06-16 02:49:50.656964	7	1
-122	91	2023-06-16 02:44:54.808714	2023-06-16 02:44:54.808714	1	16
-123	92	2023-06-16 02:44:56.923383	2023-06-16 02:44:56.923383	1	16
-124	93	2023-06-16 02:44:57.902805	2023-06-16 02:44:57.902805	1	16
-141	d	2023-06-16 02:49:51.087767	2023-06-16 02:49:51.087767	7	1
-125	94	2023-06-16 02:44:59.087111	2023-06-16 02:44:59.087111	1	16
-126	95	2023-06-16 02:45:00.531441	2023-06-16 02:45:00.531441	1	16
-149	fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f fsd df dsf sd fsdf sfsdf ssd f f csa c	2023-06-16 02:50:44.036118	2023-06-16 02:50:50.311	7	1
-127	96	2023-06-16 02:45:01.561793	2023-06-16 02:45:01.561793	1	16
-142	d	2023-06-16 02:49:51.468768	2023-06-16 02:49:51.468768	7	1
-128	97	2023-06-16 02:45:02.709531	2023-06-16 02:45:02.709531	1	16
-129	98	2023-06-16 02:45:03.77489	2023-06-16 02:45:03.77489	1	16
-147	 dsfds dsf ds fsdfsdfsdfsd df dsf sd fsdf sfsdf ssd f 	2023-06-16 02:50:08.19227	2023-06-16 02:50:21.36	7	1
-130	99	2023-06-16 02:45:04.799634	2023-06-16 02:45:04.799634	1	16
-131	1000	2023-06-16 02:45:06.323055	2023-06-16 02:45:06.323055	1	16
-150	sdf	2023-06-16 02:51:36.44937	2023-06-16 02:51:36.44937	10	1
-132	 g fd fg fdg fdgfx hghxhgh gfhx hfxghxghxgh xgfhghxh gxghg	2023-06-16 02:45:28.515652	2023-06-16 02:45:28.515652	16	6
-151	wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww	2023-06-16 02:53:01.349943	2023-06-16 02:53:01.349943	5	1
-152	cxvxcxvv	2023-06-16 02:54:36.417661	2023-06-16 02:54:36.417661	4	6
-153	xcvxcvxvcxvcxv	2023-06-16 02:54:38.475821	2023-06-16 02:54:38.475821	4	6
-154	cvxxcv	2023-06-16 02:54:38.93688	2023-06-16 02:54:38.93688	4	6
-155	xcvxcvxc	2023-06-16 02:54:39.384502	2023-06-16 02:54:39.384502	4	6
-156	xcvxcvxcvcxvxcvxcvcxvcxvcxvxcvc	2023-06-16 02:54:41.023028	2023-06-16 02:54:41.023028	4	6
-157	ds fdsf fdsdfdgfh fgh fghg fg fgh gfh fgfg hgf	2023-06-16 02:56:17.301644	2023-06-16 02:56:17.301644	15	1
-158	asdfghjkl;	2023-06-16 02:58:36.784571	2023-06-16 02:58:36.784571	12	1
-159	helo	2023-06-16 15:12:45.084314	2023-06-16 15:12:45.084314	22	1
-160	cc	2023-06-16 15:12:49.010182	2023-06-16 15:12:49.010182	1	22
-161	lkjlkl	2023-06-16 15:17:48.302031	2023-06-16 15:17:48.302031	11	1
-162	sdfdf	2023-06-16 15:22:05.755841	2023-06-16 15:22:05.755841	6	22
-163	sdfsdf	2023-06-16 15:22:09.14293	2023-06-16 15:22:09.14293	22	6
-164	sdfsdff	2023-06-16 16:45:07.861791	2023-06-16 16:45:07.861791	22	12
-166	wtf	2023-06-16 17:01:25.440609	2023-06-16 17:01:25.440609	6	22
-167	rien rien	2023-06-16 17:01:28.670056	2023-06-16 17:01:28.670056	22	6
-168	mouahahahaha	2023-06-16 17:01:31.782761	2023-06-16 17:01:31.782761	1	6
-169	heu	2023-06-16 17:01:35.813625	2023-06-16 17:01:35.813625	1	6
-170	d'accord	2023-06-16 17:01:38.745864	2023-06-16 17:01:38.745864	1	6
-171	sdsad	2023-06-16 17:02:02.865932	2023-06-16 17:02:02.865932	1	6
-172	TEST	2023-06-16 17:02:13.767655	2023-06-16 17:02:13.767655	1	6
-173	drg	2023-06-16 17:08:53.681591	2023-06-16 17:08:53.681591	6	22
-174	dfg	2023-06-16 17:08:55.879323	2023-06-16 17:08:55.879323	22	6
+1	helllo	2023-06-18 00:13:00.261499	2023-06-18 00:13:00.261499	12	3
+2	coucou	2023-06-18 00:13:05.916224	2023-06-18 00:13:05.916224	3	12
+3	slt	2023-06-18 01:43:09.894962	2023-06-18 01:43:09.894962	3	6
+\.
+
+
+--
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "senderId", "receiverId", "invitationLink") FROM stdin;
+108	roomInvite	you have been invited to join the room BLIBLIB	f	2023-06-18 03:06:10.197115	2023-06-18 03:06:10.197115	3	0	/chat/channel/invitation/15/BLIBLIB
+106	roomInvite	you have been invited to join the room BLIBLIB	t	2023-06-18 03:06:10.131773	2023-06-18 03:06:10.131773	3	12	/chat/channel/invitation/15/BLIBLIB
+105	roomInvite	you have been invited to join the room BLIBLIB	t	2023-06-18 03:06:10.101085	2023-06-18 03:06:10.101085	3	6	/chat/channel/invitation/15/BLIBLIB
+110	roomInvite	you have been invited to join the room Mouahahaa	f	2023-06-18 03:22:48.559236	2023-06-18 03:22:48.559236	3	0	/chat/channel/invitation/16/Mouahahaa
+109	roomInvite	you have been invited to join the room Mouahahaa	t	2023-06-18 03:22:48.545275	2023-06-18 03:22:48.545275	3	12	/chat/channel/invitation/16/Mouahahaa
+113	roomInvite	you have been invited to join the room zxzxzzxzzxxzx	f	2023-06-18 03:32:15.011744	2023-06-18 03:32:15.011744	2	0	/chat/channel/invitation/17/zxzxzzxzzxxzx
+112	roomInvite	you have been invited to join the room zxzxzzxzzxxzx	t	2023-06-18 03:32:15.007388	2023-06-18 03:32:15.007388	2	12	/chat/channel/invitation/17/zxzxzzxzzxxzx
+111	friendRequestAccepted	accepted your friend request	t	2023-06-18 03:32:08.010748	2023-06-18 03:32:08.010748	2	12	\N
+131	roomInvite	you have been invited to join the room ttttt	t	2023-06-18 04:00:04.554384	2023-06-18 04:00:04.554384	2	12	/chat/channel/invitation/26/ttttt
+107	roomInvite	you have been invited to join the room BLIBLIB	t	2023-06-18 03:06:10.161693	2023-06-18 03:06:10.161693	3	2	/chat/channel/invitation/15/BLIBLIB
+115	roomInvite	you have been invited to join the room BLIBLIBLIB	f	2023-06-18 03:33:06.073373	2023-06-18 03:33:06.073373	2	0	/chat/channel/invitation/18/BLIBLIBLIB
+114	roomInvite	you have been invited to join the room BLIBLIBLIB	t	2023-06-18 03:33:06.067823	2023-06-18 03:33:06.067823	2	12	/chat/channel/invitation/18/BLIBLIBLIB
+117	roomInvite	you have been invited to join the room BLBALBA	f	2023-06-18 03:33:26.11878	2023-06-18 03:33:26.11878	2	0	/chat/channel/invitation/19/BLBALBA
+116	roomInvite	you have been invited to join the room BLBALBA	t	2023-06-18 03:33:26.113074	2023-06-18 03:33:26.113074	2	12	/chat/channel/invitation/19/BLBALBA
+120	roomInvite	you have been invited to join the room :OUAHA	f	2023-06-18 03:38:25.072359	2023-06-18 03:38:25.072359	2	0	/chat/channel/invitation/20/:OUAHA
+119	roomInvite	you have been invited to join the room :OUAHA	t	2023-06-18 03:38:25.068218	2023-06-18 03:38:25.068218	2	3	/chat/channel/invitation/20/:OUAHA
+118	roomInvite	you have been invited to join the room :OUAHA	t	2023-06-18 03:38:25.060387	2023-06-18 03:38:25.060387	2	12	/chat/channel/invitation/20/:OUAHA
+122	roomInvite	you have been invited to join the room iiiiiii	f	2023-06-18 03:40:00.675445	2023-06-18 03:40:00.675445	2	0	/chat/channel/invitation/21/iiiiiii
+121	roomInvite	you have been invited to join the room iiiiiii	t	2023-06-18 03:40:00.67105	2023-06-18 03:40:00.67105	2	12	/chat/channel/invitation/21/iiiiiii
+124	roomInvite	you have been invited to join the room ccccccc	f	2023-06-18 03:40:54.275259	2023-06-18 03:40:54.275259	2	0	/chat/channel/invitation/22/ccccccc
+123	roomInvite	you have been invited to join the room ccccccc	t	2023-06-18 03:40:54.270911	2023-06-18 03:40:54.270911	2	12	/chat/channel/invitation/22/ccccccc
+126	roomInvite	you have been invited to join the room zzzzzzzzzz	f	2023-06-18 03:42:28.136003	2023-06-18 03:42:28.136003	2	0	/chat/channel/invitation/23/zzzzzzzzzz
+125	roomInvite	you have been invited to join the room zzzzzzzzzz	t	2023-06-18 03:42:28.13107	2023-06-18 03:42:28.13107	2	12	/chat/channel/invitation/23/zzzzzzzzzz
+128	roomInvite	you have been invited to join the room aaaaaaa	f	2023-06-18 03:43:53.009194	2023-06-18 03:43:53.009194	2	0	/chat/channel/invitation/24/aaaaaaa
+127	roomInvite	you have been invited to join the room aaaaaaa	t	2023-06-18 03:43:53.004496	2023-06-18 03:43:53.004496	2	12	/chat/channel/invitation/24/aaaaaaa
+130	roomInvite	you have been invited to join the room uuuuuuu	f	2023-06-18 03:45:05.956493	2023-06-18 03:45:05.956493	2	0	/chat/channel/invitation/25/uuuuuuu
+129	roomInvite	you have been invited to join the room uuuuuuu	t	2023-06-18 03:45:05.952418	2023-06-18 03:45:05.952418	2	12	/chat/channel/invitation/25/uuuuuuu
+132	roomInvite	you have been invited to join the room ttttt	f	2023-06-18 04:00:04.56032	2023-06-18 04:00:04.56032	2	0	/chat/channel/invitation/26/ttttt
 \.
 
 
@@ -727,29 +733,18 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 --
 
 COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity") FROM stdin;
-2	Kurt	Batz	William20	Christiana_Schulist65@yahoo.com	$2b$10$13Ztzgw.mrmEwozJpt5ckOhsqpMZficWPxEwfRv10KefeOZf1uSg2	user	https://avatars.githubusercontent.com/u/73806346	Maxime dignissimos quasi exercitationem praesentium porro at.	f	offline	\N	2023-06-15 23:05:11.549823	2023-06-15 23:05:11.549823	2023-06-15 23:05:11.549823
-3	Brooks	Brekke	Susie50	Kory45@yahoo.com	$2b$10$yw9ESCjldtUp3J2cSHwFCOnqUmVgxyGzclCb.aJk97dj472WK2Ssi	user	https://avatars.githubusercontent.com/u/10185778	Recusandae nulla ratione nobis minus voluptatem earum eum.	f	offline	\N	2023-06-15 23:05:11.823801	2023-06-15 23:05:11.823801	2023-06-15 23:05:11.823801
-17	Lucinda	Leffler	Stephania_McLaughlin	Norberto97@hotmail.com	$2b$10$Rot6z5WXjojGgcmkprRd3.B.hFEEi4ydsvFMGroZfvseeg0IeSoJ6	user	https://avatars.githubusercontent.com/u/55306448	Nihil repellat voluptate pariatur odio nam nulla.	f	offline	\N	2023-06-15 23:23:19.418435	2023-06-15 23:23:19.418435	2023-06-15 23:23:19.418435
-18	Floyd	Lesch	Maria_Lakin72	Roy.Fisher@yahoo.com	$2b$10$xJjAgtUlZWSlY3c.79iD4.a3tGSmIodH5cpKBbp0RaL.THCCb23Cy	user	https://avatars.githubusercontent.com/u/21272949	Facilis quas placeat.	f	offline	\N	2023-06-15 23:23:19.497028	2023-06-15 23:23:19.497028	2023-06-15 23:23:19.497028
-19	Jannie	Rempel	Autumn_Stroman-Mohr	Kristoffer35@yahoo.com	$2b$10$j4SWK.Mb4kVMfE0OrYxvTuYLwmoqKk.2zXU8ZqEulkQzK3wrNPEqu	user	https://avatars.githubusercontent.com/u/75137093	Similique odit consequuntur dolore eveniet quidem harum expedita.	f	offline	\N	2023-06-15 23:24:13.344258	2023-06-15 23:24:13.344258	2023-06-15 23:24:13.344258
-20	Celestino	Connelly	Alayna.Spinka53	Koby44@gmail.com	$2b$10$6BJIHG4dE7ynvhmqijcdNusQUCRfdKkVnTLbPj5wayFY7pcZ8LGCu	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/890.jpg	Excepturi tenetur error ullam rem a atque quam laudantium error.	f	offline	\N	2023-06-15 23:24:13.40784	2023-06-15 23:24:13.40784	2023-06-15 23:24:13.40784
-21	Sidney	Towne	Barry.Gerhold	Helene.Bednar@hotmail.com	$2b$10$YzDCeCs4dRTK8sHrbKVLieajNaf4DQ8MNK.ZezbKxPv8q7DNTGDKq	user	https://avatars.githubusercontent.com/u/36896261	Culpa dolor aut dolores facilis ad minus.	f	offline	\N	2023-06-15 23:24:13.470445	2023-06-15 23:24:13.470445	2023-06-15 23:24:13.470445
-15	Loyce	Prohaska	Perry83	Maryjane_Swift@gmail.com	$2b$10$zeAGVWCwtBoPZYcLqjbrJuZLSQ7mfTJDfP0MB/wqpwLPn0KMkLa.e	user	https://avatars.githubusercontent.com/u/97518305	Hic iure eligendi maiores saepe repellat a.	f	offline	\N	2023-06-15 23:23:19.285663	2023-06-16 02:56:30.924	2023-06-16 02:56:30.918
-9	Lonzo	Kessler	Milton.Wyman	Teresa_Russel@hotmail.com	$2b$10$QXfO2UtOAULnHYNOSf3H1.Nc.9QFDxIPwsP4hSOTfFmFZsP4BQo2i	user	https://avatars.githubusercontent.com/u/99210078	Eveniet illo nostrum suscipit.	f	offline	\N	2023-06-15 23:23:18.84982	2023-06-15 23:23:18.84982	2023-06-15 23:23:18.84982
-13	Deanna	Luettgen	Cleora_Donnelly33	Ignacio94@hotmail.com	$2b$10$GBPi7XecZ3sNe66k2k4pIePrJ6jiQBVIAkrnetQcXio2zPvrhOUkq	user	https://avatars.githubusercontent.com/u/7051334	Cupiditate accusantium voluptatibus impedit tempore.	f	offline	\N	2023-06-15 23:23:19.144389	2023-06-15 23:23:19.144389	2023-06-15 23:23:19.144389
-7	Rod	Koss	Ike.Stanton11	Kolby24@yahoo.com	$2b$10$.5zQvYQVcdD1P9dc0M9IE.2tY/XThLorIh5OgDmF1FYXV5/B41F4e	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/232.jpg	A enim doloribus magni labore incidunt neque voluptatem.	f	offline	\N	2023-06-15 23:05:12.116236	2023-06-16 02:50:59.409	2023-06-16 02:50:59.403
-8	Gracie	Stracke	Timmy_Marquardt28	Esther64@yahoo.com	$2b$10$fQYmwBqFAMC0gChq2Tkfi.ttIjutckc8.pwIhJ8Lb1SyJ4lHiATGe	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/750.jpg	Ipsam excepturi a eaque quibusdam cumque doloremque magnam magnam.	f	offline	\N	2023-06-15 23:05:12.195326	2023-06-16 02:48:45.895	2023-06-16 02:48:45.89
-14	Toby	Bernier	Kamren_Smitham98	Terrence_Carroll37@yahoo.com	$2b$10$zdjEq8161iFgV2qlyJxEquYKoutKSXS8KB9l8UsIruy/jpeEaI716	user	https://avatars.githubusercontent.com/u/5596822	Blanditiis quos vel hic fugiat fuga eligendi quo dolore.	f	offline	\N	2023-06-15 23:23:19.21863	2023-06-16 02:34:47.899	2023-06-16 02:34:47.894
-16	Brooks	Stark	Jonatan79	Presley_OReilly52@gmail.com	$2b$10$/3a3HMGPsWoj3jj6QgaLu..VKjIoN/puuDGjqCWOByBMWajPgcUrS	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1148.jpg	Eaque ratione id architecto at.	f	offline	\N	2023-06-15 23:23:19.357497	2023-06-16 02:46:56.543	2023-06-16 02:46:56.537
-10	Nicklaus	Steuber	Lloyd25	Ashley91@yahoo.com	$2b$10$KFuAhpr0pMACmc2gbkzvNO.YHf8JO/K/mTjWxzsF6oWhOLQxTIx.W	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/775.jpg	Excepturi eos perferendis ullam.	f	offline	\N	2023-06-15 23:23:18.916448	2023-06-16 02:51:53.358	2023-06-16 02:51:53.352
-5	Rosemary	Breitenberg	Davin.Wunsch32	Jakob.Stark60@gmail.com	$2b$10$ThBR9XyHGy5aRv9dpzQOnOxp/MMS7oh1adg8Pak7aYx0YuTo2IanC	user	https://avatars.githubusercontent.com/u/44420470	Impedit minus quia vitae iure aliquid dolor.	f	offline	\N	2023-06-15 23:05:11.983213	2023-06-16 02:53:05.443	2023-06-16 02:53:05.437
-12	Trudie	Koelpin	Demond47	Terrill59@yahoo.com	$2b$10$BQdu.uyMPgU9Gbny6.VQJuIbj.022TeNwEMWhG.1wGJkGH9q.KZGG	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1186.jpg	Officiis sapiente doloremque nobis magnam sunt laborum totam a.	f	offline	\N	2023-06-15 23:23:19.074919	2023-06-16 02:58:39.179	2023-06-16 02:58:39.175
-4	Antoinette	Rippin	Lyric12	Marshall.Bins@yahoo.com	$2b$10$PqdsWOTH56DG00Wvsn/4z.IiSCwgp6gBd4qqtzqhOQDJb.X2fS/02	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/424.jpg	Recusandae voluptas officia quaerat neque nisi.	f	offline	\N	2023-06-15 23:05:11.907128	2023-06-16 02:55:47.185	2023-06-16 02:55:47.181
-11	Colin	Johnston	Aleen_Stamm11	Laney.Schmeler0@gmail.com	$2b$10$kS9/kIkLOVoQt87AG21qRuabFu14kwLEkMRB5Rad4PL.57YW/7C7q	user	https://avatars.githubusercontent.com/u/35595372	Ipsa distinctio magni non repellendus.	f	offline	\N	2023-06-15 23:23:18.979132	2023-06-16 15:18:12.594	2023-06-16 15:18:12.585
-1	Julio	Kessler	login1	Tia.Moen61@hotmail.com	$2b$10$jXoNqYAMQ/3tti1B2K8iVe3uR.EVtpFof.jGe8JAXIQkFeIvez8QK	user	https://avatars.githubusercontent.com/u/48230799	Iste quam quae eaque occaecati nihil voluptates voluptatibus ipsum.	f	offline	\N	2023-06-15 23:05:11.194982	2023-06-16 15:18:26.049	2023-06-16 18:34:11.734
-0	Bot	Bot	Bot	botmail@mail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	Description de bot	t	absent	\N	2023-06-15 23:05:11.194982	2023-06-16 18:36:02.478	2023-06-15 23:05:11.194982
-6	Adolphus	Rodriguez	Marion_Donnelly53	Allen78@gmail.com	$2b$10$x1Q0PD3Iql9nlEZQGzf/buSpYAN9CMduduYQUKKbRCjX1tCx2VNJa	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/433.jpg	Facilis occaecati voluptates modi voluptatibus repellat voluptatum vel enim deleniti.	f	absent	\N	2023-06-15 23:05:12.046586	2023-06-16 16:10:48.795	2023-06-16 18:30:33.133
-22	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1686926700265-120853.jpg	\N	f	absent	\N	2023-06-16 14:45:00.350129	2023-06-16 16:26:48.813	2023-06-16 18:35:22.898
+2	Ressie	Fisher	Benjamin50	Leon.Fahey1@gmail.com	$2b$10$cgmbHX2D7VP3Hf.PUrz3m.QE6eK3QJbcnSXqlXRkmJuTLK5Nuu0vi	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/699.jpg	Nulla magni expedita quam.	f	absent	\N	2023-06-17 22:22:32.741511	2023-06-18 02:51:48.333	2023-06-18 04:00:04.487
+0	Bot	Bot	Bot	bot@mail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	bot description	f	absent	\N	2023-06-17 22:22:16.018156	2023-06-18 04:00:21.614	2023-06-17 22:22:16.018156
+4	Zackary	Leuschke	Maddison.Nolan69	Hollis_Schultz31@hotmail.com	$2b$10$4oCYnR2crVTmQxBNCAmUg.3bDcanf4sovnPSgTAq6rwngsY6uXom2	user	https://avatars.githubusercontent.com/u/90351874	Unde cumque explicabo assumenda consectetur tempore asperiores ea enim.	f	offline	\N	2023-06-17 22:22:32.870325	2023-06-17 22:22:32.870325	2023-06-17 22:22:32.870325
+5	Nico	Mayert	Icie_Mayer	Jairo.Hoeger60@gmail.com	$2b$10$pTCACJl4jLHb4mn0xi.cXuIeohTBMsmylEfMsBf6o38zTPjVdsKMO	user	https://avatars.githubusercontent.com/u/37201890	Molestias laborum laborum quae minus nemo ratione iusto.	f	offline	\N	2023-06-17 22:22:32.932016	2023-06-17 22:22:32.932016	2023-06-17 22:22:32.932016
+7	Johnathon	Nicolas	Talon.Cartwright33	Evans70@yahoo.com	$2b$10$sDiVkK8HTWjLhnbDnQMZuu3jtu0VM1IBdSsrt4WEoiB7YSeDIHPaC	user	https://avatars.githubusercontent.com/u/15462752	Ipsum repellat reprehenderit fugit inventore veritatis minima.	f	offline	\N	2023-06-17 22:22:33.057834	2023-06-17 22:22:33.057834	2023-06-17 22:22:33.057834
+8	Hadley	Beatty	Friedrich_Lakin	Tina.Cormier20@gmail.com	$2b$10$HO8chHJIZKgDwfZC4jU1NO6jPg8v46ygjatlVpKbp9m7w/xop0nDa	user	https://avatars.githubusercontent.com/u/22865324	Dicta necessitatibus iste facere suscipit odio.	f	offline	\N	2023-06-17 22:22:33.12163	2023-06-17 22:22:33.12163	2023-06-17 22:22:33.12163
+9	Myrna	Ferry	Corene.Roob30	Reid_Grimes@hotmail.com	$2b$10$5sv.FznN3jpX7VQQI7A1NO5Xgxpzc6CfGLMw//F4p3Kcm4W3IJjZ2	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/158.jpg	Suscipit veritatis voluptatem voluptates commodi.	f	offline	\N	2023-06-17 22:22:33.181338	2023-06-17 22:22:33.181338	2023-06-17 22:22:33.181338
+10	Jimmy	McGlynn-Kshlerin	Zechariah_Stroman50	Vallie.Ullrich@gmail.com	$2b$10$ND.lHAg2xT27ENeU08fO9OiNtRMlKvy62y2uzVEhpvWj52Quog3Lu	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/923.jpg	Suscipit ipsum aut unde quis cum dolorum ab incidunt accusantium.	f	offline	\N	2023-06-17 22:22:33.242532	2023-06-17 22:22:33.242532	2023-06-17 22:22:33.242532
+11	Idell	Abernathy	Verlie.Reilly	Ottilie6@hotmail.com	$2b$10$nKQGm1VJ/97lpmNIyQzUIOIzS0Hm4EKsK7C3aiSq2phfqJz8vfhGK	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/789.jpg	Aliquid natus eligendi cupiditate ipsam ad libero nihil consequatur.	f	offline	\N	2023-06-17 22:22:33.303534	2023-06-17 22:22:33.303534	2023-06-17 22:22:33.303534
+6	Kareem	Powlowski	Jon.Torp	Logan_Ankunding81@hotmail.com	$2b$10$O0rHoAj1BdOj6mj3m8oXouFPDRh9EN3t4f5jqXC2l.hhfN51RxTOm	user	https://avatars.githubusercontent.com/u/97260829	Autem minus ab aspernatur molestiae exercitationem necessitatibus facilis dignissimos provident.	f	offline	\N	2023-06-17 22:22:32.993764	2023-06-17 22:22:32.993764	2023-06-18 03:59:05.898
+3	Mustafa	McGlynn	Joana.Cartwright	Devan.Abbott75@gmail.com	$2b$10$uZYrFAEZbH5P1pacq6s0NeEMGHk89kg3t4rg2XAOErzaTh1S9ZfMS	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/584.jpg	Necessitatibus asperiores incidunt expedita adipisci delectus inventore beatae ducimus.	f	absent	\N	2023-06-17 22:22:32.806413	2023-06-18 02:25:32.569	2023-06-18 03:59:06.008
+12	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1687046709734-714939.png	\N	f	online	\N	2023-06-17 23:53:44.75819	2023-06-18 03:39:54.282	2023-06-18 04:00:22.981
 \.
 
 
@@ -758,76 +753,22 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 --
 
 COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", "updatedAt", "userInitiateurId", "userRelationId") FROM stdin;
-7	pending	f	2023-06-16 00:38:22.446526	2023-06-16 00:38:22.446526	1	17
-8	pending	f	2023-06-16 00:38:22.806259	2023-06-16 00:38:22.806259	1	19
-9	pending	f	2023-06-16 00:38:23.109709	2023-06-16 00:38:23.109709	1	21
-13	pending	f	2023-06-16 00:38:24.189132	2023-06-16 00:38:24.189132	1	0
-14	pending	f	2023-06-16 00:38:24.485623	2023-06-16 00:38:24.485623	1	13
-15	pending	f	2023-06-16 00:38:25.020807	2023-06-16 00:38:25.020807	1	20
-2	friend	f	2023-06-15 23:30:19.692645	2023-06-16 00:38:50.999	1	16
-17	pending	f	2023-06-16 02:24:17.982653	2023-06-16 02:24:17.982653	14	18
-18	pending	f	2023-06-16 02:24:18.382718	2023-06-16 02:24:18.382718	14	20
-19	pending	f	2023-06-16 02:24:18.756513	2023-06-16 02:24:18.756513	14	9
-20	pending	f	2023-06-16 02:24:19.086496	2023-06-16 02:24:19.086496	14	13
-21	friend	f	2023-06-16 02:24:20.028666	2023-06-16 02:24:29.144	14	1
-23	pending	f	2023-06-16 02:36:11.310931	2023-06-16 02:36:11.310931	11	14
-24	pending	f	2023-06-16 02:36:12.190136	2023-06-16 02:36:12.190136	11	13
-25	pending	f	2023-06-16 02:36:12.773982	2023-06-16 02:36:12.773982	11	9
-26	pending	f	2023-06-16 02:36:14.213904	2023-06-16 02:36:14.213904	11	17
-22	friend	f	2023-06-16 02:36:10.516667	2023-06-16 02:36:38.152	11	1
-28	pending	f	2023-06-16 02:40:44.166573	2023-06-16 02:40:44.166573	6	2
-29	pending	f	2023-06-16 02:40:44.62994	2023-06-16 02:40:44.62994	6	3
-33	pending	f	2023-06-16 02:40:46.045115	2023-06-16 02:40:46.045115	6	17
-34	pending	f	2023-06-16 02:40:46.325169	2023-06-16 02:40:46.325169	6	18
-35	pending	f	2023-06-16 02:40:46.639608	2023-06-16 02:40:46.639608	6	19
-36	pending	f	2023-06-16 02:40:46.917596	2023-06-16 02:40:46.917596	6	20
-37	pending	f	2023-06-16 02:40:47.243407	2023-06-16 02:40:47.243407	6	21
-39	pending	f	2023-06-16 02:40:47.83691	2023-06-16 02:40:47.83691	6	9
-42	pending	f	2023-06-16 02:40:48.693472	2023-06-16 02:40:48.693472	6	13
-43	pending	f	2023-06-16 02:40:48.956834	2023-06-16 02:40:48.956834	6	0
-5	friend	f	2023-06-15 23:30:21.045207	2023-06-16 02:40:56.826	1	6
-16	friend	f	2023-06-16 02:24:17.624808	2023-06-16 02:40:57.638	14	6
-27	friend	f	2023-06-16 02:36:15.244522	2023-06-16 02:40:58.208	11	6
-45	friend	f	2023-06-16 02:40:52.998396	2023-06-16 02:45:16.422	6	16
-46	pending	f	2023-06-16 02:47:13.518799	2023-06-16 02:47:13.518799	8	3
-47	pending	f	2023-06-16 02:47:15.167932	2023-06-16 02:47:15.167932	8	2
-50	pending	f	2023-06-16 02:47:17.9169	2023-06-16 02:47:17.9169	8	9
-51	pending	f	2023-06-16 02:47:18.918217	2023-06-16 02:47:18.918217	8	21
-52	pending	f	2023-06-16 02:47:19.82905	2023-06-16 02:47:19.82905	8	20
-3	friend	f	2023-06-15 23:30:20.209733	2023-06-16 02:47:54.928	1	8
-32	friend	f	2023-06-16 02:40:45.740921	2023-06-16 02:47:55.527	6	8
-49	friend	f	2023-06-16 02:47:17.02936	2023-06-16 02:48:58.071	8	7
-4	friend	f	2023-06-15 23:30:20.607792	2023-06-16 02:48:58.509	1	7
-38	friend	f	2023-06-16 02:40:47.532673	2023-06-16 02:48:58.974	6	7
-10	friend	f	2023-06-16 00:38:23.381524	2023-06-16 02:51:27.964	1	10
-1	friend	f	2023-06-15 23:30:17.575387	2023-06-16 02:52:20.552	1	5
-31	friend	f	2023-06-16 02:40:45.389554	2023-06-16 02:52:21.012	6	5
-53	pending	f	2023-06-16 02:52:22.902689	2023-06-16 02:52:22.902689	5	18
-54	pending	f	2023-06-16 02:52:23.20757	2023-06-16 02:52:23.20757	5	21
-56	pending	f	2023-06-16 02:52:24.466708	2023-06-16 02:52:24.466708	5	20
-57	pending	f	2023-06-16 02:52:24.717152	2023-06-16 02:52:24.717152	5	17
-60	pending	f	2023-06-16 02:52:25.6542	2023-06-16 02:52:25.6542	5	14
-61	pending	f	2023-06-16 02:52:26.08739	2023-06-16 02:52:26.08739	5	7
-48	friend	f	2023-06-16 02:47:16.093908	2023-06-16 02:54:20.528	8	4
-6	friend	f	2023-06-15 23:30:21.470447	2023-06-16 02:54:20.895	1	4
-30	friend	f	2023-06-16 02:40:45.030992	2023-06-16 02:54:21.291	6	4
-58	friend	f	2023-06-16 02:52:25.014498	2023-06-16 02:54:21.637	5	4
-62	pending	f	2023-06-16 02:54:28.117228	2023-06-16 02:54:28.117228	4	19
-63	pending	f	2023-06-16 02:54:28.509246	2023-06-16 02:54:28.509246	4	20
-64	pending	f	2023-06-16 02:54:28.902474	2023-06-16 02:54:28.902474	4	21
-65	pending	f	2023-06-16 02:54:29.294451	2023-06-16 02:54:29.294451	4	9
-44	friend	f	2023-06-16 02:40:49.22877	2023-06-16 02:56:09.864	6	15
-59	friend	f	2023-06-16 02:52:25.311414	2023-06-16 02:56:10.205	5	15
-12	friend	f	2023-06-16 00:38:23.917229	2023-06-16 02:56:10.631	1	15
-11	friend	f	2023-06-16 00:38:23.660869	2023-06-16 02:58:21.707	1	12
-41	friend	f	2023-06-16 02:40:48.413735	2023-06-16 02:58:21.997	6	12
-55	friend	f	2023-06-16 02:52:23.639124	2023-06-16 02:58:22.254	5	12
-66	friend	f	2023-06-16 02:54:29.637679	2023-06-16 02:58:22.536	4	12
-68	pending	f	2023-06-16 15:03:17.060546	2023-06-16 15:03:17.060546	22	12
-70	pending	f	2023-06-16 15:03:17.997908	2023-06-16 15:03:17.997908	22	16
-67	friend	f	2023-06-16 15:03:16.429334	2023-06-16 15:12:39.984	22	1
-69	friend	f	2023-06-16 15:03:17.558076	2023-06-16 15:21:03.045	22	6
-71	pending	f	2023-06-16 17:02:18.929864	2023-06-16 17:02:18.929864	6	10
+10	friend	f	2023-06-17 22:36:28.575896	2023-06-17 22:36:34.907	3	2
+28	pending	f	2023-06-17 22:55:09.097375	2023-06-17 22:55:09.097375	3	9
+29	pending	f	2023-06-17 22:55:09.29191	2023-06-17 22:55:09.29191	3	10
+34	pending	f	2023-06-17 22:55:21.763398	2023-06-17 22:55:21.763398	3	5
+35	pending	f	2023-06-17 22:55:21.907834	2023-06-17 22:55:21.907834	3	7
+31	friend	f	2023-06-17 22:55:09.595713	2023-06-18 01:30:40.301	3	6
+43	friend	f	2023-06-18 00:05:42.085934	2023-06-18 01:30:40.932	12	6
+46	pending	f	2023-06-18 01:33:21.021019	2023-06-18 01:33:21.021019	12	7
+47	pending	f	2023-06-18 01:33:21.286501	2023-06-18 01:33:21.286501	12	8
+48	pending	f	2023-06-18 01:33:21.587265	2023-06-18 01:33:21.587265	12	9
+49	pending	f	2023-06-18 01:33:21.852575	2023-06-18 01:33:21.852575	12	10
+50	pending	f	2023-06-18 01:33:22.118109	2023-06-18 01:33:22.118109	12	11
+52	pending	f	2023-06-18 02:39:14.792132	2023-06-18 02:39:14.792132	12	5
+53	pending	f	2023-06-18 02:39:15.175782	2023-06-18 02:39:15.175782	12	4
+51	friend	f	2023-06-18 02:39:14.417243	2023-06-18 02:39:21.146	12	3
+54	friend	f	2023-06-18 02:39:15.598536	2023-06-18 03:32:08.006	12	2
 \.
 
 
@@ -835,42 +776,49 @@ COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", 
 -- Name: chat_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_messages_id_seq', 144, true);
+SELECT pg_catalog.setval('public.chat_messages_id_seq', 105, true);
 
 
 --
 -- Name: chat_rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_rooms_id_seq', 22, true);
+SELECT pg_catalog.setval('public.chat_rooms_id_seq', 26, true);
 
 
 --
 -- Name: games_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.games_id_seq', 1, true);
+SELECT pg_catalog.setval('public.games_id_seq', 1, false);
 
 
 --
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_id_seq', 174, true);
+SELECT pg_catalog.setval('public.messages_id_seq', 3, true);
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notifications_id_seq', 132, true);
 
 
 --
 -- Name: users-relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."users-relation_id_seq"', 71, true);
+SELECT pg_catalog.setval('public."users-relation_id_seq"', 54, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 22, true);
+SELECT pg_catalog.setval('public.users_id_seq', 12, true);
 
 
 --
@@ -919,6 +867,14 @@ ALTER TABLE ONLY public.chat_messages
 
 ALTER TABLE ONLY public."users-relation"
     ADD CONSTRAINT "PK_6973ffe5e4128326da10a9527d1" PRIMARY KEY (id);
+
+
+--
+-- Name: notifications PK_6a72c3c0f683f6462415e653c3a; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT "PK_6a72c3c0f683f6462415e653c3a" PRIMARY KEY (id);
 
 
 --
@@ -1197,6 +1153,22 @@ ALTER TABLE ONLY public.messages
 
 ALTER TABLE ONLY public.chat_rooms
     ADD CONSTRAINT "FK_b7803818c38584a3a2a0dce2830" FOREIGN KEY ("ownerUserId") REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: notifications FK_d1e9b2452666de3b9b4d271cca0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT "FK_d1e9b2452666de3b9b4d271cca0" FOREIGN KEY ("receiverId") REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: notifications FK_ddb7981cf939fe620179bfea33a; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT "FK_ddb7981cf939fe620179bfea33a" FOREIGN KEY ("senderId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

@@ -12,9 +12,9 @@ import { UserEntity } from 'src/modules/users/entity/users.entity';
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationEntity } from 'src/modules/users_relations/entities/users_relation.entity';
 import { UserRelationInterface } from 'src/modules/users_relations/interfaces/users_relations.interface';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { NotificationInterface } from '../users/interfaces/notification.interface';
-import { NotificationCreatedEvent } from '../users/events/notification.event';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
+import { NotificationEntity } from '../notification/entity/notification.entity';
 
 @Injectable()
 export class UsersRelationsService {
@@ -23,7 +23,7 @@ export class UsersRelationsService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(UserRelationEntity)
     private readonly userRelationRepository: Repository<UserRelationEntity>,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly notificationService: NotificationService, // private readonly eventEmitter: EventEmitter2,
   ) {}
 
   // surement foireux ! et pas utilisé
@@ -369,19 +369,22 @@ export class UsersRelationsService {
           await this.userRelationRepository.save(newRelation);
 
         // send notification to userFriend
-        const notification: NotificationInterface = {
-          type: 'friendRequest',
-          content: `send you a friend request`,
-          read: false,
-          receiver: userFriend,
-          sender: userToUpdate,
-          createdAt: new Date(),
-        };
+        // const notification: NotificationCreateDTO = {
+        //   type: 'friendRequest',
+        //   content: `send you a friend request`,
+        //   receiver: userFriend,
+        //   sender: userToUpdate,
+        // };
 
-        this.eventEmitter.emit(
-          'notification.friendRequest',
-          new NotificationCreatedEvent(notification),
-        );
+        const newNotif: NotificationEntity =
+          await this.notificationService.createNotification({
+            type: 'friendRequest',
+            content: `send you a friend request`,
+            receiver: userFriend,
+            sender: userToUpdate,
+          } as NotificationCreateDTO);
+        console.log('newNotif : ', newNotif);
+
         return createdRelation;
       } catch (e) {
         throw new BadRequestException(
@@ -444,19 +447,15 @@ export class UsersRelationsService {
             await this.userRelationRepository.save(relationExist);
 
           // send notification to userFriend
-          const notification: NotificationInterface = {
-            type: 'friendRequestAccepted',
-            content: `accepted your friend request`,
-            read: false,
-            receiver: userFriend,
-            sender: userToUpdate,
-            createdAt: new Date(),
-          };
+          const newNotif: NotificationEntity =
+            await this.notificationService.createNotification({
+              type: 'friendRequestAccepted',
+              content: `accepted your friend request`,
+              receiver: userFriend,
+              sender: userToUpdate,
+            } as NotificationCreateDTO);
+          console.log('newNotif : ', newNotif);
 
-          this.eventEmitter.emit(
-            'notification.friendRequestAccepted',
-            new NotificationCreatedEvent(notification),
-          );
           return updatedRelation;
         } catch (e) {
           throw new BadRequestException(
@@ -529,19 +528,14 @@ export class UsersRelationsService {
           });
 
           // send notification to userFriend
-          const notification: NotificationInterface = {
-            type: 'friendRequestDeclined',
-            content: `declined your friend request`,
-            read: false,
-            receiver: userFriend,
-            sender: userToUpdate,
-            createdAt: new Date(),
-          };
-
-          this.eventEmitter.emit(
-            'notification.friendRequestDeclined',
-            new NotificationCreatedEvent(notification),
-          );
+          const newNotif: NotificationEntity =
+            await this.notificationService.createNotification({
+              type: 'friendRequestDeclined',
+              content: `declined your friend request`,
+              receiver: userFriend,
+              sender: userToUpdate,
+            } as NotificationCreateDTO);
+          console.log('newNotif : ', newNotif);
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't decline ${friendId}`,
@@ -608,19 +602,14 @@ export class UsersRelationsService {
           });
 
           // send notification to userFriend
-          const notification: NotificationInterface = {
-            type: 'friendRequestCanceled',
-            content: `canceled your friend request`,
-            read: false,
-            receiver: userFriend,
-            sender: userToUpdate,
-            createdAt: new Date(),
-          };
-
-          this.eventEmitter.emit(
-            'notification.friendRequestCanceled',
-            new NotificationCreatedEvent(notification),
-          );
+          const newNotif: NotificationEntity =
+            await this.notificationService.createNotification({
+              type: 'friendRequestCanceled',
+              content: `Canceled your friend request`,
+              receiver: userFriend,
+              sender: userToUpdate,
+            } as NotificationCreateDTO);
+          console.log('newNotif : ', newNotif);
         } catch (e) {
           throw new BadRequestException(
             `User ${userId} can't cancel ${friendId}`,
@@ -690,20 +679,16 @@ export class UsersRelationsService {
           const updatedRelation: UserRelationEntity =
             await this.userRelationRepository.save(relationExist);
 
-          //event notification
-          const notification: NotificationInterface = {
-            type: 'blockUser',
-            content: `blocked you`,
-            read: false,
-            receiver: userBlocked,
-            sender: userToUpdate,
-            createdAt: new Date(),
-          };
+          // send notification to userFriend
+          const newNotif: NotificationEntity =
+            await this.notificationService.createNotification({
+              type: 'blockUser',
+              content: `blocked you`,
+              receiver: userBlocked,
+              sender: userToUpdate,
+            } as NotificationCreateDTO);
+          console.log('newNotif : ', newNotif);
 
-          this.eventEmitter.emit(
-            'notification.blockUser',
-            new NotificationCreatedEvent(notification),
-          );
           return updatedRelation;
         } catch (e) {
           throw new BadRequestException(
@@ -730,20 +715,15 @@ export class UsersRelationsService {
             const updatedRelation: UserRelationEntity =
               await this.userRelationRepository.save(relationExist);
 
-            //event notification
-            const notification: NotificationInterface = {
-              type: 'blockUser',
-              content: `blocked you`,
-              read: false,
-              receiver: userBlocked,
-              sender: userToUpdate,
-              createdAt: new Date(),
-            };
-
-            this.eventEmitter.emit(
-              'notification.blockUser',
-              new NotificationCreatedEvent(notification),
-            );
+            // send notification to userFriend
+            const newNotif: NotificationEntity =
+              await this.notificationService.createNotification({
+                type: 'blockUser',
+                content: `blocked you`,
+                receiver: userBlocked,
+                sender: userToUpdate,
+              } as NotificationCreateDTO);
+            console.log('newNotif : ', newNotif);
 
             return updatedRelation;
           } catch (e) {
@@ -855,19 +835,15 @@ export class UsersRelationsService {
             );
           }
 
-          // send notification to userBlocked
-          const notification: NotificationInterface = {
-            type: 'unblockUser',
-            content: `unblocked you`,
-            read: false,
-            receiver: userBlocked,
-            sender: userToUpdate,
-            createdAt: new Date(),
-          };
-          this.eventEmitter.emit(
-            'notification.unblockUser',
-            new NotificationCreatedEvent(notification),
-          );
+          // send notification to userFriend
+          const newNotif: NotificationEntity =
+            await this.notificationService.createNotification({
+              type: 'unblockUser',
+              content: `unblocked you`,
+              receiver: userBlocked,
+              sender: userToUpdate,
+            } as NotificationCreateDTO);
+          console.log('newNotif : ', newNotif);
         } catch (e) {
           throw new InternalServerErrorException(
             `Error while deleting relation between user ${userId} and user friend ${blockedId}`,
@@ -932,17 +908,13 @@ export class UsersRelationsService {
     }
 
     // send notification to userFriend
-    const notification: NotificationInterface = {
-      type: 'friendDeleted',
-      content: `deleted you from his friend list`,
-      read: false,
-      receiver: userFriend,
-      sender: userToUpdate,
-      createdAt: new Date(),
-    };
-    this.eventEmitter.emit(
-      'notification.removeFriend',
-      new NotificationCreatedEvent(notification),
-    );
+    const newNotif: NotificationEntity =
+      await this.notificationService.createNotification({
+        type: 'friendDeleted',
+        content: `deleted you from his friend list`,
+        receiver: userFriend,
+        sender: userToUpdate,
+      } as NotificationCreateDTO);
+    console.log('newNotif : ', newNotif);
   }
 }

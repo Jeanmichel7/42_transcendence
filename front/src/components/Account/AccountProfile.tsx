@@ -18,23 +18,38 @@ interface AccountProfileProps {
 
 const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
   // const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const [isLoading, setIsLoading] = useState(false);
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
+  const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
   const dispatch = useDispatch();
   const fileInputRef = createRef<HTMLInputElement>();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleFileUpload = async () => {
     const fileInput: HTMLInputElement | null = fileInputRef.current;
     const formData: FormData = new FormData();
     formData.append('avatar', fileInput?.files?.[0] as File);
-
+    setIsLoading(true);
     const updatedUser: UserInterface | ApiErrorResponse = await patchUserAccount(formData);
     if ('error' in updatedUser) {
       dispatch(setErrorSnackbar(updatedUser.error + updatedUser.message ? ': ' + updatedUser.message : ''));
     } else {
       dispatch(setUser({ ...user, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
+      setPreviewAvatar(null);
       dispatch(setMsgSnackbar('Updated!'));
     }
+    setIsLoading(false);
   };
 
   return (
@@ -45,7 +60,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
       <Box className="flex justify-between" >
         <div className="w-1/4">
           <img
-            src={user.avatar}
+            src={previewAvatar && openInputAvatar ? previewAvatar : user.avatar}
             className="text-center mb-2 w-auto rounded-[16px] max-h-[200px]"
             alt="avatar"
             onError={(e) => {
@@ -79,11 +94,16 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                   type="file"
                   ref={fileInputRef}
                   // style={{ display: 'none' }} 
-                  // onChange={handleFileChange}
+                  onChange={handleFileChange}
                 />
               </div>
               <div className='flex justify-center mt-2' >
-                <Button variant="contained" color="primary" onClick={handleFileUpload}>
+                <Button 
+                  variant="contained"
+                  color="primary"
+                  onClick={handleFileUpload}
+                  disabled={isLoading}
+                >
                   Upload File
                 </Button>
               </div>
@@ -126,7 +146,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
               value={user.description}
             /> }
 
-            { user.is2FAEnabled && <AccountItem
+            { user.is2FAEnabled != null &&  user.is2FAEnabled != undefined && <AccountItem
               keyName="Active 2FA"
               value={user.is2FAEnabled}
             /> }

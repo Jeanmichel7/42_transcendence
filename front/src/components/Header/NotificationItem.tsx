@@ -11,6 +11,7 @@ import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlic
 import { reduxAddConversationList } from '../../store/chatSlicer';
 import { reduxReadNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 import { RootState } from '../../store';
+import { readNotification } from '../../api/notification';
 
 
 interface NotificationItemProps {
@@ -26,6 +27,13 @@ const NotificationItem = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+
+
+
+
+
+
+
 
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
@@ -59,6 +67,12 @@ const NotificationItem = ({
     return false;
   };
   
+
+
+
+
+
+
   //handler ation notif
   const handleClickNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
@@ -71,17 +85,25 @@ const NotificationItem = ({
     navigate('/profile/' + notif.sender.login);
   };
 
-
   const handleDeleteNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
     dispatch(reduxRemoveNotification(notif));
+    localStorage.setItem('notifications' + userData.id, JSON.stringify(
+      JSON.parse(localStorage.getItem('notifications' + userData.id) as string)
+        .filter((n: NotificationInterface) => n.id !== notif.id),
+    ));
   };
+
+
+
 
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
     setAnchorElNotification(null);
+    handleDeleteNotification(notif);
     if (notif.type === 'friendRequest')
-      if (await handleAcceptFriendRequest(notif.sender))
-        handleDeleteNotification(notif);
+      await handleAcceptFriendRequest(notif.sender);
+    if (notif.type === 'roomInvite') 
+      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
 
 
 
@@ -90,17 +112,20 @@ const NotificationItem = ({
   const handleDenyActionNotification = async (notif: NotificationInterface) => {
     setAnchorElNotification(null);
     if (notif.type === 'friendRequest')
-      if ( await handleDeclineFriendRequest(notif.sender))
-        handleDeleteNotification(notif);
-
-
-
+      await handleDeclineFriendRequest(notif.sender);
+    if (notif.type === 'roomInvite') 
+      dispatch(setMsgSnackbar('Room invitation declined'));
+    handleDeleteNotification(notif);
   };
 
 
   //handler mouse notif
-  const handleMouseEnter = () => {
-    dispatch(reduxReadNotification(notification));
+  const handleMouseEnter = async () => {
+    const resReadNotif: void | ApiErrorResponse = await readNotification(notification.id);
+    if (typeof resReadNotif === 'object' && 'error' in resReadNotif)
+      dispatch(setErrorSnackbar(resReadNotif.error + resReadNotif.message ? ': ' + resReadNotif.message : ''));
+    else 
+      dispatch(reduxReadNotification(notification));
   };
 
   const handleMouseLeave = () => {

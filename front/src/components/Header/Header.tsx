@@ -106,6 +106,14 @@ function Header() {
     //   dispatch(reduxRemoveUserBlocked(notification.sender));
     // });
 
+
+    /* ROOM */
+    socket.on('notification_room_invite', (notification: NotificationInterface) => {
+      dispatch(reduxAddNotification(notification));
+    });
+
+
+
     return () => {
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');
@@ -158,8 +166,8 @@ function Header() {
   }, [connectWebSocket]);
   
   useEffect(() => {
-    // console.log('setnotifications localstorage', notifications);
-    if (userData.id === undefined || userData.id == -1) return;
+    console.log('setnotifications localstorage', notifications);
+    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
     localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
   }, [notifications, userData.id]);
   

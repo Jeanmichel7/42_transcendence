@@ -147,7 +147,7 @@ export class UsersService {
       const salt: string = await bcrypt.genSalt();
       const hash: string = await bcrypt.hash(newUser.password, salt);
       newUser.password = hash;
-      return this.userRepository.save(newUser);
+      return await this.userRepository.save(newUser);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -187,7 +187,7 @@ export class UsersService {
 
     const updateData: Partial<UserEntity> = {};
     if (file) {
-      updateData.avatar = file.filename;
+      updateData.avatar = 'http://localhost:3000/avatars/' + file.filename;
       this.deleteAvatar(userToUpdate.avatar);
     } else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;

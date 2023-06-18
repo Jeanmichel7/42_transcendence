@@ -31,6 +31,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userData } = useSelector((state: RootState) => state.user);
+  const { userBlocked } = useSelector((state: RootState) => state.user);
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
@@ -277,8 +278,15 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
     if (!conv.room.id || conv.room.id === -1) return;
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
-    // console.log('roomData : ', roomData);
-    if (roomData && 'error' in roomData)
+    console.log('roomData : ', roomData);
+    if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
+      dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
+      socketRef.current?.emit('leaveRoom', {
+        roomId: id,
+      });
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      navigate('/chat/channel');
+    } else if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
       setRoom(roomData);
@@ -287,6 +295,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       if (roomData.users && roomData.acceptedUsers) {
         const isUserInRoom = roomData.users.some((u) => u.id === userData.id)
           || roomData.acceptedUsers.some((u) => u.id === userData.id);
+          // || roomData.;
         // console.log('is user in room; ', isUserInRoom);
         if (!isUserInRoom) {
           socketRef.current?.emit('leaveRoom', {
@@ -491,10 +500,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
           <div className='flex h-full'>
             <div className="flex-grow self-end overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8] " onScroll={handleScroll}>
               {/* display messages */}
-              {messages &&
+              {messages && userBlocked &&
                 <div className='text-lg m-1 p-2 '>
                   {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
                   {messages.map((message: ChatMsgInterface) => (
+                    //check if message is from blocked user
+                    userBlocked.some((u) => u.id === message.ownerUser.id) ? null :
                     <MessageItem
                       key={message.id}
                       message={message}

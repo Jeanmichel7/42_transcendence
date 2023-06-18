@@ -14,6 +14,7 @@ import { UserRelationEntity } from 'src/modules/users_relations/entities/users_r
 import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
 import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 import { GameEntity } from 'src/modules/game/entity/game.entity';
+import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -198,6 +199,20 @@ export class UserEntity extends BaseEntity {
   )
   relatedRelations: UserRelationEntity[];
 
+  /* notifications */
+  @OneToMany(() => NotificationEntity, (notif) => notif.sender, {
+    // cascade: true,
+    onDelete: 'CASCADE',
+  })
+  notificationsSend: NotificationEntity[];
+
+  @OneToMany(() => NotificationEntity, (notif) => notif.receiver, {
+    // cascade: true,
+    onDelete: 'CASCADE',
+  })
+  notificationsReceived: NotificationEntity[];
+
+  /* helper */
   get relations(): UserRelationEntity[] {
     return [...this.initiatedRelations, ...this.relatedRelations];
   }

@@ -1,6 +1,6 @@
 import { OnEvent } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
-import { NotificationGateway } from '../gateway/user.notification.gateway';
+import { NotificationGateway } from '../../notification/gateway/notification.gateway';
 import { NotificationCreatedEvent } from './notification.event';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class NotificationListener {
   }
 
   //notif remove friend
-  @OnEvent('notification.removeFriend')
+  @OnEvent('notification.friendDeleted')
   handleRemoveFriend(event: NotificationCreatedEvent) {
     console.log('notif remove friend', event.data);
     this.socketEvents.emitNotificationRemoveFriend(event.data);
@@ -50,5 +50,12 @@ export class NotificationListener {
   handleUnblockUser(event: NotificationCreatedEvent) {
     console.log('notif unblock user', event.data);
     this.socketEvents.emitNotificationUnblockUser(event.data);
+  }
+
+  /* ROOM */
+  @OnEvent('notification.roomInvite')
+  handleRoomInvite(event: NotificationCreatedEvent) {
+    console.log('notif room invite', event.data);
+    this.socketEvents.emitNotificationRoomInvite(event.data);
   }
 }

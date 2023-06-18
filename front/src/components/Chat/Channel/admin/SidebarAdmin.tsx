@@ -16,6 +16,7 @@ interface SideBarProps {
 }
 
 const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handleDeleteChannel }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -74,10 +75,9 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
       password: form.password ? form.password : null,
       // acceptedUsers: form.acceptedUsers ? form.acceptedUsers.map(u => u.id) : null,
     };
-    // setIsLoading(true);
+    setIsLoading(true);
     const resCreateChannel: RoomInterface | ApiErrorResponse = await editChannel(room.id, data);
-    // setIsLoading(false);
-
+    
     if ('error' in resCreateChannel) {
       dispatch(setErrorSnackbar(resCreateChannel.error + resCreateChannel.message ? ': ' + resCreateChannel.message : ''));
     } else {
@@ -90,6 +90,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
         // acceptedUsers: null,
       });
     }
+    setIsLoading(false);
     console.log(form);
   };
 
@@ -159,6 +160,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
                             type='submit'
                             variant="contained"
                             color="primary"
+                            disabled={isLoading}
                           >
                             Validate
                           </Button>
@@ -216,8 +218,12 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
                           </DialogContent>
                           <DialogActions>
                             <Button onClick={handleCloseDialog}>Cancel</Button>
-                            <Button onClick={handleDeleteChannel}
-                              color='error' autoFocus>
+                            <Button 
+                              onClick={handleDeleteChannel}
+                              color='error' 
+                              disabled={isLoading}
+                              autoFocus
+                            >
                               Delete
                             </Button>
                           </DialogActions>

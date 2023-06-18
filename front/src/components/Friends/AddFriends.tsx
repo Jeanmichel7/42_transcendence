@@ -69,6 +69,7 @@ const AddFriends = () => {
             actions={[
               { name: 'Add', callback: handleRequestAddFriend },
             ]}
+            isLoading={isLoading}
           />
         ))}
       { isLoading && <CircularProgress />}

@@ -1,7 +1,7 @@
-import { UserInterface } from './users.interface';
+import { UserEntity } from 'config';
 
 export interface NotificationInterface {
-  // id: number;
+  id: bigint;
   type:
     | 'friendRequest'
     | 'friendRequestAccepted'
@@ -10,11 +10,13 @@ export interface NotificationInterface {
     | 'friendDeleted'
     | 'blockUser'
     | 'unblockUser'
+    | 'roomInvite'
     | 'message';
-  // title: string;
   content: string;
   read: boolean;
   createdAt: Date;
-  receiver: UserInterface;
-  sender: UserInterface;
+  updatedAt?: Date;
+  sender: UserEntity;
+  receiver: UserEntity;
+  invitationLink?: string;
 }

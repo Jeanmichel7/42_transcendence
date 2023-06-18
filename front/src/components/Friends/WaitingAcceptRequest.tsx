@@ -71,6 +71,7 @@ const WaitingAcceptRequest = () => {
             { name: 'Accept', callback: handleAcceptFriendRequest },
             { name: 'Decline', callback: handleDeclineFriendRequest },
           ]}
+          isLoading={isLoading}
         />
       ))}
       { isLoading && <CircularProgress />}

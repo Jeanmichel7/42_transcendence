@@ -39,6 +39,7 @@ const BlockedUser = () => {
           actions={[
             { name: 'Unblock', callback: handleUnblockUser },
           ]}
+          isLoading={isLoading}
         />
       ))}
       { isLoading && <CircularProgress />}

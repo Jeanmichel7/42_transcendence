@@ -10,17 +10,22 @@ import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 import { UserRelationEntity } from './entities/users_relation.entity';
 import { UserEntity } from '../users/entity/users.entity';
 import { JwtService } from '@nestjs/jwt';
-import { NotificationGateway } from '../users/gateway/user.notification.gateway';
-import { NotificationListener } from '../users/events/notification.listener';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationEntity } from '../notification/entity/notification.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, UserRelationEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      UserEntity,
+      UserRelationEntity,
+      NotificationEntity,
+    ]),
+  ],
   providers: [
     UsersRelationsService,
     AuthAdmin,
     JwtService,
-    NotificationGateway,
-    NotificationListener,
+    NotificationService,
   ],
   controllers: [UsersRelationsController],
 })

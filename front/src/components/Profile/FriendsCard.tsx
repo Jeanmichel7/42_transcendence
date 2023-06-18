@@ -13,6 +13,7 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
+import { useState } from 'react';
 
 interface FriendCardProps {
   actualUserLogin?: string,
@@ -25,6 +26,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   friend,
   setFriends,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   // const [ isFriendRequestSent, setIsFriendRequestSent ] = useState(false);
@@ -37,8 +39,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     console.log(userIdToDefi);
   };
 
-
-  
   function isRequestFriendSent() {
     return waitingFriendsRequestSent?.some((f: UserInterface) => f.id === friend.id);
   }
@@ -46,6 +46,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   const handleRequestAddFriend = async (userIdToAdd: number) => {
     // const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
     if (isRequestFriendSent()) return;
+    setIsLoading(true);
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(userIdToAdd);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
@@ -53,9 +54,11 @@ const FriendCard:  React.FC<FriendCardProps> = ({
       dispatch(reduxAddWaitingFriendsSent(friend));
       dispatch(setMsgSnackbar('Request sent'));
     }
+    setIsLoading(false);
   };
   
   const handleRemoveFriend = async (userIdToRemove: number) => {
+    setIsLoading(true);
     const res: void | ApiErrorResponse = await deleteFriend(userIdToRemove);
     if (typeof res === 'object' && 'error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
@@ -65,9 +68,11 @@ const FriendCard:  React.FC<FriendCardProps> = ({
       if (userData.login == actualUserLogin && setFriends)
         setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
     }
+    setIsLoading(false);
   };
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
+    setIsLoading(true);
     const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
@@ -77,16 +82,14 @@ const FriendCard:  React.FC<FriendCardProps> = ({
       if (userData.login == actualUserLogin && setFriends)
         setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userToBlock.id));
     }
+    setIsLoading(false);
   };
-
 
   function isMyFriend() {
     if (userData.login == friend.login) // if it's own profile
       return true;
     return userFriends?.find((f: UserInterface) => f.id === friend.id);
   }
-
-
 
   return (
     <Card key={friend.login} sx={{ maxWidth: 140, margin: '10px' }}>
@@ -126,8 +129,6 @@ const FriendCard:  React.FC<FriendCardProps> = ({
         </CardActionArea>
       </Link>
 
-
-
       {/**
        * Bouton action
        **/}
@@ -156,7 +157,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
             <IconButton aria-label="add friend" 
               sx={{ margin:0, padding:0 }}
               onClick={() => handleRequestAddFriend(friend.id)}
-              disabled={ isRequestFriendSent() }
+              disabled={ isRequestFriendSent() || isLoading}
               >
               <AddIcon color={ isRequestFriendSent() ? 'disabled' : 'primary' }/>
             </IconButton>
@@ -173,6 +174,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
               <IconButton aria-label="delete friend"
                 sx={{ margin:0, padding:0 }}
                 onClick={() => handleRemoveFriend(friend.id)}
+                disabled={isLoading}
               >
                 <DeleteForeverIcon sx={{ color: red[800] }} />
               </IconButton>
@@ -186,6 +188,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
               <IconButton aria-label="delete friend"
                 onClick={() => handleBlockUser(friend)}
                 sx={{ margin:0, padding:0 }}
+                disabled={isLoading}
               >
                 <RemoveCircleIcon sx={{ color: red[800] }} />
               </IconButton>

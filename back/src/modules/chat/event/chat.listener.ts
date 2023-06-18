@@ -42,6 +42,11 @@ export class MessageChatListener {
       event.botMessage.userId,
     );
   }
+  // @OnEvent('chat_room.invit')
+  // handleRoomInvit(event: ChatUserRoomEvent) {
+  //   console.log('event room.invit recu', event);
+  //   this.socketEvents.emitInvitRoom(event.roomId, event.user);
+  // }
 
   /*ROOM ADMIN */
   @OnEvent('chat_room.muted')

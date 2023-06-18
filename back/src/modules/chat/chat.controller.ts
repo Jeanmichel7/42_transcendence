@@ -23,7 +23,7 @@ import { ChatService } from './chat.service';
 // import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 
 import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
 import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';

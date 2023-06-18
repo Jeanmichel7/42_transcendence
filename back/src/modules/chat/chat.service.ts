@@ -19,6 +19,10 @@ import { ChatRoomEntity, UserEntity, ChatMessageEntity } from 'config';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 
+import { NotificationEntity } from '../notification/entity/notification.entity';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
+
 import {
   BotChatMessageEvent,
   ChatMessageEvent,
@@ -37,6 +41,7 @@ export class ChatService {
     private readonly roomRepository: Repository<ChatRoomEntity>,
     @InjectRepository(ChatMessageEntity)
     private readonly messageRepository: Repository<ChatMessageEntity>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /* ************************************************ */
@@ -127,17 +132,37 @@ export class ChatService {
     });
 
     const res = await this.createMessage(newBotMessage, userBot.id, room.id);
-    // if (!res) throw new Error('Bot message not created');
-    // this.eventEmitter.emit(
-    //   'chat_room.leave',
-    //   new BotChatMessageEvent({
-    //     roomId: room.id,
-    //     userId: user.id as bigint,
-    //     userLogin: user.login,
-    //     text: `${user.login} has left the room`,
-    //     createdAt: new Date(),
-    //   }),
-    // );
+    if (!res) throw new Error('Bot message not created');
+
+    // room.acceptedUsers.forEach(async (userInvited) => {
+    //   const newNotif: NotificationEntity =
+    //     await this.notificationService.createNotification({
+    //       type: 'roomInvite',
+    //       content: `you have been invited to join the room ${room.name}`,
+    //       receiver: userInvited,
+    //       sender: user,
+    //       invitationLink: `/chat/channel/invitation/${room.id}/${room.name}`,
+    //     } as NotificationCreateDTO);
+    //   console.log('newNotif : ', newNotif);
+    // });
+
+    for (const userInvited of room.acceptedUsers) {
+      const newNotif: NotificationEntity =
+        await this.notificationService.createNotification({
+          type: 'roomInvite',
+          content: `you have been invited to join the room ${room.name}`,
+          receiver: userInvited,
+          sender: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            login: user.login,
+            avatar: user.avatar,
+          },
+          invitationLink: `/chat/channel/invitation/${room.id}/${room.name}`,
+        } as NotificationCreateDTO);
+      console.log('newNotif : ', newNotif);
+    }
 
     return resultRoom;
   }
@@ -526,7 +551,7 @@ export class ChatService {
 
     const newAdmin: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeAdmin },
-      select: ['id'],
+      select: ['id', 'login', 'avatar', 'status'],
       relations: ['roomUsers', 'roomAdmins'],
     });
     if (!newAdmin)

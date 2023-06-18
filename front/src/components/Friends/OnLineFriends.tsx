@@ -72,6 +72,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
             { name: 'Block', callback: handleBlockUser },
             { name: 'Delete', callback: handleDeleteFriend },
           ]}
+          isLoading={isLoading}
         />
       ))}
       { isLoading && <CircularProgress />}

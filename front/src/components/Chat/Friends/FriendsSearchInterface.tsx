@@ -82,6 +82,7 @@ export default function FriendsSearch() {
           onClick={() => handleRequestAddFriend(selectedUser)}
           variant="contained"
           color="primary"
+          disabled={!selectedUser || isLoading}
           sx={{ ml: 2, height: '40px', alignSelf: 'center',
             visibility: !selectedUser || isMyFriend(selectedUser.id) ? 'hidden' : 'visible',
           }}

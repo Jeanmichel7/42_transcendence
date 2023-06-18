@@ -44,18 +44,20 @@ const Transition = React.forwardRef(function Transition(
 
 export default function AccountItem({ keyName, value }: ItemProps) {
   const dispatch = useDispatch();
-
-  // console.log(keyName, value)
   const [edit, setEdit] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number | boolean>(value);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [QRCode, setQRCode] = useState<string>();
-  // const [validCode, setValidCode] = useState<boolean>(false);
   const [userCode, setUserCode] = useState<string>('');
   const [error2FA, setError2FA] = useState<boolean>(false);
-
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+
+  // useEffect(() => {
+  //   console.log('inputValue', inputValue);
+  //   console.log('value', value);
+  // }, [value]);
+
 
   async function handleClose2FA(): Promise<void> {
     const res: ApiLogin2FACode | ApiErrorResponse = await check2FACode(userCode, userData.id);
@@ -139,6 +141,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
 
   useEffect(() => {
     setInputValue(value);
+    console.log('here value', value);
   }, [value]);
 
   useEffect(() => {
@@ -146,8 +149,6 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       if (localStorage.getItem('2FA')) {
         setQRCode(localStorage.getItem('2FA') as string);
         setInputValue(true);
-      } else {
-        setInputValue(false);
       }
     }
   }, [keyName]);
@@ -206,6 +207,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
             endIcon={<SendIcon />}
             variant="outlined"
             loading={loading}
+            disabled={!loading}
             onClick={() => { handleForm(); }}
           >
             Modifier
