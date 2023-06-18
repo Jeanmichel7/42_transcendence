@@ -38,6 +38,7 @@ const WaitingRequestSent = () => {
         actions={[
           { name: 'Cancel', callback: handleCancelFriendRequest },
         ]}
+        isLoading={isLoading}
       />
     ))}
     { isLoading && <CircularProgress />}

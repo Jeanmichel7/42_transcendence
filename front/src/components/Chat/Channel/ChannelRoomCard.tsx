@@ -44,7 +44,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
     const res: RoomInterface | ApiErrorResponse = await joinRoom(room.id, {
       password: inputPwd,
     });
-    setIsLoading(false);
 
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
@@ -61,6 +60,8 @@ const RoomCard = ({ room }: RoomCardProps) => {
       setDisplayInputPwd(false);
       setInputPwd(null);
     }
+    setIsLoading(false);
+
   };
 
   const checkAlreadyInRoom = (): boolean => {
@@ -120,6 +121,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             <IconButton
               onClick={handleJoinRoom}
               color="primary"
+              disabled={!inputPwd || isLoading}
             >
               <DoneIcon />
             </IconButton>

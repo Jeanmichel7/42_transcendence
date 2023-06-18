@@ -21,7 +21,7 @@ import { MessageService } from './messages.service';
 
 import { MessageInterface } from './interfaces/message.interface';
 import { MessageBtwTwoUserInterface } from './interfaces/messageBetweenTwoUsers.interface';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 import { MessageCreateDTO } from './dto/message.create.dto';
 import { MessagePatchDTO } from './dto/message.patch.dto';
 

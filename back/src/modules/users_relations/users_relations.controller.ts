@@ -14,7 +14,7 @@ import { UsersRelationsService } from './users_relations.service';
 
 import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 import { UserRelationInterface } from './interfaces/users_relations.interface';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 
 // import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 

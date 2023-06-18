@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { GameService } from './game.service';
 // import { Public } from 'src/modules/auth/decorators/public.decorator';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 
 @Controller('games')
 export class GameController {

@@ -20,7 +20,7 @@ import { Public } from 'src/modules/auth/decorators/public.decorator';
 
 import { UserInterface } from '../users/interfaces/users.interface';
 import { AuthInterface } from './interfaces/auth.interface';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from './interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { AuthDTO } from './dto/user2fa.auth.dto';
 // import { AuthAdmin } from './guard/authAdmin.guard';

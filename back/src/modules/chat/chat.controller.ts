@@ -23,7 +23,7 @@ import { ChatService } from './chat.service';
 // import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
-import { RequestWithUser } from '../users/interfaces/request.user.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 
 import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
 import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';
@@ -54,8 +54,16 @@ export class ChatController {
   }
 
   @Get('rooms/:roomId')
-  async getRoom(@Param('roomId') roomId: bigint): Promise<ChatRoomInterface> {
-    const room: ChatRoomInterface = await this.ChatService.getRoom(roomId);
+  async getRoom(
+    @Req() req: RequestWithUser,
+    @Param('roomId', ParseIntPipe) roomId: bigint,
+  ): Promise<ChatRoomInterface> {
+    // console.log('get room : ', roomId, typeof roomId);
+    // console.log('get room : ', req.user.id, typeof req.user.id);
+    const room: ChatRoomInterface = await this.ChatService.getRoom(
+      req.user.id,
+      roomId,
+    );
     // console.log('return room : ', room);
     return room;
   }
@@ -84,6 +92,21 @@ export class ChatController {
       req.user.id,
       roomId,
       roomData,
+    );
+    return result;
+  }
+
+  //invite user
+  @Patch('rooms/:roomId/users/:userId/invite')
+  async inviteUser(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: bigint,
+    @Param('userId') userId: bigint,
+  ) {
+    const result: ChatRoomInterface = await this.ChatService.inviteUser(
+      req.user.id,
+      roomId,
+      userId,
     );
     return result;
   }

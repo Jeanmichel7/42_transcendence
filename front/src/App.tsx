@@ -22,8 +22,9 @@ import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
-import { reduxSetNotifications } from './store/notificationSlice';
+import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
 import { reduxSetConversationList } from './store/chatSlicer';
+import { getNotifsNotRead } from './api/notification';
 
 
 
@@ -37,7 +38,7 @@ function App() {
     dispatch(closeSnackbar());
   };
 
-  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
+  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[] | NotificationInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
     action: ((payload: T) => UserActionInterface),
   ): Promise<void> {
@@ -68,9 +69,22 @@ function App() {
       ));
       dispatch(reduxSetConversationList(
         localStorage.getItem('conversationsList' + userId)
-          ? JSON.parse(localStorage.getItem('conversationsList' + userId) as string) 
+          ? JSON.parse(localStorage.getItem('conversationsList' + userId) as string)
           : [] as ConversationInterface[],
       ));
+      const notifsNotRead = await getNotifsNotRead();
+      const notifInLocalStorage: NotificationInterface[]
+        = JSON.parse(localStorage.getItem('notifications' + userId) as string);
+      // console.log('notifsNotRead : ', notifsNotRead);
+      // console.log('notifInLocalStorage : ', notifInLocalStorage);
+      if (!('error' in notifsNotRead)) {
+        const notifsNotReadFiltered = notifsNotRead.filter((n: NotificationInterface) =>
+          !notifInLocalStorage?.find((n2: NotificationInterface) => n2.id === n.id),
+        );
+        // console.log('notifsNotReadFiltered : ', notifsNotReadFiltered);
+        if (notifsNotReadFiltered.length > 0)
+          dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
+      }
 
     } else {
       dispatch(setLogged(false));

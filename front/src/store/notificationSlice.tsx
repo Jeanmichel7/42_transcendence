@@ -34,6 +34,12 @@ export const notificationSlice = createSlice({
           return notif;
         });
     },
+    reduxAddManyNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
+      // check localStorage
+      // const notifsInLoc
+      
+      state.notifications = [...state.notifications, ...action.payload];
+    },
   },
 });
 
@@ -42,6 +48,7 @@ export const {
   reduxAddNotification,
   reduxRemoveNotification,
   reduxReadNotification,
+  reduxAddManyNotifications,
 } = notificationSlice.actions;
 
 export default notificationSlice.reducer;

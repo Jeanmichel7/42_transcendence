@@ -4,6 +4,7 @@ import { MessageEntity } from 'src/modules/messagerie/entity/messages.entity';
 import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
 import { GameEntity } from 'src/modules/game/entity/game.entity';
+import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 
 const entities = [
   UserEntity,
@@ -12,6 +13,7 @@ const entities = [
   ChatRoomEntity,
   ChatMessageEntity,
   GameEntity,
+  NotificationEntity,
 ];
 
 export { UserEntity };
@@ -20,4 +22,5 @@ export { MessageEntity };
 export { ChatRoomEntity };
 export { ChatMessageEntity };
 export { GameEntity };
+export { NotificationEntity };
 export default entities;

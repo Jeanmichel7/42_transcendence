@@ -20,6 +20,17 @@ export async function createChannel(
   );
 }
 
+export async function inviteUser(
+  roomId: number,
+  userId: number,
+): Promise< RoomInterface | ApiErrorResponse> {
+  return apiRequest(
+    'patch',
+    'chat/rooms/' + roomId + '/users/' + userId + '/invite',
+    'Failed to invite user: ',
+  );
+}
+
 export async function editChannel(
   roomId: number,
   data: any,
@@ -76,13 +87,14 @@ export async function leaveRoom(
 export async function getRoomData(
   roomId: string,
 ): Promise< RoomInterface | ApiErrorResponse> {
+  console.log('roomId : ', roomId, typeof(roomId));
+  console.log('roomIdNumber : ', roomId, typeof(roomId));
   return apiRequest(
     'get',
     'chat/rooms/' + roomId,
     'Failed to get room data: ',
   );
 }
-
 
 /* ****************************
  *          ADMIN ROOM        *
@@ -225,13 +237,3 @@ export async function chatOldMessages(
     'Failed to get old messages: ',
   );
 }
-
-
-
-
-/* *****************************
-*                              *
-*          ADMIN ROOM          *
-*                              *
-* ******************************/
-

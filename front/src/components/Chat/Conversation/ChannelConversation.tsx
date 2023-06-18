@@ -12,12 +12,14 @@ import { ApiErrorResponse } from '../../../types';
 import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { Badge, Button, TextareaAutosize, Typography } from '@mui/material';
+import { TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
-import { reduxAddConversationList, reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import ChatMembers from './Members';
+import InvitationRoom from '../Channel/admin/InvitationRoom';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
@@ -29,9 +31,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userData } = useSelector((state: RootState) => state.user);
+  const { userBlocked } = useSelector((state: RootState) => state.user);
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
+  // const [isInvitMenuOpen, setIsInvitMenuOpen] = useState<boolean>(false);
 
   // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
   const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
@@ -93,6 +97,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users ? [...prev.users, user] : [user],
+        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
       } : null);
     });
 
@@ -101,9 +106,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users?.filter((u) => u.id !== userId),
-      } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== userId),
       } : null);
       //accepted user ?
@@ -133,9 +135,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         users: prev.users?.filter((u) => u.id !== userId),
-      } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== userId),
       } : null);
       if (userData.id === userId) {
@@ -156,16 +155,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       setRoom((prev) => prev ? {
         ...prev,
         bannedUsers: prev.bannedUsers ? [...prev.bannedUsers, user] : [user],
-      } : null);
-      // setRoom((prev) => prev ? { ...prev,
-      // users: prev.users?.filter((u) => u.id !== user.id) } : null);
-      setRoom((prev) => prev ? {
-        ...prev,
         admins: prev.admins?.filter((u) => u.id !== user.id),
+        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
       } : null);
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);
       if (userData.id === user.id) {
         socket.emit('leaveRoom', {
           roomId: id,
@@ -239,12 +231,13 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     });
 
     socketRef.current = socket;
-  }, [id]);
+  }, [conv, dispatch, id, navigate, userData]);
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
     if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
+    console.log('fetch old messages');
 
     // setIsLoadingPagination(true);
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
@@ -278,37 +271,32 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   }, [pageDisplay]);
 
   const fetchRoomData = useCallback(async () => {
-    // if (conv == null) {
-    //   dispatch(setErrorSnackbar('Nop'));
-    //   navigate('/chat/channel');
-    //   return;
-    // }
-    
-    // if (!conv.room.id || conv.room.id === -1) return;
-    const roomData: RoomInterface | ApiErrorResponse = await getRoomData(id);
-    console.log('roomData : ', roomData);
-    if (!roomData) {
-      dispatch(setErrorSnackbar('Room not found'));
+    if (conv == null) {
+      dispatch(setErrorSnackbar('Nop'));
       navigate('/chat/channel');
       return;
     }
-    if (roomData && 'error' in roomData)
+    if (!conv.room.id || conv.room.id === -1) return;
+    const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
+    console.log('roomData : ', roomData);
+    if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
+      dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
+      socketRef.current?.emit('leaveRoom', {
+        roomId: id,
+      });
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      navigate('/chat/channel');
+    } else if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
-      if (conv == null) {
-        if (roomData.users?.some((u) => u.id === userData.id) ||
-          roomData.acceptedUsers?.some((u) => u.id === userData.id)) {
-          dispatch(reduxAddConversationList({ item: roomData, userId: userData.id }));
-          dispatch(setMsgSnackbar('You are now in the room ' + roomData.name));
-        } else {
-          dispatch(setErrorSnackbar('Room is private '));
-          navigate('/chat/channel');
-        }
-      }
       setRoom(roomData);
+
+      //check if user is accepted in room
       if (roomData.users && roomData.acceptedUsers) {
-        const isUserInRoom = roomData.users.some((u) => u.id === userData.id) 
+        const isUserInRoom = roomData.users.some((u) => u.id === userData.id)
           || roomData.acceptedUsers.some((u) => u.id === userData.id);
+          // || roomData.;
+        // console.log('is user in room; ', isUserInRoom);
         if (!isUserInRoom) {
           socketRef.current?.emit('leaveRoom', {
             roomId: id,
@@ -316,16 +304,21 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
           dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
           dispatch(setWarningSnackbar('You are not in the room ' + conv.room.name));
           navigate('/chat/channel');
+        } else {
+          // console.log('user already in room');
         }
+      
+      // check if channel removed
       } else if (!roomData.users) {
         socketRef.current?.emit('leaveRoom', {
           roomId: id,
         });
+        console.log('room delete, conv : ', conv);
         dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-        dispatch(setWarningSnackbar('Room wa deleted ' + conv.room.name));
+        dispatch(setWarningSnackbar('Room ' + conv.room.name + ' was deleted'));
         navigate('/chat/channel');
-      } else if (!roomData) {
-        console.log('NO room Data : ', roomData);
+      } else {
+        console.log('WTF ?');
       }
     }
   }, [conv, dispatch, id, navigate, userData]);
@@ -338,8 +331,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
 
   useEffect(() => {
-    if (!room || !userData.id || !room.bannedUsers) return;
-    if (room.bannedUsers.some((u) => u.id === userData.id)) {
+    if (!room || !userData.id ) return;
+    if (room.bannedUsers?.some((u) => u.id === userData.id)) {
+      console.log('kick user');
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
       });
@@ -364,7 +358,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   useEffect(() => {
     fetchOldMessages();
-  }, [fetchOldMessages]);
+  }, [fetchOldMessages, room]);
 
   useEffect(() => {
     if (!userData.id || userData.id == -1) return;
@@ -487,122 +481,88 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   return (
     <>
-      <div className="flex flex-col h-full">
-        <div className="w-full flex text-lg text-blue">
+      {!room ? <p>loading...</p> :
+        <div className="flex flex-col h-full">
+          <div className="w-full flex text-lg text-blue justify-between">
 
-          <Button
-            className='text-blue-500'
-            onClick={() => dispatch(setMsgSnackbar('Coming soon'))}
-            sx={{ mr: 2 }}
-          >
-            Invite
-          </Button>
-          <div className="w-full text-center">
-            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+            {isAdmin && room && <InvitationRoom room={room} setRoom={setRoom} /> }
+            {/* <div className="w-full text-center"> */}
+              <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+            {/* </div> */}
+            {isAdmin && room && 
+              <SideBarAdmin
+                room={room}
+                setIsAdminMenuOpen={setIsAdminMenuOpen}
+                handleDeleteChannel={handleDeleteChannel}
+              />}
           </div>
 
-          {isAdmin && room && <SideBarAdmin room={room} setIsAdminMenuOpen={setIsAdminMenuOpen} handleDeleteChannel={handleDeleteChannel} />}
-        </div>
+          <div className='flex h-full'>
+            <div className="flex-grow self-end overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8] " onScroll={handleScroll}>
+              {/* display messages */}
+              {messages && userBlocked &&
+                <div className='text-lg m-1 p-2 '>
+                  {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
+                  {messages.map((message: ChatMsgInterface) => (
+                    //check if message is from blocked user
+                    userBlocked.some((u) => u.id === message.ownerUser.id) ? null :
+                    <MessageItem
+                      key={message.id}
+                      message={message}
+                      isLoadingDeleteMsg={isLoadingDeleteMsg}
+                      handleDeleteMessage={handleDeleteMessage}
+                      isAdminMenuOpen={isAdminMenuOpen}
+                    />
+                  ))}
+                  {/* display form message */}
+                  <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
+                    <TextareaAutosize
+                      ref={textareaRef}
+                      name="text"
+                      value={text}
+                      onChange={handleChangeTextArea(setText)}
+                      onKeyDown={handleSubmit()}
+                      placeholder="Enter your text here..."
+                      className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
+                    />
+                    <button className='flex justify-center items-center'
+                      onClick={handleSubmit()}
+                    >
+                      <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
+                    </button>
 
-        <div className='flex h-full'>
-         <div className="flex-grow self-end overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8] " onScroll={handleScroll}>
-            {/* display messages */}
-            {messages &&
-              <div className='text-lg m-1 p-2 '>
-                {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
-                {messages.map((message: ChatMsgInterface) => (
-                  <MessageItem
-                    key={message.id}
-                    message={message}
-                    isLoadingDeleteMsg={isLoadingDeleteMsg}
-                    handleDeleteMessage={handleDeleteMessage}
-                    isAdminMenuOpen={isAdminMenuOpen}
-                  />
-                ))}
-                {/* display form message */}
-                <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
-                  <TextareaAutosize
-                    ref={textareaRef}
-                    name="text"
-                    value={text}
-                    onChange={handleChangeTextArea(setText)}
-                    onKeyDown={handleSubmit()}
-                    placeholder="Enter your text here..."
-                    className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
-                  />
-                  <button className='flex justify-center items-center'
-                    onClick={handleSubmit()}
-                  >
-                    <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
-                  </button>
-
-                  {/* display status send message */}
-                  {statusSendMsg !== '' &&
-                    <span className={`
+                    {/* display status send message */}
+                    {statusSendMsg !== '' &&
+                      <span className={`
                   ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
                   bottom-16 
                   text-white
                   p-2
                   rounded-xl
                   shadow-lg`}
-                      onClick={() => setStatusSendMsg('')}
-                    >
-                      {statusSendMsg}
-                    </span>
-                  }
-                </form>
-
-              </div>}
-            <div ref={bottomRef}></div>
-          </div>
-          <div className='w-[150px]'>
-            {room && room.users && <h3> MEMBRES - {room.users.length} </h3>
-              && room.users.map((user) => (
-                <Link 
-                  key={user.id} 
-                  to={'/profile/' + user.login}
-                  className="flex flex-grow text-black p-1 pl-2 items-center "
-                >
-                  <Badge
-                    color={
-                      user.status === 'online' ? 'success' :
-                        user.status === 'absent' ? 'warning' :
-                          'error'
+                        onClick={() => setStatusSendMsg('')}
+                      >
+                        {statusSendMsg}
+                      </span>
                     }
-                    overlap="circular"
-                    badgeContent=" "
-                    variant="dot"
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
-                  >
-                    <img
-                      className="w-10 h-10 rounded-full object-cover mr-2 "
-                      src={user.avatar}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-                      }}
-                      alt="avatar"
-                    />
-                  </Badge>
-                  <Typography component="span"
-                    sx={{
-                      overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-                      color: user.status === 'online' ? 'success' : 'error',
-                    }}
-                    title={user.login}
-                  >
-                    {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
-                  </Typography>
-                </Link>
-              ))}
+                  </form>
+
+                </div>}
+              <div ref={bottomRef}></div>
+            </div>
+
+            {/* display members */}
+            { room.users && room.acceptedUsers && room.admins &&
+              <div className='w-[150px]'>
+                <ChatMembers 
+                  admins={room.admins}
+                  users={room.users} 
+                  acceptedUsers={room.acceptedUsers}
+                />
+              </div> }
           </div>
         </div>
-      </div>
+      }
     </>
   );
 };

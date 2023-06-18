@@ -28,7 +28,7 @@ export interface RoomUserActionInterface {
 }
 
 export interface NotificationInterface {
-  // id: number;
+  id: number;
   type: 'friendRequest' |
   'friendRequestAccepted' |
   'friendRequestDeclined' |
@@ -36,6 +36,7 @@ export interface NotificationInterface {
   'friendDeleted' |
   'blockUser' |
   'unblockUser' |
+  'roomInvite' |
   'message';
   // title: string;
   content: string;
@@ -43,4 +44,5 @@ export interface NotificationInterface {
   createdAt: Date;
   receiver: UserInterface;
   sender: UserInterface;
+  invitationLink?: string;
 }

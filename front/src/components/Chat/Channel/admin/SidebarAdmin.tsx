@@ -16,6 +16,7 @@ interface SideBarProps {
 }
 
 const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handleDeleteChannel }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -55,7 +56,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
     setOpenEdit(!openEdit);
   };
 
-  const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }> ) => {
+  const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const { name, value } = e.target as HTMLInputElement;
     setForm(prev => ({ ...prev, [name]: value }));
   };
@@ -74,10 +75,9 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
       password: form.password ? form.password : null,
       // acceptedUsers: form.acceptedUsers ? form.acceptedUsers.map(u => u.id) : null,
     };
-    // setIsLoading(true);
+    setIsLoading(true);
     const resCreateChannel: RoomInterface | ApiErrorResponse = await editChannel(room.id, data);
-    // setIsLoading(false);
-
+    
     if ('error' in resCreateChannel) {
       dispatch(setErrorSnackbar(resCreateChannel.error + resCreateChannel.message ? ': ' + resCreateChannel.message : ''));
     } else {
@@ -90,24 +90,12 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
         // acceptedUsers: null,
       });
     }
+    setIsLoading(false);
     console.log(form);
   };
 
-  // const handleDeleteChannel = async () => {
-  //   const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
-  //   console.log('resDeleteChannel : ', resDeleteChannel);
-  //   if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
-  //     dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
-  //   else {
-  //     setOpenDialog(false);
-  //     dispatch(setMsgSnackbar('Channel deleted'));
-  //     setIsAdminMenuOpen(false);
-  //     navigate('/chat');
-  //   }
-  // };
-
   return (
-    <div className="absolute right-0 top-[64px]">
+    <div className="right-0 top-[64px]">
       <div ref={ref} className={'border-stone-300 shadow-gray-300 text-right'} >
         <Button
           className='text-blue-500'
@@ -117,138 +105,146 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
           <p className={'text-center'}> admin </p>
         </Button>
 
-        <div className={`rounded-md transition-all duration-1000 ease-in-out transform overflow-hidden origin-top-right ${openEdit
+        {/* <div className={`rounded-md transition-all duration-1000 ease-in-out transform overflow-hidden origin-top-right 
+        ${openEdit
           ? 'scale-100 visible opacity-100 z-50 bg-slate-400 border-stone-300 shadow-gray-300'
           : 'scale-0 invisible opacity-0 z-0 border-stone-300 shadow-gray-300'
-        }`}>
-          <div className='min-w-[50vw]'>  {/* w-[calc(100vw-275px)]  */}
-            <div className='bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center'>
-              {isOwner &&
-                <Box sx={{
-                  bgcolor: 'background.paper',
-                  pb: 1,
-                }}>
-                  {isOpenRenameMenu &&
-                    <Box
-                      component="form"
-                      onSubmit={handleValidateForm}
-                      sx={{
-                      }}
-                    // noValidate
-                    // autoComplete="off"
-                    >
-                      <div className='flex'>
-                       
-                        <FormControl>
-                          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                          <OutlinedInput
-                            name='password'
-                            id="outlined-adornment-password"
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            value={form.password ? form.password : ''}
-                            onChange={handleChangeInput}
-                            required
-                            endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  aria-label="toggle password visibility"
-                                  onClick={handleClickShowPassword}
-                                  onMouseDown={handleMouseDownPassword}
-                                  edge="end"
-                                >
-                                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                              </InputAdornment>
-                            }
-                          />
-                        </FormControl>
-                        <Button
-                          type='submit'
-                          variant="contained"
-                          color="primary"
-                        >
-                          Validate
-                        </Button>
-                        <Button
-                          type='submit'
-                          variant="contained"
-                          color="error"
-                          onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </Box>
-                  }
-
-
-
-
-
-                  {!isOpenRenameMenu &&
-                    <>
-                      <Button
-                        type='submit'
-                        variant='contained'
-                        className='text-blue-500'
-                        onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
-                        sx={{ mr: 1 }}
-                        color={isOpenRenameMenu ? 'warning' : 'primary'}
+        }`}> */}
+        {openEdit &&
+          // <div className="rounded-md transition-all duration-1000 ease-in-out transform overflow-hidden origin-top-right scale-100 visible opacity-100 z-50 bg-slate-400 border-stone-300 shadow-gray-300">
+          <div className="min-w-[50vw] rounded-md overflow-hidden origin-top-right bg-slate-400 border-stone-300 shadow-gray-300">
+            {/* <div className=''>  */}
+             {/* w-[calc(100vw-275px)]  */}
+              <div className='bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center'>
+                {isOwner &&
+                  <Box sx={{
+                    bgcolor: 'background.paper',
+                    pb: 1,
+                  }}>
+                    {isOpenRenameMenu &&
+                      <Box
+                        component="form"
+                        onSubmit={handleValidateForm}
+                        sx={{
+                        }}
+                      // noValidate
+                      // autoComplete="off"
                       >
-                        {isOpenRenameMenu ? 'Cancel' : 'Change password'}
-                      </Button>
-                      <Button
-                        variant='contained'
-                        className='text-blue-500'
-                        color='error'
-                        onClick={handleClickOpenDialog}
-                      >
-                        Delete channel
-                      </Button>
-                      <Dialog
-                        open={openDialog}
-                        onClose={handleCloseDialog}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                      >
-                        <DialogTitle id="alert-dialog-title">
-                          {'Are you sure you want to delete this channel ?'}
-                        </DialogTitle>
-                        <DialogContent>
-                          <DialogContentText id="alert-dialog-description">
-                            You are about to delete this channel. Please note that this action is irreversible 
-                            and all the channel's content will be permanently deleted.
-                            Are you sure you want to proceed?
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleCloseDialog}>Cancel</Button>
-                          <Button onClick={handleDeleteChannel} 
-                            color='error' autoFocus>
-                            Delete
+                        <div className='flex'>
+
+                          <FormControl>
+                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                            <OutlinedInput
+                              name='password'
+                              id="outlined-adornment-password"
+                              label="Password"
+                              type={showPassword ? 'text' : 'password'}
+                              value={form.password ? form.password : ''}
+                              onChange={handleChangeInput}
+                              required
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    edge="end"
+                                  >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  </IconButton>
+                                </InputAdornment>
+                              }
+                            />
+                          </FormControl>
+                          <Button
+                            type='submit'
+                            variant="contained"
+                            color="primary"
+                            disabled={isLoading}
+                          >
+                            Validate
                           </Button>
-                        </DialogActions>
-                      </Dialog>
-                    </>
-                  }
-                </Box>
-              }
+                          <Button
+                            type='submit'
+                            variant="contained"
+                            color="error"
+                            onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </Box>
+                    }
 
-              {/* <div className='flex flex-row items-center'>
+
+
+
+
+                    {!isOpenRenameMenu &&
+                      <>
+                        <Button
+                          type='submit'
+                          variant='contained'
+                          className='text-blue-500'
+                          onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
+                          sx={{ mr: 1 }}
+                          color={isOpenRenameMenu ? 'warning' : 'primary'}
+                        >
+                          {isOpenRenameMenu ? 'Cancel' : 'Change password'}
+                        </Button>
+                        <Button
+                          variant='contained'
+                          className='text-blue-500'
+                          color='error'
+                          onClick={handleClickOpenDialog}
+                        >
+                          Delete channel
+                        </Button>
+                        <Dialog
+                          open={openDialog}
+                          onClose={handleCloseDialog}
+                          aria-labelledby="alert-dialog-title"
+                          aria-describedby="alert-dialog-description"
+                        >
+                          <DialogTitle id="alert-dialog-title">
+                            {'Are you sure you want to delete this channel ?'}
+                          </DialogTitle>
+                          <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                              You are about to delete this channel. Please note that this action is irreversible
+                              and all the channel's content will be permanently deleted.
+                              Are you sure you want to proceed?
+                            </DialogContentText>
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={handleCloseDialog}>Cancel</Button>
+                            <Button 
+                              onClick={handleDeleteChannel}
+                              color='error' 
+                              disabled={isLoading}
+                              autoFocus
+                            >
+                              Delete
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
+                      </>
+                    }
+                  </Box>
+                }
+
+                {/* <div className='flex flex-row items-center'>
                 <p className='text-blue-500' >{room.name}</p>
               </div> */}
-              {room.users &&
-                room.users.map((user: UserInterface) => (
-                  <AdminUserCard key={user.id} user={user} room={room} />
-                ))
-              }
-
-
-            </div>
+                {room.users &&
+                  room.users.map((user: UserInterface) => (
+                    <AdminUserCard key={user.id} user={user} room={room} />
+                  ))
+                }
+              </div>
+            {/* </div> */}
           </div>
-        </div>
-      </div>
+        } </div>
     </div>
 
   );

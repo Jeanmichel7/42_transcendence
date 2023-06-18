@@ -45,8 +45,7 @@ export default function ChannelSearch() {
     const res: RoomInterface | ApiErrorResponse = await joinRoom(room.id, {
       password: inputPwd,
     });
-    setIsLoading(false);
-
+    
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
@@ -62,6 +61,7 @@ export default function ChannelSearch() {
       setDisplayInputPwd(false);
       setInputPwd(null);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -105,6 +105,7 @@ export default function ChannelSearch() {
           variant="contained"
           color="primary"
           sx={{ ml: 2, height: '40px', alignSelf: 'center' }}
+          disabled={!selectedRoom || isLoading}
         > Add </Button>
       </div>
 
@@ -120,6 +121,7 @@ export default function ChannelSearch() {
               value={inputPwd ? inputPwd : ''}
               onChange={(e) => setInputPwd(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom(selectedRoom)}
+              disabled={isLoading}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -140,6 +142,7 @@ export default function ChannelSearch() {
             <IconButton
               onClick={() => handleJoinRoom(selectedRoom)}
               color="primary"
+              disabled={isLoading}
             >
               <DoneIcon />
             </IconButton>
@@ -147,6 +150,7 @@ export default function ChannelSearch() {
             <IconButton
               onClick={() => setDisplayInputPwd(false)}
               color="secondary"
+              disabled={isLoading}
             >
               <CloseIcon />
             </IconButton>
