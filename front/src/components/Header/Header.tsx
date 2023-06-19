@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, reduxUpdateUserStatus, setLogout } from '../../store/userSlice';
-import { reduxAddConversationList } from '../../store/convListSlice';
+import { reduxAddConversationList, reduxUpdateStatusUserConvList } from '../../store/convListSlice';
 import { ApiErrorResponse, NotificationInterface, UserInterface, UserStatusInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
@@ -114,10 +114,10 @@ function Header() {
 
     /* user update status */
     socket.on('update_user_status', (userStatus: UserStatusInterface) => {
-      // console.log('recu du socket update user status : ', userStatus);
+      console.log('recu du socket update user status : ', userStatus);
       dispatch(reduxUpdateUserStatus(userStatus));
+      dispatch(reduxUpdateStatusUserConvList({ item: userStatus, userId: userData.id }));
     });
-
 
     return () => {
       socket.off('notification_friend_request');

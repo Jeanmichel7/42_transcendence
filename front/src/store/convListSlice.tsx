@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserInterface, RoomInterface, ConversationInterface } from '../types';
+import { UserInterface, RoomInterface, ConversationInterface, UserStatusInterface } from '../types';
 import { isRoomInterface, isUserInterface } from '../utils/utils';
 
 
@@ -25,47 +25,9 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
   });
 }
 
-// const helperSetConversationList = (state: ChatState, action: PayloadAction<ConversationInterface[]>) => {
-//   state.conversationsList = action.payload.map((conv) => {
-//     if (isRoomInterface(conv.room)) {
-//       return {
-//         id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
-//         room: {
-//           id: conv.room.id,
-//           name: conv.room.name,
-//           type: conv.room.type,
-//           isProtected: conv.room.isProtected,
-//           users: conv.room.users,
-//           // lastMessage: conv.lastMessage,
-//           // lastMessageDate: conv.lastMessageDate,
-//         },
-//         user: {} as UserInterface,
-//       };
-//     } else if (isUserInterface(conv.user)) {
-//       return {
-//         id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
-//         user: {
-//           id: conv.user.id,
-//           login: conv.user.login,
-//           email: conv.user.email,
-//           firstName: conv.user.firstName,
-//           lastName: conv.user.lastName,
-//           avatar: conv.user.avatar,
-//           status: conv.user.status,
-//           // lastMessage: conv.lastMessage,
-//           // lastMessageDate: conv.lastMessageDate,
-//         },
-//         room: {} as RoomInterface,
-//       };
-//     } else {
-//       throw new Error("action.payload n'est ni de type RoomInterface, ni de type UserInterface");
-//     }
-//   });
-// };
-
 const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
   //create new conversation
-  // console.log('redux conv list : ', item);
+  console.log('redux add conv list : ', item);
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
@@ -101,6 +63,40 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
       state.conversationsList = [...state.conversationsList, newConversation]; // order ?
     }
   }
+};
+
+const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterface) => {
+  console.log('redux update status conv list : ', item);
+  state.conversationsList.forEach((conv: ConversationInterface) => {
+    if (isUserInterface(conv.user) && conv.user.id === item.id) {
+      conv.user.status = item.status;
+    }
+    if (isRoomInterface(conv.room)) {
+      //check ownerUser
+      if (conv.room.ownerUser?.id === item.id && conv.room.ownerUser.id === item.id) {
+        conv.room.ownerUser.status = item.status;
+      }
+
+      //check admins
+      if (conv.room.admins) {
+        conv.room.admins.forEach((admin) => {
+          if (admin.id === item.id) {
+            admin.status = item.status;
+          }
+        });
+      }
+
+      //check users
+      if (conv.room.users) {
+        conv.room.users.forEach((user) => {
+          if (user.id === item.id) {
+            user.status = item.status;
+          }
+        });
+      }
+    }
+  });
+  return true;
 };
 
 const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => {
@@ -148,6 +144,11 @@ export const chatSlice = createSlice({
       if (helperUpdateConversationList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
+    reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface, userId: number }>) => {
+      const { item, userId } = action.payload;
+      if (helperUpdateStatusUserConvList(state, item))
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+    },
   },
 });
 
@@ -156,6 +157,7 @@ export const {
   reduxAddConversationList,
   reduxRemoveConversationToList,
   reduxUpdateRoomConvList,
+  reduxUpdateStatusUserConvList,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

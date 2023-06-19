@@ -37,9 +37,9 @@ export class UsersService {
     private userRepository: Repository<UserEntity>,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    const absentDuration: number = 15 * 60 * 1000; // 15min
+    const absentDuration: number = 1 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
-      // console.log('check user status');
+      console.log('check user status');
       this.checkUserStatus(absentDuration);
     }, 60000);
   }
@@ -396,7 +396,11 @@ export class UsersService {
           avatar: user.avatar,
           updatedAt: new Date(),
         });
-        // console.log('userUpdated offline: ', userUpdated);
+        console.log(
+          'userUpdated offline: ',
+          userUpdated.userStatus.id,
+          userUpdated.userStatus.login,
+        );
         this.eventEmitter.emit('user_status.updated', userUpdated);
       } else if (inactivityDuration > absentDuration) {
         await this.userRepository.update(
@@ -415,11 +419,14 @@ export class UsersService {
           avatar: user.avatar,
           updatedAt: new Date(),
         });
-        // console.log('userUpdated absent: ', userUpdated);
+        console.log(
+          'userUpdated absent: ',
+          userUpdated.userStatus.id,
+          userUpdated.userStatus.login,
+        );
         this.eventEmitter.emit('user_status.updated', userUpdated);
       }
     }
-    // console.log('users after: ', users);
   }
 
   async getRooms(id: bigint): Promise<ChatRoomInterface[]> {

@@ -71,7 +71,6 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
           <Typography component="span"
             sx={{ 
               overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-              color: conv.user.status === 'online' ? 'success' : 'error',
             }}
             title={conv.user.login}
           >

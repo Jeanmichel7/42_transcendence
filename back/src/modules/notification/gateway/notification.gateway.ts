@@ -103,7 +103,7 @@ export class NotificationGateway {
 
   /* UPDATE USER STATUS */
   emitUpdateUserStatus(updateStatusUser: UserStatusInterface) {
-    // console.log('updateStatusUser : ', updateStatusUser);
+    console.log('SEND updateStatusUser : ', updateStatusUser);
     this.server.emit('update_user_status', updateStatusUser, (ack) => {
       if (ack) {
         // console.log('update status sent to room' + updateStatusUser);
