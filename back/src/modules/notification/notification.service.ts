@@ -77,6 +77,21 @@ export class NotificationService {
     return savedNotification;
   }
 
+  async sendNotification(
+    newNotification: NotificationCreateDTO,
+  ): Promise<NotificationEntity> {
+    const savedNotification = await this.notificationRepository.save({
+      ...newNotification,
+      read: true,
+    });
+    // console.log('savedNotification : ', savedNotification);
+
+    this.eventEmitter.emit(
+      'notification.' + savedNotification.type,
+      new NotificationCreatedEvent(savedNotification),
+    );
+    return savedNotification;
+  }
   async readNotification(
     userId: bigint,
     notificationId: bigint,

@@ -37,11 +37,11 @@ export class UsersService {
     private userRepository: Repository<UserEntity>,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    const absentDuration: number = 1 * 60 * 1000; // 15min
+    const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
       console.log('check user status');
       this.checkUserStatus(absentDuration);
-    }, 60000);
+    }, 1 * 60 * 1000);
   }
 
   onModuleDestroy() {

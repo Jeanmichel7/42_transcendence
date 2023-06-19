@@ -46,7 +46,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const [messages, setMessages] = useState<(ChatMsgInterface)[]>([]);
   const [text, setText] = useState<string>('');
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-  // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
+  const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -252,11 +252,10 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
 
-    // setIsLoadingPagination(true);
+    setIsLoadingPagination(true);
     console.log('FETCH OLD MESSAGES');
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
-    // setIsLoadingPagination(false);
-
+    
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
@@ -267,12 +266,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       if (!scrollContainer) return;
       const oldScrollHeight = scrollContainer.scrollHeight;
 
+      const reversedMessageFiltred = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
       if (pageDisplay === 1)
-        setMessages(allMessages.reverse());
-      else {
-        const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-        setMessages((prev) => [...reversedMessageArray, ...prev]);
-      }
+        setMessages(reversedMessageFiltred);
+      else
+        setMessages((prev) => [...reversedMessageFiltred, ...prev]);
 
       //set pos scrool to top old messages
       requestAnimationFrame(() => {
@@ -281,6 +279,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         setShouldScrollToBottom(true);
       });
     }
+    setIsLoadingPagination(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageDisplay]);
 
@@ -335,7 +334,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         console.error('WTF ?');
       }
     }
-  }, [id, userData.id]);
+  }, [conv, dispatch, id, navigate, userData.id]);
 
   useEffect(() => {
     if (!room || !userData) return;
@@ -367,7 +366,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socketRef.current = null;
       }
     };
-  }, [userData.id, id, room?.bannedUsers, room, connectSocketChat, dispatch, conv, navigate]);
+  }, [userData.id, id, room?.bannedUsers, connectSocketChat, dispatch, navigate]);
 
   useEffect(() => {
     fetchOldMessages();
@@ -458,7 +457,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   //scrool top = fetch new page messages
   const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const element = e.target as HTMLDivElement;
-    if (element.scrollTop === 0) {
+    if (element.scrollTop === 0 && !isLoadingPagination) {
       setPageDisplay((prev) => prev + 1);
       //display waiting message
     }

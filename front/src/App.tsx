@@ -97,10 +97,12 @@ function App() {
 
 
     } else {
+      // console.log('isAuth : ', isAuth, userId);
       dispatch(setLogged(false));
       //disconnect user
+      if (userId !== -1)
+        navigate('/');
       setUserId(-1);
-      // navigate('/');
     }
   }, [dispatch, fetchData, userId]);
 

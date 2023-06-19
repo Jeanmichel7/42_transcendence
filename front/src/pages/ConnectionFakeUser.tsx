@@ -15,7 +15,7 @@ import { reduxSetNotifications } from '../store/notificationSlice';
 import { reduxSetConversationList } from '../store/convListSlice';
 
 export default function FakeConnection() {
-  const [login, setLogin] = useState<string>('login1');
+  const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('Password1!');
   const [usersCreated, setUsersCreated] = useState<UserInterface[]>([]);
 
@@ -36,6 +36,7 @@ export default function FakeConnection() {
 
   //save user data in redux
   const saveUserData = useCallback(async function (id: number) {
+    console.log('ID : ', id);
     dispatch(setLogged(true));
     await fetchData(getUserData, setUser);
     await fetchData(getFriends, reduxSetFriends);
@@ -50,7 +51,6 @@ export default function FakeConnection() {
         ? JSON.parse(localStorage.getItem('conversationsList' + id) as string) 
         : [] as ConversationInterface[],
     ));
-
   }, [dispatch, fetchData]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {

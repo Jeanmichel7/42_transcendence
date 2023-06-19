@@ -15,6 +15,7 @@ import { UserRelationInterface } from 'src/modules/users_relations/interfaces/us
 import { NotificationService } from '../notification/notification.service';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
 import { NotificationEntity } from '../notification/entity/notification.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UsersRelationsService {
@@ -23,7 +24,8 @@ export class UsersRelationsService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(UserRelationEntity)
     private readonly userRelationRepository: Repository<UserRelationEntity>,
-    private readonly notificationService: NotificationService, // private readonly eventEmitter: EventEmitter2,
+    private readonly notificationService: NotificationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   // surement foireux ! et pas utilisé
@@ -450,8 +452,13 @@ export class UsersRelationsService {
             await this.userRelationRepository.save(relationExist);
 
           // send notification to userFriend
+          // this.eventEmitter.emit(
+          //   'notification.' + savedNotification.type,
+          //   new NotificationCreatedEvent(savedNotification),
+          // );
+
           const newNotif: NotificationEntity =
-            await this.notificationService.createNotification({
+            await this.notificationService.sendNotification({
               type: 'friendRequestAccepted',
               content: `accepted your friend request`,
               receiver: userFriend,
@@ -535,7 +542,7 @@ export class UsersRelationsService {
 
           // send notification to userFriend
           const newNotif: NotificationEntity =
-            await this.notificationService.createNotification({
+            await this.notificationService.sendNotification({
               type: 'friendRequestDeclined',
               content: `declined your friend request`,
               receiver: userFriend,
@@ -612,7 +619,7 @@ export class UsersRelationsService {
 
           // send notification to userFriend
           const newNotif: NotificationEntity =
-            await this.notificationService.createNotification({
+            await this.notificationService.sendNotification({
               type: 'friendRequestCanceled',
               content: `Canceled your friend request`,
               receiver: userFriend,
@@ -693,7 +700,7 @@ export class UsersRelationsService {
 
           // send notification to userFriend
           const newNotif: NotificationEntity =
-            await this.notificationService.createNotification({
+            await this.notificationService.sendNotification({
               type: 'blockUser',
               content: `blocked you`,
               receiver: userBlocked,
@@ -732,7 +739,7 @@ export class UsersRelationsService {
 
             // send notification to userFriend
             const newNotif: NotificationEntity =
-              await this.notificationService.createNotification({
+              await this.notificationService.sendNotification({
                 type: 'blockUser',
                 content: `blocked you`,
                 receiver: userBlocked,
@@ -855,7 +862,7 @@ export class UsersRelationsService {
 
           // send notification to userFriend
           const newNotif: NotificationEntity =
-            await this.notificationService.createNotification({
+            await this.notificationService.sendNotification({
               type: 'unblockUser',
               content: `unblocked you`,
               receiver: userBlocked,
@@ -930,7 +937,7 @@ export class UsersRelationsService {
 
     // send notification to userFriend
     const newNotif: NotificationEntity =
-      await this.notificationService.createNotification({
+      await this.notificationService.sendNotification({
         type: 'friendDeleted',
         content: `deleted you from his friend list`,
         receiver: userFriend,

@@ -46,7 +46,7 @@ function Header() {
   const { notifications } = useSelector((state: RootState) => state.notification);
 
   const connectWebSocket = useCallback(() => {
-    if (!userData.id) return;
+    if (!userData.id || userData.id === -1) return;
     if (userIsLogged === false) return;
 
     const socket = io('http://localhost:3000/notification', {
@@ -78,8 +78,6 @@ function Header() {
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
       dispatch(reduxAcceptedRequest(notification));
       dispatch(reduxAddConversationList({ item: notification.sender, userId: userData.id }));
-
-
     });
 
     socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
