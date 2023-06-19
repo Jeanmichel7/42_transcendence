@@ -17,6 +17,7 @@ import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
+
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
@@ -102,6 +103,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       };
       console.log('usr add ws : ', user);
       dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
     });
 
     socket.on('room_leave', (roomId, userId) => {
@@ -113,6 +115,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         // acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== userId),
       };
       dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
     });
 
     /* ROOM ADMIN */
@@ -136,6 +139,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
     socket.on('room_kicked', (roomId, userId) => {
       if (roomId !== id) return;
+
       const roomUpdated: RoomInterface = {
         ...conv.room,
         users: conv.room.users?.filter((u) => u.id !== userId),
@@ -143,6 +147,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         // acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== userId),
       };
       dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
 
       if (userData.id === userId) {
         socket.emit('leaveRoom', {
@@ -247,10 +252,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userData.id]);
 
+
   // get messages
   const fetchOldMessages = useCallback(async () => {
     if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
+    console.log('fetch old messages');
 
     setIsLoadingPagination(true);
     console.log('FETCH OLD MESSAGES');
@@ -290,8 +297,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       return;
     }
     if (!conv.room.id || conv.room.id === -1 || userData.id === -1) return;
-    console.log('FEEEEEEECTH ROOM DATA');
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
+
     if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
       socketRef.current?.emit('leaveRoom', {
@@ -302,7 +309,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     } else if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
-      // setRoom(roomData);
       dispatch(reduxUpdateRoomConvList({ item: roomData, userId: userData.id }));
 
       //check if user is accepted in room
@@ -327,11 +333,13 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socketRef.current?.emit('leaveRoom', {
           roomId: id,
         });
+        console.log('room delete, conv : ', conv);
         dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
         dispatch(setWarningSnackbar('Room ' + conv.room.name + ' was deleted'));
         navigate('/chat/channel');
       } else {
         console.error('WTF ?');
+
       }
     }
   }, [conv, dispatch, id, navigate, userData.id]);
@@ -344,6 +352,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   useEffect(() => {
     if (!room || !userData.id || userData.id === -1 || id === '-1') return;
     if (room.bannedUsers?.some((u) => u.id === userData.id)) {
+
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
       });
@@ -371,6 +380,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   useEffect(() => {
     fetchOldMessages();
   }, [fetchOldMessages, room?.id]);
+
 
   useEffect(() => {
     if (!userData.id || userData.id == -1) return;

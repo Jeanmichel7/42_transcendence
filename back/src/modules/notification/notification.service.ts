@@ -55,8 +55,6 @@ export class NotificationService {
         ])
         .orderBy('notifications.createdAt', 'DESC')
         .getMany();
-    // console.log('notifications : ', notifications);
-
     return notifications;
   }
 
@@ -92,6 +90,7 @@ export class NotificationService {
     );
     return savedNotification;
   }
+
   async readNotification(
     userId: bigint,
     notificationId: bigint,

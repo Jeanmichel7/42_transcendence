@@ -38,7 +38,7 @@ export class NotificationListener {
   //notif remove friend
   @OnEvent('notification.friendDeleted')
   handleRemoveFriend(event: NotificationCreatedEvent) {
-    // console.log('notif remove friend', event.data);
+     // console.log('notif remove friend', event.data);
     this.socketEvents.emitNotificationRemoveFriend(event.data);
   }
 

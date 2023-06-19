@@ -1,17 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
+
 import { Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup } from '@mui/material';
 import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 import { inviteUser } from '../../../../api/chat';
+
 import RowOfFriendToInvit from './RowInvitation';
 import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
 
 
 interface InvitationRoomProps {
   room: RoomInterface;
+
 }
 
 const InvitationRoom: React.FC<InvitationRoomProps> = ({ 
@@ -79,11 +82,13 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     }
     dispatch(setMsgSnackbar('User(s) invited'));
     setIsLoading(false);
+
     const roomUpdated: RoomInterface = {
       ...room,
       acceptedUsers: [...(room?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
     };
     dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
     setForm({ acceptedUsers: null });
     setOpenEdit(false);
   };

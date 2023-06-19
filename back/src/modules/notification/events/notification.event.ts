@@ -8,3 +8,4 @@ export class NotificationCreatedEvent {
 export class UserUpdateEvent {
   constructor(public readonly userStatus: UserStatusInterface) {}
 }
+

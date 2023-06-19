@@ -5,10 +5,6 @@ import { useEffect, useState } from 'react';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
 
-  // useEffect(() => {
-  //   console.log('user in MemberCard : ', user);
-  // }, [user]);
-
   return (
     <>
       {!user ? null :
@@ -89,12 +85,6 @@ const ChatMembers = ({
       acceptedUsers.filter((u) => u.id != 0),
     );
   }, [acceptedUsers]);
-
-  // useEffect(() => {
-  //   console.log('admins : ', admins);
-  //   console.log('user : ', users);
-  //   console.log('acceptedUsers : ', acceptedUsers);
-  // }, [acceptedUsers, admins, users]);
 
   return (
     <>

@@ -413,6 +413,7 @@ ALTER TABLE ONLY public."users-relation" ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "roomId") FROM stdin;
+
 235	Invitation link http://localhost:3006/chat/channel/invitation/58/Hello	2023-06-19 18:25:09.315217	2023-06-19 18:25:09.315217	0	58
 303	8	2023-06-19 18:56:16.652485	2023-06-19 18:56:16.652485	24	59
 236	Invitation link http://localhost:3006/chat/channel/invitation/59/Private	2023-06-19 18:25:17.004831	2023-06-19 18:25:17.004831	0	59
@@ -542,6 +543,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 361	z	2023-06-19 18:58:45.319229	2023-06-19 18:58:45.319229	24	59
 362	Laron76 has join the room	2023-06-19 19:08:02.783762	2023-06-19 19:08:02.783762	0	58
 363	hello	2023-06-19 19:47:29.477643	2023-06-19 19:47:29.477643	25	58
+
 \.
 
 
@@ -552,6 +554,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
 58	public	f	Hello	\N	2023-06-19 18:25:09.293451	2023-06-19 18:25:09.293451	24
 59	private	f	Private	\N	2023-06-19 18:25:16.986254	2023-06-19 18:25:16.986254	25
+
 \.
 
 
@@ -560,7 +563,9 @@ COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "u
 --
 
 COPY public.chat_rooms_accepted_users_users ("chatRoomsId", "usersId") FROM stdin;
+
 59	0
+
 \.
 
 
@@ -569,9 +574,11 @@ COPY public.chat_rooms_accepted_users_users ("chatRoomsId", "usersId") FROM stdi
 --
 
 COPY public.chat_rooms_admins_users ("chatRoomsId", "usersId") FROM stdin;
+
 58	24
 59	25
 58	25
+
 \.
 
 
@@ -596,12 +603,14 @@ COPY public.chat_rooms_muted_users_users ("chatRoomsId", "usersId") FROM stdin;
 --
 
 COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
+
 58	24
 59	25
 59	24
 58	25
 59	29
 58	29
+
 \.
 
 
@@ -618,11 +627,13 @@ COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlaye
 --
 
 COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUserId") FROM stdin;
+
 16	elo	2023-06-19 18:24:58.014339	2023-06-19 18:24:58.014339	24	25
 17	hello	2023-06-19 18:25:03.283594	2023-06-19 18:25:03.283594	25	24
 18	cc	2023-06-19 18:56:05.483116	2023-06-19 18:56:05.483116	29	25
 19	hello	2023-06-19 19:05:30.359879	2023-06-19 19:05:30.359879	27	24
 20	slt	2023-06-19 19:46:59.950707	2023-06-19 19:46:59.950707	25	24
+
 \.
 
 
@@ -631,6 +642,7 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 --
 
 COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "senderId", "receiverId", "invitationLink") FROM stdin;
+
 189	friendRequest	send you a friend request	f	2023-06-19 18:24:45.516455	2023-06-19 18:24:45.516455	25	26	\N
 191	friendRequest	send you a friend request	f	2023-06-19 18:24:46.115453	2023-06-19 18:24:46.115453	25	28	\N
 193	friendRequest	send you a friend request	f	2023-06-19 18:24:46.427762	2023-06-19 18:24:46.427762	25	30	\N
@@ -663,6 +675,7 @@ COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "s
 217	friendDeleted	deleted you from his friend list	t	2023-06-19 19:46:39.59073	2023-06-19 19:46:39.59073	25	24	\N
 218	friendRequest	send you a friend request	t	2023-06-19 19:46:46.451994	2023-06-19 19:46:46.451994	25	24	\N
 219	friendRequestAccepted	accepted your friend request	t	2023-06-19 19:46:48.820393	2023-06-19 19:46:48.820393	24	25	\N
+
 \.
 
 
@@ -671,6 +684,7 @@ COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "s
 --
 
 COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity") FROM stdin;
+
 24	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1687198549286-879531.jpg	\N	f	online	\N	2023-06-19 18:15:49.384301	2023-06-19 19:38:01.044	2023-06-19 19:47:22.024
 0	Bot	Bot	Bot	bla@gmail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	\N	t	offline	\N	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889
 26	Violette	Beahan	Angelina93	Cali.Halvorson71@hotmail.com	$2b$10$c7fuqdKwSmloYW70MiVILe7LCQc2U56P18n7Q3fjUtr9rk3Po11FW	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/33.jpg	Neque eveniet ullam quia vitae esse facere.	f	offline	\N	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241
@@ -683,6 +697,7 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 25	Leila	Kessler	Lynn6	Cynthia4@yahoo.com	$2b$10$i3n6ue9OCkjOq5fezKOClunOOY7EhllA65vdYe0o9/zP9EEw9Nxyu	user	https://avatars.githubusercontent.com/u/41298539	Placeat aliquam iure eum.	f	online	\N	2023-06-19 18:24:15.049995	2023-06-19 19:38:01.048	2023-06-19 19:47:29.461
 27	Rhianna	Hoppe	Randi.Bruen-Lakin	Katarina50@hotmail.com	$2b$10$sVfIx5EnyQslMSrSohv6Gei0BQkHqOlPOJ6wwO24Ig8i/ULVDmxpm	user	https://avatars.githubusercontent.com/u/58112789	Tenetur fugiat eveniet exercitationem repellendus fuga temporibus numquam accusamus.	f	offline	\N	2023-06-19 18:24:15.1809	2023-06-19 19:13:55.237	2023-06-19 19:05:43.524
 29	Darrin	Kirlin	Laron76	Furman_Buckridge-Gusikowski@gmail.com	$2b$10$c1j721RAxyGoIukxRC5suu2ALUFfYV2XoH51h8rryg7U1k40YmC/2	user	https://avatars.githubusercontent.com/u/82350039	Quis blanditiis vel aut repellendus atque itaque.	f	offline	\N	2023-06-19 18:24:15.304727	2023-06-19 19:16:55.236	2023-06-19 19:08:10.659
+
 \.
 
 
@@ -691,6 +706,7 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 --
 
 COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", "updatedAt", "userInitiateurId", "userRelationId") FROM stdin;
+
 90	pending	f	2023-06-19 18:24:45.513717	2023-06-19 18:24:45.513717	25	26
 92	pending	f	2023-06-19 18:24:46.1126	2023-06-19 18:24:46.1126	25	28
 94	pending	f	2023-06-19 18:24:46.424417	2023-06-19 18:24:46.424417	25	30
@@ -710,6 +726,7 @@ COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", 
 100	friend	f	2023-06-19 18:26:35.477428	2023-06-19 19:05:13.573	24	27
 91	friend	f	2023-06-19 18:24:45.809777	2023-06-19 19:05:18.024	25	27
 109	friend	f	2023-06-19 19:46:46.447963	2023-06-19 19:46:48.816	25	24
+
 \.
 
 
@@ -720,11 +737,13 @@ COPY public."users-relation" (id, "relationType", "mutuelBlocked", "createdAt", 
 SELECT pg_catalog.setval('public.chat_messages_id_seq', 363, true);
 
 
+
 --
 -- Name: chat_rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.chat_rooms_id_seq', 59, true);
+
 
 
 --
@@ -741,11 +760,13 @@ SELECT pg_catalog.setval('public.games_id_seq', 1, false);
 SELECT pg_catalog.setval('public.messages_id_seq', 20, true);
 
 
+
 --
 -- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.notifications_id_seq', 219, true);
+
 
 
 --
@@ -760,6 +781,7 @@ SELECT pg_catalog.setval('public."users-relation_id_seq"', 109, true);
 --
 
 SELECT pg_catalog.setval('public.users_id_seq', 34, true);
+
 
 
 --

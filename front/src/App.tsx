@@ -95,7 +95,6 @@ function App() {
       await fetchData(getFriendRequests, reduxSetWaitingFriends);
       await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
 
-
     } else {
       // console.log('isAuth : ', isAuth, userId);
       dispatch(setLogged(false));

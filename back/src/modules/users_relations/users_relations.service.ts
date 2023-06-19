@@ -452,13 +452,8 @@ export class UsersRelationsService {
             await this.userRelationRepository.save(relationExist);
 
           // send notification to userFriend
-          // this.eventEmitter.emit(
-          //   'notification.' + savedNotification.type,
-          //   new NotificationCreatedEvent(savedNotification),
-          // );
-
           const newNotif: NotificationEntity =
-            await this.notificationService.sendNotification({
+            await this.notificationService.createNotification({
               type: 'friendRequestAccepted',
               content: `accepted your friend request`,
               receiver: userFriend,
