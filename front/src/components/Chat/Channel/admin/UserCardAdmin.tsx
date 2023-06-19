@@ -41,11 +41,11 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (room.ownerUser) setIsOwner(room.ownerUser.id === user.id);
     if (room.admins) setIsAdmin(room.admins.some((u) => u.id === user.id));
     if (room.mutedUsers) setIsMuted(room.mutedUsers.some((u) => u.id === user.id));
-  }, [room, user, userData.id]);
+  }, [room, room.ownerUser, room.admins, room.users, user, userData.id]);
 
   useEffect(() => {
     if (userData.id && room.ownerUser) setImIOwner(room.ownerUser.id === userData.id);
-  }, [userData.id, room]);
+  }, [userData.id, room.ownerUser]);
 
   const handleMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
   : Promise< void | PayloadAction<string> > => {

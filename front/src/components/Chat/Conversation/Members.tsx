@@ -18,10 +18,11 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
           <Badge
-            color={
+            color={ 
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
-                  'error'
+                  user.status === 'inactive' ? 'secondary' :
+                    'error' 
             }
             overlap="circular"
             badgeContent=" "
@@ -46,11 +47,9 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
           <Typography component="span"
             sx={{
               overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-              color: user.status === 'online' ? 'success' : 'error',
             }}
             title={user.login}
           >
-            
             { user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
           </Typography>
         </Link>

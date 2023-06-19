@@ -379,53 +379,46 @@ export class UsersService {
       if (user.status === 'offline') continue;
       const inactivityDuration =
         Date.now() - new Date(user.lastActivity).getTime();
+      if (inactivityDuration < absentDuration) continue;
+      let newStatus: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
+      if (inactivityDuration > 8 * absentDuration) newStatus = 'offline';
+      else if (inactivityDuration > 4 * absentDuration) newStatus = 'inactive';
+      else if (inactivityDuration > absentDuration) newStatus = 'absent';
+      else newStatus = 'online';
 
-      if (inactivityDuration > 4 * absentDuration) {
-        await this.userRepository.update(
-          { id: user.id },
-          {
-            status: 'offline',
-            updatedAt: new Date(),
-          },
-        );
-
-        const userUpdated = new UserUpdateEvent({
-          id: user.id,
-          status: 'offline',
-          login: user.login,
-          avatar: user.avatar,
+      if (user.status === newStatus) continue;
+      console.log(
+        'Update status from :',
+        user.id,
+        user.login,
+        user.status,
+        ' to: ',
+        newStatus,
+      );
+      await this.userRepository.update(
+        { id: user.id },
+        {
+          status: newStatus,
           updatedAt: new Date(),
-        });
-        console.log(
-          'userUpdated offline: ',
-          userUpdated.userStatus.id,
-          userUpdated.userStatus.login,
-        );
-        this.eventEmitter.emit('user_status.updated', userUpdated);
-      } else if (inactivityDuration > absentDuration) {
-        await this.userRepository.update(
-          { id: user.id },
-          {
-            status: 'absent',
-            updatedAt: new Date(),
-          },
-        );
-        // console.log('res update status user: ', res);
+        },
+      );
 
-        const userUpdated = new UserUpdateEvent({
-          id: user.id,
-          status: 'absent',
-          login: user.login,
-          avatar: user.avatar,
-          updatedAt: new Date(),
-        });
-        console.log(
-          'userUpdated absent: ',
-          userUpdated.userStatus.id,
-          userUpdated.userStatus.login,
-        );
-        this.eventEmitter.emit('user_status.updated', userUpdated);
-      }
+      const userUpdated = new UserUpdateEvent({
+        id: user.id,
+        status: newStatus,
+        login: user.login,
+        avatar: user.avatar,
+        updatedAt: new Date(),
+      });
+      console.log(
+        'event update status from :',
+        userUpdated.userStatus.id,
+        userUpdated.userStatus.login,
+        userUpdated.userStatus.status,
+        ', to :',
+        newStatus,
+      );
+      this.eventEmitter.emit('user_status.updated', userUpdated);
     }
   }
 

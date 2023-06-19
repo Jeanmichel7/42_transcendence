@@ -46,7 +46,8 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
             color={ 
               conv.user.status === 'online' ? 'success' :
                 conv.user.status === 'absent' ? 'warning' :
-                  'error' 
+                  conv.user.status === 'inactive' ? 'secondary' :
+                    'error' 
             }
             overlap="circular"
             badgeContent=" "

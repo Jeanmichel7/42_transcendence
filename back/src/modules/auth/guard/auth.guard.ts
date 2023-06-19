@@ -63,7 +63,7 @@ export class AuthGuard implements CanActivate {
     user.lastActivity = new Date();
     if (user.status !== 'online') {
       console.log(
-        'update user status to online, ',
+        'update user status to ONLINE, ',
         user.id,
         user.login,
         user.status,
@@ -71,13 +71,13 @@ export class AuthGuard implements CanActivate {
 
       const userUpdated = new UserUpdateEvent({
         id: user.id,
-        status: 'absent',
+        status: 'online',
         login: user.login,
         avatar: user.avatar,
         updatedAt: new Date(),
       });
       console.log(
-        'userUpdated absent: ',
+        'userUpdated: ',
         userUpdated.userStatus.id,
         userUpdated.userStatus.login,
       );

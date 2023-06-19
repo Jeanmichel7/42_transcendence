@@ -66,7 +66,7 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
 };
 
 const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterface) => {
-  console.log('redux update status conv list : ', item);
+  // console.log('redux update status conv list : ', item);
   state.conversationsList.forEach((conv: ConversationInterface) => {
     if (isUserInterface(conv.user) && conv.user.id === item.id) {
       conv.user.status = item.status;

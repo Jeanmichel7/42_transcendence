@@ -57,24 +57,16 @@ function App() {
     if (typeof isAuth === 'boolean' && isAuth === true) {
       dispatch(setLogged(true));
 
-      await fetchData(getUserData, setUser);
-      await fetchData(getFriends, reduxSetFriends);
-      await fetchData(getBlockedUsers, reduxSetUserBlocked);
-      await fetchData(getFriendRequests, reduxSetWaitingFriends);
-      await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
-      dispatch(reduxSetNotifications(
-        localStorage.getItem('notifications' + userId)
-          ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
-          : [] as NotificationInterface[],
-      ));
-      dispatch(reduxSetConversationList(
-        localStorage.getItem('conversationsList' + userId)
-          ? JSON.parse(localStorage.getItem('conversationsList' + userId) as string)
-          : [] as ConversationInterface[],
-      ));
-      const notifsNotRead = await getNotifsNotRead();
+      /* GET NOTIF IN LOCALSTORAGE AND ADD NOTIF NOT READ */
+      // dispatch(reduxSetNotifications(
+      //   localStorage.getItem('notifications' + userId)
+      //     ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
+      //     : [] as NotificationInterface[],
+      // ));
       const notifInLocalStorage: NotificationInterface[]
-        = JSON.parse(localStorage.getItem('notifications' + userId) as string);
+        = JSON.parse(localStorage.getItem('notifications' + userId) as string) || [] as NotificationInterface[];
+      dispatch(reduxSetNotifications(notifInLocalStorage));
+      const notifsNotRead = await getNotifsNotRead();
       // console.log('notifsNotRead : ', notifsNotRead);
       // console.log('notifInLocalStorage : ', notifInLocalStorage);
       if (!('error' in notifsNotRead)) {
@@ -85,8 +77,28 @@ function App() {
         if (notifsNotReadFiltered.length > 0)
           dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
       }
+
+      /* GET CONVERSATION LIST IN LOCALSTORAGE AND UPDATE STATUS FRIENDS*/
+      const convListInLocalStorage: ConversationInterface[]
+        = JSON.parse(localStorage.getItem('conversationsList' + userId) as string) || [] as ConversationInterface[];
+      
+      console.log('conv list in local storage : ', convListInLocalStorage);
+      
+      dispatch(reduxSetConversationList(convListInLocalStorage));
+
+
+
+
+      await fetchData(getUserData, setUser);
+      await fetchData(getFriends, reduxSetFriends);
+      await fetchData(getBlockedUsers, reduxSetUserBlocked);
+      await fetchData(getFriendRequests, reduxSetWaitingFriends);
+      await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
+
+
     } else {
       dispatch(setLogged(false));
+      //disconnect user
       setUserId(-1);
       // navigate('/');
     }

@@ -43,7 +43,7 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.leave(data.roomId.toString());
-    console.log('DISCONNECT TO room', data.roomId);
+    console.log('DISCONNECT TO chat room', data.roomId);
   }
 
   emitNewMessage(message: ChatMsgInterface) {

@@ -49,7 +49,7 @@ export interface NotificationInterface {
 
 export interface UserStatusInterface {
   id: number;
-  status: 'online' | 'offline' | 'absent';
+  status: 'online' | 'offline' | 'absent' | 'inactive' | 'in game';
   login?: string;
   avatar?: string;
   updatedAt?: Date;

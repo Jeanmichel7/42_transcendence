@@ -30,6 +30,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const name = (useParams<{ name: string }>().name || 'unknown');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { room } = useSelector((state: RootState) => state.chat.conversationsList.find((c) => c.id === conv.id) || {} as ConversationInterface);
   const { userData } = useSelector((state: RootState) => state.user);
   const { userBlocked } = useSelector((state: RootState) => state.user);
 
@@ -38,7 +39,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   // const [isInvitMenuOpen, setIsInvitMenuOpen] = useState<boolean>(false);
 
   // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
-  const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
+  // const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
@@ -53,7 +54,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   // connect socket
   const connectSocketChat = useCallback(() => {
-    if (!userData) return;
+    if (!userData.id || userData.id === -1) return;
     const socket = io('http://localhost:3000/chat', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -94,50 +95,55 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     /* ROOM */
     socket.on('room_join', (roomId, user) => {
       if (roomId !== id) return;
+      const roomUpdated: RoomInterface = { 
+        ...conv.room,
+        users: conv.room.users ? [...conv.room.users, user] : [user],
+        acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== user.id),
+      };
       console.log('usr add ws : ', user);
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users ? [...prev.users, user] : [user],
-        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
-      } : null);
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     });
 
     socket.on('room_leave', (roomId, userId) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users?.filter((u) => u.id !== userId),
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== userId) } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        users: conv.room.users?.filter((u) => u.id !== userId),
+        admins: conv.room.admins?.filter((u) => u.id !== userId),
+        // acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== userId),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     });
 
     /* ROOM ADMIN */
     socket.on('room_muted', (roomId, user) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        mutedUsers: prev.mutedUsers ? [...prev.mutedUsers, user] : [user],
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        mutedUsers: conv.room.mutedUsers ? [...conv.room.mutedUsers, user] : [user],
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     });
 
     socket.on('room_unmuted', (roomId, userId) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        mutedUsers: prev.mutedUsers?.filter((u) => u.id !== userId),
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        mutedUsers: conv.room.mutedUsers?.filter((u) => u.id !== userId),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     });
 
     socket.on('room_kicked', (roomId, userId) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users?.filter((u) => u.id !== userId),
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        users: conv.room.users?.filter((u) => u.id !== userId),
+        admins: conv.room.admins?.filter((u) => u.id !== userId),
+        // acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== userId),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
       if (userData.id === userId) {
         socket.emit('leaveRoom', {
           roomId: id,
@@ -146,19 +152,18 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         navigate('/chat/channel');
         dispatch(setWarningSnackbar('You have been kicked from the room ' + conv.room.name));
       }
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);  
     });
 
     socket.on('room_banned', (roomId, user) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        bannedUsers: prev.bannedUsers ? [...prev.bannedUsers, user] : [user],
-        admins: prev.admins?.filter((u) => u.id !== user.id),
-        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        bannedUsers: conv.room.bannedUsers ? [...conv.room.bannedUsers, user] : [user],
+        admins: conv.room.admins?.filter((u) => u.id !== user.id),
+        acceptedUsers: conv.room.acceptedUsers?.filter((u) => u.id !== user.id),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
       if (userData.id === user.id) {
         socket.emit('leaveRoom', {
           roomId: id,
@@ -171,19 +176,22 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
     socket.on('room_unbanned', (roomId, userId) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        bannedUsers: prev.bannedUsers?.filter((u) => u.id !== userId),
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        bannedUsers: conv.room.bannedUsers?.filter((u) => u.id !== userId),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     });
 
     /* ROOM ADMIN */
     socket.on('room_admin_added', (roomId, user) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        admins: prev.admins ? [...prev.admins, user] : [user],
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        admins: conv.room.admins ? [...conv.room.admins, user] : [user],
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
       if (userData.id === user.id) {
         // setIsAdmin(true);
         dispatch(setMsgSnackbar('You are now admin of the room ' + conv.room.name));
@@ -192,10 +200,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
     socket.on('room_admin_removed', (roomId, userId) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        admins: conv.room.admins?.filter((u) => u.id !== userId),
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
       if (userData.id === userId) {
         // setIsAdmin(false);
         dispatch(setWarningSnackbar('You are no longer admin of the room ' + conv.room.name));
@@ -205,10 +215,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     /* OWNER */
     socket.on('room_owner_added', (roomId, user) => {
       if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        owner: user,
-      } : null);
+      const roomUpdated: RoomInterface = {
+        ...conv.room,
+        ownerUser: user,
+      };
+      dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+
       if (userData.id === user.id) {
         dispatch(setMsgSnackbar('You are now owner of the room ' + conv.room.name));
       }
@@ -232,7 +244,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     });
 
     socketRef.current = socket;
-  }, [conv, dispatch, id, navigate, userData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userData.id]);
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
@@ -240,6 +253,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     setShouldScrollToBottom(false);
 
     // setIsLoadingPagination(true);
+    console.log('FETCH OLD MESSAGES');
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
     // setIsLoadingPagination(false);
 
@@ -276,7 +290,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       navigate('/chat/channel');
       return;
     }
-    if (!conv.room.id || conv.room.id === -1) return;
+    if (!conv.room.id || conv.room.id === -1 || userData.id === -1) return;
+    console.log('FEEEEEEECTH ROOM DATA');
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
     if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
@@ -288,7 +303,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     } else if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
-      setRoom(roomData);
+      // setRoom(roomData);
       dispatch(reduxUpdateRoomConvList({ item: roomData, userId: userData.id }));
 
       //check if user is accepted in room
@@ -320,17 +335,15 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         console.error('WTF ?');
       }
     }
-  }, [conv, dispatch, id, navigate, userData]);
+  }, [id, userData.id]);
 
   useEffect(() => {
     if (!room || !userData) return;
     if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
   }, [room, userData]);
 
-
-
   useEffect(() => {
-    if (!room || !userData.id ) return;
+    if (!room || !userData.id || userData.id === -1 || id === '-1') return;
     if (room.bannedUsers?.some((u) => u.id === userData.id)) {
       socketRef.current?.emit('leaveRoom', {
         roomId: id,
@@ -341,7 +354,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
     connectSocketChat();
     return () => {
-      if (socketRef.current) {
+      if (socketRef.current !== null && socketRef.current !== undefined && userData.id !== -1 && id !== '-1'
+      && room?.bannedUsers !== undefined && room?.bannedUsers !== null && !room?.bannedUsers.some((u) => u.id === userData.id)) {
+        console.log('AUTO DEMONTAGE CHANNEL CONVERSATION DISCONNECT');
         socketRef.current.off('chat_message');
         socketRef.current.off('chat_message_edit');
         socketRef.current.off('chat_message_delete');
@@ -352,29 +367,16 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         socketRef.current = null;
       }
     };
-  }, [connectSocketChat, id, room, userData.id, room?.bannedUsers, dispatch, conv, navigate]);
+  }, [userData.id, id, room?.bannedUsers, room, connectSocketChat, dispatch, conv, navigate]);
 
   useEffect(() => {
     fetchOldMessages();
-  }, [fetchOldMessages, room]);
+  }, [fetchOldMessages, room?.id]);
 
   useEffect(() => {
     if (!userData.id || userData.id == -1) return;
     fetchRoomData();
   }, [fetchRoomData, id, userData.id]);
-
-  // useEffect(() => {
-  //   console.log('conv : ', conv);
-  // }, [conv]);
-
-  // useEffect(() => {
-  //   console.log('room : ', room);
-  // }, [room]);
-
-
-
-
-
 
   // scroll to bottom
   useEffect(() => {
@@ -475,6 +477,10 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log('room : ', room);
+  // }, [room]);
+
 
   return (
     <>
@@ -483,7 +489,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
           <div className="w-full flex text-lg text-blue justify-between">
 
             {isAdmin && room && 
-              <InvitationRoom room={room} setRoom={setRoom} 
+              <InvitationRoom room={room}
             /> }
             
             <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
@@ -532,13 +538,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
                     {/* display status send message */}
                     {statusSendMsg !== '' &&
-                      <span className={`
-                  ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                  bottom-16 
-                  text-white
-                  p-2
-                  rounded-xl
-                  shadow-lg`}
+                      <span className={`${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
+                        bottom-16  text-white p-2 rounded-xl shadow-lg`}
                         onClick={() => setStatusSendMsg('')}
                       >
                         {statusSendMsg}
@@ -551,7 +552,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
             </div>
 
             {/* display members */}
-            { room.users && room.acceptedUsers && room.admins &&
+            {room.users && room.acceptedUsers && room.admins &&
               <div className='w-[150px]'>
                 <ChatMembers 
                   admins={room.admins}

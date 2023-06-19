@@ -26,13 +26,13 @@ const FriendItem: React.FC<FriendItemProps> = ({
           onClick={() => {navigate(`/profile/${user.login}`);}}
         >
           <Badge
-            color={
+            color={ 
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
-                  'error'
+                  user.status === 'inactive' ? 'secondary' :
+                    'error' 
             }
             overlap="circular"
-            badgeContent=" "
             variant="dot"
             anchorOrigin={{
               vertical: 'bottom',
@@ -54,10 +54,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
           }
           </Badge>
           <Typography component="span"
-            sx={{
-              overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-              color: user.status === 'online' ? 'success' : 'error',
-            }}
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap' }}
             title={user.login}
           >
             {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}

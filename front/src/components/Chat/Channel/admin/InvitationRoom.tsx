@@ -7,16 +7,15 @@ import { RootState } from '../../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 import { inviteUser } from '../../../../api/chat';
 import RowOfFriendToInvit from './RowInvitation';
+import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
 
 
 interface InvitationRoomProps {
   room: RoomInterface;
-  setRoom: React.Dispatch<React.SetStateAction<RoomInterface | null | undefined>>;
 }
 
 const InvitationRoom: React.FC<InvitationRoomProps> = ({ 
   room,
-  setRoom,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -80,11 +79,11 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     }
     dispatch(setMsgSnackbar('User(s) invited'));
     setIsLoading(false);
-    setRoom(prev => prev ? { 
-      ...prev,
-      acceptedUsers: [...(prev?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
-    } : null);
-
+    const roomUpdated: RoomInterface = {
+      ...room,
+      acceptedUsers: [...(room?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
+    };
+    dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
     setForm({ acceptedUsers: null });
     setOpenEdit(false);
   };
