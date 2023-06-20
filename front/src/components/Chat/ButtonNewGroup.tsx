@@ -21,12 +21,19 @@ function ButtonUser({ login, selectedLogins }: { login: any, selectedLogins: any
 
 export function ButtonNewGroup2() {
 
+<<<<<<< HEAD
   let [userData, setUserData] = useState<any>([])
   const [password, setPassword] = useState('');
   const [roomName, setRoomName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedLogins, setSelectedLogins] = useState<any[]>([]);
+=======
+  let [userData, setUserData] = useState<any>([]);
+  const [password, setPassword] = useState('');
+  const [roomName, setRoomName] = useState('');
+  const [Public, setPublic] = useState(false);
+>>>>>>> 726cfe1bf3e54913cb69d9455443a1afb2271f82
 
   /* requete pour avoir userData */
   async function getData () {
@@ -94,6 +101,7 @@ export function ButtonNewGroup2() {
   return(
       <div className=' m-3 p-3 h-full m-full flex items-center text-center flex-col' >
         
+<<<<<<< HEAD
         <div
         className={`w-4/6 py-2 border font-bold font-mono rounded-xl mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer ${isPublic ? 'bg-gray-200' : 'bg-white'}`}
         onClick={() => {setIsPublic(true); setIsPrivate(false);}}
@@ -111,6 +119,14 @@ export function ButtonNewGroup2() {
         </div>
 
         <div className={`bg-white flex  w-4/6 flex-col overflow-auto h-32 border rounded-xl shadow-sm ${!isPrivate?'hidden':''} `}> 
+=======
+        <div className={` w-4/6 py-2 border font-bold font-mono rounded-xl mt-2 shadow-sm bg-white hover:bg-gray-200 transition-all cursor-pointer ${Public ? 'bg-gray-300' : ''} `} onClick={() => setPublic(!Public)} >
+           Public
+        </div>
+
+        <h1 className=" m-2 ">Or</h1>
+        <div className="bg-white flex  w-4/6 flex-col overflow-auto h-32 border rounded-xl shadow-sm">
+>>>>>>> 726cfe1bf3e54913cb69d9455443a1afb2271f82
           <h1 className=" m-2i font-mono font-bold ">Selects users</h1>
             {addUserList}
         </div>
@@ -130,11 +146,17 @@ export function ButtonNewGroup2() {
                 onChange={(e) => setRoomName(e.target.value)} 
                 className="border rounded-xl text-center m-1 shadow-sm " type="text" />
           </div>
+<<<<<<< HEAD
 
           {console.log('selectedLogins : ',selectedLogins)}
 
           <button className="bg-white border-2 w-2/6 mt-5 rounded-xl mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer" onClick={() => { password === '' ? (addNewRoom(), setPassword(''), setRoomName('')) : (addNewRoomPassword(), setPassword(''), setRoomName('')); }}>
             <p>Create</p>
+=======
+
+          <button className=" bg-white border-2 w-2/6 mt-5 rounded-xl mt-2 shadow-sm hover:bg-gray-200 transition-all cursor-pointer" onClick={() => password === '' ? addNewRoom() : addNewRoomPassword()} >
+            <p> Create </p>
+>>>>>>> 726cfe1bf3e54913cb69d9455443a1afb2271f82
           </button>
 
       </div>
