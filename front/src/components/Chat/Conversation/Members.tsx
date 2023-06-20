@@ -1,6 +1,6 @@
 import { Badge, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { UserInterface } from '../../../types';
+import { RoomInterface, UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
@@ -62,52 +62,40 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
 
 
 interface ChatMembersProps {
-  admins: UserInterface[];
-  users: UserInterface[];
-  acceptedUsers: UserInterface[] | null;
+  room: RoomInterface,
 }
 
 const ChatMembers = ({
-  admins,
-  users,
-  acceptedUsers,
+  room,
 }: ChatMembersProps) => {
 
   const [userWithoutAdmins, setUserWithoutAdmins] = useState<UserInterface[] | null>(null);
   const [acceptedusersWithoudBot, setAcceptedUsersWithoutBot] = useState<UserInterface[] | null>(null);
 
   useEffect(() => {
-    // console.log('admins : ', admins);
-    // console.log('user : ', users);
-    // console.log('acceptedUsers : ', acceptedUsers);
-  }, [acceptedUsers, admins, users]);
+    console.log('room : ', room);
+  }, [room]);
 
   useEffect(() => {
-    if (!admins || !users) return;
+    if (!room.admins || !room.users) return;
     setUserWithoutAdmins(
-      users?.filter((u) => !admins?.some((a) => a.id === u.id)),
+      room.users?.filter((u) => !room.admins?.some((a) => a.id === u.id)),
     );
-  }, [admins, users]);
+  }, [room.admins, room.users]);
 
   useEffect(() => {
-    if (!acceptedUsers) return;
+    if (!room.acceptedUsers) return;
     setAcceptedUsersWithoutBot(
-      acceptedUsers.filter((u) => u.id != 0),
+      room.acceptedUsers.filter((u) => u.id != 0),
     );
-  }, [acceptedUsers]);
-
-  // useEffect(() => {
-  //   console.log('admins : ', admins);
-  //   console.log('user : ', users);
-  //   console.log('acceptedUsers : ', acceptedUsers);
-  // }, [acceptedUsers, admins, users]);
+  }, [room.acceptedUsers]);
 
   return (
     <>
-      {admins &&
+      {room.admins &&
         <>
-          <h3> ADMINS - {admins.length} </h3>
-          {admins.map((user) => (
+          <h3> ADMINS - {room.admins.length} </h3>
+          {room.admins.map((user) => (
             <MembersCard key={user.id} user={user} />
           ))}
         </>
@@ -117,8 +105,6 @@ const ChatMembers = ({
         <>
           <h3> MEMBRES - {userWithoutAdmins.length} </h3>
           {userWithoutAdmins.map((user) => (
-            // check if user is admin
-            admins.some((admin) => admin.id !== user.id) &&
             <MembersCard key={user.id} user={user} />
           ))}
         </>
@@ -127,10 +113,10 @@ const ChatMembers = ({
       {acceptedusersWithoudBot && acceptedusersWithoudBot.length > 0 &&
         <>
           <h3> WAITING - {acceptedusersWithoudBot.length} </h3>
-          {acceptedusersWithoudBot.map((user) => (
-            user.id != 0 &&
-            <MembersCard key={user.id} user={user} />
-          ))}
+          {acceptedusersWithoudBot.map((user) => {
+            if (user.id === 0) return null;
+            return <MembersCard key={user.id} user={user} />;
+          })}
         </>
       }
     </>

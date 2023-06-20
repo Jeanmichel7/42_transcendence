@@ -37,7 +37,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   const handleCloseConv = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     dispatch(setMsgSnackbar('Conv Close'));
-    dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+    dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
     if (conv.id === parseInt(convId as string)) navigate('/chat');
   };
 
@@ -51,7 +51,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
       dispatch(setErrorSnackbar(resLeaveRoom.error + resLeaveRoom.message ? ': ' + resLeaveRoom.message : ''));
     else {
       dispatch(setMsgSnackbar('Leaved room'));
-      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
       if (conv.id == parseInt(convId as string))
         navigate('/chat');
     }

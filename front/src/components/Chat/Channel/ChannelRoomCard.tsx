@@ -49,7 +49,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
 
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
-        console.log('conflit already in room in db but not in redux ?');
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         dispatch(setMsgSnackbar('Add room to conversation list'));
         setAlreadyInRoom(true);

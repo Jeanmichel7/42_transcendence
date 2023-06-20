@@ -441,20 +441,25 @@ export class ChatService {
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
-      .leftJoinAndSelect('chat_rooms.users', 'users')
       .select([
         'chat_rooms.id',
         'chat_rooms.type',
         'chat_rooms.name',
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
+        'chat_rooms.isProtected',
+      ])
+      .leftJoin('chat_rooms.ownerUser', 'ownerUser')
+      .addSelect([
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
         'ownerUser.avatar',
         'ownerUser.status',
+      ])
+      .leftJoin('chat_rooms.users', 'users')
+      .addSelect([
         'users.id',
         'users.firstName',
         'users.lastName',
@@ -470,6 +475,33 @@ export class ChatService {
         'admins.login',
         'admins.avatar',
         'admins.status',
+      ])
+      .leftJoin('chat_rooms.acceptedUsers', 'acceptedUsers')
+      .addSelect([
+        'acceptedUsers.id',
+        'acceptedUsers.firstName',
+        'acceptedUsers.lastName',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
+      ])
+      .leftJoin('chat_rooms.bannedUsers', 'bannedUsers')
+      .addSelect([
+        'bannedUsers.id',
+        'bannedUsers.firstName',
+        'bannedUsers.lastName',
+        'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
+      ])
+      .leftJoin('chat_rooms.mutedUsers', 'mutedUsers')
+      .addSelect([
+        'mutedUsers.id',
+        'mutedUsers.firstName',
+        'mutedUsers.lastName',
+        'mutedUsers.login',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();

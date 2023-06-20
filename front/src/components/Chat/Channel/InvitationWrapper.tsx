@@ -19,7 +19,6 @@ const InvitationWrapper = () => {
   const fetchRoom = useCallback(async () => {
     if (!channelId || userData.id === -1) return;
     const result: RoomInterface | ApiErrorResponse = await getRoomData(channelId);
-    console.log('result get room data : ', result);
     if ('statusCode' in result && result.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room'));
       navigate('/chat');

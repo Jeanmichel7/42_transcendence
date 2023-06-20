@@ -27,7 +27,8 @@ const NotificationItem = ({
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const { userData } = useSelector((state: RootState) => state.user);
+  const { notifications } = useSelector((state: RootState) => state.notification);
 
 
 
@@ -56,6 +57,7 @@ const NotificationItem = ({
     const resDeclineRequest: void | ApiErrorResponse = await declineFriend(userToDecline.id);
     setIsLoading(false);
     
+    if (notifications.length == 1) setAnchorElNotification(null);
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
       dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
     else {
@@ -104,7 +106,6 @@ const NotificationItem = ({
   };
 
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
-    console.log('toi la');
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
     if (notif.type === 'roomInvite') {

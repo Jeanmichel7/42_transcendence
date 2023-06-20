@@ -29,7 +29,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
   ) {
     if (conv.id === parseInt(convId as string)) navigate('/chat');
     e.stopPropagation();
-    dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+    dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
   }
 
   return (
