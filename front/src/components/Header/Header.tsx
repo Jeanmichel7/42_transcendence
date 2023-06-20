@@ -204,7 +204,7 @@ function Header() {
         color="inherit"
         onClick={handleOpenNotificationMenu}
       >
-        <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
+        <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
           { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
             notifications.length ? <NotificationsIcon /> :
               <NotificationsNoneIcon />

@@ -72,7 +72,7 @@ const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
 };
 
 const helperUpdateUserStatus = (state: UserState, userStatus: UserStatusInterface) => {
-  console.log('redux update userStatus : ', userStatus);
+  // console.log('redux update userStatus : ', userStatus);
   // userFriends
   if (state.userFriends) {
     const userFriend = state.userFriends.find((u) => u.id === userStatus.id);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { RoomInterface, UserInterface } from '../../../types';
 import { Typography } from '@mui/material';
+import LockIcon from '@mui/icons-material/Lock';
 
 
 interface ConversationListRoomItemIconsProps {
@@ -8,11 +9,7 @@ interface ConversationListRoomItemIconsProps {
 }
 
 const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsProps) => {
-
-  // useEffect(() => {
-  //   console.log('room : ', room);
-  // }, [room]);
-
+  
   const [usersToDisplay, setUsersToDisplay] = useState<UserInterface[] | null>(null);
 
   const getRandAdmin = useCallback(() => {
@@ -32,10 +29,15 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
     return users[rand];
   }, [room]);
 
+  // useEffect(() => {
+    // console.log('usersToDisplay : ', usersToDisplay);
+  // }, [usersToDisplay]);
+
   useEffect(() => {
     if (room && room.ownerUser && (usersToDisplay == null || usersToDisplay.length < 2)) {
       const adminSelected: UserInterface | undefined = getRandAdmin();
       if (adminSelected) {
+        // console.log('adminSelected : ', adminSelected);
         setUsersToDisplay([adminSelected]);
         const userSelected: UserInterface | undefined = getRandUser(adminSelected);
         if (userSelected)
@@ -50,14 +52,14 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
         }
       }
     }
-  }, [room, room.ownerUser, room.admins, room.users, getRandAdmin, getRandUser]);
+  }, [room, room.ownerUser, room.admins, room.users]);
 
   return (
     <>
-      <div className="flex relative">
-        {room.ownerUser &&
+      <div className="flex">
+        { room.ownerUser &&
           <img
-            className="w-10 h-10 rounded-full object-cover mr-2 z-0 border border-[#5f616f]"
+            className="w-10 h-10 rounded-full object-cover z-0 border border-[#5f616f]"
             src={room.ownerUser.avatar}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -67,18 +69,20 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
             alt="avatar"
           />
         }
-        {usersToDisplay && usersToDisplay.map((user, index) => (
-          <div className={`absolute -right-${index * 2}`} key={user.id}>
-            <img
-              className={`w-10 h-10 rounded-full object-cover z-${(index) * 10} border border-[#5f616f] `}
-              src={user.avatar}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-              }}
-              alt="avatar"
-            />
+        { usersToDisplay && usersToDisplay.map((user, index) => (
+          <div className='relative' key={user.id}>
+            <div className={`absolute w-10 h-10 -right-${2 + (2 * index)}`}>
+              <img
+                className={`w-10 h-10 rounded-full object-cover z-${(index)} border border-[#5f616f] `}
+                src={user.avatar}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                }}
+                alt="avatar"
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -91,15 +95,16 @@ const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsPr
           title={room.name}
         >
           <div className='flex flex-col'>
-            <p> {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name} </p>
-            <span className='m-0 p-0 text-xs text-gray-400'>{
-              room.users?.length ? room.users.length != 1 ? room.users.length + ' Members' : '1 Member' : 'No Member'
-            } </span>
+            <p> 
+              {room.type === 'private' ? <LockIcon sx={{fontSize: 16 , marginRight: 0.5}} /> : ''}
+              {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name} 
+            </p>
+            <span className='m-0 p-0 text-xs text-gray-400'>
+              {room.users?.length ? room.users.length != 1 ? room.users.length + ' Members' : '1 Member' : 'No Member'} </span>
           </div>
         </Typography>
       </div>
     </>
-
   );
 };
 

@@ -82,7 +82,7 @@ function App() {
       const convListInLocalStorage: ConversationInterface[]
         = JSON.parse(localStorage.getItem('conversationsList' + userId) as string) || [] as ConversationInterface[];
       
-      console.log('conv list in local storage : ', convListInLocalStorage);
+      // console.log('conv list in local storage : ', convListInLocalStorage);
       
       dispatch(reduxSetConversationList(convListInLocalStorage));
 

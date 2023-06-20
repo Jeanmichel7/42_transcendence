@@ -36,7 +36,6 @@ export default function FakeConnection() {
 
   //save user data in redux
   const saveUserData = useCallback(async function (id: number) {
-    console.log('ID : ', id);
     dispatch(setLogged(true));
     await fetchData(getUserData, setUser);
     await fetchData(getFriends, reduxSetFriends);

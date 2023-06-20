@@ -27,7 +27,7 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
 
 const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
   //create new conversation
-  console.log('redux add conv list : ', item);
+  // console.log('redux add conv list : ', item);
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,

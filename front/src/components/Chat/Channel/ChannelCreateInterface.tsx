@@ -87,7 +87,7 @@ const CreateGroupInterface = () => {
       });
     }
 
-    console.log(form);
+    // console.log(form);
   };
 
 

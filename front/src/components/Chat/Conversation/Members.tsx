@@ -77,6 +77,12 @@ const ChatMembers = ({
   const [acceptedusersWithoudBot, setAcceptedUsersWithoutBot] = useState<UserInterface[] | null>(null);
 
   useEffect(() => {
+    // console.log('admins : ', admins);
+    // console.log('user : ', users);
+    // console.log('acceptedUsers : ', acceptedUsers);
+  }, [acceptedUsers, admins, users]);
+
+  useEffect(() => {
     if (!admins || !users) return;
     setUserWithoutAdmins(
       users?.filter((u) => !admins?.some((a) => a.id === u.id)),

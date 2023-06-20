@@ -21,11 +21,11 @@ export class NotificationGateway {
   @WebSocketServer() server: Server;
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected to notif', client.id);
+    console.log('user is connected to NOTIF', client.id);
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected to notif', client.id);
+    console.log('user is disconnected to NOTIF', client.id);
   }
 
   @SubscribeMessage('joinNotificationRoom')

@@ -25,13 +25,10 @@ const InvitationWrapper = () => {
       navigate('/chat');
     } else if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      navigate('/chat');
     } else {
       setRoom(result);
-      // console.log('result : ', result);
-      // check if userData.id is in room.acceptedUsers
-      // if not, redirect to /chat
-      // if yes, redirect to /chat/channel/:channelId/:channelName
-      // console.log('userData.id : ', userData.id, typeof userData.id);
+
       if (!result.acceptedUsers?.some(u => u.id === userData.id)) {
         dispatch(setErrorSnackbar('You are not allowed to access this room'));
         navigate('/chat');
@@ -56,7 +53,7 @@ const InvitationWrapper = () => {
     // ajoute list conv
     // redirige vers conv
 
-  }, [channelId, channelName, fetchRoom, location]);
+  }, [fetchRoom]);
 
   return (
     <>

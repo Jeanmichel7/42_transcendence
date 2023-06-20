@@ -22,10 +22,10 @@ export class ChatGateway {
   @WebSocketServer() server: Server;
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected', client.id);
+    console.log('user is connected to CHAT', client.id);
   }
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected', client.id);
+    console.log('user is disconnected to CHAT', client.id);
   }
 
   @SubscribeMessage('joinRoom')

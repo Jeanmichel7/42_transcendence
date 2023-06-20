@@ -11,6 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
+
 import ConversationListRoomItemIcons from './IconAvatars';
 
 
@@ -51,7 +52,8 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
     else {
       dispatch(setMsgSnackbar('Leaved room'));
       dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-      if (conv.id === parseInt(convId as string)) navigate('/chat');
+      if (conv.id == parseInt(convId as string))
+        navigate('/chat');
     }
   };
 

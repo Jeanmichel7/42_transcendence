@@ -11,6 +11,7 @@ import { RootState } from '../../../store';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Navigate, useNavigate } from 'react-router-dom';
 export interface RoomCardProps {
   room: RoomInterface;
 }
@@ -24,6 +25,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
@@ -40,7 +42,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
       return dispatch(setErrorSnackbar('Password required'));
 
     setIsLoading(true);
-    // console.log('inputPwd', inputPwd);
+    console.log('inputPwd', inputPwd);
     const res: RoomInterface | ApiErrorResponse = await joinRoom(room.id, {
       password: inputPwd,
     });
@@ -48,17 +50,16 @@ const RoomCard = ({ room }: RoomCardProps) => {
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
-        if (isConvAlreadyExist(room, conversationsList))
-          dispatch(setErrorSnackbar('Room already in conversation list jtevois toi ?'));
-        else
-          dispatch(setMsgSnackbar('Add room to conversation list'));
+        dispatch(setMsgSnackbar('Add room to conversation list'));
       } else
         dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      dispatch(setMsgSnackbar('Room joint'));
-      dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
+      // const newConvId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
+      dispatch(setMsgSnackbar('Room joined'));
+      dispatch(reduxAddConversationList({ item: res, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
+      //navigate ?
     }
     setIsLoading(false);
 
@@ -87,7 +88,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
           > 
             { checkAlreadyInRoom() ? 'In room' : 'Join'}
           </Button>
-          {isLoading && <CircularProgress />}
         </div>}
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">

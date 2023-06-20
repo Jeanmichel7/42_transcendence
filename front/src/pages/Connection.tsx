@@ -85,7 +85,7 @@ function ConnectPage() {
 
   const fetchAndSetIs2FAactived = useCallback(async () => {
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-    console.log('res : ', res);
+    // console.log('res : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {

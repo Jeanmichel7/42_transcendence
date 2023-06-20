@@ -2,14 +2,14 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  InternalServerErrorException,
+  // InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 import { NotificationInterface } from './interfaces/notification.interface';
-import { UserEntity } from '../users/entity/users.entity';
+// import { UserEntity } from '../users/entity/users.entity';
 import { NotificationCreateDTO } from './dto/notification.create.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationCreatedEvent } from './events/notification.event';
