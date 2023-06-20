@@ -133,18 +133,6 @@ export class ChatService {
     const res = await this.createMessage(newBotMessage, userBot.id, room.id);
     if (!res) throw new Error('Bot message not created');
 
-    // room.acceptedUsers.forEach(async (userInvited) => {
-    //   const newNotif: NotificationEntity =
-    //     await this.notificationService.createNotification({
-    //       type: 'roomInvite',
-    //       content: `you have been invited to join the room ${room.name}`,
-    //       receiver: userInvited,
-    //       sender: user,
-    //       invitationLink: `/chat/channel/invitation/${room.id}/${room.name}`,
-    //     } as NotificationCreateDTO);
-    //   console.log('newNotif : ', newNotif);
-    // });
-
     for (const userInvited of room.acceptedUsers) {
       const newNotif: NotificationEntity =
         await this.notificationService.createNotification({
@@ -286,32 +274,86 @@ export class ChatService {
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
-      .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
       .select([
         'chat_rooms.id',
         'chat_rooms.type',
         'chat_rooms.name',
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
+        'chat_rooms.isProtected',
+      ])
+      .leftJoin('chat_rooms.ownerUser', 'ownerUser')
+      .addSelect([
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+      ])
+      .leftJoin('chat_rooms.users', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.avatar',
+        'users.status',
+      ])
+      .leftJoin('chat_rooms.admins', 'admins')
+      .addSelect([
+        'admins.id',
+        'admins.firstName',
+        'admins.lastName',
+        'admins.login',
+        'admins.avatar',
+        'admins.status',
+      ])
+      .leftJoin('chat_rooms.acceptedUsers', 'acceptedUsers')
+      .addSelect([
+        'acceptedUsers.id',
+        'acceptedUsers.firstName',
+        'acceptedUsers.lastName',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
+      ])
+      .leftJoin('chat_rooms.bannedUsers', 'bannedUsers')
+      .addSelect([
+        'bannedUsers.id',
+        'bannedUsers.firstName',
+        'bannedUsers.lastName',
+        'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
+      ])
+      .leftJoin('chat_rooms.mutedUsers', 'mutedUsers')
+      .addSelect([
+        'mutedUsers.id',
+        'mutedUsers.firstName',
+        'mutedUsers.lastName',
+        'mutedUsers.login',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
 
-    // this.eventEmitter.emit(
-    //   'chat_room.invite',
-    //   new ChatUserRoomEvent(room.id, {
-    //     id: user.id,
-    //     firstName: user.firstName,
-    //     lastName: user.lastName,
-    //     login: user.login,
-    //     avatar: user.avatar,
-    //     status: user.status,
-    //   }),
-    // );
+    const newNotif: NotificationEntity =
+      await this.notificationService.createNotification({
+        type: 'roomInvite',
+        content: `${user.login} invite you to join the room ${room.name}`,
+        receiver: userToInvite,
+        sender: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          login: user.login,
+          avatar: user.avatar,
+        },
+        invitationLink: `/chat/channel/invitation/${room.id}/${room.name}`,
+      } as NotificationCreateDTO);
+    if (!newNotif) throw new Error('Notification not created');
 
     return resultRoom;
   }
@@ -457,6 +499,37 @@ export class ChatService {
     );
 
     return resultRoom;
+  }
+
+  async declineRoom(userId: bigint, roomId: bigint): Promise<void> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'login'],
+      relations: ['roomUsers'],
+    });
+    if (!user) throw new NotFoundException(`User ${userId} not found`);
+
+    const room: ChatRoomEntity = await this.roomRepository.findOne({
+      where: { id: roomId },
+      select: ['id', 'name', 'type', 'password', 'isProtected'],
+      relations: [
+        'users',
+        'ownerUser',
+        'admins',
+        'bannedUsers',
+        'acceptedUsers',
+      ],
+    });
+    if (!room) throw new NotFoundException(`Room ${roomId} not found`);
+
+    // check si user est dans acceptedUsers
+    if (!room.acceptedUsers.some((u) => u.id === user.id))
+      throw new ConflictException(
+        `User ${userId} is not in acceptedUsers of room ${roomId}`,
+      );
+
+    room.acceptedUsers = room.acceptedUsers.filter((u) => u.id !== user.id);
+    await room.save();
   }
 
   async leaveRoom(userId: bigint, roomId: bigint): Promise<ChatRoomInterface> {

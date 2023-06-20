@@ -74,6 +74,16 @@ export async function joinRoom(
   );
 }
 
+export async function declineRoom(
+  roomId: number,
+): Promise< void | ApiErrorResponse> {
+  return apiRequest(
+    'post',
+    'chat/rooms/' + roomId + '/decline',
+    'Failed to decline room: ',
+  );
+}
+
 export async function leaveRoom(
   roomId: number,
 ): Promise< RoomInterface | ApiErrorResponse> {

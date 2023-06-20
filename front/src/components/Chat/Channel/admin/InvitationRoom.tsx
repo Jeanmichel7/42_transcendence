@@ -71,10 +71,11 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     setIsLoading(true);
 
     for (let i = 0; i < data.acceptedUsers.length; i++) {
-      const res: RoomInterface | ApiErrorResponse
-        = await inviteUser(room.id, data.acceptedUsers[i]);
+      const res: RoomInterface | ApiErrorResponse = await inviteUser(room.id, data.acceptedUsers[i]);
       if ('error' in res) {
         dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      } else {
+        dispatch(reduxUpdateRoomConvList({ item: res, userId: userData.id }));
       }
     }
     dispatch(setMsgSnackbar('User(s) invited'));

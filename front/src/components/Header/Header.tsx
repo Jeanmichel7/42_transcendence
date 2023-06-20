@@ -184,8 +184,8 @@ function Header() {
           color="inherit"
           onClick={handleOpenNotificationMenu}
         >
-          <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
-            { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
+          <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
+            { notifications.filter((n: NotificationInterface) => !n.read).length ? <NotificationsActiveIcon /> :
               notifications.length ? <NotificationsIcon /> :
               <NotificationsNoneIcon /> 
             }
@@ -205,7 +205,7 @@ function Header() {
         onClick={handleOpenNotificationMenu}
       >
         <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
-          { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
+          { notifications.filter((n: NotificationInterface) => !n.read).length ? <NotificationsActiveIcon /> :
             notifications.length ? <NotificationsIcon /> :
               <NotificationsNoneIcon />
           }
@@ -223,7 +223,7 @@ function Header() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      keepMounted
+      // keepMounted
       transformOrigin={{
         vertical: 'bottom',
         horizontal: 'right',

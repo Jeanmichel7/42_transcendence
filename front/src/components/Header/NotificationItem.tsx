@@ -8,10 +8,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
-import { reduxAddConversationList } from '../../store/convListSlice';
+import { reduxAddConversationList, reduxRemoveWaitingUserInRoom } from '../../store/convListSlice';
 import { reduxReadNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 import { RootState } from '../../store';
 import { readNotification } from '../../api/notification';
+import { declineRoom } from '../../api/chat';
 
 
 interface NotificationItemProps {
@@ -34,12 +35,12 @@ const NotificationItem = ({
 
 
 
-
+  /* helper action */
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
     const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAccept.id);
     setIsLoading(false);
-
+    
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
     else {
@@ -47,9 +48,7 @@ const NotificationItem = ({
       dispatch(reduxAddFriends(userToAccept));
       dispatch(reduxAddConversationList({ item: userToAccept, userId: userData.id }));
       dispatch(setMsgSnackbar('Friend request accepted'));
-      return true;
     }
-    return false;
   };
 
   const handleDeclineFriendRequest = async (userToDecline: UserInterface) => {
@@ -62,18 +61,29 @@ const NotificationItem = ({
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
       dispatch(setMsgSnackbar('Friend request declined'));
-      return true;
     }
-    return false;
   };
-  
+
+  const handleDeclineJoinRoom = async (notif: NotificationInterface) => {
+    const extractRoomId: number = parseInt(notif.invitationLink?.split('/')[4] as string);
+    setIsLoading(true);
+    const resDeclineRequest: void | ApiErrorResponse = await declineRoom(extractRoomId);
+    setIsLoading(false);
+
+    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
+      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+    else {
+      dispatch(reduxRemoveWaitingUserInRoom({ roomId: extractRoomId, userId: userData.id }));
+      dispatch(setMsgSnackbar('Room invitation declined'));
+    }
+  };
 
 
 
 
 
 
-  //handler ation notif
+  /* action notif */
   const handleClickNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
     if (notif.type === 'friendRequest')
@@ -86,7 +96,6 @@ const NotificationItem = ({
   };
 
   const handleDeleteNotification = (notif: NotificationInterface) => {
-    setAnchorElNotification(null);
     dispatch(reduxRemoveNotification(notif));
     localStorage.setItem('notifications' + userData.id, JSON.stringify(
       JSON.parse(localStorage.getItem('notifications' + userData.id) as string)
@@ -94,27 +103,25 @@ const NotificationItem = ({
     ));
   };
 
-
-
-
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
-    setAnchorElNotification(null);
-    handleDeleteNotification(notif);
+    console.log('toi la');
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
-    if (notif.type === 'roomInvite') 
+    if (notif.type === 'roomInvite') {
       navigate(notif.invitationLink ? notif.invitationLink : '/chat');
-
-
-
+    }
+    
+    
+    handleDeleteNotification(notif);
   };
 
   const handleDenyActionNotification = async (notif: NotificationInterface) => {
-    setAnchorElNotification(null);
     if (notif.type === 'friendRequest')
       await handleDeclineFriendRequest(notif.sender);
     if (notif.type === 'roomInvite') 
-      dispatch(setMsgSnackbar('Room invitation declined'));
+      await handleDeclineJoinRoom(notif);
+    
+
     handleDeleteNotification(notif);
   };
 

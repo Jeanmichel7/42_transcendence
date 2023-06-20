@@ -149,6 +149,15 @@ export const chatSlice = createSlice({
       if (helperUpdateStatusUserConvList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
+    reduxRemoveWaitingUserInRoom: (state, action: PayloadAction<{ roomId: number, userId: number }>) => {
+      const { roomId, userId } = action.payload;
+      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === roomId);
+      if (indexConvToUpdate !== -1) {
+        state.conversationsList[indexConvToUpdate].room.acceptedUsers = state.conversationsList[indexConvToUpdate].room.acceptedUsers
+          ?.filter((user: UserInterface) => user.id !== userId);
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+      }
+    },
   },
 });
 
@@ -158,6 +167,7 @@ export const {
   reduxRemoveConversationToList,
   reduxUpdateRoomConvList,
   reduxUpdateStatusUserConvList,
+  reduxRemoveWaitingUserInRoom,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
