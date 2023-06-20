@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ApiErrorResponse, RoomInterface } from '../../../types';
 import { getRoomData } from '../../../api/chat';
 import { setErrorSnackbar } from '../../../store/snackbarSlice';
@@ -11,7 +11,7 @@ import RoomCard from './ChannelRoomCard';
 const InvitationWrapper = () => {
   const { channelId, channelName } = useParams();
   const [room, setRoom] = useState<RoomInterface | null>(null);
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector((state: RootState) => state.user);

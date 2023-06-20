@@ -69,7 +69,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   }, [id, userData.id]);
 
   useEffect(() => {
-    console.log('useEffect connect socket: ', id, userData.id, socketRef.current?.connected, room);
+    // console.log('useEffect connect socket: ', id, userData.id, socketRef.current?.connected, room);
     if (!room || room.id === -1 || !userData.id || userData.id === -1 || !id || id === '-1') return;
     if (room.bannedUsers?.some((u) => u.id === userData.id)) {
       socketRef.current?.emit('leaveRoom', {
@@ -79,7 +79,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       navigate('/chat/channel');
       dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
     }
-    console.log('socketRef.current : ', socketRef.current)
+    // console.log('socketRef.current : ', socketRef.current)
     if (!socketRef.current || !socketRef.current.connected) {
       connectSocketChat();
     }
@@ -105,7 +105,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const fetchOldMessages = useCallback(async () => {
     if (id === '-1' || !conv) return;
     setShouldScrollToBottom(false);
-    console.log('fetch old messages');
+    // console.log('fetch old messages');
 
     setIsLoadingPagination(true);
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
