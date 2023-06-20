@@ -45,4 +45,15 @@ export interface NotificationInterface {
   receiver: UserInterface;
   sender: UserInterface;
   invitationLink?: string;
+<<<<<<< HEAD
+=======
+}
+
+export interface UserStatusInterface {
+  id: number;
+  status: 'online' | 'offline' | 'absent' | 'inactive' | 'in game';
+  login?: string;
+  avatar?: string;
+  updatedAt?: Date;
+>>>>>>> JM--ChannelV2
 }

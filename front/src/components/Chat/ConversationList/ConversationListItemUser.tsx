@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // import { ImBlocked } from 'react-icons/im';
 import { ConversationInterface } from '../../../types';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -46,7 +46,8 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
             color={ 
               conv.user.status === 'online' ? 'success' :
                 conv.user.status === 'absent' ? 'warning' :
-                  'error' 
+                  conv.user.status === 'inactive' ? 'secondary' :
+                    'error' 
             }
             overlap="circular"
             badgeContent=" "
@@ -58,7 +59,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
             <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
+              className="w-10 h-10 rounded-full object-cover mr-2 border border-[#5f616f]"
               src={conv.user.avatar}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -71,7 +72,6 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
           <Typography component="span"
             sx={{ 
               overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-              color: conv.user.status === 'online' ? 'success' : 'error',
             }}
             title={conv.user.login}
           >

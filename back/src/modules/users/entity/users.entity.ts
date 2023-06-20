@@ -81,7 +81,7 @@ export class UserEntity extends BaseEntity {
     default: 'offline',
     nullable: true,
   })
-  status: 'online' | 'offline' | 'absent';
+  status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
 
   @Column({
     type: 'text',

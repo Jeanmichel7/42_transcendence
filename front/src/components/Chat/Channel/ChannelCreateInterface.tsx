@@ -20,7 +20,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, MenuItem } from '@mui/material';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { createChannel } from '../../../api/chat';
-import { reduxAddConversationList } from '../../../store/chatSlicer';
+import { reduxAddConversationList } from '../../../store/convListSlice';
+import RowOfFriendToInvit from './admin/RowInvitation';
 
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -32,16 +33,16 @@ const CreateGroupInterface = () => {
     password: null as string | null,
     acceptedUsers: null as UserInterface[] | null,
   });
-  
+
   const { userFriends } = useSelector((state: RootState) => state.user);
   const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 
-  const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }> ) => {
+  const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const { name, value } = e.target as HTMLInputElement;
     setForm(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
 
@@ -58,7 +59,7 @@ const CreateGroupInterface = () => {
     if (form.name.length < 2)
       return dispatch(setErrorSnackbar('Name must be at least 2 characters'));
 
-    const acceptedUsersFormated = form.acceptedUsers 
+    const acceptedUsersFormated = form.acceptedUsers
       ? form.acceptedUsers.map(u => u.id)
       : null;
     const data = {
@@ -86,7 +87,7 @@ const CreateGroupInterface = () => {
       });
     }
 
-    console.log(form);
+    // console.log(form);
   };
 
 
@@ -161,19 +162,17 @@ const CreateGroupInterface = () => {
             </FormControl>
           </div>
 
-          { form.type === 'private' &&
+          {form.type === 'private' &&
             <FormGroup>
-              { userFriends?.length === 0 && <p className='ml-4 mb-4'>Add friends to invited him</p>}
-              { userFriends?.map((user: UserInterface) => (
-                 <FormControlLabel 
+              {userFriends?.length === 0 && <p className='ml-4 mb-4'>No friends to invite</p>}
+              {userFriends?.map((user: UserInterface) => (
+                <FormControlLabel
                   key={user.id}
+                  label={<RowOfFriendToInvit user={user} />}
                   control={
-                    <Checkbox 
-                      onChange={(e) => handleSelectUser(user, e.target.checked)}
-                    />
+                    <Checkbox onChange={(e) => handleSelectUser(user, e.target.checked)} />
                   }
-                  onSelect={(e) => console.log(e)} 
-                  label={user.login} />
+                />
               ))}
             </FormGroup>
           }
@@ -189,7 +188,7 @@ const CreateGroupInterface = () => {
             </Button>
           </div>
 
-          { isLoading && <CircularProgress />}
+          {isLoading && <CircularProgress />}
 
         </Box>
       </div>

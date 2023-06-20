@@ -19,19 +19,16 @@ const InvitationWrapper = () => {
   const fetchRoom = useCallback(async () => {
     if (!channelId || userData.id === -1) return;
     const result: RoomInterface | ApiErrorResponse = await getRoomData(channelId);
-    console.log('result : ', result);
+    // console.log('result : ', result);
     if ('statusCode' in result && result.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room'));
       navigate('/chat');
     } else if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      navigate('/chat');
     } else {
       setRoom(result);
-      console.log('result : ', result);
-      // check if userData.id is in room.acceptedUsers
-      // if not, redirect to /chat
-      // if yes, redirect to /chat/channel/:channelId/:channelName
-      console.log('userData.id : ', userData.id, typeof userData.id);
+
       if (!result.acceptedUsers?.some(u => u.id === userData.id)) {
         dispatch(setErrorSnackbar('You are not allowed to access this room'));
         navigate('/chat');
@@ -47,16 +44,16 @@ const InvitationWrapper = () => {
     if (!channelId || !channelName
     //  || !location.state
     ) return;
-    console.log('location : ', location);
-    console.log('channelId : ', channelId);
-    console.log('channelName : ', channelName);
+    // console.log('location : ', location);
+    // console.log('channelId : ', channelId);
+    // console.log('channelName : ', channelName);
 
     fetchRoom();
     //verifie acces
     // ajoute list conv
     // redirige vers conv
 
-  }, [channelId, channelName, fetchRoom, location]);
+  }, [fetchRoom]);
 
   return (
     <>

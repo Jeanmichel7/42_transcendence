@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, setLogout } from '../../store/userSlice';
-import { reduxAddConversationList } from '../../store/chatSlicer';
-import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
+import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, reduxUpdateUserStatus, setLogout } from '../../store/userSlice';
+import { reduxAddConversationList, reduxUpdateStatusUserConvList } from '../../store/convListSlice';
+import { ApiErrorResponse, NotificationInterface, UserInterface, UserStatusInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
@@ -46,7 +46,7 @@ function Header() {
   const { notifications } = useSelector((state: RootState) => state.notification);
 
   const connectWebSocket = useCallback(() => {
-    if (!userData.id) return;
+    if (!userData.id || userData.id === -1) return;
     if (userIsLogged === false) return;
 
     const socket = io('http://localhost:3000/notification', {
@@ -78,8 +78,6 @@ function Header() {
       dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
       dispatch(reduxAcceptedRequest(notification));
       dispatch(reduxAddConversationList({ item: notification.sender, userId: userData.id }));
-
-
     });
 
     socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
@@ -112,7 +110,12 @@ function Header() {
       dispatch(reduxAddNotification(notification));
     });
 
-
+    /* user update status */
+    socket.on('update_user_status', (userStatus: UserStatusInterface) => {
+      // console.log('recu du socket update user status : ', userStatus);
+      dispatch(reduxUpdateUserStatus(userStatus)); // modif userData.[].status
+      dispatch(reduxUpdateStatusUserConvList({ item: userStatus, userId: userData.id }));
+    });
 
     return () => {
       socket.off('notification_friend_request');
@@ -166,7 +169,7 @@ function Header() {
   }, [connectWebSocket]);
   
   useEffect(() => {
-    console.log('setnotifications localstorage', notifications);
+    // console.log('setnotifications localstorage', notifications);
     if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
     localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
   }, [notifications, userData.id]);
@@ -201,7 +204,7 @@ function Header() {
         color="inherit"
         onClick={handleOpenNotificationMenu}
       >
-        <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
+        <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
           { notifications.filter(n => !n.read).length ? <NotificationsActiveIcon /> :
             notifications.length ? <NotificationsIcon /> :
               <NotificationsNoneIcon />

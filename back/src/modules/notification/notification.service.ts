@@ -2,14 +2,14 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  InternalServerErrorException,
+  // InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 import { NotificationInterface } from './interfaces/notification.interface';
-import { UserEntity } from '../users/entity/users.entity';
+// import { UserEntity } from '../users/entity/users.entity';
 import { NotificationCreateDTO } from './dto/notification.create.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationCreatedEvent } from './events/notification.event';
@@ -55,7 +55,7 @@ export class NotificationService {
         ])
         .orderBy('notifications.createdAt', 'DESC')
         .getMany();
-    console.log('notifications : ', notifications);
+    // console.log('notifications : ', notifications);
 
     return notifications;
   }
@@ -66,7 +66,7 @@ export class NotificationService {
     const savedNotification = await this.notificationRepository.save(
       newNotification,
     );
-    console.log('savedNotification : ', savedNotification);
+    // console.log('savedNotification : ', savedNotification);
 
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,
@@ -77,6 +77,21 @@ export class NotificationService {
     return savedNotification;
   }
 
+  async sendNotification(
+    newNotification: NotificationCreateDTO,
+  ): Promise<NotificationEntity> {
+    const savedNotification = await this.notificationRepository.save({
+      ...newNotification,
+      read: true,
+    });
+    // console.log('savedNotification : ', savedNotification);
+
+    this.eventEmitter.emit(
+      'notification.' + savedNotification.type,
+      new NotificationCreatedEvent(savedNotification),
+    );
+    return savedNotification;
+  }
   async readNotification(
     userId: bigint,
     notificationId: bigint,

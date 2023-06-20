@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { NotificationInterface } from '../interfaces/notification.interface';
+import { UserStatusInterface } from 'src/modules/users/interfaces/status.interface';
 
 @WebSocketGateway({
   namespace: 'notification',
@@ -20,11 +21,11 @@ export class NotificationGateway {
   @WebSocketServer() server: Server;
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected to notif', client.id);
+    console.log('user is connected to NOTIF', client.id);
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected to notif', client.id);
+    console.log('user is disconnected to NOTIF', client.id);
   }
 
   @SubscribeMessage('joinNotificationRoom')
@@ -33,7 +34,7 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.join('notification_room_' + data.userId);
-    console.log('joined room notification_' + data.userId, data);
+    // console.log('joined room notification_' + data.userId, data);
   }
 
   // @SubscribeMessage('leaveRoom')
@@ -42,11 +43,11 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.leave('notification_room_' + data.userId);
-    console.log('left private room notification_' + data.userId);
+    // console.log('left private room notification_' + data.userId);
   }
 
   emitNotificationFriendRequest(data: NotificationInterface) {
-    console.log('emitNotificationFriendRequest', data);
+    // console.log('emitNotificationFriendRequest', data);
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_friend_request', data);
@@ -98,5 +99,17 @@ export class NotificationGateway {
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_room_invite', data);
+  }
+
+  /* UPDATE USER STATUS */
+  emitUpdateUserStatus(updateStatusUser: UserStatusInterface) {
+    console.log('SEND updateStatusUser : ', updateStatusUser);
+    this.server.emit('update_user_status', updateStatusUser, (ack) => {
+      if (ack) {
+        // console.log('update status sent to room' + updateStatusUser);
+      } else {
+        // console.log('update status not sent to room' + updateStatusUser);
+      }
+    });
   }
 }

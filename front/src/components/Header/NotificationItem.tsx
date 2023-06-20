@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { acceptFriend, declineFriend } from '../../api/relation';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlice';
-import { reduxAddConversationList } from '../../store/chatSlicer';
+import { reduxAddConversationList } from '../../store/convListSlice';
 import { reduxReadNotification, reduxRemoveNotification } from '../../store/notificationSlice';
 import { RootState } from '../../store';
 import { readNotification } from '../../api/notification';

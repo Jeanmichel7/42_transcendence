@@ -12,7 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { reduxSetNotifications } from '../store/notificationSlice';
-import { reduxSetConversationList } from '../store/chatSlicer';
+import { reduxSetConversationList } from '../store/convListSlice';
 
 function ConnectPage() {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ function ConnectPage() {
 
   const fetchAndSetIs2FAactived = useCallback(async () => {
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-    console.log('res : ', res);
+    // console.log('res : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {

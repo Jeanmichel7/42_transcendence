@@ -25,18 +25,27 @@ import { UserCreateDTO } from './dto/user.create.dto';
 import axios from 'axios';
 import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserUpdateEvent } from '../notification/events/notification.event';
 
 @Injectable()
 export class UsersService {
+  private intervalId: NodeJS.Timeout;
+
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
-    setInterval(() => {
-      // console.log('check user status');
+    this.intervalId = setInterval(() => {
+      console.log('check user status');
       this.checkUserStatus(absentDuration);
-    }, 60000);
+    }, 1 * 60 * 1000);
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.intervalId);
   }
 
   async findUser(id: bigint): Promise<UserInterface> {
@@ -363,24 +372,54 @@ export class UsersService {
 
   async checkUserStatus(absentDuration: number): Promise<void> {
     const users: UserEntity[] = await this.userRepository.find({
-      select: ['id', 'lastActivity', 'status'],
+      select: ['id', 'lastActivity', 'login', 'avatar', 'status'],
     });
     // console.log('users before: ', users);
     for (const user of users) {
       if (user.status === 'offline') continue;
       const inactivityDuration =
         Date.now() - new Date(user.lastActivity).getTime();
-      if (inactivityDuration > absentDuration) {
-        await this.userRepository.update(
-          { id: user.id },
-          {
-            status: 'absent',
-            updatedAt: new Date(),
-          },
-        );
-      }
+      if (inactivityDuration < absentDuration) continue;
+      let newStatus: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
+      if (inactivityDuration > 8 * absentDuration) newStatus = 'offline';
+      else if (inactivityDuration > 4 * absentDuration) newStatus = 'inactive';
+      else if (inactivityDuration > absentDuration) newStatus = 'absent';
+      else newStatus = 'online';
+
+      if (user.status === newStatus) continue;
+      console.log(
+        'Update status from :',
+        user.id,
+        user.login,
+        user.status,
+        ' to: ',
+        newStatus,
+      );
+      await this.userRepository.update(
+        { id: user.id },
+        {
+          status: newStatus,
+          updatedAt: new Date(),
+        },
+      );
+
+      const userUpdated = new UserUpdateEvent({
+        id: user.id,
+        status: newStatus,
+        login: user.login,
+        avatar: user.avatar,
+        updatedAt: new Date(),
+      });
+      console.log(
+        'event update status from :',
+        userUpdated.userStatus.id,
+        userUpdated.userStatus.login,
+        userUpdated.userStatus.status,
+        ', to :',
+        newStatus,
+      );
+      this.eventEmitter.emit('user_status.updated', userUpdated);
     }
-    // console.log('users after: ', users);
   }
 
   async getRooms(id: bigint): Promise<ChatRoomInterface[]> {

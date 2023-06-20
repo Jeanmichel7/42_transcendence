@@ -14,6 +14,8 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'config';
+import { UserUpdateEvent } from 'src/modules/notification/events/notification.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,6 +25,7 @@ export class AuthGuard implements CanActivate {
     private readonly configService: ConfigService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -56,7 +59,31 @@ export class AuthGuard implements CanActivate {
       id: request.user.id,
     });
     if (!user) throw new UnauthorizedException('User not found');
+
     user.lastActivity = new Date();
+    if (user.status !== 'online') {
+      console.log(
+        'update user status to ONLINE, ',
+        user.id,
+        user.login,
+        user.status,
+      );
+
+      const userUpdated = new UserUpdateEvent({
+        id: user.id,
+        status: 'online',
+        login: user.login,
+        avatar: user.avatar,
+        updatedAt: new Date(),
+      });
+      console.log(
+        'userUpdated: ',
+        userUpdated.userStatus.id,
+        userUpdated.userStatus.login,
+      );
+      this.eventEmitter.emit('user_status.updated', userUpdated);
+      user.status = 'online';
+    }
     await this.userRepository.save(user);
 
     return true;

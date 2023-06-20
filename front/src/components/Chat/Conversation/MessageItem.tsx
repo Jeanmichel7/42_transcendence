@@ -7,8 +7,6 @@ import { apiEditMessage } from '../../../api/message';
 
 import { ApiErrorResponse, UserInterface } from '../../../types';
 import { ChatMsgInterface, MessageInterface } from '../../../types/ChatTypes';
-
-
 import { BiPaperPlane } from 'react-icons/bi';
 import { CircularProgress, FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,7 +14,6 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { getTimeSince, isChatMsgInterface, isMsgInterface } from '../../../utils/utils';
 import { editChatMessage } from '../../../api/chat';
 import { RootState } from '../../../store';
-
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -39,8 +36,9 @@ const MessageItem: FC<MessageItemProps> = ({
   const [messageTime, setMessageTime] = useState<string>(getTimeSince(message.createdAt));
   const dispatch = useDispatch();
 
-
-  const handleEdit = (id: number) => async (e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleEdit = (id: number) => async (
+    e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (e === null) return;
     
     if ('key' in e) {
@@ -62,10 +60,8 @@ const MessageItem: FC<MessageItemProps> = ({
     setIsLoading(true);
     let res: (MessageInterface | ChatMsgInterface) | ApiErrorResponse;
     if (isMsgInterface(message) ) {
-      // console.log('edit message type MessageInterface');
       res = await apiEditMessage(id, inputMessage);
     } else if (isChatMsgInterface(message)) {
-      // console.log('edit message type ChatMsgInterface');
       res = await editChatMessage(id, inputMessage);
     } else {
       throw new Error('message type not supported');
@@ -110,7 +106,7 @@ const MessageItem: FC<MessageItemProps> = ({
   useEffect(() => {
     const fctTime = setInterval(() => {
       setMessageTime(getTimeSince(message.createdAt));
-    }, 1000 * 10); //10sec
+    }, 1000 * 30);
     return () => {
       clearInterval(fctTime);
     };
@@ -153,7 +149,8 @@ const MessageItem: FC<MessageItemProps> = ({
           </div>
           <div 
             className={message.ownerUser.id == 0 ? 'text-center font-light' : ''} 
-            style={{ wordBreak: 'break-word' }} >
+            style={{ wordBreak: 'break-word' }}
+          >
             { message.text.split('\n').map((line, index) => {
               return (
                 <span key={index}>

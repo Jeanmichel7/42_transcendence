@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
 
-  useEffect(() => {
-    console.log('user in MemberCard : ', user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log('user in MemberCard : ', user);
+  // }, [user]);
 
   return (
     <>
@@ -18,10 +18,11 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
           <Badge
-            color={
+            color={ 
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
-                  'error'
+                  user.status === 'inactive' ? 'secondary' :
+                    'error' 
             }
             overlap="circular"
             badgeContent=" "
@@ -46,11 +47,9 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
           <Typography component="span"
             sx={{
               overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-              color: user.status === 'online' ? 'success' : 'error',
             }}
             title={user.login}
           >
-            
             { user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
           </Typography>
         </Link>
@@ -78,7 +77,12 @@ const ChatMembers = ({
   const [acceptedusersWithoudBot, setAcceptedUsersWithoutBot] = useState<UserInterface[] | null>(null);
 
   useEffect(() => {
-    console.log('USERS : ', users);
+    // console.log('admins : ', admins);
+    // console.log('user : ', users);
+    // console.log('acceptedUsers : ', acceptedUsers);
+  }, [acceptedUsers, admins, users]);
+
+  useEffect(() => {
     if (!admins || !users) return;
     setUserWithoutAdmins(
       users?.filter((u) => !admins?.some((a) => a.id === u.id)),
@@ -92,12 +96,11 @@ const ChatMembers = ({
     );
   }, [acceptedUsers]);
 
-
-  useEffect(() => {
-    console.log('admins : ', admins);
-    console.log('user : ', users);
-    console.log('acceptedUsers : ', acceptedUsers);
-  }, [acceptedUsers, admins, users]);
+  // useEffect(() => {
+  //   console.log('admins : ', admins);
+  //   console.log('user : ', users);
+  //   console.log('acceptedUsers : ', acceptedUsers);
+  // }, [acceptedUsers, admins, users]);
 
   return (
     <>
@@ -105,7 +108,6 @@ const ChatMembers = ({
         <>
           <h3> ADMINS - {admins.length} </h3>
           {admins.map((user) => (
-            console.log('user de admins : ', user),
             <MembersCard key={user.id} user={user} />
           ))}
         </>
@@ -116,7 +118,6 @@ const ChatMembers = ({
           <h3> MEMBRES - {userWithoutAdmins.length} </h3>
           {userWithoutAdmins.map((user) => (
             // check if user is admin
-            console.log('user de userWithoutAdmins : ', user),
             admins.some((admin) => admin.id !== user.id) &&
             <MembersCard key={user.id} user={user} />
           ))}

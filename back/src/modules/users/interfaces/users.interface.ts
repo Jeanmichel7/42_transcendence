@@ -8,7 +8,7 @@ export interface UserInterface {
   lastName: string;
   login: string;
   email?: string;
-  status?: 'online' | 'offline' | 'absent';
+  status?: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
   password?: string;
   description?: string;
   avatar?: string;

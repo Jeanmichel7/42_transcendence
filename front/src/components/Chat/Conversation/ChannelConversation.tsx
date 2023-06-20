@@ -17,9 +17,10 @@ import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 import SideBarAdmin from '../Channel/admin/SidebarAdmin';
-import { reduxRemoveConversationToList } from '../../../store/chatSlicer';
+import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
+import { connectionSocketChannel } from './utils';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
@@ -30,6 +31,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const name = (useParams<{ name: string }>().name || 'unknown');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { room } = useSelector((state: RootState) => state.chat.conversationsList.find((c) => c.id === conv.id) || {} as ConversationInterface);
   const { userData } = useSelector((state: RootState) => state.user);
   const { userBlocked } = useSelector((state: RootState) => state.user);
 
@@ -37,201 +39,67 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
   // const [isInvitMenuOpen, setIsInvitMenuOpen] = useState<boolean>(false);
 
-  // const [indexMsgChatBot, setIndexMsgChatBot] = useState<number>(-1);
-  const [room, setRoom] = useState<RoomInterface | null | undefined>(undefined);
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<(ChatMsgInterface)[]>([]);
   const [text, setText] = useState<string>('');
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-  // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
+  const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
+
+
+
   // connect socket
   const connectSocketChat = useCallback(() => {
-    if (!userData) return;
-    const socket = io('http://localhost:3000/chat', {
+    if (!userData.id || userData.id === -1 || id === '-1') return;
+    if (socketRef.current && socketRef.current.connected) return;
+    // console.log('sock ref : ', socketRef.current);
+
+    const socket: Socket = io('http://localhost:3000/chat', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
-
-    // socket.on('room_joined', (message) => {
-    //   console.log('room joined ! ', message);
-    // });
-
-    /* MESSAGES */
-    socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        message,
-      ]);
-      setOffsetPagniation((prev) => prev + 1);
-      acknowledge(true);
-    });
-
-    socket.on('chat_message_edit', (message) => {
-      setMessages((prevMessages) => {
-        const newMessages = prevMessages.map((msg) => {
-          if (msg.id === message.id) {
-            return { ...msg, text: message.text, updatedAt: message.updatedAt };
-          }
-          return msg;
-        });
-        return newMessages;
-      });
-    });
-
-    socket.on('chat_message_delete', (message) => {
-      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
-      setOffsetPagniation((prev) => prev - 1);
-    });
-
-
-    /* ROOM */
-    socket.on('room_join', (roomId, user) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users ? [...prev.users, user] : [user],
-        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
-      } : null);
-    });
-
-    socket.on('room_leave', (roomId, userId) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users?.filter((u) => u.id !== userId),
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== userId) } : null);
-    });
-
-    /* ROOM ADMIN */
-    socket.on('room_muted', (roomId, user) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        mutedUsers: prev.mutedUsers ? [...prev.mutedUsers, user] : [user],
-      } : null);
-    });
-
-    socket.on('room_unmuted', (roomId, userId) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        mutedUsers: prev.mutedUsers?.filter((u) => u.id !== userId),
-      } : null);
-    });
-
-    socket.on('room_kicked', (roomId, userId) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        users: prev.users?.filter((u) => u.id !== userId),
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
-      if (userData.id === userId) {
-        socket.emit('leaveRoom', {
-          roomId: id,
-        });
-        dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-        navigate('/chat/channel');
-        dispatch(setWarningSnackbar('You have been kicked from the room ' + conv.room.name));
-      }
-      //accepted user ?
-      // setRoom((prev) => prev ? { ...prev,
-      //   acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id) } : null);  
-    });
-
-    socket.on('room_banned', (roomId, user) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        bannedUsers: prev.bannedUsers ? [...prev.bannedUsers, user] : [user],
-        admins: prev.admins?.filter((u) => u.id !== user.id),
-        acceptedUsers: prev.acceptedUsers?.filter((u) => u.id !== user.id),
-      } : null);
-      if (userData.id === user.id) {
-        socket.emit('leaveRoom', {
-          roomId: id,
-        });
-        dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-        navigate('/chat/channel');
-        dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
-      }
-    });
-
-    socket.on('room_unbanned', (roomId, userId) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        bannedUsers: prev.bannedUsers?.filter((u) => u.id !== userId),
-      } : null);
-    });
-
-    /* ROOM ADMIN */
-    socket.on('room_admin_added', (roomId, user) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        admins: prev.admins ? [...prev.admins, user] : [user],
-      } : null);
-      if (userData.id === user.id) {
-        // setIsAdmin(true);
-        dispatch(setMsgSnackbar('You are now admin of the room ' + conv.room.name));
-      }
-    });
-
-    socket.on('room_admin_removed', (roomId, userId) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        admins: prev.admins?.filter((u) => u.id !== userId),
-      } : null);
-      if (userData.id === userId) {
-        // setIsAdmin(false);
-        dispatch(setWarningSnackbar('You are no longer admin of the room ' + conv.room.name));
-      }
-    });
-
-    /* OWNER */
-    socket.on('room_owner_added', (roomId, user) => {
-      if (roomId !== id) return;
-      setRoom((prev) => prev ? {
-        ...prev,
-        owner: user,
-      } : null);
-      if (userData.id === user.id) {
-        dispatch(setMsgSnackbar('You are now owner of the room ' + conv.room.name));
-      }
-    });
-
-    socket.on('room_owner_deleted', (roomId) => {
-      if (roomId !== id) return;
-      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-      dispatch(setWarningSnackbar('The room ' + conv.room.name + ' has been deleted'));
-      navigate('/chat/channel');
-    });
-
-    /* ROOM USER */
-    // socket.on('room_user_accepted', (roomId, user) => {
-
-    socket.on('error', (error) => { console.log('erreur socket : ', error); });
-
-    //connect to room
-    socket.emit('joinRoom', {
-      roomId: id,
-    });
-
+    connectionSocketChannel(socket, id, userData.id, conv, setMessages, setOffsetPagniation, dispatch, navigate);
     socketRef.current = socket;
-  }, [conv, dispatch, id, navigate, userData]);
+  }, [id, userData.id]);
+
+  useEffect(() => {
+    console.log('useEffect connect socket: ', id, userData.id, socketRef.current?.connected, room);
+    if (!room || room.id === -1 || !userData.id || userData.id === -1 || !id || id === '-1') return;
+    if (room.bannedUsers?.some((u) => u.id === userData.id)) {
+      socketRef.current?.emit('leaveRoom', {
+        roomId: id,
+      });
+      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      navigate('/chat/channel');
+      dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
+    }
+    console.log('socketRef.current : ', socketRef.current)
+    if (!socketRef.current || !socketRef.current.connected) {
+      connectSocketChat();
+    }
+    return () => {
+      if (socketRef.current) { // && socketRef.current.connected
+        socketRef.current.off('chat_message');
+        socketRef.current.off('chat_message_edit');
+        socketRef.current.off('chat_message_delete');
+        socketRef.current.emit('leaveRoom', {
+          roomId: id,
+        });
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [userData.id, id, connectSocketChat, room?.id]);
+
+
+
+
 
   // get messages
   const fetchOldMessages = useCallback(async () => {
@@ -239,10 +107,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     setShouldScrollToBottom(false);
     console.log('fetch old messages');
 
-    // setIsLoadingPagination(true);
+    setIsLoadingPagination(true);
     const allMessages: ChatMsgInterface[] | ApiErrorResponse = await chatOldMessages(id, pageDisplay, offsetPagniation);
-    // setIsLoadingPagination(false);
-
+    
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
@@ -253,12 +120,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       if (!scrollContainer) return;
       const oldScrollHeight = scrollContainer.scrollHeight;
 
+      const reversedMessageFiltred = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
       if (pageDisplay === 1)
-        setMessages(allMessages.reverse());
-      else {
-        const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-        setMessages((prev) => [...reversedMessageArray, ...prev]);
-      }
+        setMessages(reversedMessageFiltred);
+      else
+        setMessages((prev) => [...reversedMessageFiltred, ...prev]);
 
       //set pos scrool to top old messages
       requestAnimationFrame(() => {
@@ -267,8 +133,21 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         setShouldScrollToBottom(true);
       });
     }
+    setIsLoadingPagination(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageDisplay]);
+
+
+  useEffect(() => {
+    if (!room || !userData.id || userData.id === -1 || id === '-1') return;
+    fetchOldMessages();
+  }, [fetchOldMessages, room?.id]);
+
+
+
+
+
+
 
   const fetchRoomData = useCallback(async () => {
     if (conv == null) {
@@ -276,9 +155,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
       navigate('/chat/channel');
       return;
     }
-    if (!conv.room.id || conv.room.id === -1) return;
+    if (!conv.room.id || conv.room.id === -1 || userData.id === -1) return;
     const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
-    console.log('roomData : ', roomData);
     if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
       socketRef.current?.emit('leaveRoom', {
@@ -289,14 +167,14 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     } else if (roomData && 'error' in roomData)
       dispatch(setErrorSnackbar(roomData.error + roomData.message ? ': ' + roomData.message : ''));
     else {
-      setRoom(roomData);
+      // setRoom(roomData);
+      dispatch(reduxUpdateRoomConvList({ item: roomData, userId: userData.id }));
 
       //check if user is accepted in room
       if (roomData.users && roomData.acceptedUsers) {
         const isUserInRoom = roomData.users.some((u) => u.id === userData.id)
           || roomData.acceptedUsers.some((u) => u.id === userData.id);
           // || roomData.;
-        // console.log('is user in room; ', isUserInRoom);
         if (!isUserInRoom) {
           socketRef.current?.emit('leaveRoom', {
             roomId: id,
@@ -318,65 +196,23 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         dispatch(setWarningSnackbar('Room ' + conv.room.name + ' was deleted'));
         navigate('/chat/channel');
       } else {
-        console.log('WTF ?');
+        console.error('WTF ?');
       }
     }
-  }, [conv, dispatch, id, navigate, userData]);
-
-  useEffect(() => {
-    if (!room || !userData) return;
-    if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
-  }, [room, userData]);
-
-
-
-  useEffect(() => {
-    if (!room || !userData.id ) return;
-    if (room.bannedUsers?.some((u) => u.id === userData.id)) {
-      console.log('kick user');
-      socketRef.current?.emit('leaveRoom', {
-        roomId: id,
-      });
-      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
-      navigate('/chat/channel');
-      dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
-    }
-    connectSocketChat();
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.off('chat_message');
-        socketRef.current.off('chat_message_edit');
-        socketRef.current.off('chat_message_delete');
-        socketRef.current.emit('leaveRoom', {
-          roomId: id,
-        });
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, [connectSocketChat, id, room, userData.id, room?.bannedUsers, dispatch, conv, navigate]);
-
-  useEffect(() => {
-    fetchOldMessages();
-  }, [fetchOldMessages, room]);
+  }, [dispatch, id, navigate, userData.id]);
 
   useEffect(() => {
     if (!userData.id || userData.id == -1) return;
     fetchRoomData();
   }, [fetchRoomData, id, userData.id]);
 
-  // useEffect(() => {
-  //   console.log('conv : ', conv);
-  // }, [conv]);
-
-  // useEffect(() => {
-  //   console.log('room : ', room);
-  // }, [room]);
 
 
 
-
-
+  useEffect(() => {
+    if (!room || !userData) return;
+    if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
+  }, [room, userData]);
 
   // scroll to bottom
   useEffect(() => {
@@ -387,11 +223,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         inline: 'nearest',
       });
     }
-    console.log('messages : ', messages);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
-
-
 
 
 
@@ -399,10 +231,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
   // delete message
   const handleDeleteMessage = async (msgId: number) => {
-    // console.log('delete message : ', msgId);
     setIsLoadingDeleteMsg(true);
     const res: HttpStatusCode | ApiErrorResponse = await deleteChatMessage(msgId);
-    // console.log('res : ', res);
     setIsLoadingDeleteMsg(false);
 
     if (typeof res === 'object' && 'error' in res)
@@ -458,7 +288,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   //scrool top = fetch new page messages
   const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const element = e.target as HTMLDivElement;
-    if (element.scrollTop === 0) {
+    if (element.scrollTop === 0 && !isLoadingPagination) {
       setPageDisplay((prev) => prev + 1);
       //display waiting message
     }
@@ -467,7 +297,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
   const handleDeleteChannel = async () => {
     if (!room) return;
     const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
-    console.log('resDeleteChannel : ', resDeleteChannel);
     if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
       dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
     else {
@@ -478,6 +307,10 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log('room DANS PARNT : ', room);
+  // }, [room]);
+
 
   return (
     <>
@@ -485,10 +318,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
         <div className="flex flex-col h-full">
           <div className="w-full flex text-lg text-blue justify-between">
 
-            {isAdmin && room && <InvitationRoom room={room} setRoom={setRoom} /> }
-            {/* <div className="w-full text-center"> */}
-              <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
-            {/* </div> */}
+            {isAdmin && room && 
+              <InvitationRoom room={room}
+            /> }
+            
+            <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
+            
             {isAdmin && room && 
               <SideBarAdmin
                 room={room}
@@ -533,13 +368,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
 
                     {/* display status send message */}
                     {statusSendMsg !== '' &&
-                      <span className={`
-                  ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                  bottom-16 
-                  text-white
-                  p-2
-                  rounded-xl
-                  shadow-lg`}
+                      <span className={`${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
+                        bottom-16  text-white p-2 rounded-xl shadow-lg`}
                         onClick={() => setStatusSendMsg('')}
                       >
                         {statusSendMsg}
@@ -552,7 +382,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = ({ conv }) => {
             </div>
 
             {/* display members */}
-            { room.users && room.acceptedUsers && room.admins &&
+            {room.users && room.acceptedUsers && room.admins &&
               <div className='w-[150px]'>
                 <ChatMembers 
                   admins={room.admins}

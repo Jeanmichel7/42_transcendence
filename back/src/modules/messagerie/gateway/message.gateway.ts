@@ -22,11 +22,11 @@ export class MessagerieWebsocketService {
   @WebSocketServer() server: Server;
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected', client.id);
+    console.log('user is connected to MESSAGERIE', client.id);
   }
 
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected', client.id);
+    console.log('user is disconnected to MESSAGERIE', client.id);
   }
 
   @SubscribeMessage('joinPrivateRoom')
@@ -37,7 +37,7 @@ export class MessagerieWebsocketService {
   ) {
     const privateRoomName = this.PrivateRoomName(data.user1Id, data.user2Id);
     client.join(privateRoomName);
-    console.log('joined private room', privateRoomName, data);
+    // console.log('joined private room', privateRoomName, data);
   }
 
   @SubscribeMessage('leavePrivateRoom')
@@ -47,7 +47,7 @@ export class MessagerieWebsocketService {
   ) {
     const privateRoomName = this.PrivateRoomName(data.user1Id, data.user2Id);
     client.leave(privateRoomName);
-    console.log('left private room', privateRoomName, data);
+    // console.log('left private room', privateRoomName, data);
   }
 
   emitMessage(message: MessageInterface) {
@@ -55,25 +55,25 @@ export class MessagerieWebsocketService {
     const user2 = message.destUser.id;
     const roomName = this.PrivateRoomName(user1, user2);
     this.server.to(roomName).emit('message', message);
-    console.log('message sent to room' + roomName);
+    // console.log('message sent to room' + roomName);
   }
 
   emitEditMessage(message: MessageInterface) {
-    console.log('messages edited', message);
+    // console.log('messages edited', message);
     const user1 = message.ownerUser.id;
     const user2 = message.destUser.id;
     const roomName = this.PrivateRoomName(user1, user2);
     this.server.to(roomName).emit('editMessage', message);
-    console.log('message edited sent to room' + roomName);
+    // console.log('message edited sent to room' + roomName);
   }
 
   emitDeleteMessage(message: MessageInterface) {
-    console.log('messages deleted', message);
+    // console.log('messages deleted', message);
     const user1 = message.ownerUser.id;
     const user2 = message.destUser.id;
     const roomName = this.PrivateRoomName(user1, user2);
     this.server.to(roomName).emit('deleteMessage', message);
-    console.log('message deleted sent to room' + roomName);
+    // console.log('message deleted sent to room' + roomName);
   }
 
   /* ************************* */

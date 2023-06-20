@@ -115,9 +115,8 @@ export class ChatService {
         'chat_rooms.createdAt',
         'chat_rooms.updatedAt',
         'ownerUser.id',
-        'ownerUser.firstName',
-        'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
@@ -161,7 +160,7 @@ export class ChatService {
           },
           invitationLink: `/chat/channel/invitation/${room.id}/${room.name}`,
         } as NotificationCreateDTO);
-      console.log('newNotif : ', newNotif);
+      if (!newNotif) throw new Error('Notification not created');
     }
 
     return resultRoom;

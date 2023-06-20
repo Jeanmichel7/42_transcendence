@@ -11,10 +11,11 @@ const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 5;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
-const BONUSES_TAB = 
-[{id: 'bigRacket', duration: 10000, timeStart: 0, activate: false}
-,{id: 'slow', duration: 0, timeStart: 0, activate: false}
-,{id: 'laser', duration: 10000, timeStart: 0, activate: false}];
+const BONUSES_TAB = [
+  { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
+  { id: 'slow', duration: 0, timeStart: 0, activate: false },
+  { id: 'laser', duration: 10000, timeStart: 0, activate: false },
+];
 
 // Variable constante for optimisation, don't change
 const BALL_RADIUS = BALL_DIAMETER / 2;
@@ -23,7 +24,6 @@ const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
 
-
 interface clientUpdate {
   posRacket: number;
   ArrowDown: boolean;
@@ -31,7 +31,7 @@ interface clientUpdate {
   gameId: bigint;
   useBonus: boolean;
 }
-  
+
 export class Game {
   ball: { x: number; y: number; vx: number; vy: number; speed: number };
   racketLeft: number;
@@ -72,14 +72,13 @@ export class Game {
   racketRightDamage: number;
   bonusMode: boolean;
 
-
   constructor(
     socketPlayer1Id: string,
     player1Username: string,
     socketPlayer2Id: string,
     player2Username: string,
     gameId: bigint,
-    bonusMode: boolean = false,
+    bonusMode = false,
   ) {
     this.isOver = false;
     this.ball = {
@@ -119,86 +118,90 @@ export class Game {
     this.bonusMode = bonusMode;
     // this.initIdGame();
     this.id = gameId;
-    
   }
-  
+
   // async initIdGame() {
   //   console.log('ksuis lancee');
-  //   const res = await this.gameRepository.saveNewGame(this.player1Username, this.player2Username); 
+  //   const res = await this.gameRepository.saveNewGame(this.player1Username, this.player2Username);
   //   this.id = res.id.toString();
   //   console.log('id game " ', this.id);
   // }
 
   generateBonus() {
-    if (this.bonus === null)
-    {
-      let x; 
-      do 
-      x = Math.random() * GROUND_MAX_SIZE;
-      while (x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 || x > RACKET_RIGHT_POS_X_10);
+    if (this.bonus === null) {
+      let x;
+      do x = Math.random() * GROUND_MAX_SIZE;
+      while (
+        x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 ||
+        x > RACKET_RIGHT_POS_X_10
+      );
       console.log('x : ', x);
       this.bonus = {
-        x: x, 
+        x: x,
         y: Math.random() * GROUND_MAX_SIZE,
         //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
         boxSize: 50,
+      };
+    }
+  }
+
+  checkBonusCollision() {
+    if (this.bonus) {
+      const bonusRadius = this.bonus.boxSize / 2;
+
+      if (
+        this.ball.x + BALL_RADIUS > this.bonus.x - bonusRadius &&
+        this.ball.x - BALL_RADIUS < this.bonus.x + bonusRadius &&
+        this.ball.y + BALL_RADIUS > this.bonus.y - bonusRadius &&
+        this.ball.y - BALL_RADIUS < this.bonus.y + bonusRadius
+      ) {
+        return true;
       }
     }
-  }
 
-checkBonusCollision() {
-  
-  if (this.bonus) {
-    const bonusRadius = this.bonus.boxSize / 2;
-
-    if (
-      this.ball.x + BALL_RADIUS > this.bonus.x - bonusRadius &&
-      this.ball.x - BALL_RADIUS < this.bonus.x + bonusRadius &&
-      this.ball.y + BALL_RADIUS > this.bonus.y - bonusRadius &&
-      this.ball.y - BALL_RADIUS < this.bonus.y + bonusRadius
-    ) {
-      return true;
-    }
+    return false;
   }
-  
-  return false;
-}
   checkBonusDuration(currentTime: number) {
-
     let toDelete = -1;
-    
 
     this.bonusesPlayer1.forEach((bonus, index) => {
-    if (bonus && bonus.timeStart !== 0 && currentTime  > bonus.duration + bonus.timeStart) {
+      if (
+        bonus &&
+        bonus.timeStart !== 0 &&
+        currentTime > bonus.duration + bonus.timeStart
+      ) {
         toDelete = index;
-        if (bonus.id == "bigRacket") {
+        if (bonus.id == 'bigRacket') {
           this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
-        }
-        else if (bonus.id == "laser") {
+        } else if (bonus.id == 'laser') {
           this.player1Laser = false;
-    }
-    }});
+        }
+      }
+    });
     if (toDelete !== -1) {
-    this.bonusesPlayer1.splice(toDelete, 1);
-    toDelete = 0;
+      this.bonusesPlayer1.splice(toDelete, 1);
+      toDelete = 0;
     }
 
     this.bonusesPlayer2.forEach((bonus, index) => {
-      if (bonus && bonus.timeStart !== 0 && currentTime  > bonus.duration + bonus.timeStart) {
-          toDelete = index;
-          if (bonus.id == "bigRacket") {
-            this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
-          }
-          else if (bonus.id == "laser") {
-            this.player2Laser = false;
-      }
-      }});
-      if (toDelete !== -1) {
-        this.bonusesPlayer2.splice(toDelete, 1);
-        toDelete = 0;
+      if (
+        bonus &&
+        bonus.timeStart !== 0 &&
+        currentTime > bonus.duration + bonus.timeStart
+      ) {
+        toDelete = index;
+        if (bonus.id == 'bigRacket') {
+          this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+        } else if (bonus.id == 'laser') {
+          this.player2Laser = false;
         }
- 
-}
+      }
+    });
+    if (toDelete !== -1) {
+      this.bonusesPlayer2.splice(toDelete, 1);
+      toDelete = 0;
+    }
+  }
 
   async assignRandomBonus() {
     if (this.ball.vx > 0) {
@@ -206,10 +209,12 @@ checkBonusCollision() {
     } else {
       this.bonusPlayer2Loading = true;
     }
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    const bonus = {...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)]};
-  
+    const bonus = {
+      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+    };
+
     // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
     if (this.bonusPlayer1Loading) {
       this.bonusesPlayer1.push(bonus);
@@ -222,63 +227,80 @@ checkBonusCollision() {
 
   useBonus(player: boolean) {
     if (player == true) {
-      if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == "bigRacket") {
+      if (
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == 'bigRacket'
+      ) {
         console.log('bigRacket');
         this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
-      } else if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id  == "slow") {
+      } else if (
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == 'slow'
+      ) {
         console.log('slow');
         this.ball.speed = INITIAL_BALL_SPEED;
-      } else if (this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id  == "laser") {
+      } else if (
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == 'laser'
+      ) {
         this.player1Laser = true;
         console.log('laser');
       }
-      this.bonusesPlayer1[this.bonusesPlayer1.length - 1].timeStart = performance.now();
+      this.bonusesPlayer1[this.bonusesPlayer1.length - 1].timeStart =
+        performance.now();
       this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate = true;
-    }
-    else {
-      if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "bigRacket") {
+    } else {
+      if (
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == 'bigRacket'
+      ) {
         console.log('bigRacket');
         this.racketRightHeight = RACKET_HEIGHT_10 * 2;
-      } else if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "slow") {
+      } else if (
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == 'slow'
+      ) {
         console.log('slow');
         this.ball.speed = INITIAL_BALL_SPEED;
-      } else if (this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == "laser") {
+      } else if (
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == 'laser'
+      ) {
         console.log('laser');
         this.player2Laser = true;
       }
-      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].timeStart = performance.now();
-      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate   = true;
-    } 
+      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].timeStart =
+        performance.now();
+      this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate = true;
+    }
   }
 
   checkLaserCollision() {
     // Assuming laser position is always in the center of the racket
-    var laserPosition1 = this.racketLeft + this.racketLeftHeight / 2;
-    var laserPosition2 = this.racketRight + this.racketRightHeight / 2;
+    const laserPosition1 = this.racketLeft + this.racketLeftHeight / 2;
+    const laserPosition2 = this.racketRight + this.racketRightHeight / 2;
 
     if (this.player1Laser) {
-        // Check if the laser is within the height range of the right racket
-        if (laserPosition1 >= this.racketRight && laserPosition1 <= (this.racketRight + this.racketRightHeight)) {
-          this.racketRightDamage += 1;
-          if (this.racketRightDamage >= 180) {
-            this.racketRightHeight = 0;
-            this.racketRightDamage = 0;
-          }
+      // Check if the laser is within the height range of the right racket
+      if (
+        laserPosition1 >= this.racketRight &&
+        laserPosition1 <= this.racketRight + this.racketRightHeight
+      ) {
+        this.racketRightDamage += 1;
+        if (this.racketRightDamage >= 180) {
+          this.racketRightHeight = 0;
+          this.racketRightDamage = 0;
         }
+      }
     }
     if (this.player2Laser) {
-        // Check if the laser is within the height range of the left racket
-        if (laserPosition2 >= this.racketLeft && laserPosition2 <= (this.racketLeft + this.racketLeftHeight)) {
-          this.racketLeftDamage += 1;
-          if (this.racketLeftDamage >= 180) {
-            this.racketLeftHeight = 0;
-            this.racketLeftDamage = 0;
-          }
+      // Check if the laser is within the height range of the left racket
+      if (
+        laserPosition2 >= this.racketLeft &&
+        laserPosition2 <= this.racketLeft + this.racketLeftHeight
+      ) {
+        this.racketLeftDamage += 1;
+        if (this.racketLeftDamage >= 180) {
+          this.racketLeftHeight = 0;
+          this.racketLeftDamage = 0;
         }
+      }
     }
-}
-
-
+  }
 
   updateBallPosition() {
     const currentTime = performance.now();
@@ -292,25 +314,33 @@ checkBonusCollision() {
       }
     }
     if (this.bonusMode) {
-    if(this.bonus === null && currentTime - this.bonusesLastGeneration > 20000) {  
-      this.bonusesLastGeneration = currentTime;
-      this.generateBonus();
+      if (
+        this.bonus === null &&
+        currentTime - this.bonusesLastGeneration > 20000
+      ) {
+        this.bonusesLastGeneration = currentTime;
+        this.generateBonus();
+      }
+      if (this.checkBonusCollision()) {
+        this.assignRandomBonus();
+        this.bonusesLastGeneration = currentTime;
+        this.bonus = null;
+      }
+      this.checkLaserCollision();
+      this.checkBonusDuration(currentTime);
+      if (
+        this.player1useBonus &&
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1]?.activate === false
+      ) {
+        this.useBonus(true);
+      }
+      if (
+        this.player2useBonus &&
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1]?.activate === false
+      ) {
+        this.useBonus(false);
+      }
     }
-    if (this.checkBonusCollision()){
-      this.assignRandomBonus(); 
-      this.bonusesLastGeneration = currentTime;
-      this.bonus = null;
-    }
-    this.checkLaserCollision();
-    this.checkBonusDuration(currentTime);
-    if (this.player1useBonus && this.bonusesPlayer1[this.bonusesPlayer1.length - 1]?.activate === false) {
-      this.useBonus(true);
-    }
-      if (this.player2useBonus && this.bonusesPlayer2[this.bonusesPlayer2.length - 1]?.activate === false) { 
-      this.useBonus(false);
-    }
-  }
-
 
     if (
       this.ball.y + BALL_RADIUS > GROUND_MAX_SIZE ||
@@ -330,16 +360,16 @@ checkBonusCollision() {
       !this.fail
     ) {
       this.ball.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
-    
-        const racketCenter = this.racketLeft + this.racketLeftHeight / 2 ;
-        const relativePostion = this.ball.y - racketCenter;
-        let proportion = relativePostion / (this.racketLeftHeight / 1);
-        proportion = Math.max(Math.min(proportion, 0.9), -0.9);
-        this.ball.speed += SPEED_INCREASE;
-        this.ball.vy = proportion;
-        this.ball.vx = Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;; 
-        this.ball.vy *= this.ball.speed;
-      
+
+      const racketCenter = this.racketLeft + this.racketLeftHeight / 2;
+      const relativePostion = this.ball.y - racketCenter;
+      let proportion = relativePostion / (this.racketLeftHeight / 1);
+      proportion = Math.max(Math.min(proportion, 0.9), -0.9);
+      this.ball.speed += SPEED_INCREASE;
+      this.ball.vy = proportion;
+      this.ball.vx =
+        Math.sqrt(1 - this.ball.vy * this.ball.vy) * this.ball.speed;
+      this.ball.vy *= this.ball.speed;
     } else if (
       this.ball.x >= RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
       this.ball.y >= this.racketRight &&
@@ -347,19 +377,19 @@ checkBonusCollision() {
       !this.fail
     ) {
       this.ball.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
-     
-        const racketCenter = this.racketRight + this.racketRightHeight /2 ;
-        const relativePostion = this.ball.y - racketCenter;
-        let proportion = relativePostion / (this.racketRightHeight / 2) ;
-        proportion =  Math.max(Math.min(proportion, 0.9), -0.9);
-        this.ball.speed += SPEED_INCREASE;
-        this.ball.vy = proportion;
-        this.ball.vy = Math.min(this.ball.vy, 0.9);  
-        this.ball.vy = Math.max(this.ball.vy, -0.9); 
-        this.ball.vx =  Math.sqrt(1 - this.ball.vy*this.ball.vy) * this.ball.speed;
-        this.ball.vy *= this.ball.speed;
-        this.ball.vx = -this.ball.vx;
-      
+
+      const racketCenter = this.racketRight + this.racketRightHeight / 2;
+      const relativePostion = this.ball.y - racketCenter;
+      let proportion = relativePostion / (this.racketRightHeight / 2);
+      proportion = Math.max(Math.min(proportion, 0.9), -0.9);
+      this.ball.speed += SPEED_INCREASE;
+      this.ball.vy = proportion;
+      this.ball.vy = Math.min(this.ball.vy, 0.9);
+      this.ball.vy = Math.max(this.ball.vy, -0.9);
+      this.ball.vx =
+        Math.sqrt(1 - this.ball.vy * this.ball.vy) * this.ball.speed;
+      this.ball.vy *= this.ball.speed;
+      this.ball.vx = -this.ball.vx;
     } else if (
       this.ball.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS ||
       this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS
@@ -389,18 +419,17 @@ checkBonusCollision() {
       this.ball.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS + 200 &&
       !this.isOver
     ) {
-        this.player1Score += 1;
+      this.player1Score += 1;
       if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player1Username;
         // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
-          // async saveEndGame(
-          //   gameId: bigint,
-          //   winnerId: bigint,
-          //   scorePlayer1: number,
-          //   scorePlayer2: number,
-          // ): Promise<GameInterface> {
-          
+        // async saveEndGame(
+        //   gameId: bigint,
+        //   winnerId: bigint,
+        //   scorePlayer1: number,
+        //   scorePlayer2: number,
+        // ): Promise<GameInterface> {
       } else {
         this.ball.x = 500;
         this.ball.y = 500;
@@ -409,16 +438,14 @@ checkBonusCollision() {
         this.ball.speed = INITIAL_BALL_SPEED;
         this.fail = false;
         this.racketRightHeight = RACKET_HEIGHT_10;
-        this.racketLeftHeight = RACKET_HEIGHT_10; 
+        this.racketLeftHeight = RACKET_HEIGHT_10;
       }
     }
     this.ball.x += this.ball.vx * deltaTime;
     this.ball.y += this.ball.vy * deltaTime;
-  
-}
+  }
 
   getState() {
- 
     return {
       ball: this.ball,
       racketRight: this.racketRight,
@@ -432,19 +459,27 @@ checkBonusCollision() {
       player2Username: this.player2Username,
       gameStart: this.gameStart,
       bonus: this.bonus,
-      bonusPlayer1: this.bonusesPlayer1?.length > 0 && this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate 
-  ? null 
-  : (this.bonusesPlayer1?.length > 0 ? this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id : null),
-bonusPlayer2: this.bonusesPlayer2?.length > 0 && this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate 
-  ? null 
-  : (this.bonusesPlayer2?.length > 0 ? this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id : null),
+      bonusPlayer1:
+        this.bonusesPlayer1?.length > 0 &&
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate
+          ? null
+          : this.bonusesPlayer1?.length > 0
+          ? this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id
+          : null,
+      bonusPlayer2:
+        this.bonusesPlayer2?.length > 0 &&
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate
+          ? null
+          : this.bonusesPlayer2?.length > 0
+          ? this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id
+          : null,
       racketLeftHeight: this.racketLeftHeight,
       racketRightHeight: this.racketRightHeight,
       bonusPlayer1Loading: this.bonusPlayer1Loading,
       bonusPlayer2Loading: this.bonusPlayer2Loading,
       player1Laser: this.player1Laser,
       player2Laser: this.player2Laser,
-      bonusMode: this.bonusMode
+      bonusMode: this.bonusMode,
     };
   }
 
@@ -517,17 +552,15 @@ export class GameService {
   async updateGame(game: Game) {
     game.updateBallPosition();
     if (game.isOver) {
-    
-
-    await this.saveEndGame(
+      await this.saveEndGame(
         game.id,
         game.winner,
         game.player1Score,
-        game.player2Score
-      )
+        game.player2Score,
+      );
       this.games.delete(game.id);
     }
-    return game.getState(); 
+    return game.getState();
   }
   checkAlreadyInGame(username: string): boolean {
     try {
@@ -557,7 +590,7 @@ export class GameService {
     });
   }
 
-  async addToQueue(socketId: string, username: string, bonusMode: boolean = false) {
+  async addToQueue(socketId: string, username: string, bonusMode = false) {
     if (this.checkAlreadyInGame(username)) return;
     if (bonusMode) {
       if (this.playerWaiting1Bonus === undefined) {
@@ -566,7 +599,7 @@ export class GameService {
           username: username,
         };
       } else if (
-        this.playerWaiting2Bonus === undefined  &&
+        this.playerWaiting2Bonus === undefined &&
         this.playerWaiting1Bonus !== username
       ) {
         this.playerWaiting2Bonus = {
@@ -574,66 +607,68 @@ export class GameService {
           username: username,
         };
         console.log('Game created');
-        const res = await this.saveNewGame(this.playerWaiting1Bonus.username, this.playerWaiting2Bonus.username);
-        if (!res)
-          throw new BadRequestException('erreur save start game')
+        const res = await this.saveNewGame(
+          this.playerWaiting1Bonus.username,
+          this.playerWaiting2Bonus.username,
+        );
+        if (!res) throw new BadRequestException('erreur save start game');
         const game: Game = new Game(
           this.playerWaiting1Bonus.socketId,
           this.playerWaiting1Bonus.username,
           this.playerWaiting2Bonus.socketId,
           this.playerWaiting2Bonus.username,
-          res.id,  // conversion foireuse
-          true
+          res.id, // conversion foireuse
+          true,
         );
         this.games.set(game.id, game);
-        this.playerWaiting1Bonus = undefined; 
+        this.playerWaiting1Bonus = undefined;
         this.playerWaiting2Bonus = undefined;
-        
+
         //res.id game
         return game.socketPlayer1Id;
       }
-    }
-    else {
+    } else {
       console.log('normal mode');
-    if (this.playerWaiting1Normal === undefined) {
-      this.playerWaiting1Normal = {
-        socketId: socketId,
-        username: username,
-      };
-    } else if (
-      this.playerWaiting2Normal === undefined  &&
-      this.playerWaiting1Normal.username !== username
-    ) {
-      this.playerWaiting2Normal = {
-        socketId: socketId,
-        username: username,
-      };
-      console.log('Game created');
-      const res = await this.saveNewGame(this.playerWaiting1Bonus.username, this.playerWaiting2Bonus.username);
-      if (!res)
-        throw new BadRequestException('erreur save start game')
-      const game = new Game(
-        this.playerWaiting1Normal.socketId,
-        this.playerWaiting1Normal.username,
-        this.playerWaiting2Normal.socketId,
-        this.playerWaiting2Normal.username,
-        res.id,  // conversion foireuse
-        false
-      );
-      this.games.set(game.id, game);
-      this.playerWaiting1Normal = undefined;
-      this.playerWaiting2Normal = undefined;
-      return game.socketPlayer1Id;
+      if (this.playerWaiting1Normal === undefined) {
+        this.playerWaiting1Normal = {
+          socketId: socketId,
+          username: username,
+        };
+      } else if (
+        this.playerWaiting2Normal === undefined &&
+        this.playerWaiting1Normal.username !== username
+      ) {
+        this.playerWaiting2Normal = {
+          socketId: socketId,
+          username: username,
+        };
+        console.log('Game created');
+        const res = await this.saveNewGame(
+          this.playerWaiting1Bonus.username,
+          this.playerWaiting2Bonus.username,
+        );
+        if (!res) throw new BadRequestException('erreur save start game');
+        const game = new Game(
+          this.playerWaiting1Normal.socketId,
+          this.playerWaiting1Normal.username,
+          this.playerWaiting2Normal.socketId,
+          this.playerWaiting2Normal.username,
+          res.id, // conversion foireuse
+          false,
+        );
+        this.games.set(game.id, game);
+        this.playerWaiting1Normal = undefined;
+        this.playerWaiting2Normal = undefined;
+        return game.socketPlayer1Id;
+      }
     }
-  }
   }
 
   removeFromQueue(Username: string) {
     if (this.playerWaiting1Normal?.username === Username) {
       this.playerWaiting1Normal = undefined;
       console.log('remove from queue');
-    }
-    else if (this.playerWaiting1Bonus?.username === Username) {
+    } else if (this.playerWaiting1Bonus?.username === Username) {
       this.playerWaiting1Bonus = undefined;
       console.log('remove from queue');
     }
@@ -649,7 +684,10 @@ export class GameService {
    *********************** */
 
   // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
-  async saveNewGame(userlogin1: string, userlogin2: string): Promise<GameInterface> {
+  async saveNewGame(
+    userlogin1: string,
+    userlogin2: string,
+  ): Promise<GameInterface> {
     const newGame = new GameEntity();
     newGame.player1 = await this.userRepository.findOne({
       where: { login: userlogin1 },
@@ -667,14 +705,14 @@ export class GameService {
   }
 
   async saveEndGame(
-    gameId:   bigint, 
-    winnerId: string  ,
+    gameId: bigint,
+    winnerId: string,
     scorePlayer1: number,
     scorePlayer2: number,
   ): Promise<GameInterface> {
     const game: GameEntity = await this.gameRepository.findOne({
       where: { id: gameId },
-    }); 
+    });
     game.status = 'finished';
     game.finishAt = new Date();
     game.scorePlayer1 = scorePlayer1;

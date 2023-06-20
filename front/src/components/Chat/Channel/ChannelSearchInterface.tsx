@@ -8,7 +8,7 @@ import { ApiErrorResponse, RoomInterface } from '../../../types';
 import { Autocomplete, Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField } from '@mui/material';
 import { getAllPublicRooms, joinRoom } from '../../../api/chat';
 import RoomCard from './ChannelRoomCard';
-import { reduxAddConversationList } from '../../../store/chatSlicer';
+import { reduxAddConversationList } from '../../../store/convListSlice';
 import { isConvAlreadyExist, isRoomInterface } from '../../../utils/utils';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 

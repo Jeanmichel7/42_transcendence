@@ -5,7 +5,7 @@ export interface UserInterface {
   email: string,
   firstName: string,
   lastName: string,
-  status: 'online' | 'offline' | 'absent' | 'in game',
+  status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive',
   avatar: string,
   description?: string,
   role?: 'user' | 'admin',

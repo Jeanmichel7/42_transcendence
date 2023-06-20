@@ -12,10 +12,10 @@ import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 import { reduxSetNotifications } from '../store/notificationSlice';
-import { reduxSetConversationList } from '../store/chatSlicer';
+import { reduxSetConversationList } from '../store/convListSlice';
 
 export default function FakeConnection() {
-  const [login, setLogin] = useState<string>('login1');
+  const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('Password1!');
   const [usersCreated, setUsersCreated] = useState<UserInterface[]>([]);
 
@@ -50,7 +50,6 @@ export default function FakeConnection() {
         ? JSON.parse(localStorage.getItem('conversationsList' + id) as string) 
         : [] as ConversationInterface[],
     ));
-
   }, [dispatch, fetchData]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
+<<<<<<< HEAD
 import { Badge, Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Typography } from '@mui/material';
+=======
+import { Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup } from '@mui/material';
+>>>>>>> JM--ChannelV2
 import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 import { inviteUser } from '../../../../api/chat';
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
 
 
@@ -56,11 +61,22 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface } ) => {
 interface InvitationRoomProps {
   room: RoomInterface;
   setRoom: React.Dispatch<React.SetStateAction<RoomInterface | null | undefined>>;
+=======
+import RowOfFriendToInvit from './RowInvitation';
+import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
+
+
+interface InvitationRoomProps {
+  room: RoomInterface;
+>>>>>>> JM--ChannelV2
 }
 
 const InvitationRoom: React.FC<InvitationRoomProps> = ({ 
   room,
+<<<<<<< HEAD
   setRoom,
+=======
+>>>>>>> JM--ChannelV2
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -113,7 +129,10 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
       return dispatch(setErrorSnackbar('You must select at least one user'));
 
     const data = { acceptedUsers: form.acceptedUsers.map(u => u.id) };
+<<<<<<< HEAD
     console.log('data : ', data);
+=======
+>>>>>>> JM--ChannelV2
     setIsLoading(true);
 
     for (let i = 0; i < data.acceptedUsers.length; i++) {
@@ -125,11 +144,19 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     }
     dispatch(setMsgSnackbar('User(s) invited'));
     setIsLoading(false);
+<<<<<<< HEAD
     setRoom(prev => prev ? { 
       ...prev,
       acceptedUsers: [...(prev?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
     } : null);
 
+=======
+    const roomUpdated: RoomInterface = {
+      ...room,
+      acceptedUsers: [...(room?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
+    };
+    dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
+>>>>>>> JM--ChannelV2
     setForm({ acceptedUsers: null });
     setOpenEdit(false);
   };

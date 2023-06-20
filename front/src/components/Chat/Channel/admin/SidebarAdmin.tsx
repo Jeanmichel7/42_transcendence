@@ -91,7 +91,10 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
       });
     }
     setIsLoading(false);
+<<<<<<< HEAD
     console.log(form);
+=======
+>>>>>>> JM--ChannelV2
   };
 
   return (
@@ -177,9 +180,12 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, setIsAdminMenuOpen, handle
                     }
 
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> JM--ChannelV2
                     {!isOpenRenameMenu &&
                       <>
                         <Button

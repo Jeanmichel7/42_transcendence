@@ -9,7 +9,7 @@ import { reduxAddFriends, reduxRemoveWaitingFriends } from '../../store/userSlic
 import { reduxRemoveNotification } from '../../store/notificationSlice';
 import FriendItem from './FriendItem';
 
-import { reduxAddConversationList } from '../../store/chatSlicer';
+import { reduxAddConversationList } from '../../store/convListSlice';
 
 const WaitingAcceptRequest = () => {
   const [isLoading, setIsLoading] = useState(false);

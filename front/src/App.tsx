@@ -23,7 +23,11 @@ import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
+<<<<<<< HEAD
 import { reduxSetConversationList } from './store/chatSlicer';
+=======
+import { reduxSetConversationList } from './store/convListSlice';
+>>>>>>> JM--ChannelV2
 import { getNotifsNotRead } from './api/notification';
 
 
@@ -57,11 +61,44 @@ function App() {
     if (typeof isAuth === 'boolean' && isAuth === true) {
       dispatch(setLogged(true));
 
+      /* GET NOTIF IN LOCALSTORAGE AND ADD NOTIF NOT READ */
+      // dispatch(reduxSetNotifications(
+      //   localStorage.getItem('notifications' + userId)
+      //     ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
+      //     : [] as NotificationInterface[],
+      // ));
+      const notifInLocalStorage: NotificationInterface[]
+        = JSON.parse(localStorage.getItem('notifications' + userId) as string) || [] as NotificationInterface[];
+      dispatch(reduxSetNotifications(notifInLocalStorage));
+      const notifsNotRead = await getNotifsNotRead();
+      // console.log('notifsNotRead : ', notifsNotRead);
+      // console.log('notifInLocalStorage : ', notifInLocalStorage);
+      if (!('error' in notifsNotRead)) {
+        const notifsNotReadFiltered = notifsNotRead.filter((n: NotificationInterface) =>
+          !notifInLocalStorage?.find((n2: NotificationInterface) => n2.id === n.id),
+        );
+        // console.log('notifsNotReadFiltered : ', notifsNotReadFiltered);
+        if (notifsNotReadFiltered.length > 0)
+          dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
+      }
+
+      /* GET CONVERSATION LIST IN LOCALSTORAGE AND UPDATE STATUS FRIENDS*/
+      const convListInLocalStorage: ConversationInterface[]
+        = JSON.parse(localStorage.getItem('conversationsList' + userId) as string) || [] as ConversationInterface[];
+      
+      // console.log('conv list in local storage : ', convListInLocalStorage);
+      
+      dispatch(reduxSetConversationList(convListInLocalStorage));
+
+
+
+
       await fetchData(getUserData, setUser);
       await fetchData(getFriends, reduxSetFriends);
       await fetchData(getBlockedUsers, reduxSetUserBlocked);
       await fetchData(getFriendRequests, reduxSetWaitingFriends);
       await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
+<<<<<<< HEAD
       dispatch(reduxSetNotifications(
         localStorage.getItem('notifications' + userId)
           ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
@@ -85,11 +122,17 @@ function App() {
         if (notifsNotReadFiltered.length > 0)
           dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
       }
+=======
+
+>>>>>>> JM--ChannelV2
 
     } else {
+      // console.log('isAuth : ', isAuth, userId);
       dispatch(setLogged(false));
+      //disconnect user
+      if (userId !== -1)
+        navigate('/');
       setUserId(-1);
-      // navigate('/');
     }
   }, [dispatch, fetchData, userId]);
 
