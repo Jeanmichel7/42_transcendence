@@ -1,82 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
-<<<<<<< HEAD
-import { Badge, Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Typography } from '@mui/material';
-=======
 import { Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup } from '@mui/material';
->>>>>>> JM--ChannelV2
 import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
 import { inviteUser } from '../../../../api/chat';
-<<<<<<< HEAD
-import { Link } from 'react-router-dom';
-
-
-const RowOfFriendToInvit = ({ user }: { user: UserInterface } ) => {
-  return (
-  <Link to={'/profile/' + user.login}
-    className="flex flex-grow text-black p-1 pl-2 items-center ">
-    <Badge
-      color={
-        user.status === 'online' ? 'success' :
-          user.status === 'absent' ? 'warning' :
-            'error'
-      }
-      overlap="circular"
-      badgeContent=" "
-      variant="dot"
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
-      }}
-      sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
-    >
-      <img
-        className="w-10 h-10 rounded-full object-cover mr-2 "
-        src={user.avatar}
-        onError={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.onerror = null;
-          target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-        }}
-        alt="avatar"
-      />
-    </Badge>
-    <Typography component="span"
-      sx={{
-        overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-        color: user.status === 'online' ? 'success' : 'error',
-      }}
-      title={user.login}
-    >
-      {user.login}
-      {/* {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login} */}
-    </Typography>
-  </Link>
-  );
-};
-
-interface InvitationRoomProps {
-  room: RoomInterface;
-  setRoom: React.Dispatch<React.SetStateAction<RoomInterface | null | undefined>>;
-=======
 import RowOfFriendToInvit from './RowInvitation';
 import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
 
 
 interface InvitationRoomProps {
   room: RoomInterface;
->>>>>>> JM--ChannelV2
 }
 
 const InvitationRoom: React.FC<InvitationRoomProps> = ({ 
   room,
-<<<<<<< HEAD
-  setRoom,
-=======
->>>>>>> JM--ChannelV2
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -129,10 +68,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
       return dispatch(setErrorSnackbar('You must select at least one user'));
 
     const data = { acceptedUsers: form.acceptedUsers.map(u => u.id) };
-<<<<<<< HEAD
-    console.log('data : ', data);
-=======
->>>>>>> JM--ChannelV2
     setIsLoading(true);
 
     for (let i = 0; i < data.acceptedUsers.length; i++) {
@@ -144,19 +79,11 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     }
     dispatch(setMsgSnackbar('User(s) invited'));
     setIsLoading(false);
-<<<<<<< HEAD
-    setRoom(prev => prev ? { 
-      ...prev,
-      acceptedUsers: [...(prev?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
-    } : null);
-
-=======
     const roomUpdated: RoomInterface = {
       ...room,
       acceptedUsers: [...(room?.acceptedUsers ?? []), ...(form?.acceptedUsers ?? [])],
     };
     dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userData.id }));
->>>>>>> JM--ChannelV2
     setForm({ acceptedUsers: null });
     setOpenEdit(false);
   };
@@ -167,9 +94,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     // setIsAdminMenuOpen(!openEdit);
     setOpenEdit(!openEdit);
   };
-
-
-  
 
 
   return (

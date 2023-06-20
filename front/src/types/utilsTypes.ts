@@ -45,8 +45,6 @@ export interface NotificationInterface {
   receiver: UserInterface;
   sender: UserInterface;
   invitationLink?: string;
-<<<<<<< HEAD
-=======
 }
 
 export interface UserStatusInterface {
@@ -55,5 +53,4 @@ export interface UserStatusInterface {
   login?: string;
   avatar?: string;
   updatedAt?: Date;
->>>>>>> JM--ChannelV2
 }
