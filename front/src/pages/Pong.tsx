@@ -17,7 +17,25 @@ import CountDown from '../components/Game/CountDown';
 import BonusBox from '../components/Game/BonusBox';
 import spriteBonus from '../assets/spriteBonus.png';
 import spriteBonusExplode from '../assets/spriteBonusExplode.png';
+import '../components/Game/font.css';
 
+const Playground = styled.div`
+  width: 100%;
+  top: 20%;
+  height: 80%;
+  position: absolute;
+  border: 10px 
+  border: 0.2rem solid #fff;
+  padding: 0.4em;
+  box-shadow: 0 0 .2rem #fff,
+            0 0 .2rem #fff,
+            0 0 2rem #bc13fe,
+            0 0 0.8rem #bc13fe,
+            0 0 2.8rem #bc13fe,
+            inset 0 0 1.3rem #bc13fe; 
+             color: #fff;
+
+`;
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
@@ -39,7 +57,6 @@ const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
-
 const GameWrapper = styled.div`
   width: 80vw;
   height: 50vh;
@@ -48,8 +65,16 @@ const GameWrapper = styled.div`
   flex-direction: row;
   margin: 0 auto;
   position: relative;
+  font-family: 'neontubes';
   overflow: hidden;
 `;
+
+
+interface BonusPosition {
+  x: number;
+  y: number;
+  boxSize: number;
+}
 
 const animationBonus = keyframes`
   0% { background-position: 0px; }
@@ -69,32 +94,36 @@ const fadeIn = keyframes`
     opacity: 1;
   }
 `;
-const BonusReady = styled.div`
+const BonusReady = styled.div<{ posX: number; posY: number }>`
   width: 50px; // La largeur d'une image de sprite individuelle
   height: 50px; // La hauteur de votre sprite
   background: url(${spriteBonus}) repeat-x;
   position: absolute;
 transform: translate(-50%, -50%);
-left: ${(props) => props.posX}px;
-top: ${(props) => props.posY}px;
+left: ${({posX} : {posX: number }) => posX}px;
+top: ${({posY} : {posY: number })=> posY}px;
   animation: ${animationBonus} 1s steps(12) infinite,${fadeIn} 1s ease-in-out;
 `;
 
-const BonusExplode = styled.div`
+const BonusExplode = styled.div<{ posX: number; posY: number }>`
   width: 200px; // La largeur d'une image de sprite individuelle
   height: 200px; // La hauteur de votre sprite
   background: url(${spriteBonusExplode}) repeat-x;
   position: absolute;
 transform: translate(-50%, -50%);
-left: ${(props) => props.posX}px;
-top: ${(props) => props.posY}px;
-  animation: ${animationBonusExplode} 1s steps(12)  ;
+left: ${({posX} : {posX: number }) => posX}px;
+top: ${({posY} : {posY: number })=> posY}px;
+  animation: ${animationBonusExplode} 1s steps(12)  ; 
     animation-fill-mode: forwards;
 `;
 
+interface BonusInterface {
+
+}
 
 
-function Bonus({ bonus, posX, posY }) {
+
+function Bonus({ bonus, posX, posY } : {bonus: BonusPosition | null, posX: number, posY: number}) {
   const [isBonusVisible, setIsBonusVisible] = useState(false);
   const [isBonusExplode, setBonusExplode] = useState(false);
   const [position, setPosition] = useState([-1, -1]);
@@ -124,7 +153,7 @@ const explodeAnimation = keyframes`
 
 
 
-const StyledRacket = styled.div.attrs((props) => ({
+const StyledRacket = styled.div.attrs((props) :{posY : number, height: number, type: string} => ({
   style: {
     transform: `translateY(${props.posY * ((100 / props.height))}%)`,
   },
@@ -200,26 +229,23 @@ const laserFlowLeft = keyframes`
   0% { background-position: 50px 0; }
   100% { background-position: 0 0; }
 `;
-interface LaserProps {
-  type: 'left' | 'right';
-}
 
 // Utilisez les animations dans votre composant
-const Laser = styled.div<LaserProps>`
+const Laser = styled.div<string>`
   position: absolute;
 
-  width: ${({ type }) => type === 'left' ? '10000px' : '10000px'};
+  width: ${({ type } : {type: string}) => type === 'left' ? '10000px' : '10000px'};
   height: 10px;
   top: 50%;
   z-index: 1;
-  background: ${({ type }) => type === 'left'
+  background: ${({ type } : {type: string}) => type === 'left'
     ? 'linear-gradient(to right, red, white, red)'
     : 'linear-gradient(to left, red, white, red)'};
   background-size: 50px 100%;
-  animation: ${({ type }) => type === 'left'
+  animation: ${({ type } : {type:string}) => type === 'left'
     ? css`${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite`
     : css`${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite`};
-    transform: ${({ type }) => type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'} translateY(-5px); 
+    transform: ${({ type }: {type:string}) => type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'} translateY(-5px); 
     left: 100%;
 
 `;
@@ -260,7 +286,7 @@ function Game({
   const bonusValueRef = useRef();
   const racketHeightRef = useRef({ left: RACKET_HEIGHT_10, right: RACKET_HEIGHT_10 });
   const laser = useRef({ left: false, right: false } as any);
-  const { gameData } = useSocketConnection(
+  const { gameData } : {gameData : any} = useSocketConnection(
     socket,
     keyStateRef,
     posRacket,
@@ -278,7 +304,7 @@ function Game({
 
   useEffect(() => {
     const handleResize = () => {
-      const gameWrapper = document.querySelector('.game-wrapper');
+      const gameWrapper = document.querySelector('#playground');
       if (gameWrapper) {
         gameDimensions.current.width = gameWrapper.offsetWidth;
         gameDimensions.current.height = gameWrapper.offsetHeight;
@@ -458,6 +484,7 @@ function Game({
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
       />
+      <Playground id="playground">
       <Racket posY={posRacket.current.left} height={racketHeightRef.current.left} type={'left'}>
         {laser.current.left && <Laser type={'left'} />}
       </Racket>
@@ -466,12 +493,12 @@ function Game({
         posY={ball.y * (gameDimensions.current.height / 1000)}
       />
       {gameData?.current.bonusMode && <Bonus bonus={gameData.current.bonus} posX={(bonusPositionRef?.current?.x ? bonusPositionRef.current.x * (gameDimensions.current.width / 1000) : -1)} posY={(bonusPositionRef?.current?.y ? bonusPositionRef.current.y * (gameDimensions.current.height / 1000) : -1)} />}
-      {(bonus || gameData?.current.bonusMode) && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current} />}
 
       <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={'right'} >
         {laser.current.right && <Laser type={'right'} />}
       </Racket>
-      <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type="right" />
+      </Playground>
+      {(bonus || gameData?.current.bonusMode) && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current} />}
     </div>
   );
 }
@@ -549,7 +576,7 @@ function Pong() {
     );
   }
   return (
-    <GameWrapper className="game-wrapper">
+    <GameWrapper >
       {connectStatus === 'disconnected' && <Overlay />}
       {statusComponent}
       {pageContent}

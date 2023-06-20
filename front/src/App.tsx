@@ -17,7 +17,7 @@ import {
   setUser,
 } from './store/userSlice';
 import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
@@ -31,6 +31,8 @@ import { getNotifsNotRead } from './api/notification';
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [userId, setUserId] = useState(-1);
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
@@ -101,7 +103,7 @@ function App() {
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
-        <Header />
+        {location?.pathname !== "/" && <Header />}
         <div className="flex-grow bg-[#eaeaff] w-full">
           <div className="h-full">
             <AppRoutes />
@@ -110,7 +112,7 @@ function App() {
             <SideBar />
           </div> */}
         </div>
-        <Footer />
+        {location?.pathname !== "/" && <Footer />}
       </div>
 
       <Snackbar

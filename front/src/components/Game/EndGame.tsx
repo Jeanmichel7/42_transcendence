@@ -1,5 +1,8 @@
 import styled, {keyframes} from 'styled-components';
 import { StyledButton } from './Lobby';
+import confetti from 'canvas-confetti';
+import { useEffect } from 'react';
+import './font.css' ;
 
 const LooseWrapper = styled.div`
   position: absolute;
@@ -12,39 +15,41 @@ const LooseWrapper = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 `;
 
 
 const flicker  = keyframes`{
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    text-shadow:
-      0 0 4px #fff,
-      0 0 11px #fff,
-      0 0 19px #fff,
-      0 0 40px #0fa,
-      0 0 80px #0fa,
-      0 0 90px #0fa,
-      0 0 100px #0fa,
-      0 0 150px #0fa;
+  40% {
+    opacity: 1;
   }
-  20%, 24%, 55% {       
-    text-shadow: none;
+  42% {
+    opacity: 0.8;
+  }
+  43% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.2;
+  }
+  46% {
+    opacity: 1;
   }
 }`;
+
+const buzz = keyframes`
+{
+  70% {
+    opacity: 0.80;
+  }
+}`
 const StyledNeonH1 = styled.h1`
   color: #fff;
-  animation: ${flicker} 2s infinite alternate;
-  font-size: 2rem;
-  
-  text-shadow:
-      -1 0 7px #fff,
-      -1 0 10px #fff,
-      -1 0 21px #fff,
-      -1 0 42px #0fa,
-      -1 0 82px #0fa,
-      -1 0 92px #0fa,
-      -1 0 102px #0fa,
-      -1 0 151px #0fa;`
+  -webkit-animation: ${buzz} 0.1s infinite alternate;
+  font-size: 4rem;
+  text-shadow: 0 0 0 transparent, 0 0 10px #2695ff, 0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff, 0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
+  `
 
 const neonAnimationStartUp = keyframes`
 0% { 
@@ -82,8 +87,8 @@ const NeonSign = styled.div`
 `;
   const StyledNeonH2 = styled.h2`
   color: #fff;
-  animation: ${flicker} 0.5s infinite alternate;
-  font-size: 1rem;
+  animation: ${flicker} 4s infinite alternate;
+  font-size: 2rem;
   text-shadow:
   -1px 0px 7px #fff,
   -1px 0px 10px #fff,
@@ -99,6 +104,16 @@ interface setCurrentPage {
   setLoose: React.Dispatch<React.SetStateAction<string>>;
 }
 
+const FullScreenCanvas = styled.canvas`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; 
+`;
+
+
 
 
 function Loose({
@@ -108,20 +123,32 @@ function Loose({
   setCurrentPage: setCurrentPage;
   lastGameInfo: any;
 }) {
+
+  useEffect(() => {
+    if(lastGameInfo.current.win){
+      setTimeout(() => {
+      const myConfetti = confetti.create(document.getElementById('myCanvas'), { useWorker: true, resize: true });
+      myConfetti({
+        particleCount: 100,
+        spread: 160
+      });
+    }, 2000);
+  }
+  }, [lastGameInfo.current.win]);
   return (
     <LooseWrapper>
       {lastGameInfo.current.win ? (
         <>
-        <StyledNeonH1>Gagne</StyledNeonH1>
+        <StyledNeonH1>Victoire<br/>Vainqueur: {lastGameInfo.current.winnerName} </StyledNeonH1>
         <NeonSign>Bien Joue</NeonSign>
+        <FullScreenCanvas id='myCanvas'></FullScreenCanvas>
         </>
       ) : (
         <>
-        <StyledNeonH1>Perdu</StyledNeonH1>
+        <StyledNeonH1>Defaite</StyledNeonH1>
         <NeonSign>Dommage</NeonSign>
         </>
       )}
-      <StyledNeonH1>Vainqueur: {lastGameInfo.current.winnerName}</StyledNeonH1>
       <StyledNeonH2>Perdant: {lastGameInfo.current.looserName}</StyledNeonH2>
       <StyledButton onClick={() => setCurrentPage('searchOpponent')}>Proposer une nouvelle partie</StyledButton>
     </LooseWrapper>
