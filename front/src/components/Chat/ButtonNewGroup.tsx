@@ -49,24 +49,46 @@ export function ButtonNewGroup2() {
 
   /* Create new Room without password */
   const addNewRoom = () => {
-    axios.post(`http://localhost:3000/chat/rooms/add`, {
-      name: roomName,
-      type: "public",
-      password: null,
-    }, {
-      withCredentials: true
-    });
+    if (selectedLogins.length > 0) {
+      axios.post(`http://localhost:3000/chat/rooms/add`, {
+        name: roomName,
+        type: "public",
+        password: null,
+        acceptedUsers: selectedLogins,
+      }, {
+        withCredentials: true
+      });
+    } else {
+      axios.post(`http://localhost:3000/chat/rooms/add`, {
+        name: roomName,
+        type: "public",
+        password: null,
+      }, {
+        withCredentials: true
+      });
+    }
   };
 
   /* Create new Room with password */
   const addNewRoomPassword = () => {
-    axios.post(`http://localhost:3000/chat/rooms/add`, {
-      type: "public",
-      name: roomName,
-      password: password,
-    }, {
-      withCredentials: true
-    });
+    if (selectedLogins.length > 0) {
+      axios.post(`http://localhost:3000/chat/rooms/add`, {
+        name: roomName,
+        type: "public",
+        password: password,
+        acceptedUsers: selectedLogins,
+      }, {
+        withCredentials: true
+      });
+    } else {
+      axios.post(`http://localhost:3000/chat/rooms/add`, {
+        name: roomName,
+        type: "public",
+        password: password,
+      }, {
+        withCredentials: true
+      });
+    }
   };
 
   return(
