@@ -387,14 +387,6 @@ export class UsersService {
       else newStatus = 'online';
 
       if (user.status === newStatus) continue;
-      console.log(
-        'Update status from :',
-        user.id,
-        user.login,
-        user.status,
-        ' to: ',
-        newStatus,
-      );
       await this.userRepository.update(
         { id: user.id },
         {
@@ -410,14 +402,6 @@ export class UsersService {
         avatar: user.avatar,
         updatedAt: new Date(),
       });
-      console.log(
-        'event update status from :',
-        userUpdated.userStatus.id,
-        userUpdated.userStatus.login,
-        userUpdated.userStatus.status,
-        ', to :',
-        newStatus,
-      );
       this.eventEmitter.emit('user_status.updated', userUpdated);
     }
   }

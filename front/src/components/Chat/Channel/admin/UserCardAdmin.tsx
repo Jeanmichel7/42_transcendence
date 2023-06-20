@@ -151,7 +151,6 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await addAdminToRoom(room.id, user.id);
-    console.log('result : ', result);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
     } else {

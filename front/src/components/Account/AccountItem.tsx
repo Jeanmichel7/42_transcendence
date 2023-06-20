@@ -139,10 +139,10 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   }
 
 
-  useEffect(() => {
-    setInputValue(value);
-    console.log('here value', value);
-  }, [value]);
+  // useEffect(() => {
+  //   setInputValue(value);
+  //   console.log('here value', value);
+  // }, [value]);
 
   useEffect(() => {
     if (keyName === 'Active 2FA') {
