@@ -20,8 +20,20 @@ export const useConnectionSocketChannel = (
   const { room } = useSelector((state: RootState) => state.chat.conversationsList.find((c) => c.id === convId) || {} as ConversationInterface);
 
   useEffect(() => {
-    if (socket) {
+    if (room && room.id && socket.connected )
+      socket.emit('joinRoom', { roomId: id });
+    return () => {
+      if (socket && socket.connected) {
+        socket.emit('leaveRoom', {
+          roomId: id,
+        });
+        
+      }
+    };
+  }, [convId]);
 
+  useEffect(() => {
+    if (socket) {
       /* MESSAGE */
       socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
         setMessages((prevMessages) => [
@@ -228,20 +240,6 @@ export const useConnectionSocketChannel = (
       };
 
     }
-  }, [convId, room]);
+  }, [convId, room, socket]);
 
-  useEffect(() => {
-    if (room && room.id && socket.connected )
-      socket.emit('joinRoom', { roomId: id });
-
-    return () => {
-      if (socket && socket.connected) {
-        socket.emit('leaveRoom', {
-          roomId: id,
-        });
-        
-      }
-    };
-
-  }, [convId]);
 };

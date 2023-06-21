@@ -6,14 +6,17 @@ import { Socket, io } from 'socket.io-client';
 import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import { setWarningSnackbar } from '../../../store/snackbarSlice';
 import { connectionSocketChannel } from './utils';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store';
 
 const ConversationWrapper = () => {
+  const { userData } = useSelector((state: RootState) => state.user);
   const { convId, login, name } = useParams();
   const location = useLocation();
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (login) return;
+    if (login || userData.id == -1) return;
     // console.log('socketRef.current : ', socketRef.current)
     if (!socketRef.current || !socketRef.current.connected) {
       console.log('connect socket channel : ');
@@ -21,10 +24,10 @@ const ConversationWrapper = () => {
         reconnectionDelayMax: 10000,
         withCredentials: true,
       });
-      socket.on('connect', () => {
-        console.log('socket connected');
-        socketRef.current = socket;
-      });
+      // socket.on('connect', () => {
+        // console.log('socket connected');
+      socketRef.current = socket;
+      // });
     }
     return () => {
       if (socketRef.current && socketRef.current.connected) {
@@ -32,7 +35,7 @@ const ConversationWrapper = () => {
         socketRef.current = null;
       }
     };
-  }, [login]);
+  }, [userData.id]);
 
   useEffect(() => {
     console.log('location state : ', location.state);
@@ -48,7 +51,12 @@ const ConversationWrapper = () => {
   return (
     <>
       { login && <PrivateConversation key={convId} /> }
-      { name && socketRef.current?.connected && <ChannelConversation key={convId} conv={location.state} socketRef={socketRef}/> }
+      { name && socketRef.current?.connected && 
+        <ChannelConversation
+          key={convId}
+          conv={location.state}
+          socketRef={socketRef}
+        /> }
     </>
   );
 };

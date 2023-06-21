@@ -56,8 +56,16 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
     const bottomRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const rien = useConnectionSocketChannel(socketRef.current, id, userData.id, conv.id, setMessages, setOffsetPagniation, dispatch, navigate);
-    console.log('rien : ', rien);
+    useConnectionSocketChannel(
+      socketRef.current,
+      id,
+      userData.id,
+      conv.id,
+      setMessages,
+      setOffsetPagniation,
+      dispatch,
+      navigate,
+    );
 
     // get messages
     const fetchOldMessages = useCallback(async () => {
