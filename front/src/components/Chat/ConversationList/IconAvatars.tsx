@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { RoomInterface, UserInterface } from '../../../types';
+import { ConversationInterface, UserInterface } from '../../../types';
 import { Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import { RootState } from '../../../store';
+import { useSelector } from 'react-redux';
 
 
 interface ConversationListRoomItemIconsProps {
-  room: RoomInterface;
+  conv: ConversationInterface;
 }
 
-const ConversationListRoomItemIcons = ({ room }: ConversationListRoomItemIconsProps) => {
-  
+const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsProps) => {
   const [usersToDisplay, setUsersToDisplay] = useState<UserInterface[] | null>(null);
+  const { room } = useSelector((state: RootState) => state.chat.conversationsList.find((c) => c.id === conv.id) || {} as ConversationInterface);
 
   const getRandAdmin = useCallback(() => {
     if (!room || !room.ownerUser || (room.admins == undefined)) return;

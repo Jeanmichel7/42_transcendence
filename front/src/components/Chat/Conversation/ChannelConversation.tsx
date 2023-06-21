@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Socket, io } from 'socket.io-client';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Socket } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar, setWarningSnackbar } from '../../../store/snackbarSlice';
@@ -20,7 +20,7 @@ import SideBarAdmin from '../Channel/admin/SidebarAdmin';
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
-import { useConnectionSocketChannel } from './utils';
+import { useConnectionSocketChannel } from './useSocketChannel';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
@@ -56,6 +56,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
     const bottomRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+
     useConnectionSocketChannel(
       socketRef.current,
       id,
@@ -63,9 +64,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
       conv.id,
       setMessages,
       setOffsetPagniation,
-      dispatch,
-      navigate,
     );
+
 
     // get messages
     const fetchOldMessages = useCallback(async () => {
@@ -107,6 +107,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
     useEffect(() => {
       if (!room || !userData.id || userData.id === -1 || id === '-1') return;
       fetchOldMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchOldMessages, room?.id]);
 
 
@@ -165,12 +166,14 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
           console.error('WTF ?');
         }
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, id, navigate, userData.id]);
 
     useEffect(() => {
       if (!userData.id || userData.id == -1) return;
       fetchRoomData();
     }, [fetchRoomData, id, userData.id]);
+
 
 
 
@@ -189,6 +192,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
           inline: 'nearest',
         });
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages]);
 
 

@@ -1,70 +1,26 @@
-import { Dispatch } from '@reduxjs/toolkit';
-import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types';
+import { ConversationInterface, RoomInterface } from '../../../types';
 import { Socket } from 'socket.io-client';
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import { setWarningSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
-import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+import { useNavigate } from 'react-router-dom';
 
-export const useConnectionSocketChannel = (
-  socket: Socket,
-  id: string,
+export const useConnectionSocketChat = (
+  socket: Socket | null,
   userId: number,
   convId: number,
-  setMessages: React.Dispatch<React.SetStateAction<ChatMsgInterface[]>>,
-  setOffsetPagniation: React.Dispatch<React.SetStateAction<number>>,
-  dispatch: Dispatch<any>,
-  navigate: (path: string) => void,
 ) => {
   const { room } = useSelector((state: RootState) => state.chat.conversationsList.find((c) => c.id === convId) || {} as ConversationInterface);
-
-  useEffect(() => {
-    if (room && room.id && socket.connected )
-      socket.emit('joinRoom', { roomId: id });
-    return () => {
-      if (socket && socket.connected) {
-        socket.emit('leaveRoom', {
-          roomId: id,
-        });
-        
-      }
-    };
-  }, [convId]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (socket) {
       /* MESSAGE */
-      socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          message,
-        ]);
-        setOffsetPagniation((prev) => prev + 1);
-        acknowledge(true);
-      });
-
-      socket.on('chat_message_edit', (message) => {
-        setMessages((prevMessages) => {
-          const newMessages = prevMessages.map((msg) => {
-            if (msg.id === message.id) {
-              return { ...msg, text: message.text, updatedAt: message.updatedAt };
-            }
-            return msg;
-          });
-          return newMessages;
-        });
-      });
-
-      socket.on('chat_message_delete', (message) => {
-        setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
-        setOffsetPagniation((prev) => prev - 1);
-      });
-
-
       /* ROOM */
       socket.on('room_join', (roomId, user) => {
-        if (roomId !== id) return;
         console.log('room_join : ', user);
         const roomUpdated: RoomInterface = {
           ...room,
@@ -75,7 +31,6 @@ export const useConnectionSocketChannel = (
       });
 
       socket.on('room_leave', (roomId, userIdLeave) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           users: room.users?.filter((u) => u.id !== userIdLeave),
@@ -87,7 +42,6 @@ export const useConnectionSocketChannel = (
 
       /* ROOM ADMIN */
       socket.on('room_muted', (roomId, user) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           mutedUsers: room.mutedUsers ? [...room.mutedUsers, user] : [user],
@@ -98,7 +52,6 @@ export const useConnectionSocketChannel = (
       });
 
       socket.on('room_unmuted', (roomId, userIdMuted) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           mutedUsers: room.mutedUsers?.filter((u) => u.id !== userIdMuted),
@@ -109,7 +62,6 @@ export const useConnectionSocketChannel = (
       });
 
       socket.on('room_kicked', (roomId, userIdKicked) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           users: room.users?.filter((u) => u.id !== userIdKicked),
@@ -119,7 +71,7 @@ export const useConnectionSocketChannel = (
 
         if (userId === userIdKicked) {
           socket.emit('leaveRoom', {
-            roomId: id,
+            roomId: room.id,
           });
           dispatch(reduxRemoveConversationToList({ convId: convId, userId: userId }));
           navigate('/chat/channel');
@@ -128,7 +80,6 @@ export const useConnectionSocketChannel = (
       });
 
       socket.on('room_banned', (roomId, user) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           bannedUsers: room.bannedUsers ? [...room.bannedUsers, user] : [user],
@@ -140,7 +91,7 @@ export const useConnectionSocketChannel = (
 
         if (userId === user.id) {
           socket.emit('leaveRoom', {
-            roomId: id,
+            roomId: room.id,
           });
           dispatch(reduxRemoveConversationToList({ convId: convId, userId: userId }));
           navigate('/chat/channel');
@@ -149,7 +100,6 @@ export const useConnectionSocketChannel = (
       });
 
       socket.on('room_unbanned', (roomId, userIdUnBan) => {
-        if (roomId !== id) return;
         const roomUpdated: RoomInterface = {
           ...room,
           bannedUsers: room.bannedUsers?.filter((u) => u.id !== userIdUnBan),
@@ -157,56 +107,6 @@ export const useConnectionSocketChannel = (
         dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userId }));
         if (userId === userIdUnBan)
           dispatch(setMsgSnackbar('You have been unbanned from the room ' + room.name));
-      });
-
-      /* ROOM ADMIN */
-      socket.on('room_admin_added', (roomId, user) => {
-        if (roomId !== id) return;
-        const roomUpdated: RoomInterface = {
-          ...room,
-          admins: room.admins ? [...room.admins, user] : [user],
-        };
-        dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userId }));
-
-        if (userId === user.id) {
-          // setIsAdmin(true);
-          dispatch(setMsgSnackbar('You are now admin of the room ' + room.name));
-        }
-      });
-
-      socket.on('room_admin_removed', (roomId, userIdUnAdmin) => {
-        if (roomId !== id) return;
-        const roomUpdated: RoomInterface = {
-          ...room,
-          admins: room.admins?.filter((u) => u.id !== userIdUnAdmin),
-        };
-        dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userId }));
-
-        if (userId === userId) {
-          // setIsAdmin(false);
-          dispatch(setWarningSnackbar('You are no longer admin of the room ' + room.name));
-        }
-      });
-
-      /* OWNER */
-      socket.on('room_owner_added', (roomId, user) => {
-        if (roomId !== id) return;
-        const roomUpdated: RoomInterface = {
-          ...room,
-          ownerUser: user,
-        };
-        dispatch(reduxUpdateRoomConvList({ item: roomUpdated, userId: userId }));
-
-        if (userId === user.id) {
-          dispatch(setMsgSnackbar('You are now owner of the room ' + room.name));
-        }
-      });
-
-      socket.on('room_owner_deleted', (roomId) => {
-        if (roomId !== id) return;
-        dispatch(reduxRemoveConversationToList({ convId: convId, userId: userId }));
-        dispatch(setWarningSnackbar('The room ' + room.name + ' has been deleted'));
-        navigate('/chat/channel');
       });
 
 
@@ -223,9 +123,6 @@ export const useConnectionSocketChannel = (
       // socket.on('connect_timeout', (timeout) => { console.log('socket connect_timeout : ', timeout); });
 
       return () => {
-        socket.off('chat_message');
-        socket.off('chat_message_edit');
-        socket.off('chat_message_delete');
         socket.off('room_join');
         socket.off('room_leave');
         socket.off('room_muted');
@@ -233,10 +130,6 @@ export const useConnectionSocketChannel = (
         socket.off('room_kicked');
         socket.off('room_banned');
         socket.off('room_unbanned');
-        socket.off('room_admin_added');
-        socket.off('room_admin_removed');
-        socket.off('room_owner_added');
-        socket.off('room_owner_deleted');
       };
 
     }

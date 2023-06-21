@@ -3,15 +3,14 @@ import PrivateConversation from './PrivateConversation';
 import ChannelConversation from './ChannelConversation';
 import { useEffect, useRef } from 'react';
 import { Socket, io } from 'socket.io-client';
-import { reduxRemoveConversationToList } from '../../../store/convListSlice';
-import { setWarningSnackbar } from '../../../store/snackbarSlice';
-import { connectionSocketChannel } from './utils';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+import { useConnectionSocketChat } from './useSocketChat';
+import { CircularProgress } from '@mui/material';
 
 const ConversationWrapper = () => {
-  const { userData } = useSelector((state: RootState) => state.user);
   const { convId, login, name } = useParams();
+  const { userData } = useSelector((state: RootState) => state.user);
   const location = useLocation();
   const socketRef = useRef<Socket | null>(null);
 
@@ -24,10 +23,7 @@ const ConversationWrapper = () => {
         reconnectionDelayMax: 10000,
         withCredentials: true,
       });
-      // socket.on('connect', () => {
-        // console.log('socket connected');
       socketRef.current = socket;
-      // });
     }
     return () => {
       if (socketRef.current && socketRef.current.connected) {
@@ -35,28 +31,38 @@ const ConversationWrapper = () => {
         socketRef.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData.id]);
+
+  useConnectionSocketChat(
+    socketRef?.current,
+    userData.id,
+    parseInt(convId as string),
+  );
 
   useEffect(() => {
     console.log('location state : ', location.state);
-    // if (!location.state) return;
-    // const { convId, login, name } = location.state as { convId: number, login: string, name: string };
-    // if (convId === -1 || !login || !name) return;
-    // if (login && name) {
-    //   dispatch(reduxSetCurrentConversationList(convId));
-    // }
   }, [location.state]);
 
   
   return (
     <>
       { login && <PrivateConversation key={convId} /> }
-      { name && socketRef.current?.connected && 
+      { name && socketRef && socketRef.current && socketRef.current.connected ?
         <ChannelConversation
           key={convId}
           conv={location.state}
-          socketRef={socketRef}
-        /> }
+          socketRef={socketRef as React.MutableRefObject<Socket>}
+        />
+        :
+        <div className='relative w-full h-full'>
+          <CircularProgress sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+          }}/>
+        </div>
+      }
     </>
   );
 };

@@ -69,7 +69,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
-          <ConversationListRoomItemIcons room={conv.room} />
+          <ConversationListRoomItemIcons conv={conv} />
         </Link>
 
         <Tooltip
