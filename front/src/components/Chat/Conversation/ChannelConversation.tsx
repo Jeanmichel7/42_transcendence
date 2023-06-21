@@ -20,14 +20,19 @@ import SideBarAdmin from '../Channel/admin/SidebarAdmin';
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
 import InvitationRoom from '../Channel/admin/InvitationRoom';
-import { connectionSocketChannel } from './utils';
+import { useConnectionSocketChannel } from './utils';
 
 interface ChannelConversationProps {
   conv: ConversationInterface,
+  socketRef: React.MutableRefObject<Socket>,
 }
 
-const ChannelConversation: React.FC<ChannelConversationProps> = memo(
-  ({ conv }) => {
+const ChannelConversation: React.FC<ChannelConversationProps> =
+  //  memo(
+  ({
+    conv,
+    socketRef,
+  }) => {
     const id = (useParams<{ id: string }>().id || '-1');
     const name = (useParams<{ name: string }>().name || 'unknown');
     const dispatch = useDispatch();
@@ -50,57 +55,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
     const bottomRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const socketRef = useRef<Socket | null>(null);
 
-
-
-
-    // connect socket
-    const connectSocketChat = useCallback(() => {
-      if (!userData.id || userData.id === -1 || id === '-1') return;
-      if (socketRef.current && socketRef.current.connected) return;
-      // console.log('sock ref : ', socketRef.current);
-
-      const socket: Socket = io('http://localhost:3000/chat', {
-        reconnectionDelayMax: 10000,
-        withCredentials: true,
-      });
-      connectionSocketChannel(socket, id, userData.id, conv.id, room, setMessages, setOffsetPagniation, dispatch, navigate);
-      socketRef.current = socket;
-    }, [id, userData.id, room]);
-
-    useEffect(() => {
-      // console.log('useEffect connect socket: ', id, userData.id, socketRef.current?.connected, room);
-      if (!room || room.id === -1 || !userData.id || userData.id === -1 || !id || id === '-1') return;
-      if (room.bannedUsers?.some((u) => u.id === userData.id)) {
-        socketRef.current?.emit('leaveRoom', {
-          roomId: id,
-        });
-        dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
-        navigate('/chat/channel');
-        dispatch(setWarningSnackbar('You have been banned from the room ' + conv.room.name));
-      }
-      // console.log('socketRef.current : ', socketRef.current)
-      if (!socketRef.current || !socketRef.current.connected) {
-        connectSocketChat();
-      }
-      return () => {
-        if (socketRef.current) { // && socketRef.current.connected
-          socketRef.current.off('chat_message');
-          socketRef.current.off('chat_message_edit');
-          socketRef.current.off('chat_message_delete');
-          socketRef.current.emit('leaveRoom', {
-            roomId: id,
-          });
-          socketRef.current.disconnect();
-          socketRef.current = null;
-        }
-      };
-    }, [userData.id, id, connectSocketChat, room?.id]);
-
-
-
-
+    const rien = useConnectionSocketChannel(socketRef.current, id, userData.id, conv.id, setMessages, setOffsetPagniation, dispatch, navigate);
+    console.log('rien : ', rien);
 
     // get messages
     const fetchOldMessages = useCallback(async () => {
@@ -387,14 +344,16 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         }
       </>
     );
-  },
-  (prevProps, nextProps) => {
-    if (prevProps.conv.room !== nextProps.conv.room) return false;
-    // if (prevProps.conv.room.id !== nextProps.conv.room.id) return false;
-    // if (prevProps.conv.room.name !== nextProps.conv.room.name) return false;
-    // if (prevProps.conv.room.users !== nextProps.conv.room.users) return false;
-    return true;
-  },
-);
+    // },
+    // (prevProps, nextProps) => {
+    //   if (prevProps.conv.room !== nextProps.conv.room) return false;
+    //   // if (prevProps.conv.room.id !== nextProps.conv.room.id) return false;
+    //   // if (prevProps.conv.room.name !== nextProps.conv.room.name) return false;
+    //   // if (prevProps.conv.room.users !== nextProps.conv.room.users) return false;
+    //   return true;
+    // },
+    // );
+
+  };
 
 export default ChannelConversation;
