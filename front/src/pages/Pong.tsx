@@ -1,23 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-import EndGame from '../components/Game/EndGame';
-import Score from '../components/Game/Score';
-import { Socket, io } from 'socket.io-client';
-import useSocketConnection from '../components/Game/useSocketConnection';
-import Lobby from '../components/Game/Lobby';
-import SearchingOpponent from '../components/Game/SearchingOpponent';
+import React, { useEffect, useRef, useState } from "react";
+import styled, { keyframes, css } from "styled-components";
+import EndGame from "../components/Game/EndGame";
+import Score from "../components/Game/Score";
+import { Socket, io } from "socket.io-client";
+import useSocketConnection from "../components/Game/useSocketConnection";
+import Lobby from "../components/Game/Lobby";
+import SearchingOpponent from "../components/Game/SearchingOpponent";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
   SocketInterface,
-} from '../components/Game/Interface';
-import { useSelector, useDispatch } from 'react-redux';
-import { Overlay } from '../components/Game/Overlay';
-import CountDown from '../components/Game/CountDown';
-import BonusBox from '../components/Game/BonusBox';
-import spriteBonus from '../assets/spriteBonus.png';
-import spriteBonusExplode from '../assets/spriteBonusExplode.png';
-import '../components/Game/font.css';
+} from "../components/Game/Interface";
+import { useSelector, useDispatch } from "react-redux";
+import { Overlay } from "../components/Game/Overlay";
+import CountDown from "../components/Game/CountDown";
+import BonusBox from "../components/Game/BonusBox";
+import spriteBonus from "../assets/spriteBonus.png";
+import spriteBonusExplode from "../assets/spriteBonusExplode.png";
+import "../components/Game/font.css";
 
 const Playground = styled.div`
   width: 100%;
@@ -49,7 +49,6 @@ const INITIAL_BALL_SPEED = 0.25;
 const POSITION_THRESHOLD = 30;
 const SPEED_INCREASE = 0.04;
 
-
 // Variable constante for optimisation, don't change
 const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
 const RACKET_FACTOR_1000 = RACKET_FACTOR / 1000;
@@ -65,10 +64,9 @@ const GameWrapper = styled.div`
   flex-direction: row;
   margin: 0 auto;
   position: relative;
-  font-family: 'neontubes';
+  font-family: "neontubes";
   overflow: hidden;
 `;
-
 
 interface BonusPosition {
   x: number;
@@ -99,10 +97,10 @@ const BonusReady = styled.div<{ posX: number; posY: number }>`
   height: 50px; // La hauteur de votre sprite
   background: url(${spriteBonus}) repeat-x;
   position: absolute;
-transform: translate(-50%, -50%);
-left: ${({posX} : {posX: number }) => posX}px;
-top: ${({posY} : {posY: number })=> posY}px;
-  animation: ${animationBonus} 1s steps(12) infinite,${fadeIn} 1s ease-in-out;
+  transform: translate(-50%, -50%);
+  left: ${({ posX }: { posX: number }) => posX}px;
+  top: ${({ posY }: { posY: number }) => posY}px;
+  animation: ${animationBonus} 1s steps(12) infinite, ${fadeIn} 1s ease-in-out;
 `;
 
 const BonusExplode = styled.div<{ posX: number; posY: number }>`
@@ -110,20 +108,24 @@ const BonusExplode = styled.div<{ posX: number; posY: number }>`
   height: 200px; // La hauteur de votre sprite
   background: url(${spriteBonusExplode}) repeat-x;
   position: absolute;
-transform: translate(-50%, -50%);
-left: ${({posX} : {posX: number }) => posX}px;
-top: ${({posY} : {posY: number })=> posY}px;
-  animation: ${animationBonusExplode} 1s steps(12)  ; 
-    animation-fill-mode: forwards;
+  transform: translate(-50%, -50%);
+  left: ${({ posX }: { posX: number }) => posX}px;
+  top: ${({ posY }: { posY: number }) => posY}px;
+  animation: ${animationBonusExplode} 1s steps(12);
+  animation-fill-mode: forwards;
 `;
 
-interface BonusInterface {
+interface BonusInterface {}
 
-}
-
-
-
-function Bonus({ bonus, posX, posY } : {bonus: BonusPosition | null, posX: number, posY: number}) {
+function Bonus({
+  bonus,
+  posX,
+  posY,
+}: {
+  bonus: BonusPosition | null;
+  posX: number;
+  posY: number;
+}) {
   const [isBonusVisible, setIsBonusVisible] = useState(false);
   const [isBonusExplode, setBonusExplode] = useState(false);
   const [position, setPosition] = useState([-1, -1]);
@@ -133,16 +135,17 @@ function Bonus({ bonus, posX, posY } : {bonus: BonusPosition | null, posX: numbe
       setIsBonusVisible(true);
       setPosition([posX, posY]);
     } else if (position[0] !== -1) {
-      console.log('bonus not detected');
+      console.log("bonus not detected");
       setIsBonusVisible(false);
       setBonusExplode(true);
     }
   }, [bonus]);
-  return (<div>
-    {isBonusVisible && <BonusReady posX={position[0]} posY={position[1]} />}
-    {isBonusExplode && <BonusExplode posX={position[0]} posY={position[1]} />}
-
-  </div>);
+  return (
+    <div>
+      {isBonusVisible && <BonusReady posX={position[0]} posY={position[1]} />}
+      {isBonusExplode && <BonusExplode posX={position[0]} posY={position[1]} />}
+    </div>
+  );
 }
 
 const explodeAnimation = keyframes`
@@ -151,29 +154,30 @@ const explodeAnimation = keyframes`
   100% {opacity: 0; }
 `;
 
-
-
-const StyledRacket = styled.div.attrs((props) :{posY : number, height: number, type: string} => ({
-  style: {
-    transform: `translateY(${props.posY * ((100 / props.height))}%)`,
-  },
-}))`
+const StyledRacket = styled.div.attrs(
+  (props): { posY: number; height: number; type: string } => ({
+    style: {
+      transform: `translateY(${props.posY * (100 / props.height)}%)`,
+    },
+  })
+)`
   width: ${RACKET_WIDTH}%;
   height: ${(props) => props.height / 10}%;
   background-color: blue;
   position: absolute;
   left: ${(props) =>
-    props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
+    props.type === "left" ? RACKET_LEFT_POS_X + "%" : RACKET_RIGHT_POS_X + "%"};
   top: 0%;
   border-radius: 10px;
   z-index: 2;
-  animation: ${(props) => props.isExploding ? css`${explodeAnimation} 1s forwards` : 'none'};
-  box-shadow: 0 0 .2rem #fff,
-             0 0 .2rem #fff,
-            0 0 2rem #bc13fe,
-            0 0 0.8rem #bc13fe,
-            0 0 2.8rem #bc13fe,
-            inset 0 0 1.3rem #bc13fe; 
+  animation: ${(props) =>
+    props.isExploding
+      ? css`
+          ${explodeAnimation} 1s forwards
+        `
+      : "none"};
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
 
 // Composant Raquette avec le Laser comme enfant
@@ -183,7 +187,12 @@ const Racket = ({ posY, height, type, children }) => {
     oldheight.current = height;
   }
   return (
-    <StyledRacket posY={posY} height={oldheight.current} type={type} isExploding={height === 0}>
+    <StyledRacket
+      posY={posY}
+      height={oldheight.current}
+      type={type}
+      isExploding={height === 0}
+    >
       {children}
     </StyledRacket>
   );
@@ -192,19 +201,19 @@ const Racket = ({ posY, height, type, children }) => {
 // Dans le rendu de votre jeu
 
 interface BallProps {
-  posX: number,
-  posY: number,
+  posX: number;
+  posY: number;
 }
-
 
 const Ball = styled.div.attrs<BallProps>((props) => {
   return {
     style: {
-      transform: `translate(${props.posX - BALL_RADIUS}px, ${props.posY - BALL_RADIUS
+      transform: `translate(${props.posX - BALL_RADIUS}px, ${
+        props.posY - BALL_RADIUS
       }px)`,
     },
   };
-}) <BallProps>`
+})<BallProps>`
   width: ${BALL_DIAMETER}px;
   height: ${BALL_DIAMETER}px;
   background-color: white;
@@ -234,23 +243,29 @@ const laserFlowLeft = keyframes`
 const Laser = styled.div<string>`
   position: absolute;
 
-  width: ${({ type } : {type: string}) => type === 'left' ? '10000px' : '10000px'};
+  width: ${({ type }: { type: string }) =>
+    type === "left" ? "10000px" : "10000px"};
   height: 10px;
   top: 50%;
   z-index: 1;
-  background: ${({ type } : {type: string}) => type === 'left'
-    ? 'linear-gradient(to right, red, white, red)'
-    : 'linear-gradient(to left, red, white, red)'};
+  background: ${({ type }: { type: string }) =>
+    type === "left"
+      ? "linear-gradient(to right, red, white, red)"
+      : "linear-gradient(to left, red, white, red)"};
   background-size: 50px 100%;
-  animation: ${({ type } : {type:string}) => type === 'left'
-    ? css`${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite`
-    : css`${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite`};
-    transform: ${({ type }: {type:string}) => type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'} translateY(-5px); 
-    left: 100%;
-
+  animation: ${({ type }: { type: string }) =>
+    type === "left"
+      ? css`
+          ${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
+        `
+      : css`
+          ${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
+        `};
+  transform: ${({ type }: { type: string }) =>
+      type === "left" ? "translateX(0%)" : "translateX(-10000px)"}
+    translateY(-5px);
+  left: 100%;
 `;
-
-
 
 function Game({
   socket,
@@ -284,9 +299,12 @@ function Game({
   const bonusPositionRef = useRef({} as any);
   const bonusIsLoading = useRef(false);
   const bonusValueRef = useRef();
-  const racketHeightRef = useRef({ left: RACKET_HEIGHT_10, right: RACKET_HEIGHT_10 });
+  const racketHeightRef = useRef({
+    left: RACKET_HEIGHT_10,
+    right: RACKET_HEIGHT_10,
+  });
   const laser = useRef({ left: false, right: false } as any);
-  const { gameData } : {gameData : any} = useSocketConnection(
+  const { gameData }: { gameData: any } = useSocketConnection(
     socket,
     keyStateRef,
     posRacket,
@@ -297,25 +315,25 @@ function Game({
     bonusIsLoading,
     bonusValueRef,
     racketHeightRef,
-    laser,
+    laser
   );
   const fail = useRef(false);
   const correctionFactor = useRef(0);
 
   useEffect(() => {
     const handleResize = () => {
-      const gameWrapper = document.querySelector('#playground');
+      const gameWrapper = document.querySelector("#playground");
       if (gameWrapper) {
         gameDimensions.current.width = gameWrapper.offsetWidth;
         gameDimensions.current.height = gameWrapper.offsetHeight;
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -367,35 +385,42 @@ function Game({
         if (
           oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
           oldBall.y > posRacket.current.left &&
-          oldBall.y < posRacket.current.left + racketHeightRef.current.left && fail.current === false
+          oldBall.y < posRacket.current.left + racketHeightRef.current.left &&
+          fail.current === false
         ) {
           newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
 
           newBall.speed += SPEED_INCREASE;
-          const racketCenter = posRacket.current.left + racketHeightRef.current.left / 2;
+          const racketCenter =
+            posRacket.current.left + racketHeightRef.current.left / 2;
           const relativePostion = newBall.y - racketCenter;
           let proportion = relativePostion / (racketHeightRef.current.left / 2);
           proportion = Math.max(Math.min(proportion, 0.9), -0.9);
           newBall.vy = proportion;
           newBall.vx = Math.sqrt(1 - newBall.vy * newBall.vy) * newBall.speed;
           newBall.vy *= newBall.speed;
-
         } else if (
           oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
           oldBall.y > posRacket.current.right &&
-          oldBall.y < posRacket.current.right + racketHeightRef.current.right && fail.current === false
+          oldBall.y < posRacket.current.right + racketHeightRef.current.right &&
+          fail.current === false
         ) {
           newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
           newBall.speed += SPEED_INCREASE;
-          const racketCenter = posRacket.current.right + racketHeightRef.current.right / 2;
+          const racketCenter =
+            posRacket.current.right + racketHeightRef.current.right / 2;
           const relativePostion = newBall.y - racketCenter;
-          let proportion = relativePostion / (racketHeightRef.current.right / 2);
+          let proportion =
+            relativePostion / (racketHeightRef.current.right / 2);
           proportion = Math.max(Math.min(proportion, 0.9), -0.9);
           newBall.vy = proportion;
           newBall.vx = Math.sqrt(1 - newBall.vy * newBall.vy) * newBall.speed;
           newBall.vy *= newBall.speed;
           newBall.vx = -newBall.vx;
-        } else if (oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS || oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS) {
+        } else if (
+          oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS ||
+          oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS
+        ) {
           fail.current = true;
         }
 
@@ -404,14 +429,16 @@ function Game({
 
         if (
           Math.sign(newBall.vx) === Math.sign(gameData.current.ball?.vx) ||
-          newBall.vx === 0 || gameData.current.ball?.vx === 0
+          newBall.vx === 0 ||
+          gameData.current.ball?.vx === 0
         ) {
           newBall.vx = gameData.current.ball?.vx;
         }
 
         if (
           Math.sign(newBall.vy) === Math.sign(gameData.current.ball?.vy) ||
-          newBall.vy === 0 || gameData.current.ball?.vy === 0
+          newBall.vy === 0 ||
+          gameData.current.ball?.vy === 0
         ) {
           newBall.vy = gameData.current.ball?.vy;
         }
@@ -427,7 +454,7 @@ function Game({
           newBall.speed = gameData.current.ball?.speed;
         }
 
-        console.log('speed', newBall.speed);
+        console.log("speed", newBall.speed);
         return newBall;
       });
       if (gameData.current.winner == null) {
@@ -449,14 +476,14 @@ function Game({
           }
           lastGameInfo.current.looserName = gameData.current.player2Username;
         }
-        setCurrentPage('finished');
+        setCurrentPage("finished");
       }
     }
 
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-        console.log('cancelAnimationFrame');
+        console.log("cancelAnimationFrame");
       }
     };
   }, [gameStarted]);
@@ -469,12 +496,12 @@ function Game({
     function handleKeyUp(e: any) {
       keyStateRef.current[e.key] = false;
     }
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
   return (
@@ -485,62 +512,91 @@ function Game({
         scorePlayerRight={scorePlayers.current.right}
       />
       <Playground id="playground">
-      <Racket posY={posRacket.current.left} height={racketHeightRef.current.left} type={'left'}>
-        {laser.current.left && <Laser type={'left'} />}
-      </Racket>
-      <Ball
-        posX={ball.x * (gameDimensions.current.width / 1000)}
-        posY={ball.y * (gameDimensions.current.height / 1000)}
-      />
-      {gameData?.current.bonusMode && <Bonus bonus={gameData.current.bonus} posX={(bonusPositionRef?.current?.x ? bonusPositionRef.current.x * (gameDimensions.current.width / 1000) : -1)} posY={(bonusPositionRef?.current?.y ? bonusPositionRef.current.y * (gameDimensions.current.height / 1000) : -1)} />}
+        <Racket
+          posY={posRacket.current.left}
+          height={racketHeightRef.current.left}
+          type={"left"}
+        >
+          {laser.current.left && <Laser type={"left"} />}
+        </Racket>
+        <Ball
+          posX={ball.x * (gameDimensions.current.width / 1000)}
+          posY={ball.y * (gameDimensions.current.height / 1000)}
+        />
+        {gameData?.current.bonusMode && (
+          <Bonus
+            bonus={gameData.current.bonus}
+            posX={
+              bonusPositionRef?.current?.x
+                ? bonusPositionRef.current.x *
+                  (gameDimensions.current.width / 1000)
+                : -1
+            }
+            posY={
+              bonusPositionRef?.current?.y
+                ? bonusPositionRef.current.y *
+                  (gameDimensions.current.height / 1000)
+                : -1
+            }
+          />
+        )}
 
-      <Racket posY={posRacket.current.right} height={racketHeightRef.current.right} type={'right'} >
-        {laser.current.right && <Laser type={'right'} />}
-      </Racket>
+        <Racket
+          posY={posRacket.current.right}
+          height={racketHeightRef.current.right}
+          type={"right"}
+        >
+          {laser.current.right && <Laser type={"right"} />}
+        </Racket>
       </Playground>
-      {(bonus || gameData?.current.bonusMode) && <BonusBox bonusIsLoading={bonusIsLoading.current} bonusName={bonusValueRef.current} />}
+      {(bonus || gameData?.current.bonusMode) && (
+        <BonusBox
+          bonusIsLoading={bonusIsLoading.current}
+          bonusName={bonusValueRef.current}
+        />
+      )}
     </div>
   );
 }
 
 function Pong() {
   const [socket, setSocket] = useState({});
-  const [connectStatus, setConnectStatus] = useState('disconnected');
-  const [currentPage, setCurrentPage] = useState('lobby');
+  const [connectStatus, setConnectStatus] = useState("disconnected");
+  const [currentPage, setCurrentPage] = useState("lobby");
   const userData: any = useSelector((state: any) => state.user.userData);
   const lastGameInfo = useRef({} as any);
   const [bonus, setBonus] = useState(false);
   useEffect(() => {
-    const socket = io('http://localhost:3000/game', {
+    const socket = io("http://localhost:3000/game", {
       withCredentials: true,
     });
     setSocket(socket);
 
-    socket.on('connect', () => {
-      setConnectStatus('connected');
-      console.log('connected');
+    socket.on("connect", () => {
+      setConnectStatus("connected");
+      console.log("connected");
     });
 
-    socket.on('disconnect', () => {
-      setConnectStatus('disconnected');
-      console.log('ERROR SOCKET DISCONNECTED');
+    socket.on("disconnect", () => {
+      setConnectStatus("disconnected");
+      console.log("ERROR SOCKET DISCONNECTED");
     });
 
-    socket.on('userGameStatus', (message) => {
-      console.log('Pong status updtae', message);
-      if (message === 'foundNormal') {
-        setCurrentPage('game');
+    socket.on("userGameStatus", (message) => {
+      console.log("Pong status updtae", message);
+      if (message === "foundNormal") {
+        setCurrentPage("game");
         setBonus(false);
       }
-      if (message === 'foundBonus') {
-        setCurrentPage('game');
+      if (message === "foundBonus") {
+        setCurrentPage("game");
         setBonus(true);
       }
-      if (message === 'alreadyInGame') {
-        setCurrentPage('game');
+      if (message === "alreadyInGame") {
+        setCurrentPage("game");
       }
-      if (message === 'notInGame') {
-        setCurrentPage('lobby');
+      if (message === "notInGame") {
+        setCurrentPage("lobby");
       }
     });
     return () => {
@@ -549,19 +605,19 @@ function Pong() {
   }, []);
 
   let statusComponent;
-  if (connectStatus === 'connecting') {
+  if (connectStatus === "connecting") {
     statusComponent = <p>Connecting...</p>;
   } else {
     statusComponent = undefined;
   }
   let pageContent;
-  if (currentPage === 'lobby') {
+  if (currentPage === "lobby") {
     pageContent = <Lobby setCurrentPage={setCurrentPage} socket={socket} />;
-  } else if (currentPage === 'finished') {
+  } else if (currentPage === "finished") {
     pageContent = (
       <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
     );
-  } else if (currentPage === 'game') {
+  } else if (currentPage === "game") {
     pageContent = (
       <Game
         socket={socket}
@@ -570,14 +626,14 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === 'searchOpponent') {
+  } else if (currentPage === "searchOpponent") {
     pageContent = (
       <SearchingOpponent socket={socket} setCurrentPage={setCurrentPage} />
     );
   }
   return (
-    <GameWrapper >
-      {connectStatus === 'disconnected' && <Overlay />}
+    <GameWrapper>
+      {connectStatus === "disconnected" && <Overlay />}
       {statusComponent}
       {pageContent}
     </GameWrapper>
