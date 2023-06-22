@@ -13,8 +13,6 @@ const ScoreWrapper = styled.div`
 
 const ScoreValue = styled.h1`
   font-size: 2rem;
-  border: 1px solid white;
-  border-radius: 10%;
   padding: 0.5rem;
   border: 0.2rem solid #fff;
   border-radius: 2rem;

@@ -61,8 +61,7 @@ const BonusBoxWrapper = styled.div`
   height: 75px;
   border : 1px solid white;
   position: absolute;
-  left: 25px;
-  top: 25px;
+  left: 10px;
   border: 0.2rem solid #fff;
   border-radius: 2rem;
   padding: 0.4em;
@@ -82,21 +81,7 @@ const BonusBoxWrapper = styled.div`
   `}
 
 `;
-/*
-const BonusBoxWrapper = styled.div`
-  width: 75px;
-  height: 75px;
-  border: 1px solid white;
-  position: absolute;
-  left: 25px;
-  top: 25px;
-  background-repeat: no-repeat;
-  background-size: auto 75px;
-  background-image: ${props => props.isLoading ? `url(${spriteBonusSelection})` : getBonusImage(props.bonusName)};
-  ${props => props.isLoading && css`
-    animation: ${ScrollImages} 3s steps(3) infinite;
-  `}
-`;*/
+
 function BonusBox({ bonusIsLoading, bonusName}: any) {
   return (
     <BonusBoxWrapper isLoading={bonusIsLoading} bonusName={bonusName}>

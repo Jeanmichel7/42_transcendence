@@ -8,7 +8,7 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 10;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 5;
+const SCORE_FOR_WIN = 1;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
@@ -32,6 +32,13 @@ interface clientUpdate {
   useBonus: boolean;
 }
 
+interface BonusPosition {
+  x: number;
+  y: number;
+  boxSize: number;
+}
+
+  
 export class Game {
   ball: { x: number; y: number; vx: number; vy: number; speed: number };
   racketLeft: number;
@@ -54,7 +61,7 @@ export class Game {
   startTime: number;
   fail: boolean;
 
-  bonus: any;
+  bonus: BonusPosition  ;
   bonusesLastGeneration: number;
   bonusesPlayer1: any;
   bonusPlayer1Loading: boolean;
@@ -126,6 +133,8 @@ export class Game {
   //   this.id = res.id.toString();
   //   console.log('id game " ', this.id);
   // }
+
+
 
   generateBonus() {
     if (this.bonus === null) {
@@ -423,13 +432,7 @@ export class Game {
       if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player1Username;
-        // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
-        // async saveEndGame(
-        //   gameId: bigint,
-        //   winnerId: bigint,
-        //   scorePlayer1: number,
-        //   scorePlayer2: number,
-        // ): Promise<GameInterface> {
+          
       } else {
         this.ball.x = 500;
         this.ball.y = 500;
