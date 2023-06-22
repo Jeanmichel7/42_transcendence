@@ -4,6 +4,7 @@ import styled, { keyframes, css } from "styled-components";
 import "../fonts/fonts.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
+import ConnectPage from "./Connection";
 
 const slideInFromBottom = keyframes`{
   0% {
