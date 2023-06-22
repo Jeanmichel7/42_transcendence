@@ -16,7 +16,7 @@ function Chat() {
       </div>
       <Divider orientation="vertical" flexItem />
 
-      <div className="flex-grow h-full">
+      <div className="flex-grow h-full w-full">
         <Outlet />
       </div>
     </div>

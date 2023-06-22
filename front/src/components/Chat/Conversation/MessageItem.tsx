@@ -37,7 +37,7 @@ const MessageItem: FC<MessageItemProps> = ({
   const dispatch = useDispatch();
 
   const handleEdit = (id: number) => async (
-    e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (e === null) return;
     
@@ -113,7 +113,7 @@ const MessageItem: FC<MessageItemProps> = ({
   }, [message.createdAt, message.text, message.updatedAt]);
 
   return (
-    <div key={message.id}>
+    <>
       <div
         // ref={index === messages.length - 1 ? bottomRef : null}
         className={`w-full flex ${isHovered && 'bg-[#e7e7f7] rounded-lg'}`}
@@ -226,7 +226,7 @@ const MessageItem: FC<MessageItemProps> = ({
           </IconButton>
         </form>
       }
-    </div>
+    </>
   );
 };
 //  (prevProps, nextProps) => {

@@ -17,14 +17,10 @@ import ConversationListRoomItemIcons from './IconAvatars';
 
 interface ConvProps {
   conv: ConversationInterface,
-  // setConvSelectedId: React.Dispatch<React.SetStateAction<number>>,
-  // setServiceToCall: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ConversationListRoomItem: React.FC<ConvProps> = ({
   conv,
-  // setConvSelectedId,
-  // setServiceToCall,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -37,7 +33,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   const handleCloseConv = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     dispatch(setMsgSnackbar('Conv Close'));
-    dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+    dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
     if (conv.id === parseInt(convId as string)) navigate('/chat');
   };
 
@@ -51,11 +47,16 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
       dispatch(setErrorSnackbar(resLeaveRoom.error + resLeaveRoom.message ? ': ' + resLeaveRoom.message : ''));
     else {
       dispatch(setMsgSnackbar('Leaved room'));
-      dispatch(reduxRemoveConversationToList({ item: conv, userId: userData.id }));
+      dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
       if (conv.id == parseInt(convId as string))
         navigate('/chat');
     }
   };
+
+  // useEffect(() => {
+  //   console.log('   convlistitemconv', conv);
+  // }, [conv]);
+
 
   return (
     <div>
@@ -69,7 +70,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
-          <ConversationListRoomItemIcons room={conv.room} />
+          <ConversationListRoomItemIcons conv={conv} />
         </Link>
 
         <Tooltip

@@ -1,5 +1,5 @@
 import { Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { RoomInterface, ApiErrorResponse } from '../../../types';
@@ -11,7 +11,7 @@ import { RootState } from '../../../store';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Navigate, useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 export interface RoomCardProps {
   room: RoomInterface;
 }
@@ -21,11 +21,12 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const [inputPwd, setInputPwd] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [displayInputPwd, setDisplayInputPwd] = useState(false);
+  const [alreadyInRoom, setAlreadyInRoom] = useState(false);
 
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
@@ -50,6 +51,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         dispatch(setMsgSnackbar('Add room to conversation list'));
+        setAlreadyInRoom(true);
       } else
         dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
@@ -58,17 +60,17 @@ const RoomCard = ({ room }: RoomCardProps) => {
       dispatch(reduxAddConversationList({ item: res, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
+      setAlreadyInRoom(true);
       //navigate ?
     }
     setIsLoading(false);
 
   };
 
-  const checkAlreadyInRoom = (): boolean => {
-    if (isConvAlreadyExist(room, conversationsList))
-      return true;
-    return false;
-  };
+  useEffect(() => {
+    setAlreadyInRoom(isConvAlreadyExist(room, conversationsList));
+  }, [conversationsList, room]);
+
 
 
   return (
@@ -83,9 +85,9 @@ const RoomCard = ({ room }: RoomCardProps) => {
           <Button
             onClick={() => handleJoinRoom()}
             variant="contained"
-            color={ checkAlreadyInRoom() ? 'secondary' : 'primary'}
+            color={ alreadyInRoom ? 'secondary' : 'primary'}
           > 
-            { checkAlreadyInRoom() ? 'In room' : 'Join'}
+            { alreadyInRoom ? 'In room' : 'Join'}
           </Button>
         </div>}
       {displayInputPwd && (

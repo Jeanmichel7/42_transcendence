@@ -101,7 +101,6 @@ const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterf
 
 const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => {
   //edit conversation
-  // console.log('redux conv list : ', item);
   const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === item.id);
   if (indexConvToUpdate !== -1) {
     state.conversationsList[indexConvToUpdate].room = item;
@@ -129,25 +128,39 @@ export const chatSlice = createSlice({
       state.conversationsList = action.payload;
     },
     reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {
+      // console.log('REDUX ADD CONV LIST');
       const { item, userId } = action.payload;
       helperAddConversationList(state, item as UserInterface | RoomInterface);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
-    reduxRemoveConversationToList: (state, action: PayloadAction<{ item: ConversationInterface, userId: number }>) => {
-      const { item, userId } = action.payload;
+    reduxRemoveConversationToList: (state, action: PayloadAction<{ convId: number, userId: number }>) => {
+      // console.log('REDUX REMOVE CONV LIST');
+      const { convId, userId } = action.payload;
       state.conversationsList = state.conversationsList
-        .filter((conv: ConversationInterface) => conv.id !== item.id);
+        .filter((conv: ConversationInterface) => conv.id !== convId);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxUpdateRoomConvList: (state, action: PayloadAction<{ item: RoomInterface, userId: number }>) => {
+      // console.log('REDUX UPDATE ROOM CONV LIST');
       const { item, userId } = action.payload;
       if (helperUpdateConversationList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface, userId: number }>) => {
+      // console.log('REDUX UPDATE STATUS USER CONV LIST');
       const { item, userId } = action.payload;
       if (helperUpdateStatusUserConvList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+    },
+    reduxRemoveWaitingUserInRoom: (state, action: PayloadAction<{ roomId: number, userId: number }>) => {
+      // console.log('REDUX REMOVE WAITING USER IN ROOM');
+      const { roomId, userId } = action.payload;
+      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === roomId);
+      if (indexConvToUpdate !== -1) {
+        state.conversationsList[indexConvToUpdate].room.acceptedUsers = state.conversationsList[indexConvToUpdate].room.acceptedUsers
+          ?.filter((user: UserInterface) => user.id !== userId);
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+      }
     },
   },
 });
@@ -158,6 +171,7 @@ export const {
   reduxRemoveConversationToList,
   reduxUpdateRoomConvList,
   reduxUpdateStatusUserConvList,
+  reduxRemoveWaitingUserInRoom,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

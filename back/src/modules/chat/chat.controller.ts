@@ -137,6 +137,15 @@ export class ChatController {
     return result;
   }
 
+  @UseGuards(UserNotBannedGuard)
+  @Post('rooms/:roomId/decline')
+  async declineRoom(
+    @Req() req: RequestWithUser,
+    @Param('roomId') roomId: bigint,
+  ): Promise<void> {
+    await this.ChatService.declineRoom(req.user.id, roomId);
+  }
+
   // leave room
   @Patch('rooms/:roomId/leave')
   async leaveRoom(

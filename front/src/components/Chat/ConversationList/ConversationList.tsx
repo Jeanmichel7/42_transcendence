@@ -1,13 +1,10 @@
-// import {  useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { CircularProgress } from '@mui/material';
 import { RootState } from '../../../store';
 import ConversationListUserItem from './ConversationListItemUser';
 import { ConversationInterface } from '../../../types';
-// import { useEffect } from 'react';
 import { isRoomInterface, isUserInterface } from '../../../utils/utils';
 import ConversationListRoomItem from './ConversationListItemRoom';
-
 
 const ConversationList: React.FC = () => {
   const { conversationsList } = useSelector((state: RootState) => state.chat);
@@ -36,8 +33,6 @@ const ConversationList: React.FC = () => {
                   conv={conv}
                 />
               );
-            } else {
-              return (<p> WTF ?!</p>);
             }
           })}
       </div>
