@@ -130,6 +130,7 @@ export default function FakeConnection() {
         <h2 className="text-2xl font-bold">Login</h2>
         <Box
           component="form"
+          onSubmit={handleConnection}
           sx={{
             '& > :not(style)': { m: 1, width: '25ch' },
           }}
@@ -154,7 +155,8 @@ export default function FakeConnection() {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleConnection}
+            type='submit'
+            // onClick={handleConnection}
           >
             Connection
           </Button>

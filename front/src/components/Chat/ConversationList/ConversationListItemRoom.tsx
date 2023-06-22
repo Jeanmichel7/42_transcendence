@@ -17,14 +17,10 @@ import ConversationListRoomItemIcons from './IconAvatars';
 
 interface ConvProps {
   conv: ConversationInterface,
-  // setConvSelectedId: React.Dispatch<React.SetStateAction<number>>,
-  // setServiceToCall: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ConversationListRoomItem: React.FC<ConvProps> = ({
   conv,
-  // setConvSelectedId,
-  // setServiceToCall,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -56,6 +52,11 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         navigate('/chat');
     }
   };
+
+  // useEffect(() => {
+  //   console.log('   convlistitemconv', conv);
+  // }, [conv]);
+
 
   return (
     <div>

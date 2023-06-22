@@ -18,12 +18,13 @@ export const useConnectionSocketChat = (
 
   useEffect(() => {
     if (socket) {
-      /* MESSAGE */
+
       /* ROOM */
       socket.on('room_join', (roomId, user) => {
-        console.log('room_join : ', user);
+        // console.log('Event room_join : ', roomId, user);
         const roomUpdated: RoomInterface = {
           ...room,
+          // id: roomId,
           acceptedUsers: room.acceptedUsers?.filter((u) => u.id !== user.id),
           users: room.users ? [...room.users, user] : [user],
         };
@@ -31,8 +32,10 @@ export const useConnectionSocketChat = (
       });
 
       socket.on('room_leave', (roomId, userIdLeave) => {
+        // console.log('Event room_leave : ', roomId, userIdLeave.id);
         const roomUpdated: RoomInterface = {
           ...room,
+          // id: roomId,
           users: room.users?.filter((u) => u.id !== userIdLeave),
           admins: room.admins?.filter((u) => u.id !== userIdLeave),
           acceptedUsers: room.acceptedUsers?.filter((u) => u.id !== userIdLeave),
@@ -133,6 +136,6 @@ export const useConnectionSocketChat = (
       };
 
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convId, room, socket]);
-
 };

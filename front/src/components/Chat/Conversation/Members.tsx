@@ -4,11 +4,7 @@ import { RoomInterface, UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
-
-  // useEffect(() => {
-  //   console.log('user in MemberCard : ', user);
-  // }, [user]);
-
+  
   return (
     <>
       {!user ? null :
@@ -71,10 +67,6 @@ const ChatMembers = ({
 
   const [userWithoutAdmins, setUserWithoutAdmins] = useState<UserInterface[] | null>(null);
   const [acceptedusersWithoudBot, setAcceptedUsersWithoutBot] = useState<UserInterface[] | null>(null);
-
-  useEffect(() => {
-    console.log('room : ', room);
-  }, [room]);
 
   useEffect(() => {
     if (!room.admins || !room.users) return;

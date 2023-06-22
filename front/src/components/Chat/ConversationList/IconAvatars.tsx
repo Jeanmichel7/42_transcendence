@@ -35,6 +35,10 @@ const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsPr
   // console.log('usersToDisplay : ', usersToDisplay);
   // }, [usersToDisplay]);
 
+  // useEffect(() => {
+  //   console.log('        room : ', room);
+  // }, [room]);
+
   useEffect(() => {
     if (room && room.ownerUser && (usersToDisplay == null || usersToDisplay.length < 2)) {
       const adminSelected: UserInterface | undefined = getRandAdmin();

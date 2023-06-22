@@ -6,7 +6,7 @@ import { Socket, io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { useConnectionSocketChat } from './useSocketChat';
-import { CircularProgress } from '@mui/material';
+import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
 
 const ConversationWrapper = () => {
   const { convId, login, name } = useParams();
@@ -16,9 +16,7 @@ const ConversationWrapper = () => {
 
   useEffect(() => {
     if (login || userData.id == -1) return;
-    // console.log('socketRef.current : ', socketRef.current)
     if (!socketRef.current || !socketRef.current.connected) {
-      console.log('connect socket channel : ');
       const socket: Socket = io('http://localhost:3000/chat', {
         reconnectionDelayMax: 10000,
         withCredentials: true,
@@ -32,7 +30,7 @@ const ConversationWrapper = () => {
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData.id]);
+  }, [userData.id, login]);
 
   useConnectionSocketChat(
     socketRef?.current,
@@ -40,28 +38,25 @@ const ConversationWrapper = () => {
     parseInt(convId as string),
   );
 
-  useEffect(() => {
-    console.log('location state : ', location.state);
-  }, [location.state]);
+  // useEffect(() => {
+  //   console.log('location state : ', location.state);
+  //   console.log('name : ', name);
+  // }, [location.state, name]);
 
   
   return (
     <>
-      { login && <PrivateConversation key={convId} /> }
-      { name && socketRef && socketRef.current && socketRef.current.connected ?
-        <ChannelConversation
-          key={convId}
-          conv={location.state}
-          socketRef={socketRef as React.MutableRefObject<Socket>}
-        />
-        :
-        <div className='relative w-full h-full'>
-          <CircularProgress sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-          }}/>
-        </div>
+      { login && !name && <PrivateConversation key={convId} /> }
+      { !login && name && 
+        <>
+          { socketRef && socketRef.current && socketRef.current.connected && location.state ?
+            <ChannelConversation
+              key={convId}
+              conv={location.state}
+              socketRef={socketRef as React.MutableRefObject<Socket>}
+            /> : <Loaderperosnalized top={50} left={50}/>
+          }
+        </>
       }
     </>
   );
