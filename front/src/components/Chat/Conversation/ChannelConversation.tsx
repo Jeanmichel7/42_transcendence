@@ -172,10 +172,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
         fetchRoomData();
       }, [fetchRoomData, id, userData.id]);
 
-
-
-
-
       useEffect(() => {
         if (!room || !userData) return;
         if (room.admins) setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
@@ -194,9 +190,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
       }, [messages]);
 
 
-
-
-
       // delete message
       const handleDeleteMessage = async (msgId: number) => {
         setIsLoadingDeleteMsg(true);
@@ -212,7 +205,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
       };
 
 
-
       //scrool top = fetch new page messages
       const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
         const element = e.target as HTMLDivElement;
@@ -221,6 +213,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
           //display waiting message
         }
       };
+
 
       const handleDeleteChannel = async () => {
         if (!room) return;
@@ -238,14 +231,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
 
       return (
         <>
-          {!room ? <p>loading...</p> :
-            <div className="flex flex-col h-full">
+          {!room ? <p>loading...</p> : 
+          <div className='flex h-full'>
+            <div className="flex flex-grow flex-col h-full justify-between">
               <div className="w-full flex text-lg text-blue justify-between">
-
                 {isAdmin && room && <InvitationRoom room={room} />}
-
                 <p className='font-bold text-lg py-1'>{name.toUpperCase()}</p>
-
                 {isAdmin && room &&
                   <SideBarAdmin
                     room={room}
@@ -254,39 +245,40 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
                   />}
               </div>
 
-              <div className='flex h-full'>
-                <div className="flex-grow self-end overflow-y-auto max-h-[calc(100vh-275px)] h-full bg-[#efeff8] " onScroll={handleScroll}>
-
-                  {/* display messages */}
-                  {messages && userBlocked &&
-                    <div className='text-lg m-1 p-2 '>
-                      {messages.map((message: ChatMsgInterface) => (
-                        userBlocked.some((u) => u.id === message.ownerUser.id) ? null :
+              <div
+                className="overflow-y-auto max-h-[calc(100vh-275px)] h-full bg-[#efeff8] 
+                flex flex-col"
+                onScroll={handleScroll}
+              >
+                {/* display messages */}
+                {messages && userBlocked &&
+                  <div className='align-end flex-grow text-lg m-1 p-2 '>
+                    {messages.map((message: ChatMsgInterface) => (
+                      userBlocked.some((u) => u.id === message.ownerUser.id) ? null :
                         // <ErrorBoundary>
-                          <MessageItem
-                            key={message.id}
-                            message={message}
-                            isLoadingDeleteMsg={isLoadingDeleteMsg}
-                            handleDeleteMessage={handleDeleteMessage}
-                            isAdminMenuOpen={isAdminMenuOpen}
-                          />
-                        // </ErrorBoundary>
-                      ))}
-                    </div>
-                  }
-                  <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
-                    <FormChannel setShouldScrollToBottom={setShouldScrollToBottom}/>
+                        <MessageItem
+                          key={message.id}
+                          message={message}
+                          isLoadingDeleteMsg={isLoadingDeleteMsg}
+                          handleDeleteMessage={handleDeleteMessage}
+                          isAdminMenuOpen={isAdminMenuOpen}
+                        />
+                      // </ErrorBoundary>
+                    ))}
                   </div>
-                  <div ref={bottomRef}></div>
+                }
+                <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
+                  <FormChannel setShouldScrollToBottom={setShouldScrollToBottom} />
                 </div>
-
-                {/* display members */}
-                <div className='w-[150px]'>
-                  <ChatMembers room={room} />
-                </div>
+                <div ref={bottomRef}></div>
               </div>
             </div>
-          }
+
+            {/* display members */}
+            <div className='w-[150px]'>
+              <ChatMembers room={room} />
+            </div>
+          </div> }
         </>
       );
     },

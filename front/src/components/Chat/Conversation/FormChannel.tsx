@@ -15,10 +15,36 @@ const FormChannel = ({
   const id = (useParams<{ id: string }>().id || '-1');
   const [text, setText] = useState<string>('');
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
+  const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messageQueue = useRef<string[]>([]).current;
+
+  const sendMessageFromQueue = useCallback(async () => {
+    if (isSending) return;
+    if (messageQueue.length === 0) {
+      setStatusSendMsg('');
+      return;
+    }
+    setIsSending(true);
+    const message = messageQueue.shift();
+    const newMessage: ChatMsgInterface | ApiErrorResponse = await sendChatMessage(id, {
+      text: message,
+    });
+    setIsSending(false);
+    if ('error' in newMessage)
+      setStatusSendMsg(newMessage.message);
+    setShouldScrollToBottom(true);
+    sendMessageFromQueue();
+    setTimeout(() => {
+      sendMessageFromQueue();
+    }, 300);
+    // setTimeout(sendMessageFromQueue, 10000);
+
+  }, [id, isSending, messageQueue, setShouldScrollToBottom]);
 
   // send message
-  const handleSubmit = useCallback(
+  const handleSubmit = 
+  useCallback(
     () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (e === null) return;
       if ('key' in e) {
@@ -34,28 +60,19 @@ const FormChannel = ({
         setText('');
         return;
       }
-      setStatusSendMsg('pending');
-      const newMessage: ChatMsgInterface | ApiErrorResponse = await sendChatMessage(id, {
-        text: text,
-      });
-      if ('error' in newMessage)
-        setStatusSendMsg(newMessage.message);
-      else
-        setStatusSendMsg('');
+
+      messageQueue.push(text);
       setText('');
-      setShouldScrollToBottom(true);
-    }, [id, setShouldScrollToBottom, text],
+      setStatusSendMsg('sending');
+      sendMessageFromQueue();
+    }, [messageQueue, sendMessageFromQueue, text],
   );
 
-
-  /* set text input currying + callback */
   const handleChangeTextArea = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      console.log(e);
       setText(e.target.value);
     }, [],
   );
-
 
   return (
     <>
@@ -78,12 +95,13 @@ const FormChannel = ({
 
         {/* display status send message */}
         {statusSendMsg !== '' &&
-          <span className={`${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                        bottom-16  text-white p-2 rounded-xl shadow-lg`}
+          <p className={`${statusSendMsg == 'sending' ? 'bg-yellow-500' : 'bg-red-500'}
+          text-white p-1 rounded-md shadow-md flex whitespace-nowrap justify-center items-center px-2`}
             onClick={() => setStatusSendMsg('')}
           >
-            {statusSendMsg}
-          </span>
+            { statusSendMsg } 
+            { messageQueue.length > 0 && ' (' + messageQueue.length + ')' }
+          </p>
         }
       </form>
     </>

@@ -128,7 +128,7 @@ export const chatSlice = createSlice({
       state.conversationsList = action.payload;
     },
     reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {
-      // console.log('REDUX ADD CONV LIST');
+      console.log('REDUX ADD CONV LIST', action.payload);
       const { item, userId } = action.payload;
       helperAddConversationList(state, item as UserInterface | RoomInterface);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));

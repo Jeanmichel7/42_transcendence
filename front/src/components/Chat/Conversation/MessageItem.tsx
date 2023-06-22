@@ -123,6 +123,10 @@ const MessageItem: FC<MessageItemProps> = ({
         {/**
         * Display message
         */}
+        { message && !message.ownerUser ? 
+          <p>t'as abuse bro</p>
+          :
+        <>
         <div className='flex-none w-14 mr-2'>
           <Link to={'/profile/' + message.ownerUser.login}>
             <img
@@ -193,6 +197,7 @@ const MessageItem: FC<MessageItemProps> = ({
             </IconButton>
           </Tooltip>
         </div>
+        </> }
       </div>
 
       {/**

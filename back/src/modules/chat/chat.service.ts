@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
@@ -22,7 +22,6 @@ import { ChatRoomInterface } from './interfaces/chat.room.interface';
 import { NotificationEntity } from '../notification/entity/notification.entity';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
-
 import {
   BotChatMessageEvent,
   ChatMessageEvent,
@@ -42,6 +41,7 @@ export class ChatService {
     @InjectRepository(ChatMessageEntity)
     private readonly messageRepository: Repository<ChatMessageEntity>,
     private readonly notificationService: NotificationService,
+    @InjectEntityManager() private readonly manager: EntityManager,
   ) {}
 
   /* ************************************************ */
@@ -56,8 +56,8 @@ export class ChatService {
 
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id'],
-      relations: ['roomUsers'],
+      select: ['id', 'login', 'avatar'],
+      // relations: ['roomUsers'],
     });
 
     let hashPassword: string = null;
@@ -74,7 +74,7 @@ export class ChatService {
           const userAccepted: UserEntity = await this.userRepository.findOne({
             where: { id: userId },
             select: ['id'],
-            relations: ['roomUsers'],
+            // relations: ['roomUsers'],
           });
           if (!userAccepted)
             throw new NotFoundException(`User ${user.login} not found`);
@@ -102,12 +102,13 @@ export class ChatService {
     });
     if (!room) throw new Error('Room not created');
 
-    user.roomUsers = [...user.roomUsers, room];
-    await user.save();
+    // user.roomUsers = [...user.roomUsers, room];
+    // await user.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
       .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'acceptedUsers')
       .select([
         'chat_rooms.id',
         'chat_rooms.name',
@@ -117,6 +118,11 @@ export class ChatService {
         'ownerUser.id',
         'ownerUser.login',
         'ownerUser.avatar',
+        'ownerUser.status',
+        'acceptedUsers.id',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
@@ -596,7 +602,11 @@ export class ChatService {
       .createQueryBuilder('chat_rooms')
       .leftJoin('chat_rooms.ownerUser', 'ownerUser')
       .select([
-        'chat_rooms',
+        'chat_rooms.id',
+        'chat_rooms.type',
+        'chat_rooms.name',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
         'ownerUser.firstName',
         'ownerUser.lastName',
@@ -1018,7 +1028,7 @@ export class ChatService {
     await userToBeBanned.save();
 
     room.bannedUsers = [...room.bannedUsers, userToBeBanned];
-    // room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
+    room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -1256,17 +1266,15 @@ export class ChatService {
     const userSend: UserEntity = await UserEntity.findOne({
       where: { id: userId },
       select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
-      relations: ['chatMessages'],
+      // relations: ['chatMessages'],
     });
-    // console.log('userSend', userSend);
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
       where: { id: roomId },
       select: ['id', 'type', 'name', 'isProtected'],
-      relations: ['messages', 'users', 'acceptedUsers'],
+      relations: ['users', 'acceptedUsers'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
-    // console.log('room', room);
     //check if userSend is in room or in acceptedUser
     if (
       !userSend.id &&
@@ -1278,19 +1286,20 @@ export class ChatService {
       );
     }
 
-    // const chatMessageEntity: ChatMessageEntity = new ChatMessageEntity();
-    // chatMessageEntity.text = newMessage.text;
-    // chatMessageEntity.ownerUser = userSend;
-
-    const message: ChatMessageEntity = await ChatMessageEntity.save({
-      text: newMessage.text,
-    });
+    const message: ChatMessageEntity = await ChatMessageEntity.save(
+      // ChatMessageEntity,
+      {
+        text: newMessage.text,
+        ownerUser: userSend,
+        room: room,
+      },
+    );
     if (!message) throw new Error('Message not created');
 
-    userSend.chatMessages = [...userSend.chatMessages, message];
-    await userSend.save();
-    room.messages = [...room.messages, message];
-    await room.save();
+    // userSend.chatMessages = [...userSend.chatMessages, message];
+    // await userSend.save();
+    // room.messages = [...room.messages, message];
+    // await room.save();
     const messageToSave: ChatMsgInterface = {
       id: message.id,
       text: message.text,
@@ -1476,9 +1485,9 @@ export class ChatService {
       .leftJoinAndSelect('chat_rooms.admins', 'admins')
       .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
-      .leftJoinAndSelect('chat_rooms.messages', 'messages')
+      // .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('chat_rooms.acceptedUsers', 'acceptedUsers')
-      .leftJoinAndSelect('messages.ownerUser', 'ownerMessage')
+      // .leftJoinAndSelect('messages.ownerUser', 'ownerMessage')
       .select([
         'chat_rooms',
         'ownerUser.id',
@@ -1511,16 +1520,16 @@ export class ChatService {
         'mutedUsers.login',
         'mutedUsers.avatar',
         'mutedUsers.status',
-        'messages.id',
-        'messages.text',
-        'messages.createdAt',
-        'messages.updatedAt',
-        'ownerMessage.id',
-        'ownerMessage.firstName',
-        'ownerMessage.lastName',
-        'ownerMessage.login',
-        'ownerMessage.avatar',
-        'ownerMessage.status',
+        // 'messages.id',
+        // 'messages.text',
+        // 'messages.createdAt',
+        // 'messages.updatedAt',
+        // 'ownerMessage.id',
+        // 'ownerMessage.firstName',
+        // 'ownerMessage.lastName',
+        // 'ownerMessage.login',
+        // 'ownerMessage.avatar',
+        // 'ownerMessage.status',
         'acceptedUsers', //// a verfier ///
         'acceptedUsers.id',
         'acceptedUsers.firstName',

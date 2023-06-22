@@ -57,22 +57,15 @@ function App() {
       dispatch(setLogged(true));
 
       /* GET NOTIF IN LOCALSTORAGE AND ADD NOTIF NOT READ */
-      // dispatch(reduxSetNotifications(
-      //   localStorage.getItem('notifications' + userId)
-      //     ? JSON.parse(localStorage.getItem('notifications' + userId) as string)
-      //     : [] as NotificationInterface[],
-      // ));
       const notifInLocalStorage: NotificationInterface[]
         = JSON.parse(localStorage.getItem('notifications' + userId) as string) || [] as NotificationInterface[];
       dispatch(reduxSetNotifications(notifInLocalStorage));
+
       const notifsNotRead = await getNotifsNotRead();
-      // console.log('notifsNotRead : ', notifsNotRead);
-      // console.log('notifInLocalStorage : ', notifInLocalStorage);
       if (!('error' in notifsNotRead)) {
         const notifsNotReadFiltered = notifsNotRead.filter((n: NotificationInterface) =>
           !notifInLocalStorage?.find((n2: NotificationInterface) => n2.id === n.id),
         );
-        // console.log('notifsNotReadFiltered : ', notifsNotReadFiltered);
         if (notifsNotReadFiltered.length > 0)
           dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
       }
@@ -80,13 +73,7 @@ function App() {
       /* GET CONVERSATION LIST IN LOCALSTORAGE AND UPDATE STATUS FRIENDS*/
       const convListInLocalStorage: ConversationInterface[]
         = JSON.parse(localStorage.getItem('conversationsList' + userId) as string) || [] as ConversationInterface[];
-      
-      // console.log('conv list in local storage : ', convListInLocalStorage);
-      
       dispatch(reduxSetConversationList(convListInLocalStorage));
-
-
-
 
       await fetchData(getUserData, setUser);
       await fetchData(getFriends, reduxSetFriends);
@@ -95,14 +82,13 @@ function App() {
       await fetchData(getFriendRequestsSent, reduxSetWaitingFriendsSent);
 
     } else {
-      // console.log('isAuth : ', isAuth, userId);
       dispatch(setLogged(false));
       //disconnect user
       if (userId !== -1)
         navigate('/');
       setUserId(-1);
     }
-  }, [dispatch, fetchData, userId]);
+  }, [dispatch, fetchData, navigate, userId]);
 
 
   useEffect(() => {
@@ -117,9 +103,6 @@ function App() {
           <div className="h-full">
             <AppRoutes />
           </div>
-          {/* <div className="absolute right-0 top-0">
-            <SideBar />
-          </div> */}
         </div>
         <Footer />
       </div>
