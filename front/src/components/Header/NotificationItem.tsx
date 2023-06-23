@@ -1,5 +1,5 @@
 import { Button, CircularProgress, IconButton, MenuItem, Tooltip, Typography, Zoom } from '@mui/material';
-import { ApiErrorResponse, NotificationInterface, UserInterface, UserRelation } from '../../types';
+import { ApiErrorResponse, GameInterface, NotificationInterface, UserInterface, UserRelation } from '../../types';
 import { useState } from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,6 +13,7 @@ import { reduxReadNotification, reduxRemoveNotification } from '../../store/noti
 import { RootState } from '../../store';
 import { readNotification } from '../../api/notification';
 import { declineRoom } from '../../api/chat';
+import { acceptGame } from '../../api/game';
 
 
 interface NotificationItemProps {
@@ -36,7 +37,7 @@ const NotificationItem = ({
 
 
 
-  /* helper action */
+  /* helper action FriendShip action */
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
     const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAccept.id);
@@ -82,6 +83,35 @@ const NotificationItem = ({
 
 
 
+  /* helper action Game action */
+  const handleAcceptGameInvite = async (notif: NotificationInterface) => {
+    console.log('notif', notif);
+    const extractGameId: number = parseInt(notif.invitationLink?.split('?id=')[1] as string);
+    console.log('extractGameId', extractGameId);
+
+    setIsLoading(true);
+    const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(extractGameId);
+    if ('error' in resAcceptRequest)
+      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
+    else {
+      dispatch(setMsgSnackbar('Game invitation accepted'));
+      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
+    }
+    setIsLoading(false);
+  };
+
+  const handleDeclineGameInvitation = async (notif: NotificationInterface) => {
+    const extractGameId: number = parseInt(notif.invitationLink?.split('?id=')[1] as string);
+    setIsLoading(true);
+
+    const resDeclineRequest: void | ApiErrorResponse = await declineRoom(extractGameId);
+    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest) 
+      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+    setIsLoading(false);
+  };
+
+
+
 
 
 
@@ -108,11 +138,12 @@ const NotificationItem = ({
   const handleAcceptActionNotification = async (notif: NotificationInterface) => {
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
-    if (notif.type === 'roomInvite') {
+    if (notif.type === 'roomInvite')
+      return navigate(notif.invitationLink ? notif.invitationLink : '/chat');
+    if (notif.type === 'gameInvite')
+      await handleAcceptGameInvite(notif);
+    if (notif.type === 'gameInviteAccepted')
       navigate(notif.invitationLink ? notif.invitationLink : '/chat');
-    }
-    
-    
     handleDeleteNotification(notif);
   };
 
@@ -121,7 +152,9 @@ const NotificationItem = ({
       await handleDeclineFriendRequest(notif.sender);
     if (notif.type === 'roomInvite') 
       await handleDeclineJoinRoom(notif);
-    
+    if (notif.type === 'gameInvite')
+      await handleDeclineGameInvitation(notif);
+    // if (notif.type === 'gameInviteAccepted')
 
     handleDeleteNotification(notif);
   };

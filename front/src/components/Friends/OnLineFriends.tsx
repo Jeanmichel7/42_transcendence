@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../types';
 import { RootState } from '../../store';
 import { useState } from 'react';
 import { apiBlockUser, deleteFriend } from '../../api/relation';
@@ -10,6 +10,7 @@ import FriendItem from './FriendItem';
 import { useNavigate } from 'react-router-dom';
 import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
+import { inviteGameUser } from '../../api/game';
 
 interface OnLineFriendsProps {
   userDataId: number;
@@ -34,6 +35,18 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
       dispatch(reduxAddUserBlocked(userToBlock));
       dispatch(setMsgSnackbar('User blocked'));
     }
+  };
+
+  const handleDefi = async (userToDefie: UserInterface) => {
+    const resInvitGameUser: GameInterface | ApiErrorResponse =
+       await inviteGameUser(userToDefie.id);
+    if ('error' in resInvitGameUser)
+      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+    //recupe url de ;invite ?
+
+    //send bot message to invited ?
+
+    dispatch(setMsgSnackbar('Invitation sent'));
   };
 
   const handleDeleteFriend = async (userToDelete: UserInterface) => {
@@ -68,6 +81,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
           key={user.id}
           user={user}
           actions={[
+            { name: 'Defi', callback: handleDefi },
             { name: 'Chat', callback: handleNavigateToChat },
             { name: 'Block', callback: handleBlockUser },
             { name: 'Delete', callback: handleDeleteFriend },

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import { ClientToServerEvents, ServerToClientEvents } from './Interface';
-import { Socket } from 'socket.io-client';
-import { GROUND_MAX_SIZE } from '../../pages/Pong';
+import { GROUND_MAX_SIZE } from './Game';
 
 const useSocketConnection = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
@@ -30,15 +29,14 @@ const useSocketConnection = (
       racketHeightRef.current.left = serverData.racketRightHeight;
       racketHeightRef.current.right = serverData.racketLeftHeight;
       if (serverData.bonus) {
-      bonusPositionRef.current = serverData.bonus;
+        bonusPositionRef.current = serverData.bonus;
         bonusPositionRef.current.x = GROUND_MAX_SIZE - serverData.bonus.x;
       }
       bonusIsLoading.current = serverData.bonusPlayer2Loading;
       bonusValueRef.current = serverData.bonusPlayer2;
       laser.current.left = serverData.player2Laser;
       laser.current.right = serverData.player1Laser;
-      }
-     else {
+    } else {
       racketHeightRef.current.left = serverData.racketLeftHeight;
       racketHeightRef.current.right = serverData.racketRightHeight;
       scorePlayers.current.left = serverData.player2Score;
@@ -59,8 +57,8 @@ const useSocketConnection = (
     const intervalId: NodeJS.Timeout = setInterval(() => {
       socket.emit('clientUpdate', {
         posRacket: posRacket.current.left,
-        ArrowDown: keyStateRef.current['ArrowDown'],
-        ArrowUp: keyStateRef.current['ArrowUp'],
+        ArrowDown: keyStateRef.current.ArrowDown,
+        ArrowUp: keyStateRef.current.ArrowUp,
         gameId: gameId.current,
         useBonus: keyStateRef.current[' '],
       });

@@ -17,7 +17,7 @@ import {
   setUser,
 } from './store/userSlice';
 import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
-import { useLocation, useNavigate, useNavigation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
@@ -100,13 +100,13 @@ function App() {
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
-        {location?.pathname !== "/" && <Header />}
-        <div className="flex-grow bg-[#eaeaff] w-full">
+        {location?.pathname !== '/' && <Header />}
+        <div className="flex-grow bg-[#1e1e1e] w-full">
           <div className="h-full">
             <AppRoutes />
           </div>
         </div>
-        {location?.pathname !== "/" && <Footer />}
+        {location?.pathname !== '/' && <Footer />}
       </div>
 
       <Snackbar

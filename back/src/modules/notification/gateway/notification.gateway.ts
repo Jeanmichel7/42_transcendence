@@ -112,4 +112,23 @@ export class NotificationGateway {
       }
     });
   }
+
+  /* GAME */
+  emitNotificationGameInvite(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_game_invite', data);
+  }
+
+  emitNotificationGameInviteAccepted(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_game_invite_accepted', data);
+  }
+
+  emitNotificationGameInviteDeclined(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_game_invite_declined', data);
+  }
 }

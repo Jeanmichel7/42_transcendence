@@ -1,4 +1,5 @@
-import styled, {keyframes} from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+// import { StyledButton } from './Lobby';
 import { StyledButton } from './Lobby';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
@@ -43,13 +44,13 @@ const buzz = keyframes`
   70% {
     opacity: 0.80;
   }
-}`
+}`;
 const StyledNeonH1 = styled.h1`
   color: #fff;
   -webkit-animation: ${buzz} 0.1s infinite alternate;
   font-size: 4rem;
   text-shadow: 0 0 0 transparent, 0 0 10px #2695ff, 0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff, 0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
-  `
+  `;
 
 const neonAnimationStartUp = keyframes`
 0% { 
@@ -85,7 +86,7 @@ const NeonSign = styled.div`
   animation: ${neonAnimationStartUp} steps(1) 1s forwards;
   animation-delay: 1s; // The sign will start glowing after 1 second
 `;
-  const StyledNeonH2 = styled.h2`
+const StyledNeonH2 = styled.h2`
   color: #fff;
   animation: ${flicker} 4s infinite alternate;
   font-size: 2rem;
@@ -97,12 +98,12 @@ const NeonSign = styled.div`
   -1px 0px 82px #800080,
   -1px 0px 92px #800080,
   -1px 0px 102px #800080,
-  -1px 0px 151px #800080; `
+  -1px 0px 151px #800080; `;
 
 
-interface setCurrentPage {
-  setLoose: React.Dispatch<React.SetStateAction<string>>;
-}
+// interface setCurrentPage {
+//   setLoose: React.Dispatch<React.SetStateAction<string>>;
+// }
 
 const FullScreenCanvas = styled.canvas`
   position: fixed;
@@ -115,26 +116,26 @@ const FullScreenCanvas = styled.canvas`
 
 
 
-
+interface LooseProps {
+  setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
+  lastGameInfo: any;
+}
 function Loose({
   setCurrentPage,
   lastGameInfo,
-}: {
-  setCurrentPage: setCurrentPage;
-  lastGameInfo: any;
-}) {
-
+}: LooseProps) {
   useEffect(() => {
-    if(lastGameInfo.current.win){
+    if (lastGameInfo.current.win) {
       setTimeout(() => {
-      const myConfetti = confetti.create(document.getElementById('myCanvas'), { useWorker: true, resize: true });
-      myConfetti({
-        particleCount: 100,
-        spread: 160
-      });
-    }, 2000);
-  }
+        const myConfetti = confetti.create(document.getElementById('myCanvas'), { useWorker: true, resize: true });
+        myConfetti({
+          particleCount: 100,
+          spread: 160,
+        });
+      }, 2000);
+    }
   }, [lastGameInfo.current.win]);
+  
   return (
     <LooseWrapper>
       {lastGameInfo.current.win ? (

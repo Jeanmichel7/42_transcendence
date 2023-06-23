@@ -37,6 +37,9 @@ export interface NotificationInterface {
   'blockUser' |
   'unblockUser' |
   'roomInvite' |
+  'gameInvite' |
+  'gameInviteAccepted' |
+  'gameInviteDeclined' |
   'message';
   // title: string;
   content: string;

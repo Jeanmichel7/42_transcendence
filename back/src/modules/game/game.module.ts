@@ -8,10 +8,28 @@ import { GameEntity } from './entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
 // import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { MessageService } from '../messagerie/messages.service';
+import { MessageEntity } from '../messagerie/entity/messages.entity';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationEntity } from '../notification/entity/notification.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GameEntity, UserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      GameEntity,
+      UserEntity,
+      MessageEntity,
+      NotificationEntity,
+    ]),
+  ],
   controllers: [GameController],
-  providers: [GameService, GameEvents, ConfigService, JwtService],
+  providers: [
+    GameService,
+    GameEvents,
+    ConfigService,
+    JwtService,
+    MessageService,
+    NotificationService,
+  ],
 })
 export class GameModule {}

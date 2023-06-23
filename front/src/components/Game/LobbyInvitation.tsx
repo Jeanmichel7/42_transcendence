@@ -5,6 +5,8 @@ import {
   ServerToClientEvents,
   SocketInterface,
 } from './Interface';
+import { useEffect } from 'react';
+import { GameInterface } from '../../../types';
 
 export const StyledButton = styled.button`
  border: 0.2rem solid #fff;
@@ -47,19 +49,35 @@ const ButtonWrapper = styled.div`
 
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
+  game: GameInterface;
   // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   socket: any;
 }
 
-function Lobby({
+function LobbyInvitation({
   setCurrentPage,
+  game,
   socket,
 }: LobbyProps) {
+
+  useEffect(() => {
+    socket.emit('joinInvitationGame', {
+      gameId: game.id,
+    });
+
+    return () => {
+      socket.emit('leaveInvitationGame', {
+        gameId: game.id,
+      });
+    };
+  }, [socket]);
+
+
   return (
     <ButtonWrapper>
       <StyledButton
         onClick={() => {
-          socket.emit('userGameStatus', 'searchNormal',  (response) => {
+          socket.emit('userGameStatus', 'searchNormalInvite', (response) => {
             if (response === 'error') {
               setCurrentPage('lobby');
             }
@@ -71,7 +89,7 @@ function Lobby({
       </StyledButton>
       <StyledButton
         onClick={() => {
-          socket.emit('userGameStatus', 'searchBonus',  (response) => {
+          socket.emit('userGameStatus', 'searchBonusInvite', (response) => {
             if (response === 'error') {
               setCurrentPage('lobby');
             }
@@ -85,4 +103,4 @@ function Lobby({
   );
 }
 
-export default Lobby;
+export default LobbyInvitation;

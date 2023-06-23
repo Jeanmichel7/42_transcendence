@@ -18,6 +18,9 @@ export class NotificationCreateDTO {
     | 'blockUser'
     | 'unblockUser'
     | 'roomInvite'
+    | 'gameInvite'
+    | 'gameInviteAccepted'
+    | 'gameInviteDeclined'
     | 'message';
 
   @IsNotEmpty()

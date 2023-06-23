@@ -77,6 +77,7 @@ export class NotificationService {
     return savedNotification;
   }
 
+  // notif sans action
   async sendNotification(
     newNotification: NotificationCreateDTO,
   ): Promise<NotificationEntity> {
@@ -84,7 +85,6 @@ export class NotificationService {
       ...newNotification,
       read: true,
     });
-    // console.log('savedNotification : ', savedNotification);
 
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,
@@ -92,6 +92,7 @@ export class NotificationService {
     );
     return savedNotification;
   }
+
   async readNotification(
     userId: bigint,
     notificationId: bigint,

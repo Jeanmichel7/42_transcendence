@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from './entity/game.entity';
 
@@ -38,7 +38,6 @@ interface BonusPosition {
   boxSize: number;
 }
 
-  
 export class Game {
   ball: { x: number; y: number; vx: number; vy: number; speed: number };
   racketLeft: number;
@@ -61,7 +60,7 @@ export class Game {
   startTime: number;
   fail: boolean;
 
-  bonus: BonusPosition  ;
+  bonus: BonusPosition;
   bonusesLastGeneration: number;
   bonusesPlayer1: any;
   bonusPlayer1Loading: boolean;
@@ -133,8 +132,6 @@ export class Game {
   //   this.id = res.id.toString();
   //   console.log('id game " ', this.id);
   // }
-
-
 
   generateBonus() {
     if (this.bonus === null) {
@@ -432,7 +429,6 @@ export class Game {
       if (this.player1Score >= SCORE_FOR_WIN) {
         this.isOver = true;
         this.winner = this.player1Username;
-          
       } else {
         this.ball.x = 500;
         this.ball.y = 500;
@@ -526,6 +522,11 @@ import {
   // NotFoundException,
   // UnauthorizedException,
 } from '@nestjs/common';
+import { MessageCreateDTO } from '../messagerie/dto/message.create.dto';
+import { MessageService } from '../messagerie/messages.service';
+import { NotificationEntity } from '../notification/entity/notification.entity';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
 
 @Injectable()
 export class GameService {
@@ -534,6 +535,8 @@ export class GameService {
   playerWaiting2Normal: any;
   playerWaiting1Bonus: any;
   playerWaiting2Bonus: any;
+  createdWaitingGameBonus: GameInterface;
+  createdWaitingGame: GameInterface;
 
   constructor(
     @InjectRepository(GameEntity)
@@ -541,6 +544,9 @@ export class GameService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly eventEmitter: EventEmitter2,
+    // private readonly messageRepository: Repository<MessageEntity>,
+    private readonly messageService: MessageService,
+    private readonly notificationService: NotificationService,
   ) {
     this.games = new Map<bigint, Game>();
   }
@@ -601,6 +607,10 @@ export class GameService {
           socketId: socketId,
           username: username,
         };
+        this.createdWaitingGameBonus = await this.saveCreateWaitingGame(
+          this.playerWaiting1Bonus.username,
+        );
+        console.log('create waiting game : ', this.createdWaitingGameBonus);
       } else if (
         this.playerWaiting2Bonus === undefined &&
         this.playerWaiting1Bonus !== username
@@ -610,11 +620,14 @@ export class GameService {
           username: username,
         };
         console.log('Game created');
-        const res = await this.saveNewGame(
-          this.playerWaiting1Bonus.username,
+        const res = await this.saveStartGame(
           this.playerWaiting2Bonus.username,
+          this.createdWaitingGameBonus.id,
         );
         if (!res) throw new BadRequestException('erreur save start game');
+
+        this.createdWaitingGameBonus = {} as GameInterface;
+
         const game: Game = new Game(
           this.playerWaiting1Bonus.socketId,
           this.playerWaiting1Bonus.username,
@@ -637,6 +650,11 @@ export class GameService {
           socketId: socketId,
           username: username,
         };
+        // createdWaitingGame
+        this.createdWaitingGame = await this.saveCreateWaitingGame(
+          this.playerWaiting1Normal.username,
+        );
+        console.log('create waiting game : ', this.createdWaitingGame);
       } else if (
         this.playerWaiting2Normal === undefined &&
         this.playerWaiting1Normal.username !== username
@@ -646,11 +664,15 @@ export class GameService {
           username: username,
         };
         console.log('Game created');
-        const res = await this.saveNewGame(
-          this.playerWaiting1Bonus.username,
-          this.playerWaiting2Bonus.username,
+
+        const res = await this.saveStartGame(
+          this.playerWaiting2Normal.username,
+          this.createdWaitingGame.id,
         );
         if (!res) throw new BadRequestException('erreur save start game');
+
+        this.createdWaitingGame = {} as GameInterface;
+
         const game = new Game(
           this.playerWaiting1Normal.socketId,
           this.playerWaiting1Normal.username,
@@ -670,9 +692,13 @@ export class GameService {
   removeFromQueue(Username: string) {
     if (this.playerWaiting1Normal?.username === Username) {
       this.playerWaiting1Normal = undefined;
+      this.saveCancelWaitingGame(this.createdWaitingGame.id);
+      this.createdWaitingGame = {} as GameInterface;
       console.log('remove from queue');
     } else if (this.playerWaiting1Bonus?.username === Username) {
       this.playerWaiting1Bonus = undefined;
+      this.saveCancelWaitingGame(this.createdWaitingGameBonus.id);
+      this.createdWaitingGameBonus = {} as GameInterface;
       console.log('remove from queue');
     }
   }
@@ -687,24 +713,214 @@ export class GameService {
    *********************** */
 
   // async saveNewGame(userId1: bigint, userId2: bigint): Promise<GameInterface> {
-  async saveNewGame(
-    userlogin1: string,
-    userlogin2: string,
+
+  async getGame(UserId: bigint, gameId: bigint): Promise<GameInterface> {
+    const game: GameEntity = await this.gameRepository
+      .createQueryBuilder('games')
+      // .select('id', 'status')
+      .leftJoin('games.player1', 'player1')
+      .addSelect(['player1.id', 'player1.login'])
+      .leftJoin('games.player2', 'player2')
+      .addSelect(['player2.id', 'player2.login'])
+      .where('games.id = :gameId', { gameId })
+      .getOne();
+    if (!game) throw new BadRequestException('game not found');
+
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: UserId },
+    });
+    if (!user) throw new BadRequestException('user not found');
+
+    //check if user is in game
+    if (game.player1.id !== user.id && game.player2.id !== user.id)
+      throw new BadRequestException('user not in game');
+
+    const result: GameInterface = game;
+    console.log('result get game : ', result);
+    return result;
+  }
+
+  async saveInviteGame(
+    userId: bigint,
+    userIdToInvite: bigint,
   ): Promise<GameInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) throw new BadRequestException('user not found');
+
+    const userToInvite: UserEntity = await this.userRepository.findOne({
+      where: { id: userIdToInvite },
+    });
+    if (!userToInvite) throw new BadRequestException('user not found');
+
+    const newGame = new GameEntity();
+    newGame.player1 = user;
+    newGame.player2 = userToInvite;
+    newGame.status = 'waiting';
+    newGame.createdAt = new Date();
+    const newGameCreated: GameEntity = await this.gameRepository.save(newGame);
+    console.log('invitation new game created : ', newGameCreated);
+
+    //create message
+    const newBotMessage: MessageCreateDTO = {
+      text: `Invitation Game http://localhost:3006/game?id=${newGameCreated.id}`,
+    };
+
+    const res = await this.messageService.createInvitationBotMessage(
+      newBotMessage,
+      userId,
+      userIdToInvite,
+    );
+    if (!res) throw new Error('Invitation game message not created');
+
+    //event notification
+    const newNotif: NotificationEntity =
+      await this.notificationService.createNotification({
+        type: 'gameInvite',
+        content: `${user.login} challenges you}`,
+        receiver: userToInvite,
+        sender: {
+          id: user.id,
+          login: user.login,
+          avatar: user.avatar,
+        },
+        invitationLink: `/game?id=${newGameCreated.id}`,
+      } as NotificationCreateDTO);
+    if (!newNotif) throw new Error('Notification not created');
+
+    return newGameCreated;
+  }
+
+  async saveAcceptGame(userId: bigint, roomId: bigint): Promise<GameInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) throw new BadRequestException('user not found');
+    console.log('user : ', user);
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: roomId },
+      relations: ['player1', 'player2'],
+    });
+    if (!game) throw new BadRequestException('game not found');
+    console.log('game : ', game);
+
+    if (game.status !== 'waiting')
+      throw new BadRequestException('game already started');
+
+    if (game.player2.id != user.id)
+      throw new BadRequestException('You are not allowed to accept this game');
+
+    game.status = 'waiting_start';
+    game.updatedAt = new Date();
+    const gameUpdated: GameEntity = await this.gameRepository.save(game);
+    console.log('accept game : ', gameUpdated);
+
+    //event notification
+    const newNotif: NotificationEntity =
+      await this.notificationService.createNotification({
+        type: 'gameInviteAccepted',
+        content: `${user.login} accept challenge, let's play`,
+        receiver: {
+          id: game.player1.id,
+          login: game.player1.login,
+          avatar: game.player1.avatar,
+        },
+        sender: {
+          id: user.id,
+          login: user.login,
+          avatar: user.avatar,
+        },
+        invitationLink: `/game?id=${game.id}`,
+      } as NotificationCreateDTO);
+    if (!newNotif) throw new Error('Notification not created');
+
+    return gameUpdated;
+  }
+
+  async saveDeclineGame(userId: bigint, roomId: bigint): Promise<void> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) throw new BadRequestException('user not found');
+
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: roomId },
+      relations: ['player1'],
+    });
+    if (!game) throw new BadRequestException('game not found');
+
+    if (game.status !== 'waiting')
+      throw new BadRequestException('game already started or no invitation');
+
+    if (game.player2.id != user.id)
+      throw new BadRequestException('You are not allowed to decline this game');
+    await this.gameRepository.delete({ id: roomId });
+
+    //event notification
+    const newNotif: NotificationEntity =
+      await this.notificationService.createNotification({
+        type: 'gameInviteDeclined',
+        content: `${user.login} decline challenge`,
+        receiver: {
+          id: game.player1.id,
+          login: game.player1.login,
+          avatar: game.player1.avatar,
+        },
+        sender: {
+          id: user.id,
+          login: user.login,
+          avatar: user.avatar,
+        },
+      } as NotificationCreateDTO);
+    if (!newNotif) throw new Error('Notification not created');
+  }
+
+  async saveCreateWaitingGame(userlogin1: string): Promise<GameInterface> {
     const newGame = new GameEntity();
     newGame.player1 = await this.userRepository.findOne({
       where: { login: userlogin1 },
     });
-    newGame.player2 = await this.userRepository.findOne({
-      where: { login: userlogin2 },
-    });
-    newGame.status = 'playing';
+    newGame.status = 'waiting';
     newGame.createdAt = new Date();
     await this.gameRepository.save(newGame);
 
     const result: GameInterface = newGame;
     console.log('result create game : ', result);
     return result;
+  }
+
+  async saveStartGame(
+    userlogin2: string,
+    gameId: bigint,
+  ): Promise<GameInterface> {
+    const findWaitingGame = await this.gameRepository.findOne({
+      where: { id: gameId },
+      relations: ['player1', 'player2'],
+    });
+    if (!findWaitingGame) throw new NotFoundException('game not found');
+
+    const player2 = await this.userRepository.findOne({
+      where: { login: userlogin2 },
+    });
+    if (!player2) throw new NotFoundException('player2 not found');
+
+    findWaitingGame.player2 = player2;
+    findWaitingGame.status = 'playing';
+    findWaitingGame.updatedAt = new Date();
+
+    const test: GameEntity = await this.gameRepository.save(findWaitingGame);
+    const result: GameInterface = test;
+    console.log('result create game : ', result);
+    return result;
+  }
+
+  async saveCancelWaitingGame(gameId: bigint): Promise<void> {
+    const findWaitingGame = await this.gameRepository.findOne({
+      where: { id: gameId },
+    });
+    if (!findWaitingGame) throw new NotFoundException('game not found');
+    await this.gameRepository.delete({ id: gameId });
   }
 
   async saveEndGame(
@@ -732,12 +948,12 @@ export class GameService {
 
   async getAllUserGames(userId: bigint): Promise<GameInterface[]> {
     const games: GameEntity[] = await this.gameRepository
-      .createQueryBuilder('game')
-      .leftJoinAndSelect('game.player1', 'player1')
-      .leftJoinAndSelect('game.player2', 'player2')
-      .leftJoinAndSelect('game.winner', 'winner')
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.player1', 'player1')
+      .leftJoinAndSelect('games.player2', 'player2')
+      .leftJoinAndSelect('games.winner', 'winner')
       .select([
-        'game',
+        'games',
         'player1.id',
         'player1.firstName',
         'player1.lastName',
@@ -752,7 +968,7 @@ export class GameService {
         'winner.login',
       ])
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
-      .orderBy('game.createdAt', 'DESC')
+      .orderBy('games.createdAt', 'DESC')
       .getMany();
 
     const result: GameInterface[] = games;

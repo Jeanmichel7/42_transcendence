@@ -15,6 +15,7 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
       return;
     async function fetchAndSetFriendsProfile() {
       const gamesFetched = await getHistoryGames(user.id);
+      console.log(gamesFetched);
       if ('error' in gamesFetched) {
         // console.log(res);
       } else {
@@ -53,45 +54,58 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
     return minutes + 'min ' + seconds + 's';
   };
 
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+
   return (
     <>
       <h2 className="text-3xl text-center mb-5">Games</h2>
       <div className="flex items-center w-full pb-3">
-      { games.length == 0 &&
-        <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
-          No history games
-        </div> }
-      { games.length > 0 &&
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 700 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Id</StyledTableCell>
-                <StyledTableCell align="right">Player1</StyledTableCell>
-                <StyledTableCell align="right">Player2</StyledTableCell>
-                <StyledTableCell align="right">Score P1</StyledTableCell>
-                <StyledTableCell align="right">Score P2</StyledTableCell>
-                <StyledTableCell align="right">Duration</StyledTableCell>
-                <StyledTableCell align="right">Winner</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {games.map((row) => (
-                <StyledTableRow key={row.id}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.id}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">{row.player1.login}</StyledTableCell>
-                  <StyledTableCell align="right">{row.player2.login}</StyledTableCell>
-                  <StyledTableCell align="right">{row.scorePlayer1}</StyledTableCell>
-                  <StyledTableCell align="right">{row.scorePlayer2}</StyledTableCell>
-                  <StyledTableCell align="right">{row.finishAt ? calculDuration(row.createdAt, row.finishAt) : row.status }</StyledTableCell>
-                  <StyledTableCell align="right">{row.winner ? row.winner.login : row.status}</StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer> }
+        {games && games.length == 0 &&
+          <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
+            No history games
+          </div>}
+        {games && games.length > 0 &&
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 700 }} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Id</StyledTableCell>
+                  <StyledTableCell align="right">Status</StyledTableCell>
+                  <StyledTableCell align="right">Player1</StyledTableCell>
+                  <StyledTableCell align="right">Player2</StyledTableCell>
+                  <StyledTableCell align="right">Score P1</StyledTableCell>
+                  <StyledTableCell align="right">Score P2</StyledTableCell>
+                  <StyledTableCell align="right">Duration</StyledTableCell>
+                  <StyledTableCell align="right">Winner</StyledTableCell>
+                  <StyledTableCell align="right">Date</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {games.map((row) => (
+                  <StyledTableRow key={row.id}>
+                    <StyledTableCell component="th" scope="row">
+                      {row.id}
+                    </StyledTableCell>
+                    <StyledTableCell align="right">{row.status}</StyledTableCell>
+                    <StyledTableCell align="right">{row.player1 ? row.player1.login : ''}</StyledTableCell>
+                    <StyledTableCell align="right">{row.player2 ? row.player2.login : ''}</StyledTableCell>
+                    <StyledTableCell align="right">{row.scorePlayer1 ? row.scorePlayer1 : ''}</StyledTableCell>
+                    <StyledTableCell align="right">{row.scorePlayer2 ? row.scorePlayer2 : ''}</StyledTableCell>
+                    <StyledTableCell align="right">{row.finishAt ? calculDuration(row.createdAt, row.finishAt) : row.status}</StyledTableCell>
+                    <StyledTableCell align="right">{row.winner ? row.winner.login : row.status}</StyledTableCell>
+                    <StyledTableCell align="right">{ new Date(row.createdAt).toLocaleString('fr-FR', options) }</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>}
       </div>
     </>
   );

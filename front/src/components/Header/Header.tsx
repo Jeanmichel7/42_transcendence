@@ -117,6 +117,20 @@ function Header() {
       dispatch(reduxUpdateStatusUserConvList({ item: userStatus, userId: userData.id }));
     });
 
+    /* GAME */
+    socket.on('notification_game_invite', (notification: NotificationInterface) => {
+      dispatch(reduxAddNotification(notification));
+    });
+
+    socket.on('notification_game_invite_accepted', (notification: NotificationInterface) => {
+      dispatch(reduxAddNotification(notification));
+    });
+
+    socket.on('notification_game_invite_declined', (notification: NotificationInterface) => {
+      dispatch(setMsgSnackbar(notification.sender.login + ': Game request declined'));
+    });
+    // // socket.on('notification_game_invite_canceled', (notification: NotificationInterface) => {
+
     return () => {
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');

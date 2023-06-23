@@ -5,7 +5,7 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { Link } from 'react-router-dom';
 
 import { deleteFriend, apiBlockUser, requestAddFriend } from '../../api/relation';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../types';
 
 import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Badge } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -14,6 +14,7 @@ import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
 import { useState } from 'react';
+import { inviteGameUser } from '../../api/game';
 
 interface FriendCardProps {
   actualUserLogin?: string,
@@ -35,8 +36,18 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   = friend.status === 'online' ? 'success' :
     friend.status === 'absent' ? 'warning' : 'error';
 
-  const handleDefi = (userIdToDefi: number) => async () => {
-    console.log(userIdToDefi);
+  const handleDefi = async () => {
+    console.log('user to defi : ', friend.id, friend.login);
+
+    const resInvitGameUser: GameInterface | ApiErrorResponse =
+       await inviteGameUser(friend.id);
+    if ('error' in resInvitGameUser)
+      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+    //recupe url de ;invite ?
+
+    //send bot message to invited ?
+
+    dispatch(setMsgSnackbar('Invitation sent'));
   };
 
   function isRequestFriendSent() {
@@ -138,8 +149,8 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton aria-label="delete friend"
-            onClick={() => handleDefi(friend.id)}
+          <IconButton aria-label="defi friend"
+            onClick={handleDefi}
             sx={{ margin:0, padding:0 }}
           >
             <SportsTennisIcon color='info' />

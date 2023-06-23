@@ -27,6 +27,9 @@ export class NotificationEntity extends BaseEntity {
     | 'blockUser'
     | 'unblockUser'
     | 'roomInvite'
+    | 'gameInvite'
+    | 'gameInviteAccepted'
+    | 'gameInviteDeclined'
     | 'message';
 
   @Column({

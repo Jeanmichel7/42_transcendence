@@ -1,10 +1,10 @@
-import { Link, NavLink } from "react-router-dom";
-import "../utils/login.scss";
-import styled, { keyframes, css } from "styled-components";
-import "../fonts/fonts.css";
-import { Button } from "@mui/material";
-import { useState } from "react";
-import ConnectPage from "./Connection";
+import { Link, NavLink } from 'react-router-dom';
+import '../utils/login.scss';
+import styled, { keyframes, css } from 'styled-components';
+import '../fonts/fonts.css';
+import { Button } from '@mui/material';
+import { useState } from 'react';
+import ConnectPage from './Connection';
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -100,7 +100,7 @@ const StyledLink = styled(Link)`
   }
 
   &:hover {
-    color: ${(props) => (!props.expand ? "#000" : "#fff")};
+    color: ${(props) => (!props.expand ? '#000' : '#fff')};
     &::before {
       width: 100%;
     }
@@ -177,11 +177,11 @@ export default function Login() {
         >
           Login as a 42 student
         </StyledLink>
-        <NavLink to="/fakeconnection">
-          <Button sx={{ my: 2, color: "white", display: "block" }}>
+        <Link to="/fakeconnection">
+          <Button sx={{ my: 2, color: 'white', display: 'block' }}>
             Login Fake
           </Button>
-        </NavLink>
+        </Link>
       </TitleWrapper>
     </LoginWrapper>
   );

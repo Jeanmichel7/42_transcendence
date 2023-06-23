@@ -40,8 +40,7 @@ export class ChatService {
     private readonly roomRepository: Repository<ChatRoomEntity>,
     @InjectRepository(ChatMessageEntity)
     private readonly messageRepository: Repository<ChatMessageEntity>,
-    private readonly notificationService: NotificationService,
-    @InjectEntityManager() private readonly manager: EntityManager,
+    private readonly notificationService: NotificationService, // @InjectEntityManager() private readonly manager: EntityManager,
   ) {}
 
   /* ************************************************ */

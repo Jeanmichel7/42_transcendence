@@ -60,8 +60,15 @@ export default function FakeConnection() {
     setPassword(e.target.value);
   };
 
-  const handleConnection = async () => {
+  const handleConnection = async (
+    e: React.FormEvent<HTMLFormElement> |
+    React.MouseEvent<HTMLButtonElement, MouseEvent> |
+    React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(login, password);
+    console.log('res connection : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
@@ -150,7 +157,7 @@ export default function FakeConnection() {
             defaultValue={'Password1!'}
             variant="outlined"
             onChange={handlePasswordChange}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleConnection(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleConnection(e); }}
           />
           <Button
             variant="contained"

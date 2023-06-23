@@ -11,6 +11,9 @@ export interface NotificationInterface {
     | 'blockUser'
     | 'unblockUser'
     | 'roomInvite'
+    | 'gameInvite'
+    | 'gameInviteAccepted'
+    | 'gameInviteDeclined'
     | 'message';
   content: string;
   read: boolean;

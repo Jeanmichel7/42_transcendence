@@ -85,7 +85,7 @@ export class GameEvents {
     } else {
       this.server.to(client.id).emit('userGameStatus', 'notInGame');
     }
-    return 'connected';
+    return 'connected to GAME';
   }
 
   //desconexio

@@ -17,6 +17,7 @@ import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
 
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
+import ErrorBoundary from '../utils/errorBoundaries';
 
 function Profile() {
   const { pseudo } = useParams();
@@ -110,7 +111,9 @@ function Profile() {
       </Box>
 
       <Box className="w-full">
-        <HistoryGame user={userProfile} />
+        <ErrorBoundary>
+          <HistoryGame user={userProfile} />
+        </ErrorBoundary>
       </Box>
     </>
 

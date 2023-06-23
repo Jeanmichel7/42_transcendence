@@ -19,18 +19,22 @@ const SearchingWrapper = styled.div`
   width: 100%;
 `;
 
+interface SearchingOpponentProps {
+  // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  socket: any;
+  setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
+}
+
 function SearchingOpponent({
   socket,
   setCurrentPage,
-}: Socket<ServerToClientEvents, ClientToServerEvents> &
-  React.Dispatch<React.SetStateAction<string>>) {
-
+}: SearchingOpponentProps) {
   return (
     <SearchingWrapper>
       <DotWaitings />
       <StyledButton
         onClick={() => {
-          socket.emit('userGameStatus', 'cancel',);
+          socket.emit('userGameStatus', 'cancel');
           setCurrentPage('lobby');
         }}
       >

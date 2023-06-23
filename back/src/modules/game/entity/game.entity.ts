@@ -18,7 +18,7 @@ export class GameEntity extends BaseEntity {
     type: 'text',
     default: 'in progress',
   })
-  status: 'waiting' | 'playing' | 'finished' | 'aborted';
+  status: 'waiting' | 'playing' | 'waiting_start' | 'finished' | 'aborted';
 
   @Column({
     nullable: true,
@@ -26,6 +26,13 @@ export class GameEntity extends BaseEntity {
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
+
+  @Column({
+    nullable: true,
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @Column({
     nullable: true,

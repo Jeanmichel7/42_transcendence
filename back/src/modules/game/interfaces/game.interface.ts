@@ -2,8 +2,9 @@ import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 
 export interface GameInterface {
   id: bigint;
-  status: 'waiting' | 'playing' | 'finished' | 'aborted';
+  status: 'waiting' | 'waiting_start' | 'playing' | 'finished' | 'aborted';
   createdAt: Date;
+  updatedAt?: Date;
   finishAt?: Date;
   abortedAt?: Date;
   scorePlayer1?: number;

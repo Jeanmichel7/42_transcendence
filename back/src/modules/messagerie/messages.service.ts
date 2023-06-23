@@ -311,4 +311,45 @@ export class MessageService {
     const result: MessageInterface[] = { ...messages };
     return result;
   }
+
+  async createInvitationBotMessage(
+    newMessage: MessageCreateDTO,
+    userId: bigint,
+    userIdDest: bigint,
+  ): Promise<MessageInterface> {
+    const user: UserEntity = await UserEntity.findOne({
+      where: { id: userId },
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
+    });
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+
+    const userDest: UserEntity = await UserEntity.findOne({
+      where: { id: userIdDest },
+      select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
+    });
+    if (!userDest)
+      throw new NotFoundException(`User with id ${userIdDest} not found`);
+
+    // check if friend ?
+
+    // const userBot = await UserEntity.findOne({
+    //   where: { login: 'bot' },
+    //   select: ['id', 'login', 'avatar'],
+    // });
+    // if (!userBot) throw new NotFoundException(`User bot not found`);
+
+    const message: MessageEntity = await this.messageRepository.save({
+      text: newMessage.text,
+      ownerUser: user,
+      destUser: userDest,
+    });
+    if (!message) throw new Error('Message not created');
+
+    // this.eventEmitter.emit(
+    //   'invitation_game.created',
+    //   new InvitationGameEvent(message),
+    // );
+
+    return message;
+  }
 }

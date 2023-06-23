@@ -68,4 +68,23 @@ export class NotificationListener {
     // console.log('event user_status.updated recu', event.userStatus);
     this.socketEvents.emitUpdateUserStatus(event.userStatus);
   }
+
+  /* GAME */
+  @OnEvent('notification.gameInvite')
+  handleGameInvite(event: NotificationCreatedEvent) {
+    console.log('notif game invite', event.data);
+    this.socketEvents.emitNotificationGameInvite(event.data);
+  }
+
+  @OnEvent('notification.gameInviteAccepted')
+  handleGameInviteAccepted(event: NotificationCreatedEvent) {
+    console.log('notif game invite accepted', event.data);
+    this.socketEvents.emitNotificationGameInviteAccepted(event.data);
+  }
+
+  @OnEvent('notification.gameInviteDeclined')
+  handleGameInviteDeclined(event: NotificationCreatedEvent) {
+    console.log('notif game invite declined', event.data);
+    this.socketEvents.emitNotificationGameInviteDeclined(event.data);
+  }
 }
