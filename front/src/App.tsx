@@ -18,12 +18,12 @@ import {
 } from './store/userSlice';
 import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
+import { NotificationInterface, UserActionInterface, UserStatusInterface } from './types/utilsTypes';
 import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
-import { reduxSetConversationList } from './store/convListSlice';
+import { reduxSetConversationList, reduxUpdateStatusUserConvList } from './store/convListSlice';
 import { getNotifsNotRead } from './api/notification';
 
 
@@ -50,8 +50,16 @@ function App() {
     } else {
       if ( !Array.isArray(result) && apiFunction === getUserData) setUserId(result.id);
       dispatch(action(result));
+      if ( Array.isArray(result) && apiFunction === getFriends) {
+        const userFriendsStatusInterface: UserStatusInterface[]
+        = (result as UserInterface[]).map((user: UserInterface) => ({
+          id: user.id,
+          status: user.status,
+        }));
+        dispatch(reduxUpdateStatusUserConvList({ item: userFriendsStatusInterface, userId: userId }));
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, userId]);
 
   const checkAuth = useCallback(async () => {
     const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
@@ -101,7 +109,7 @@ function App() {
     <>
       <div className="flex flex-col h-screen min-h-md ">
         {location?.pathname !== '/' && <Header />}
-        <div className="flex-grow bg-[#1e1e1e] w-full">
+        <div className="flex-grow w-full">
           <div className="h-full">
             <AppRoutes />
           </div>

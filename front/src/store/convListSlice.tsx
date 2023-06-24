@@ -65,38 +65,40 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
   }
 };
 
-const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterface) => {
+const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterface[]) => {
   // console.log('redux update status conv list : ', item);
-  state.conversationsList.forEach((conv: ConversationInterface) => {
-    if (isUserInterface(conv.user) && conv.user.id === item.id) {
-      conv.user.status = item.status;
-    }
-    if (isRoomInterface(conv.room)) {
-      //check ownerUser
-      if (conv.room.ownerUser?.id === item.id && conv.room.ownerUser.id === item.id) {
-        conv.room.ownerUser.status = item.status;
+  item.forEach((userStatus) => {
+    state.conversationsList.forEach((conv: ConversationInterface) => {
+      if (isUserInterface(conv.user) && conv.user.id === userStatus.id) {
+        conv.user.status = userStatus.status;
       }
+      if (isRoomInterface(conv.room)) {
+        //check ownerUser
+        if (conv.room.ownerUser?.id === userStatus.id && conv.room.ownerUser.id === userStatus.id) {
+          conv.room.ownerUser.status = userStatus.status;
+        }
 
-      //check admins
-      if (conv.room.admins) {
-        conv.room.admins.forEach((admin) => {
-          if (admin.id === item.id) {
-            admin.status = item.status;
-          }
-        });
-      }
+        //check admins
+        if (conv.room.admins) {
+          conv.room.admins.forEach((admin) => {
+            if (admin.id === userStatus.id) {
+              admin.status = userStatus.status;
+            }
+          });
+        }
 
-      //check users
-      if (conv.room.users) {
-        conv.room.users.forEach((user) => {
-          if (user.id === item.id) {
-            user.status = item.status;
-          }
-        });
+        //check users
+        if (conv.room.users) {
+          conv.room.users.forEach((user) => {
+            if (user.id === userStatus.id) {
+              user.status = userStatus.status;
+            }
+          });
+        }
       }
-    }
+      console.log('redux check user status ');
+    });
   });
-  return true;
 };
 
 const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => {
@@ -146,11 +148,11 @@ export const chatSlice = createSlice({
       if (helperUpdateConversationList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
-    reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface, userId: number }>) => {
+    reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface[], userId: number }>) => {
       // console.log('REDUX UPDATE STATUS USER CONV LIST');
       const { item, userId } = action.payload;
-      if (helperUpdateStatusUserConvList(state, item))
-        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+      helperUpdateStatusUserConvList(state, item);
+      localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxRemoveWaitingUserInRoom: (state, action: PayloadAction<{ roomId: number, userId: number }>) => {
       // console.log('REDUX REMOVE WAITING USER IN ROOM');

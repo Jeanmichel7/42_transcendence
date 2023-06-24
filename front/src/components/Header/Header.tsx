@@ -112,9 +112,9 @@ function Header() {
 
     /* user update status */
     socket.on('update_user_status', (userStatus: UserStatusInterface) => {
-      // console.log('recu du socket update user status : ', userStatus);
+      console.log('recu du socket update user status : ', userStatus);
       dispatch(reduxUpdateUserStatus(userStatus)); // modif userData.[].status
-      dispatch(reduxUpdateStatusUserConvList({ item: userStatus, userId: userData.id }));
+      dispatch(reduxUpdateStatusUserConvList({ item: [userStatus], userId: userData.id }));
     });
 
     /* GAME */
