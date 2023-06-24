@@ -48,4 +48,5 @@ export interface ConversationInterface {
   id: number;
   user: UserInterface
   room: RoomInterface;
+  msgNotRead: number;
 }

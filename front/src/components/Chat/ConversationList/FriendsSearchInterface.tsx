@@ -4,13 +4,10 @@ import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
+import FriendCard from '../../Profile/FriendsCard';
 import { getAllUsers } from '../../../api/user';
 import { requestAddFriend } from '../../../api/relation';
-
 import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
-
-import FriendCard from '../../Profile/FriendsCard';
-
 
 import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material';
 
@@ -44,15 +41,13 @@ export default function FriendsSearch() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, waitingFriendsRequestSent]);
 
-
   function isMyFriend(userId: number): boolean {
     if (!userFriends) return false;
     return !!userFriends?.find((friend: UserInterface) => friend.id === userId);
   }
 
   const handleRequestAddFriend = async (user: UserInterface | null) => {
-    if (!user)
-      return;
+    if (!user) return;
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(user.id);
     if ('error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
@@ -69,7 +64,7 @@ export default function FriendsSearch() {
         <Autocomplete
           id="searchFriends"
           fullWidth
-          options={users}
+          options={users.filter((u: UserInterface) => !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id))}
           getOptionLabel={(option: UserInterface) => option.login}
           onChange={(event: React.ChangeEvent<object>, newValue: UserInterface | null) => {
             event.stopPropagation();

@@ -21,7 +21,7 @@ export function ButtonInterfaceAddGroups() {
   return (
     <Link to='/chat/addChannels' >
       <Tooltip
-        title="Search channels" arrow
+        title="Add channels" arrow
         TransitionComponent={Zoom}
         TransitionProps={{ timeout: 600 }}
       >
@@ -37,7 +37,7 @@ export function ButtonInterfaceAddFriends() {
   return (
     <Link to='/chat/addFriends'>
       <Tooltip
-        title="Search friends" arrow
+        title="Add friends" arrow
         TransitionComponent={Zoom}
         TransitionProps={{ timeout: 600 }}
       >

@@ -764,7 +764,7 @@ export class GameService {
 
     //create message
     const newBotMessage: MessageCreateDTO = {
-      text: `Invitation Game http://localhost:3006/game?id=${newGameCreated.id}`,
+      text: `http://localhost:3006/game?id=${newGameCreated.id}`,
     };
 
     const res = await this.messageService.createInvitationBotMessage(
@@ -778,7 +778,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInvite',
-        content: `${user.login} challenges you}`,
+        content: `challenges you`,
         receiver: userToInvite,
         sender: {
           id: user.id,
@@ -820,7 +820,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInviteAccepted',
-        content: `${user.login} accept challenge, let's play`,
+        content: `'s challenge accepted, let's play`,
         receiver: {
           id: game.player1.id,
           login: game.player1.login,
@@ -861,7 +861,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInviteDeclined',
-        content: `${user.login} decline challenge`,
+        content: `decline challenge`,
         receiver: {
           id: game.player1.id,
           login: game.player1.login,

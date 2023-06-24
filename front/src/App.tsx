@@ -17,15 +17,17 @@ import {
   setUser,
 } from './store/userSlice';
 import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { NotificationInterface, UserActionInterface } from './types/utilsTypes';
-import { Alert, Snackbar } from '@mui/material';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { NotificationInterface, UserActionInterface, UserStatusInterface } from './types/utilsTypes';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
-import { reduxSetConversationList } from './store/convListSlice';
+import { reduxSetConversationList, reduxUpdateStatusUserConvList } from './store/convListSlice';
 import { getNotifsNotRead } from './api/notification';
 
+import { Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
+import MessageIcon from '@mui/icons-material/Message';
+import CloseIcon from '@mui/icons-material/Close';
 
 function App() {
   const dispatch = useDispatch();
@@ -35,10 +37,7 @@ function App() {
   const [userId, setUserId] = useState(-1);
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
-  const handleClose = () => {
-    dispatch(closeSnackbar());
-  };
-
+ 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[] | NotificationInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
     action: ((payload: T) => UserActionInterface),
@@ -50,8 +49,16 @@ function App() {
     } else {
       if ( !Array.isArray(result) && apiFunction === getUserData) setUserId(result.id);
       dispatch(action(result));
+      if ( Array.isArray(result) && apiFunction === getFriends) {
+        const userFriendsStatusInterface: UserStatusInterface[]
+        = (result as UserInterface[]).map((user: UserInterface) => ({
+          id: user.id,
+          status: user.status,
+        }));
+        dispatch(reduxUpdateStatusUserConvList({ item: userFriendsStatusInterface, userId: userId }));
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, userId]);
 
   const checkAuth = useCallback(async () => {
     const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
@@ -96,12 +103,24 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [dispatch, navigate, fetchData, checkAuth]);
-  
+
+  const handleClick = () => {
+    if (snackbar.link) {
+      navigate(snackbar.link);
+      dispatch(closeSnackbar());
+    }
+  };
+
+  const handleClose = () => {
+    dispatch(closeSnackbar());
+  };
+
+
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
         {location?.pathname !== '/' && <Header />}
-        <div className="flex-grow bg-[#1e1e1e] w-full">
+        <div className="flex-grow w-full">
           <div className="h-full">
             <AppRoutes />
           </div>
@@ -117,14 +136,38 @@ function App() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleClose}
+        onClick={handleClick}
       >
-        <Alert 
+      { snackbar.link ?
+          <SnackbarContent
+            message={
+              <Link to={snackbar.link} className="text-white">
+                <MessageIcon />
+                {' ' + snackbar.message}
+              </Link>
+            }
+            action={
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClose();
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            }
+          />
+        :
+        <Alert
           onClose={handleClose}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >
           {snackbar.message}
-        </Alert>
+        </Alert> }
       </Snackbar>
     </>
   );

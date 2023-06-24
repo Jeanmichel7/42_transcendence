@@ -33,10 +33,6 @@ const NotificationItem = ({
 
 
 
-
-
-
-
   /* helper action FriendShip action */
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
@@ -139,7 +135,7 @@ const NotificationItem = ({
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
     if (notif.type === 'roomInvite')
-      return navigate(notif.invitationLink ? notif.invitationLink : '/chat');
+      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
     if (notif.type === 'gameInvite')
       await handleAcceptGameInvite(notif);
     if (notif.type === 'gameInviteAccepted')

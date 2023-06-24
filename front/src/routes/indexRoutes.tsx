@@ -11,10 +11,10 @@ import FakeConnection from '../pages/ConnectionFakeUser';
 import Profile from '../pages/Profile';
 import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
-import CreateGroupInterface from '../components/Chat/Channel/ChannelCreateInterface';
-import ChannelSearch from '../components/Chat/Channel/ChannelSearchInterface';
-import FriendsSearch from '../components/Chat/Friends/FriendsSearchInterface';
-import ConversationWrapper from '../components/Chat/Conversation/ConversationWrapper';
+import CreateGroupInterface from '../components/Chat/ConversationList/ChannelCreateInterface';
+import ChannelSearch from '../components/Chat/ConversationList/ChannelSearchInterface';
+import FriendsSearch from '../components/Chat/ConversationList/FriendsSearchInterface';
+import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 
 const HomeChat = () => {

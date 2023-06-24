@@ -5,17 +5,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
-import MessageItem from './MessageItem';
+import MessageItem from '../MessageItem';
 
 import { sendMessage, getOldMessages, apiDeleteMessage } from '../../../api/message';
 
-import { ApiErrorResponse, UserInterface } from '../../../types';
+import { ApiErrorResponse, GameInterface, UserInterface } from '../../../types';
 import { MessageInterface } from '../../../types/ChatTypes';
 
 import { BiPaperPlane } from 'react-icons/bi';
-import { TextareaAutosize } from '@mui/material';
+import { Button, TextareaAutosize } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useParams } from 'react-router-dom';
+import { inviteGameUser } from '../../../api/game';
+// import { reduxResetNotReadMP } from '../../../store/convListSlice';
 
 
 
@@ -73,6 +75,12 @@ const PrivateConversation: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userData.id, pageDisplay]);
 
+  // useEffect(() => {
+  //   if (id != '-1' && userData.id != -1) {
+  //     dispatch(reduxResetNotReadMP({ userIdFrom: parseInt(id), userId: userData.id }));
+  //   }
+  // }, [id, userData.id, dispatch]);
+
   const connectSocket = useCallback(() => {
     if (id == '-1' || userData.id == -1 ) return;
     const socket = io('http://localhost:3000/messagerie', {
@@ -92,9 +100,8 @@ const PrivateConversation: React.FC = () => {
     socket.on('editMessage', (message) => {
       setMessages((prevMessages) => {
         const newMessages = prevMessages.map((msg) => {
-          if (msg.id === message.id) {
+          if (msg.id === message.id)
             return { ...msg, text: message.text, updatedAt: message.updatedAt };
-          }
           return msg;
         });
         return newMessages;
@@ -112,12 +119,12 @@ const PrivateConversation: React.FC = () => {
       user1Id: userData.id,
       user2Id: id,
     });
-
     socketRef.current = socket;
   }, [userData.id, id]);
 
   useEffect(() => {
     connectSocket();
+
     return () => {
       if (socketRef.current === null) return;
       socketRef.current.off('message');
@@ -133,13 +140,7 @@ const PrivateConversation: React.FC = () => {
 
   useEffect(() => {
     fetchOldMessages();
-  }, [pageDisplay, id, userData.id, fetchOldMessages]);
-
-
-
-
-
-
+  }, [pageDisplay, id, userData.id, fetchOldMessages, dispatch]);
 
 
   // scroll to bottom
@@ -204,6 +205,14 @@ const PrivateConversation: React.FC = () => {
     setShouldScrollToBottom(true);
   };
 
+  const handleDefi = async () => {
+    const resInvitGameUser: GameInterface | ApiErrorResponse =
+       await inviteGameUser(parseInt(id));
+    if ('error' in resInvitGameUser)
+      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+    dispatch(setMsgSnackbar('Invitation sent'));
+  };
+
 
   /* set text input currying + callback */
   const handleChangeTextArea = useCallback(
@@ -221,7 +230,10 @@ const PrivateConversation: React.FC = () => {
         : */}
       <div className="flex flex-col h-full justify-between">
         <div className="w-full text-lg text-blue text-center">
-          <p className='font-bold text-lg py-1'>{login.toUpperCase()}</p>
+          <p className='font-bold text-lg py-1'>
+            {login.toUpperCase()}
+            <Button sx={{ p:0, m:0 }} onClick={handleDefi}>Defi</Button>
+          </p>
         </div>
 
         <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>

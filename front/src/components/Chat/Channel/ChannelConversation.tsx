@@ -4,7 +4,7 @@ import { Socket } from 'socket.io-client';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar, setWarningSnackbar } from '../../../store/snackbarSlice';
 
-import MessageItem from './MessageItem';
+import MessageItem from '../MessageItem';
 
 import { chatOldMessages, deleteChannel, deleteChatMessage, getRoomData } from '../../../api/chat';
 
@@ -14,12 +14,12 @@ import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../..
 import { HttpStatusCode } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
-import SideBarAdmin from '../Channel/admin/SidebarAdmin';
+import SideBarAdmin from './admin/SidebarAdmin';
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
 import ChatMembers from './Members';
-import InvitationRoom from '../Channel/admin/InvitationRoom';
+import InvitationRoom from './admin/InvitationRoom';
 import { useConnectionSocketChannel } from './useSocketChannel';
-import FormChannel from './FormChannel';
+import FormChannel from '../Conversation/FormChannel';
 // import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
 // import ErrorBoundary from './errorBoundaries';
 
@@ -52,6 +52,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
       const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
       const bottomRef = useRef<HTMLDivElement>(null);
       const [allMessagesDisplayed, setAllMessagesDisplayed] = useState<boolean>(false);
+
       useConnectionSocketChannel(
         socketRef.current,
         id, //room id
@@ -122,6 +123,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
         }
         if (!conv.room.id || conv.room.id === -1 || userData.id === -1) return;
         const roomData: RoomInterface | ApiErrorResponse = await getRoomData((conv.room.id).toString());
+        // console.log('roomData : ', roomData);
         if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
           dispatch(setErrorSnackbar('You are not allowed to access this room or just be kicked from it'));
           socketRef.current?.emit('leaveRoom', {

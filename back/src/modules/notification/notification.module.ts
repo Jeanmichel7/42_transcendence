@@ -23,6 +23,6 @@ import { UserEntity } from '../users/entity/users.entity';
     JwtService,
   ],
   controllers: [NotificationController],
-  exports: [NotificationService],
+  exports: [NotificationGateway],
 })
 export class NotificationModule {}

@@ -147,7 +147,7 @@ export class MessageService {
 
     const userReceive: UserEntity = await this.userRepository.findOne({
       where: { id: userIdTo },
-      select: ['id'],
+      select: ['id', 'login'],
       relations: [
         'messagesReceive',
         'initiatedRelations.userInitiateur',
@@ -159,12 +159,8 @@ export class MessageService {
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);
 
-    if (userReceive.blocked.map((user) => user.id).includes(userSend.id)) {
-      throw new ForbiddenException(
-        `You can't send a message to ${userReceive.login}, you are blocked`,
-      );
-    }
-
+    if (userReceive.blocked.map((user) => user.id).includes(userSend.id))
+      throw new ForbiddenException(`${userReceive.login} blocked you`);
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);
     if (userSend.id === userReceive.id)
@@ -176,22 +172,10 @@ export class MessageService {
       text: messageToSave.text,
     });
     if (!newMessage) throw new NotFoundException(`Message not created`);
-    userSend.messagesSend = [...userSend.messagesSend, newMessage];
+    userSend.messagesSend = [...userSend.messagesSend, newMessage]; //useless and slow ?
     await userSend.save();
     userReceive.messagesReceive = [...userReceive.messagesReceive, newMessage];
     await userReceive.save();
-
-    // const result = await this.messageRepository
-    // .createQueryBuilder("message")
-    // .leftJoinAndSelect("message.ownerUser", "ownerUser")
-    // .leftJoinAndSelect("message.destUser", "destUser")
-    // .select([
-    // 	'message',
-    // 	'ownerUser.id','ownerUser.firstName','ownerUser.lastName','ownerUser.login',
-    // 	'destUser.id', 'destUser.firstName', 'destUser.lastName', 'destUser.login'
-    // ])
-    // .where("message.id = :id", { id: newMessage.id })
-    // .getOne();
 
     const result: MessageInterface = await this.messageRepository.findOne({
       // select: ["id", "text", "createdAt", "updatedAt" ],
@@ -330,14 +314,6 @@ export class MessageService {
     if (!userDest)
       throw new NotFoundException(`User with id ${userIdDest} not found`);
 
-    // check if friend ?
-
-    // const userBot = await UserEntity.findOne({
-    //   where: { login: 'bot' },
-    //   select: ['id', 'login', 'avatar'],
-    // });
-    // if (!userBot) throw new NotFoundException(`User bot not found`);
-
     const message: MessageEntity = await this.messageRepository.save({
       text: newMessage.text,
       ownerUser: user,
@@ -345,11 +321,7 @@ export class MessageService {
     });
     if (!message) throw new Error('Message not created');
 
-    // this.eventEmitter.emit(
-    //   'invitation_game.created',
-    //   new InvitationGameEvent(message),
-    // );
-
+    this.eventEmitter.emit('message.created', new MessageCreatedEvent(message));
     return message;
   }
 }
