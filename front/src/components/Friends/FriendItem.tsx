@@ -30,7 +30,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
                   user.status === 'inactive' ? 'secondary' :
-                    'error' 
+                    'error'
             }
             overlap="circular"
             variant="dot"
@@ -79,7 +79,8 @@ const FriendItem: React.FC<FriendItemProps> = ({
                     action.name === 'Cancel' ||
                     action.name === 'Decline' ? 'error'
                       : action.name === 'Block' ? 'warning'
-                        : 'primary' }
+                        : action.name === 'Defi' ? 'success'
+                          : 'primary' }
                 sx={{ marginRight: '10px' }}
               >
                 {action.name}

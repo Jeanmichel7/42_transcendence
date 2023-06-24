@@ -1,6 +1,6 @@
 import ConversationList from '../components/Chat/ConversationList/ConversationList';
 import { Outlet } from 'react-router-dom';
-import { ButtonCreateGroup, ButtonInterfaceAddGroups, ButtonInterfaceAddFriends } from '../components/Chat/Channel/ChannelButtons';
+import { ButtonCreateGroup, ButtonInterfaceAddGroups, ButtonInterfaceAddFriends } from '../components/Chat/ConversationList/ChannelButtons';
 import { Divider } from '@mui/material';
 
 function Chat() {

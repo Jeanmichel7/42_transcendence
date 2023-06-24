@@ -7,6 +7,7 @@ export interface SnackbarInterface {
   severity: 'success' | 'info' | 'warning' | 'error';
   vertical: 'top' | 'bottom';
   horizontal: 'left' | 'center' | 'right';
+  link: string;
 }
 
 export interface PutSnackbarInterface {
@@ -15,6 +16,7 @@ export interface PutSnackbarInterface {
   severity?: 'success' | 'info' | 'warning' | 'error';
   vertical?: 'top' | 'bottom';
   horizontal?: 'left' | 'center' | 'right';
+  link?: string;
 }
 
 export interface UserActionInterface {

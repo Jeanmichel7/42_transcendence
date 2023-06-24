@@ -1,10 +1,10 @@
-import { ConversationInterface, RoomInterface } from '../../../types';
+import { ConversationInterface, RoomInterface } from '../../types';
 import { Socket } from 'socket.io-client';
-import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../store/convListSlice';
-import { setWarningSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../store/convListSlice';
+import { setWarningSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { RootState } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
 export const useConnectionSocketChat = (

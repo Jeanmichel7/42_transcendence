@@ -21,7 +21,7 @@ import { Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, MenuIt
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { createChannel } from '../../../api/chat';
 import { reduxAddConversationList } from '../../../store/convListSlice';
-import RowOfFriendToInvit from './admin/RowInvitation';
+import RowOfFriendToInvit from '../Channel/admin/RowInvitation';
 
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);

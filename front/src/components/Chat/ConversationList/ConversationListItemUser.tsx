@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 // import { ImBlocked } from 'react-icons/im';
 import { ConversationInterface } from '../../../types';
-import { reduxRemoveConversationToList } from '../../../store/convListSlice';
+import { reduxRemoveConversationToList, reduxResetNotReadMP } from '../../../store/convListSlice';
 
 import { Badge, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -32,6 +32,10 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
     dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
   }
 
+  const handleClickConv = () => {
+    dispatch(reduxResetNotReadMP({ userIdFrom: conv.user.id, userId: userData.id }));
+  };
+
   return (
     <div>
       <div className="border hover:bg-gray-100 transition-all 
@@ -41,7 +45,9 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
         // onClick={handleClickRaw}
       >
         <Link to={'conv/' + conv.id + '/' + conv.user.id + '/' + conv.user.login} 
-          className="flex flex-grow text-black p-1 pl-2 items-center ">
+          className="flex flex-grow text-black p-1 pl-2 items-center "
+          onClick={handleClickConv}
+        >
           <Badge
             color={ 
               conv.user.status === 'online' ? 'success' :
@@ -76,6 +82,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
             title={conv.user.login}
           >
             {conv.user.login.length > 15 ? conv.user.login.slice(0, 12) + '...' : conv.user.login}
+            {conv.msgNotRead > 0 ? ' (' + conv.msgNotRead + ')' : ''}
           </Typography>
         </Link>
 

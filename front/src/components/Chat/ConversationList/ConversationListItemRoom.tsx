@@ -12,7 +12,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
 
-import ConversationListRoomItemIcons from './IconAvatars';
+import ConversationListRoomItemIcons from './ChannelIconAvatars';
 
 
 interface ConvProps {

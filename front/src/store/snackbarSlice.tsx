@@ -14,6 +14,7 @@ export const snackbarSlice = createSlice({
       severity: 'success',
       vertical: 'bottom',
       horizontal: 'right',
+      link: '',
     } as SnackbarInterface,
   },
   reducers: {

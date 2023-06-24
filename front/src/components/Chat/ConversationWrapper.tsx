@@ -1,12 +1,12 @@
 import { useParams, useLocation } from 'react-router-dom';
-import PrivateConversation from './PrivateConversation';
-import ChannelConversation from './ChannelConversation';
+import PrivateConversation from './Conversation/PrivateConversation';
+import ChannelConversation from './Channel/ChannelConversation';
 import { useEffect, useRef } from 'react';
 import { Socket, io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { RootState } from '../../store';
 import { useConnectionSocketChat } from './useSocketChat';
-import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
+import Loaderperosnalized from '../../utils/LoaderPerosnalized ';
 
 const ConversationWrapper = () => {
   const { convId, login, name } = useParams();

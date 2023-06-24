@@ -17,15 +17,17 @@ import {
   setUser,
 } from './store/userSlice';
 import { ApiErrorResponse, ConversationInterface, UserInterface } from './types';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NotificationInterface, UserActionInterface, UserStatusInterface } from './types/utilsTypes';
-import { Alert, Snackbar } from '@mui/material';
 import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
 import { RootState } from './store';
 import { reduxAddManyNotifications, reduxSetNotifications } from './store/notificationSlice';
 import { reduxSetConversationList, reduxUpdateStatusUserConvList } from './store/convListSlice';
 import { getNotifsNotRead } from './api/notification';
 
+import { Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
+import MessageIcon from '@mui/icons-material/Message';
+import CloseIcon from '@mui/icons-material/Close';
 
 function App() {
   const dispatch = useDispatch();
@@ -35,10 +37,7 @@ function App() {
   const [userId, setUserId] = useState(-1);
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
-  const handleClose = () => {
-    dispatch(closeSnackbar());
-  };
-
+ 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[] | NotificationInterface[]>(
     apiFunction: () => Promise<T | ApiErrorResponse>,
     action: ((payload: T) => UserActionInterface),
@@ -104,7 +103,19 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [dispatch, navigate, fetchData, checkAuth]);
-  
+
+  const handleClick = () => {
+    if (snackbar.link) {
+      navigate(snackbar.link);
+      dispatch(closeSnackbar());
+    }
+  };
+
+  const handleClose = () => {
+    dispatch(closeSnackbar());
+  };
+
+
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
@@ -125,14 +136,38 @@ function App() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleClose}
+        onClick={handleClick}
       >
-        <Alert 
+      { snackbar.link ?
+          <SnackbarContent
+            message={
+              <Link to={snackbar.link} className="text-white">
+                <MessageIcon />
+                {' ' + snackbar.message}
+              </Link>
+            }
+            action={
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClose();
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            }
+          />
+        :
+        <Alert
           onClose={handleClose}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >
           {snackbar.message}
-        </Alert>
+        </Alert> }
       </Snackbar>
     </>
   );

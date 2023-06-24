@@ -37,16 +37,10 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     friend.status === 'absent' ? 'warning' : 'error';
 
   const handleDefi = async () => {
-    console.log('user to defi : ', friend.id, friend.login);
-
     const resInvitGameUser: GameInterface | ApiErrorResponse =
        await inviteGameUser(friend.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
-    //recupe url de ;invite ?
-
-    //send bot message to invited ?
-
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 

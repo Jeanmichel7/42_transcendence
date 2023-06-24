@@ -1,16 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { reduxAcceptedRequest, reduxAddWaitingFriends, reduxDeclinedRequest, reduxRemoveFriends, reduxRemoveWaitingFriends, reduxUpdateUserStatus, setLogout } from '../../store/userSlice';
-import { reduxAddConversationList, reduxUpdateStatusUserConvList } from '../../store/convListSlice';
-import { ApiErrorResponse, NotificationInterface, UserInterface, UserStatusInterface } from '../../types';
+import { setLogout } from '../../store/userSlice';
+import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
 import { RootState } from '../../store';
 import { AuthLogout } from '../../types/AuthTypes';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import NotificationItem from './NotificationItem';
 import { logout } from '../../api/auth';
-import { io } from 'socket.io-client';
 
 import { Badge } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
@@ -29,7 +27,7 @@ import MenuItem from '@mui/material/MenuItem';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import { reduxAddNotification, reduxRemoveNotification } from '../../store/notificationSlice';
+import useConnection from './useConnection';
 
 
 
@@ -40,109 +38,18 @@ function Header() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  /* redux */
+
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
   const { notifications } = useSelector((state: RootState) => state.notification);
 
-  const connectWebSocket = useCallback(() => {
-    if (!userData.id || userData.id === -1) return;
-    if (userIsLogged === false) return;
+  useConnection();
 
-    const socket = io('http://localhost:3000/notification', {
-      reconnectionDelayMax: 10000,
-      withCredentials: true,
-    });
-
-    socket.on('connect', () => {
-    });
-
-    socket.on('disconnect', () => {
-    });
-
-    //connect room
-    socket.emit('joinNotificationRoom', {
-      userId: userData.id,
-    });
-
-    socket.on('notification_friend_request', (notification: NotificationInterface) => {
-      // setNotifications((prevNotifications) => [
-      //   ...prevNotifications,
-      //   notification,
-      // ]);
-      dispatch(reduxAddNotification(notification));
-      dispatch(reduxAddWaitingFriends(notification.sender));
-    });
-
-    socket.on('notification_friend_request_accepted', (notification: NotificationInterface) => {
-      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request accepted'));
-      dispatch(reduxAcceptedRequest(notification));
-      dispatch(reduxAddConversationList({ item: notification.sender, userId: userData.id }));
-    });
-
-    socket.on('notification_friend_request_declined', (notification: NotificationInterface) => {
-      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request declined'));
-      dispatch(reduxDeclinedRequest(notification));
-    });
-
-    socket.on('notification_friend_request_canceled', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveNotification(notification));
-      // setNotifications(notifications.filter(n => n.sender.id !== notification.sender.id));
-      dispatch(setMsgSnackbar(notification.sender.login + ': Friend request canceled'));
-      dispatch(reduxRemoveWaitingFriends(notification.sender));
-    });
-
-    socket.on('notification_friend_deleted', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveFriends(notification.sender));
-    });
-
-    socket.on('notification_block_user', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveFriends(notification.sender));
-    });
-
-    // socket.on('notification_unblock_user', (notification: NotificationInterface) => {
-    //   dispatch(reduxRemoveUserBlocked(notification.sender));
-    // });
-
-
-    /* ROOM */
-    socket.on('notification_room_invite', (notification: NotificationInterface) => {
-      dispatch(reduxAddNotification(notification));
-    });
-
-    /* user update status */
-    socket.on('update_user_status', (userStatus: UserStatusInterface) => {
-      console.log('recu du socket update user status : ', userStatus);
-      dispatch(reduxUpdateUserStatus(userStatus)); // modif userData.[].status
-      dispatch(reduxUpdateStatusUserConvList({ item: [userStatus], userId: userData.id }));
-    });
-
-    /* GAME */
-    socket.on('notification_game_invite', (notification: NotificationInterface) => {
-      dispatch(reduxAddNotification(notification));
-    });
-
-    socket.on('notification_game_invite_accepted', (notification: NotificationInterface) => {
-      dispatch(reduxAddNotification(notification));
-    });
-
-    socket.on('notification_game_invite_declined', (notification: NotificationInterface) => {
-      dispatch(setMsgSnackbar(notification.sender.login + ': Game request declined'));
-    });
-    // // socket.on('notification_game_invite_canceled', (notification: NotificationInterface) => {
-
-    return () => {
-      socket.off('notification_friend_request');
-      socket.off('notification_friend_request_accepted');
-      socket.off('notification_friend_request_declined');
-      socket.off('notification_friend_request_canceled');
-      socket.off('notification_friend_deleted');
-      socket.off('notification_block_user');
-      socket.off('notification_unblock_user');
-      socket.disconnect();
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, userData.id]);
+  useEffect(() => {
+    // console.log('setnotifications localstorage', notifications);
+    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
+    localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
+  }, [notifications, userData.id]);
 
   //handler nav menu
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -178,16 +85,7 @@ function Header() {
       navigate('/');
     }
   }
-  useEffect(() => {
-    connectWebSocket();
-  }, [connectWebSocket]);
-  
-  useEffect(() => {
-    // console.log('setnotifications localstorage', notifications);
-    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
-    localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
-  }, [notifications, userData.id]);
-  
+
 
   const renderMobileNotification = (
     <Box sx={{ display: { xs: 'flex flex-raw', md: 'none' } }}>
@@ -219,9 +117,11 @@ function Header() {
         onClick={handleOpenNotificationMenu}
       >
         <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
-          { notifications.filter((n: NotificationInterface) => !n.read).length ? <NotificationsActiveIcon /> :
-            notifications.length ? <NotificationsIcon /> :
-              <NotificationsNoneIcon />
+          { notifications.filter((n: NotificationInterface) => !n.read).length 
+            ? <NotificationsActiveIcon />
+            : notifications.length
+              ? <NotificationsIcon />
+              : <NotificationsNoneIcon />
           }
         </Badge>
       </IconButton>

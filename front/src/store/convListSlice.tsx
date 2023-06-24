@@ -32,6 +32,7 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
     user: {} as UserInterface,
+    msgNotRead: 0,
   };
   if (isRoomInterface(item)) {
     newConversation.room = {
@@ -130,32 +131,32 @@ export const chatSlice = createSlice({
       state.conversationsList = action.payload;
     },
     reduxAddConversationList: (state, action: PayloadAction<{ item: UserInterface | RoomInterface, userId: number }>) => {
-      console.log('REDUX ADD CONV LIST', action.payload);
+      // console.log('REDUX ADD CONV LIST', action.payload);
       const { item, userId } = action.payload;
       helperAddConversationList(state, item as UserInterface | RoomInterface);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxRemoveConversationToList: (state, action: PayloadAction<{ convId: number, userId: number }>) => {
-      // console.log('REDUX REMOVE CONV LIST');
+      // console.log('REDUX REMOVE CONV LIST', action.payload);
       const { convId, userId } = action.payload;
       state.conversationsList = state.conversationsList
         .filter((conv: ConversationInterface) => conv.id !== convId);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxUpdateRoomConvList: (state, action: PayloadAction<{ item: RoomInterface, userId: number }>) => {
-      // console.log('REDUX UPDATE ROOM CONV LIST');
+      // console.log('REDUX UPDATE ROOM CONV LIST', action.payload);
       const { item, userId } = action.payload;
       if (helperUpdateConversationList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface[], userId: number }>) => {
-      // console.log('REDUX UPDATE STATUS USER CONV LIST');
+      // console.log('REDUX UPDATE STATUS USER CONV LIST', action.payload);
       const { item, userId } = action.payload;
       helperUpdateStatusUserConvList(state, item);
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxRemoveWaitingUserInRoom: (state, action: PayloadAction<{ roomId: number, userId: number }>) => {
-      // console.log('REDUX REMOVE WAITING USER IN ROOM');
+      // console.log('REDUX REMOVE WAITING USER IN ROOM', action.payload);
       const { roomId, userId } = action.payload;
       const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === roomId);
       if (indexConvToUpdate !== -1) {
@@ -164,6 +165,28 @@ export const chatSlice = createSlice({
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
       }
     },
+
+
+    /* MP */
+    reduxAddNotReadMP: (state, action: PayloadAction<{ userIdFrom: number, userId: number }>) => {
+      const { userIdFrom, userId } = action.payload;
+      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id === userIdFrom);
+      if (indexConvToUpdate !== -1) {
+        state.conversationsList[indexConvToUpdate].msgNotRead++;
+        state.conversationsList.sort((a, b) => b.msgNotRead - a.msgNotRead);
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+      }
+    },
+    reduxResetNotReadMP: (state, action: PayloadAction<{ userIdFrom: number, userId: number }>) => {
+      const { userIdFrom, userId } = action.payload;
+      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id === userIdFrom);
+      if (indexConvToUpdate !== -1) {
+        state.conversationsList[indexConvToUpdate].msgNotRead = 0;
+        state.conversationsList.sort((a, b) => b.msgNotRead - a.msgNotRead);
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+      }
+    },
+
   },
 });
 
@@ -174,6 +197,8 @@ export const {
   reduxUpdateRoomConvList,
   reduxUpdateStatusUserConvList,
   reduxRemoveWaitingUserInRoom,
+  reduxAddNotReadMP,
+  reduxResetNotReadMP,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
