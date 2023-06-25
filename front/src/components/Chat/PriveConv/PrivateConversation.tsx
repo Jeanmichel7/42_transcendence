@@ -5,21 +5,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
+import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';
-
-import { sendMessage, getOldMessages, apiDeleteMessage } from '../../../api/message';
-
+import { getOldMessages, apiDeleteMessage } from '../../../api/message';
 import { ApiErrorResponse, GameInterface, UserInterface } from '../../../types';
 import { MessageInterface } from '../../../types/ChatTypes';
 
-import { BiPaperPlane } from 'react-icons/bi';
-import { Button, TextareaAutosize } from '@mui/material';
+import { Button } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { useParams } from 'react-router-dom';
 import { inviteGameUser } from '../../../api/game';
-// import { reduxResetNotReadMP } from '../../../store/convListSlice';
-
-
 
 const PrivateConversation: React.FC = () => {
   const id = (useParams<{ id: string }>().id || '-1') ;
@@ -29,26 +24,20 @@ const PrivateConversation: React.FC = () => {
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
-  const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [messages, setMessages] = useState<MessageInterface[]>([]);
-  const [text, setText] = useState<string>('');
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   
   const bottomRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   const fetchOldMessages = useCallback(async () => {
     if (id == '-1' || userData.id == -1 ) return;
     setShouldScrollToBottom(false);
 
-    // setIsLoadingPagination(true);
     const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
-    // setIsLoadingPagination(false);
-
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
@@ -74,12 +63,6 @@ const PrivateConversation: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userData.id, pageDisplay]);
-
-  // useEffect(() => {
-  //   if (id != '-1' && userData.id != -1) {
-  //     dispatch(reduxResetNotReadMP({ userIdFrom: parseInt(id), userId: userData.id }));
-  //   }
-  // }, [id, userData.id, dispatch]);
 
   const connectSocket = useCallback(() => {
     if (id == '-1' || userData.id == -1 ) return;
@@ -177,34 +160,6 @@ const PrivateConversation: React.FC = () => {
     }
   };
 
-
-  // send message
-  const handleSubmit = () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (e === null) return;
-    if ('key' in e) {
-      if (e.shiftKey && e.key === 'Enter') {
-        setText((prev) => prev + '\n');
-        e.preventDefault();
-        return;
-      } else if (e.key !== 'Enter')
-        return;
-    }
-    e.preventDefault();
-    if (text.trim() === '') {
-      setText('');
-      return;
-    }
-    setStatusSendMsg('pending');
-
-    const newMessage: MessageInterface | ApiErrorResponse = await sendMessage(text, id);
-    if ('error' in newMessage)
-      setStatusSendMsg(newMessage.message);
-    else
-      setStatusSendMsg('');
-    setText('');
-    setShouldScrollToBottom(true);
-  };
-
   const handleDefi = async () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
        await inviteGameUser(parseInt(id));
@@ -213,15 +168,6 @@ const PrivateConversation: React.FC = () => {
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 
-
-  /* set text input currying + callback */
-  const handleChangeTextArea = useCallback(
-    (setTextFn: React.Dispatch<React.SetStateAction<string>>) => (
-      e: React.ChangeEvent<HTMLTextAreaElement>,
-    ) => {
-      setTextFn(e.target.value);
-    }, [],
-  );
 
   return (
     <>
@@ -251,7 +197,10 @@ const PrivateConversation: React.FC = () => {
               ))}
 
               {/* display form message */}
-              <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
+              <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
+                <FormPriveConv setShouldScrollToBottom={setShouldScrollToBottom} />
+              </div>
+              {/* <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
                 <TextareaAutosize
                   ref={textareaRef}
                   name="text"
@@ -267,7 +216,6 @@ const PrivateConversation: React.FC = () => {
                   <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
                 </button>
 
-                {/* display status send message */}
                 {statusSendMsg !== '' &&
                   <span className={`
                   ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
@@ -281,7 +229,7 @@ const PrivateConversation: React.FC = () => {
                     {statusSendMsg}
                   </span>
                 }
-              </form>
+              </form> */}
 
             </div>
           }

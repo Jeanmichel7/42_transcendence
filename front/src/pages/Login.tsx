@@ -151,7 +151,6 @@ export default function Login() {
     window.addEventListener('message', (event) => {
       if (event.source !== newWindow) return;
       if (event.data === 'user connected') {
-        console.log('user connected');
         newWindow.close();
         navigate('/home');
       }

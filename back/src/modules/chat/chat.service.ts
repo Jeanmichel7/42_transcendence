@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -172,25 +173,18 @@ export class ChatService {
 
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
-      select: ['id', 'type'],
-      relations: [
-        'users',
-        'ownerUser',
-        'admins',
-        'bannedUsers',
-        'mutedUsers',
-        'acceptedUsers',
-      ],
+      select: ['id', 'name', 'type', 'password', 'isProtected'],
+      relations: ['ownerUser'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     if (room.ownerUser.id !== userId)
-      throw new Error('User is not owner of room');
+      throw new UnauthorizedException('User is not owner of room');
 
     if (roomToUpdate.isProtected != null) {
       if (roomToUpdate.isProtected === true) {
         if (roomToUpdate.password === null)
-          throw new Error('Room is protected but no password');
+          throw new ConflictException('Room is protected but no password');
         room.isProtected = true;
       }
       if (roomToUpdate.isProtected === false) {
@@ -227,12 +221,37 @@ export class ChatService {
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
       .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'acceptedUsers')
+      .leftJoinAndSelect('chat_rooms.admins', 'admins')
+      .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
       .select([
-        'chat_rooms',
+        'chat_rooms.id',
+        'chat_rooms.name',
+        'chat_rooms.type',
+        'chat_rooms.isProtected',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
-        'ownerUser.firstName',
-        'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+        'acceptedUsers.id',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
+        'admins.id',
+        'admins.login',
+        'admins.avatar',
+        'admins.status',
+        'bannedUsers.id',
+        'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
+        'mutedUsers.id',
+        'mutedUsers.login',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();

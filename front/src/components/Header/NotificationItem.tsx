@@ -81,9 +81,7 @@ const NotificationItem = ({
 
   /* helper action Game action */
   const handleAcceptGameInvite = async (notif: NotificationInterface) => {
-    console.log('notif', notif);
     const extractGameId: number = parseInt(notif.invitationLink?.split('?id=')[1] as string);
-    console.log('extractGameId', extractGameId);
 
     setIsLoading(true);
     const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(extractGameId);

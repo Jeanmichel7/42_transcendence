@@ -178,7 +178,6 @@ export class MessageService {
     await userReceive.save();
 
     const result: MessageInterface = await this.messageRepository.findOne({
-      // select: ["id", "text", "createdAt", "updatedAt" ],
       select: {
         id: true,
         text: true,

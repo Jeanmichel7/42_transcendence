@@ -46,8 +46,8 @@ function Header() {
   useConnection();
 
   useEffect(() => {
-    // console.log('setnotifications localstorage', notifications);
-    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
+    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) 
+      return;
     localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
   }, [notifications, userData.id]);
 
@@ -77,7 +77,6 @@ function Header() {
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
-    console.log('logout : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {

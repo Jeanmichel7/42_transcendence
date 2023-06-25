@@ -14,7 +14,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { getTimeSince, isChatMsgInterface, isMsgInterface } from '../../utils/utils';
 import { editChatMessage } from '../../api/chat';
 import { RootState } from '../../store';
-import { StyledLink } from './Conversation/style';
+import { StyledLink } from './PriveConv/style';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;

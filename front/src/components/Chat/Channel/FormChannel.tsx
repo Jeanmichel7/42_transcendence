@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { sendChatMessage } from '../../../api/chat';
 import { ChatMsgInterface, ApiErrorResponse } from '../../../types';
 import { TextareaAutosize } from '@mui/material';
@@ -17,56 +17,51 @@ const FormChannel = ({
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const messageQueue = useRef<string[]>([]).current;
+  const [messageQueue, setMessageQueue] = useState<string[]>([]);
 
-  const sendMessageFromQueue = useCallback(async () => {
-    if (isSending) return;
-    if (messageQueue.length === 0) {
-      setStatusSendMsg('');
-      return;
-    }
-    setIsSending(true);
-    const message = messageQueue.shift();
-    const newMessage: ChatMsgInterface | ApiErrorResponse = await sendChatMessage(id, {
-      text: message,
-    });
-    setIsSending(false);
-    if ('error' in newMessage)
-      setStatusSendMsg(newMessage.message);
-    setShouldScrollToBottom(true);
-    sendMessageFromQueue();
-    setTimeout(() => {
-      sendMessageFromQueue();
-    }, 300);
-    // setTimeout(sendMessageFromQueue, 10000);
-
-  }, [id, isSending, messageQueue, setShouldScrollToBottom]);
+  useEffect(() => {
+    const sendMessage = async () => {
+      if (isSending) return;
+      if (messageQueue.length === 0) return setStatusSendMsg('');
+      setIsSending(true);
+      const message = messageQueue[0];
+      setMessageQueue((prev) => prev.slice(1));
+      const newMessage: ChatMsgInterface | ApiErrorResponse = await sendChatMessage(id, {
+        text: message,
+      });
+      setIsSending(false);
+      if ('error' in newMessage) {
+        setStatusSendMsg(newMessage.message);
+      } else {
+        setShouldScrollToBottom(true);
+      }
+    };
+    sendMessage();
+  }, [messageQueue, id, isSending, setShouldScrollToBottom]);
 
   // send message
-  const handleSubmit = 
-  useCallback(
-    () => async (e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      if (e === null) return;
-      if ('key' in e) {
-        if (e.shiftKey && e.key === 'Enter') {
-          setText((prev) => prev + '\n');
-          e.preventDefault();
-          return;
-        } else if (e.key !== 'Enter')
-          return;
-      }
-      e.preventDefault();
-      if (text.trim() === '') {
-        setText('');
+  const handleSubmit = useCallback((
+    e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    if (e === null) return;
+    if ('key' in e) {
+      if (e.shiftKey && e.key === 'Enter') {
+        setText((prev) => prev + '\n');
+        e.preventDefault();
         return;
-      }
-
-      messageQueue.push(text);
+      } else if (e.key !== 'Enter')
+        return;
+    }
+    e.preventDefault();
+    if (text.trim() === '') {
       setText('');
-      setStatusSendMsg('sending');
-      sendMessageFromQueue();
-    }, [messageQueue, sendMessageFromQueue, text],
-  );
+      return;
+    }
+    setMessageQueue((prev) => prev ? [...prev, text] : [text]);
+    setStatusSendMsg('sending');
+    setText('');
+  }, [text]);
+
 
   const handleChangeTextArea = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -83,12 +78,12 @@ const FormChannel = ({
           name="text"
           value={text}
           onChange={handleChangeTextArea}
-          onKeyDown={handleSubmit()}
+          onKeyDown={handleSubmit}
           placeholder="Enter your text here..."
           className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
         />
         <button className='flex justify-center items-center'
-          onClick={handleSubmit()}
+          onClick={handleSubmit}
         >
           <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
         </button>

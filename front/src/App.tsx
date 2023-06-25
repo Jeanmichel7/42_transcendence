@@ -93,7 +93,7 @@ function App() {
     } else {
       dispatch(setLogged(false));
       //disconnect user
-      if (userId !== -1)
+      if (location?.pathname != '/connection' && location?.pathname != '/fakeconnection')
         navigate('/');
       setUserId(-1);
     }
@@ -101,7 +101,10 @@ function App() {
 
 
   useEffect(() => {
-    checkAuth();
+    if (location?.pathname != '/' 
+      && location?.pathname != '/connection'
+      && location?.pathname != '/fakeconnection')
+      checkAuth();
   }, [dispatch, navigate, fetchData, checkAuth]);
 
   const handleClick = () => {

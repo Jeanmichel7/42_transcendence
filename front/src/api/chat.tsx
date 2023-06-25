@@ -1,16 +1,14 @@
 import { ApiErrorResponse } from '../types';
 import { apiRequest } from './index';
-import { ChatMsgInterface, RoomInterface } from '../types/ChatTypes';
+import { ChatMsgInterface, JoinRoomDTO, RoomInterface, UpdateRoomData } from '../types/ChatTypes';
 import { HttpStatusCode } from 'axios';
-
-
 
 /* ****************************
  *             ROOM           *
  ******************************/
 
 export async function createChannel(
-  body: any,
+  body: UpdateRoomData,
 ): Promise< RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'post',
@@ -33,7 +31,7 @@ export async function inviteUser(
 
 export async function editChannel(
   roomId: number,
-  data: any,
+  data: UpdateRoomData,
 ): Promise< RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
@@ -64,7 +62,7 @@ export async function getAllPublicRooms(
 
 export async function joinRoom(
   roomId: number,
-  data: any,
+  data: JoinRoomDTO,
 ): Promise< RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'post',

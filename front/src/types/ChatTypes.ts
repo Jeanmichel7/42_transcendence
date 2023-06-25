@@ -50,3 +50,14 @@ export interface ConversationInterface {
   room: RoomInterface;
   msgNotRead: number;
 }
+
+export interface UpdateRoomData {
+  name?: string;
+  isProtected?: boolean;
+  password?: string | null;
+}
+
+export interface JoinRoomDTO {
+  roomId: number;
+  password?: string;
+}

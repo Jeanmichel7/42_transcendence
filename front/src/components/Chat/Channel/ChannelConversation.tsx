@@ -19,7 +19,7 @@ import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../..
 import ChatMembers from './Members';
 import InvitationRoom from './admin/InvitationRoom';
 import { useConnectionSocketChannel } from './useSocketChannel';
-import FormChannel from '../Conversation/FormChannel';
+import FormChannel from './FormChannel';
 // import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
 // import ErrorBoundary from './errorBoundaries';
 
