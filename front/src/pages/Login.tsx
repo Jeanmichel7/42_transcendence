@@ -1,10 +1,9 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../utils/login.scss';
 import styled, { keyframes, css } from 'styled-components';
 import '../fonts/fonts.css';
 import { Button } from '@mui/material';
 import { useState } from 'react';
-import ConnectPage from './Connection';
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -118,16 +117,47 @@ const LoginWrapper = styled.div`
 export default function Login() {
   const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
-  const handleClick = (e) => {
+  const navigate = useNavigate();
+
+  // const handleClick = (
+  //   e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+  // ) => {
+  //   e.preventDefault();
+  //   setExpand(true);
+  //   setTimeout(() => {
+  //     // redirect after 1s
+  //     window.location = e.target.href;
+  //   }, 1000);
+  // };
+
+  const handleConnection = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+  ) => {
     e.preventDefault();
+    const width = 600;
+    const height = 688;
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
 
-    setExpand(true);
+    const newWindow = window.open(
+      'http://localhost:3006/connection',
+      '_blank',
+      `toolbar=no, location=no, directories=no, status=no, menubar=no,
+        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
+    );
+    if (!newWindow)
+      return console.log('erreur new windos  ');
 
-    setTimeout(() => {
-      // redirect after 1s
-      window.location = e.target.href;
-    }, 1000);
+    window.addEventListener('message', (event) => {
+      if (event.source !== newWindow) return;
+      if (event.data === 'user connected') {
+        console.log('user connected');
+        newWindow.close();
+        navigate('/home');
+      }
+    });
   };
+
 
   return (
     <LoginWrapper>
@@ -169,19 +199,19 @@ export default function Login() {
       <TitleWrapper>
         <Title>Pong</Title>
         <StyledLink
-          onClick={handleClick}
-          to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code"
+          onClick={handleConnection}
+          // to=""
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           expand={expand}
         >
-          Login as a 42 student
+          Login
         </StyledLink>
-        <Link to="/fakeconnection">
+        {/* <Link to="/fakeconnection">
           <Button sx={{ my: 2, color: 'white', display: 'block' }}>
             Login Fake
           </Button>
-        </Link>
+        </Link> */}
       </TitleWrapper>
     </LoginWrapper>
   );

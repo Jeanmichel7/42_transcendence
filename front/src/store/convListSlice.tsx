@@ -70,9 +70,8 @@ const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterf
   // console.log('redux update status conv list : ', item);
   item.forEach((userStatus) => {
     state.conversationsList.forEach((conv: ConversationInterface) => {
-      if (isUserInterface(conv.user) && conv.user.id === userStatus.id) {
+      if (isUserInterface(conv.user) && conv.user.id === userStatus.id)
         conv.user.status = userStatus.status;
-      }
       if (isRoomInterface(conv.room)) {
         //check ownerUser
         if (conv.room.ownerUser?.id === userStatus.id && conv.room.ownerUser.id === userStatus.id) {
@@ -97,7 +96,6 @@ const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterf
           });
         }
       }
-      console.log('redux check user status ');
     });
   });
 };

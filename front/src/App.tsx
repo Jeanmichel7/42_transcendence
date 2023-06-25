@@ -119,13 +119,19 @@ function App() {
   return (
     <>
       <div className="flex flex-col h-screen min-h-md ">
-        {location?.pathname !== '/' && <Header />}
+        { location?.pathname !== '/' 
+          && location?.pathname != '/connection' 
+          && location?.pathname != '/fakeconnection' 
+          && <Header />}
         <div className="flex-grow w-full">
           <div className="h-full">
             <AppRoutes />
           </div>
         </div>
-        {location?.pathname !== '/' && <Footer />}
+        { location?.pathname !== '/' 
+          && location?.pathname != '/connection' 
+          && location?.pathname != '/fakeconnection' 
+          && <Footer />}
       </div>
 
       <Snackbar

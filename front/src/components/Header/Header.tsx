@@ -77,6 +77,7 @@ function Header() {
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
+    console.log('logout : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
