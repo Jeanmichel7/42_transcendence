@@ -9,10 +9,12 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
         {user.login}
       </div>
       <Badge
-        color={
+        color={ 
           user.status === 'online' ? 'success' :
             user.status === 'absent' ? 'warning' :
-              'error'
+              user.status === 'inactive' ? 'secondary' :
+                user.status === 'in game' ? 'info' :
+                  'error' 
         }
         overlap="circular"
         badgeContent=" "

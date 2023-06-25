@@ -189,10 +189,12 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
         <Link to={'/profile/' + user.login}
           className="flex flex-grow text-black p-1 pl-2 items-center ">
           <Badge
-            color={
+            color={ 
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
-                  'error'
+                  user.status === 'inactive' ? 'secondary' :
+                    user.status === 'in game' ? 'info' :
+                      'error' 
             }
             overlap="circular"
             badgeContent=" "

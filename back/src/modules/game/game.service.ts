@@ -527,6 +527,8 @@ import { MessageService } from '../messagerie/messages.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
+import { UserStatusInterface } from '../users/interfaces/status.interface';
+import { UserUpdateEvent } from '../notification/events/notification.event';
 
 @Injectable()
 export class GameService {
@@ -900,6 +902,11 @@ export class GameService {
     });
     if (!findWaitingGame) throw new NotFoundException('game not found');
 
+    const player1 = await this.userRepository.findOne({
+      where: { login: findWaitingGame.player1.login },
+    });
+    if (!player1) throw new NotFoundException('player1 not found');
+
     const player2 = await this.userRepository.findOne({
       where: { login: userlogin2 },
     });
@@ -909,9 +916,38 @@ export class GameService {
     findWaitingGame.status = 'playing';
     findWaitingGame.updatedAt = new Date();
 
-    const test: GameEntity = await this.gameRepository.save(findWaitingGame);
-    const result: GameInterface = test;
-    console.log('result create game : ', result);
+    const gameSaved: GameEntity = await this.gameRepository.save(
+      findWaitingGame,
+    );
+
+    player1.status = 'in game';
+    player1.updatedAt = new Date();
+    await this.userRepository.save(player1);
+    player2.status = 'in game';
+    player2.updatedAt = new Date();
+    await this.userRepository.save(player2);
+
+    //event update status
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: player1.id,
+        status: player1.status,
+        login: player1.login,
+      }),
+    );
+
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: player2.id,
+        status: player2.status,
+        login: player2.login,
+      }),
+    );
+
+    const result: GameInterface = gameSaved;
+    // console.log('result create game : ', result);
     return result;
   }
 
@@ -931,6 +967,7 @@ export class GameService {
   ): Promise<GameInterface> {
     const game: GameEntity = await this.gameRepository.findOne({
       where: { id: gameId },
+      relations: ['player1', 'player2'],
     });
     game.status = 'finished';
     game.finishAt = new Date();
@@ -941,8 +978,35 @@ export class GameService {
     });
     await this.gameRepository.save(game);
 
+    // update status players to online
+    game.player1.status = 'online';
+    game.player1.updatedAt = new Date();
+    await this.userRepository.save(game.player1);
+
+    game.player2.status = 'online';
+    game.player2.updatedAt = new Date();
+    await this.userRepository.save(game.player2);
+
+    //event update status
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: game.player1.id,
+        status: game.player1.status,
+        login: game.player1.login,
+      }),
+    );
+
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: game.player2.id,
+        status: game.player2.status,
+        login: game.player2.login,
+      }),
+    );
     const result: GameInterface = game;
-    console.log('result end game : ', result);
+    // console.log('result end game : ', result);
     return result;
   }
 
@@ -968,6 +1032,9 @@ export class GameService {
         'winner.login',
       ])
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
+      .andWhere('games.status IN (:...statuses)', {
+        statuses: ['finished', 'playing'],
+      })
       .orderBy('games.createdAt', 'DESC')
       .getMany();
 

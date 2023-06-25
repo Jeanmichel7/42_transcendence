@@ -53,7 +53,8 @@ const ConversationListUserItem: React.FC<ConvProps> = ({
               conv.user.status === 'online' ? 'success' :
                 conv.user.status === 'absent' ? 'warning' :
                   conv.user.status === 'inactive' ? 'secondary' :
-                    'error' 
+                    conv.user.status === 'in game' ? 'info' :
+                      'error' 
             }
             overlap="circular"
             badgeContent=" "

@@ -30,7 +30,8 @@ const FriendItem: React.FC<FriendItemProps> = ({
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
                   user.status === 'inactive' ? 'secondary' :
-                    'error'
+                    user.status === 'in game' ? 'info' :
+                      'error' 
             }
             overlap="circular"
             variant="dot"
