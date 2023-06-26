@@ -15,6 +15,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -120,6 +121,19 @@ export class UsersController {
       req.user.id,
     );
     return result;
+  }
+
+  /* ************************************************ */
+  /*                   LEADERBOARD                    */
+  /* ************************************************ */
+
+  @Get('leaderboard')
+  async getLeaderboard(
+    @Req() req: RequestWithUser,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('offset', ParseIntPipe) offset: number,
+  ): Promise<UserInterface[]> {
+    return await this.usersService.getLeaderboard(req.user.id, page, offset);
   }
 
   /* ************************************************ */

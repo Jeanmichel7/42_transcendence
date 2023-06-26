@@ -529,6 +529,7 @@ import { NotificationService } from '../notification/notification.service';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
 import { UserStatusInterface } from '../users/interfaces/status.interface';
 import { UserUpdateEvent } from '../notification/events/notification.event';
+import { UserInterface } from '../users/interfaces/users.interface';
 
 @Injectable()
 export class GameService {
@@ -539,6 +540,8 @@ export class GameService {
   playerWaiting2Bonus: any;
   createdWaitingGameBonus: GameInterface;
   createdWaitingGame: GameInterface;
+
+  leaderBoardLimitPerPage = 20;
 
   constructor(
     @InjectRepository(GameEntity)
@@ -978,12 +981,22 @@ export class GameService {
     });
     await this.gameRepository.save(game);
 
+    let scoreEloP1 = game.player1.score;
+    let scoreEloP2 = game.player2.score;
+    ({ scoreEloP1, scoreEloP2 } = this.updateEloScore(
+      game.player1,
+      game.player2,
+      game.winner,
+    ));
+
     // update status players to online
     game.player1.status = 'online';
+    game.player1.score = scoreEloP1;
     game.player1.updatedAt = new Date();
     await this.userRepository.save(game.player1);
 
     game.player2.status = 'online';
+    game.player2.score = scoreEloP2;
     game.player2.updatedAt = new Date();
     await this.userRepository.save(game.player2);
 
@@ -1041,5 +1054,52 @@ export class GameService {
     const result: GameInterface[] = games;
     // console.log('result get all game : ', result);
     return result;
+  }
+
+  /** **********************
+   *       ELO SCORE
+   * *********************** */
+
+  // https://fr.wikipedia.org/wiki/Classement_Elo
+
+  //    Rn = Ro + K * (S - Se)
+  // Où :
+
+  // Rn est le nouveau classement ELO
+  // Ro est l'ancien classement ELO (avant le match)
+  // K est un coefficient défini qui représente l'importance du match (généralement, c'est 32 pour les échecs)
+  // S est le score réel (1 pour une victoire, 0.5 pour une égalité, 0 pour une défaite)
+  // Se est le score attendu
+  // Le score attendu est calculé avec cette formule :
+
+  // Se = 1 / (1 + 10^((Rb-Ra) / 400))
+  // Où :
+
+  // Rb est le classement ELO de l'adversaire
+  // Ra est votre propre classement ELO
+
+  updateEloScore(
+    player1: UserEntity,
+    player2: UserEntity,
+    winner: UserEntity,
+  ): { scoreEloP1: number; scoreEloP2: number } {
+    const k = 32;
+    const scoreEloP1 = player1.score;
+    const scoreEloP2 = player2.score;
+    const expectedScoreP1 =
+      1 / (1 + Math.pow(10, (scoreEloP2 - scoreEloP1) / 400));
+    const expectedScoreP2 =
+      1 / (1 + Math.pow(10, (scoreEloP1 - scoreEloP2) / 400));
+    let newScoreEloP1 = scoreEloP1;
+    let newScoreEloP2 = scoreEloP2;
+
+    if (winner.id === player1.id) {
+      newScoreEloP1 = scoreEloP1 + k * (1 - expectedScoreP1);
+      newScoreEloP2 = scoreEloP2 + k * (0 - expectedScoreP2);
+    } else if (winner.id === player2.id) {
+      newScoreEloP1 = scoreEloP1 + k * (0 - expectedScoreP1);
+      newScoreEloP2 = scoreEloP2 + k * (1 - expectedScoreP2);
+    }
+    return { scoreEloP1: newScoreEloP1, scoreEloP2: newScoreEloP2 };
   }
 }

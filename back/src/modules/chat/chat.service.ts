@@ -1231,7 +1231,8 @@ export class ChatService {
       page = page + Math.floor(offset / limit);
       offset = offset % limit;
     }
-    const skip = (page - 1) * limit - offset;
+    let skip = (page - 1) * limit - offset;
+    if (skip < 0) skip = 0;
 
     const messages: ChatMessageEntity[] = await this.messageRepository
       .createQueryBuilder('chat_messages')

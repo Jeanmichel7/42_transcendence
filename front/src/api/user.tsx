@@ -10,23 +10,6 @@ export async function getUserData()
   );
 }
 
-// export async function fetchUserAccount(): Promise< UserInterface | ApiErrorResponse> {
-//   try {
-//     const response = await api.get< UserInterface >('users/allDatass');
-//     if (response.status === 200) {
-//       return response.data;
-//     }
-//   } catch (e: unknown) {
-//     console.log('e : ', e)
-//     if (e instanceof Error && 'response' in e) {
-//       // const errorResponse = e.response.data ;
-//       return e.response.data;
-//     }
-//     throw new Error('Failed to check auth: ' + e);
-//   }
-//   throw new Error('Unexpected error');
-// }
-
 export async function fetchUserAccount()
 : Promise< UserInterface | ApiErrorResponse > {
   return apiRequest<UserInterface>(

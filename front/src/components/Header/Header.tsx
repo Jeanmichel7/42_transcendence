@@ -225,16 +225,25 @@ function Header() {
                   Play
                 </MenuItem>
               </NavLink>
+
+              <NavLink to="/leaderboard">
+                <MenuItem onClick={handleCloseNavMenu}>
+                  Leaderboard
+                </MenuItem>
+              </NavLink>
+
               <NavLink to="/chat">
                 <MenuItem onClick={handleCloseNavMenu}>
                   Chat
                 </MenuItem>
               </NavLink>
+
               <NavLink to="/friends">
                 <MenuItem onClick={handleCloseNavMenu}>
                   Friends
                 </MenuItem>
               </NavLink>
+              
               <NavLink to={'/profile/' + userData.login}>
                 <MenuItem onClick={handleCloseNavMenu}>
                   Profile
@@ -281,6 +290,12 @@ function Header() {
             <NavLink to="/game">
               <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Play
+              </Button>
+            </NavLink>
+
+            <NavLink to="/leaderboard">
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+                Leaderboard
               </Button>
             </NavLink>
 

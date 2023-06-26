@@ -5,12 +5,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { GameService } from './game.service';
 // import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 import { GameInterface } from './interfaces/game.interface';
+import { UserInterface } from '../users/interfaces/users.interface';
 
 @Controller('games')
 export class GameController {
