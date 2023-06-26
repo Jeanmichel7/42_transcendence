@@ -46,8 +46,8 @@ function Header() {
   useConnection();
 
   useEffect(() => {
-    // console.log('setnotifications localstorage', notifications);
-    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) return;
+    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) 
+      return;
     localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
   }, [notifications, userData.id]);
 
@@ -77,7 +77,6 @@ function Header() {
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
-    console.log('logout : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
@@ -226,16 +225,25 @@ function Header() {
                   Play
                 </MenuItem>
               </NavLink>
+
+              <NavLink to="/leaderboard">
+                <MenuItem onClick={handleCloseNavMenu}>
+                  Leaderboard
+                </MenuItem>
+              </NavLink>
+
               <NavLink to="/chat">
                 <MenuItem onClick={handleCloseNavMenu}>
                   Chat
                 </MenuItem>
               </NavLink>
+
               <NavLink to="/friends">
                 <MenuItem onClick={handleCloseNavMenu}>
                   Friends
                 </MenuItem>
               </NavLink>
+              
               <NavLink to={'/profile/' + userData.login}>
                 <MenuItem onClick={handleCloseNavMenu}>
                   Profile
@@ -282,6 +290,12 @@ function Header() {
             <NavLink to="/game">
               <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
                 Play
+              </Button>
+            </NavLink>
+
+            <NavLink to="/leaderboard">
+              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+                Leaderboard
               </Button>
             </NavLink>
 

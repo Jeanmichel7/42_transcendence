@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import { ApiErrorResponse, RoomInterface } from '../../../types';
 
-import { Autocomplete, Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField } from '@mui/material';
-import { getAllPublicRooms, joinRoom } from '../../../api/chat';
+import { Autocomplete, Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, OutlinedInput, Pagination, Select, Stack, TextField } from '@mui/material';
+import { getAllPublicRooms, getAllPublicRoomsCount, joinRoom } from '../../../api/chat';
 import RoomCard from './ChannelRoomCard';
 import { reduxAddConversationList } from '../../../store/convListSlice';
-import { isConvAlreadyExist, isRoomInterface } from '../../../utils/utils';
+import { isConvAlreadyExist } from '../../../utils/utils';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import DoneIcon from '@mui/icons-material/Done';
@@ -24,26 +24,30 @@ export default function ChannelSearch() {
   const [selectedRoom, setSelectedRoom] = useState<RoomInterface | null>(null);
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
 
+  const topRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [userPerPage, setUserPerPage] = useState(20);
+  const [totalPages, setTotalPages] = useState(0);
+  const dispatch = useDispatch();
+  
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
 
   const handleJoinRoom = async (room: RoomInterface | null) => {
     if (!room)
       return;
-    if (isConvAlreadyExist(room, conversationsList)) {
+    if (isConvAlreadyExist(room, conversationsList))
       return dispatch(setErrorSnackbar('Room already in conversation list'));
-    }
     if (room.isProtected && !displayInputPwd)
       return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
       return dispatch(setErrorSnackbar('Password required'));
 
     setIsLoading(true);
-    // console.log('inputPwd', inputPwd);
-    const res: RoomInterface | ApiErrorResponse = await joinRoom(room.id, {
-      password: inputPwd,
+    const res: RoomInterface | ApiErrorResponse = await joinRoom({
+      roomId: room.id,
+      password: inputPwd ? inputPwd : undefined,
     });
     
     if ('error' in res) {
@@ -65,26 +69,51 @@ export default function ChannelSearch() {
   };
 
   useEffect(() => {
-    async function fetchUsers() {
+    async function fetchTotalRooms() {
+      const res: number | ApiErrorResponse = await getAllPublicRoomsCount();
+      if (typeof res != 'number' && 'error' in res)
+        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      else
+        setTotalPages(Math.ceil(res / userPerPage));
+    }
+    async function fetchRooms() {
       setIsLoading(true);
-      const allRooms: RoomInterface[] | ApiErrorResponse = await getAllPublicRooms();
+      const allRooms: RoomInterface[] | ApiErrorResponse = await getAllPublicRooms(
+        currentPage,
+        userPerPage,
+      );
       setIsLoading(false);
 
       if ('error' in allRooms)
         dispatch(setErrorSnackbar(allRooms.error + allRooms.message ? ': ' + allRooms.message : ''));
       else {
-        const roomsToFilter = allRooms
-          .filter((r: RoomInterface) => !conversationsList.some(cv => isRoomInterface(cv) && cv.name === r.name));
-        setRooms(roomsToFilter);
-        // console.log(allRooms);
+        setRooms(allRooms);
+        topRef.current?.scrollIntoView({ behavior: 'smooth' });
       }
       setSelectedRoom(null);
     }
-    fetchUsers();
-  }, [conversationsList, dispatch]);
+    fetchTotalRooms();
+    fetchRooms();
+  }, [conversationsList, dispatch, currentPage, userPerPage]);
 
-  // if (!conversationsList || !rooms)
-  //   return <p>Loading...</p>;
+
+
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown> | null,
+    value: number,
+  ) => {
+    setCurrentPage(value);
+  };
+
+  const handleChangeUserPerPage = (
+    event: any,
+  ) => {
+    setUserPerPage(event.target.value);
+    setCurrentPage(1);
+  };
+
+
+
   return (
     <div className="h-full">
       <div className='flex p-3 border'>
@@ -92,13 +121,13 @@ export default function ChannelSearch() {
           id="searchFriends"
           fullWidth
           options={rooms}
-          getOptionLabel={(option: RoomInterface) => option.name}
+          getOptionLabel={(option: RoomInterface) => option.name + ' (' + option.id + ')'}
           onChange={(event: React.ChangeEvent<object>, newValue: RoomInterface | null) => {
             event.stopPropagation();
             setSelectedRoom(newValue);
           }}
           value={selectedRoom}
-          renderInput={(params) => <TextField {...params} label="Search Friends" variant="outlined" />}
+          renderInput={(params) => <TextField {...params} label="Search Channels" variant="outlined" />}
         />
         <Button
           onClick={() => handleJoinRoom(selectedRoom)}
@@ -159,12 +188,36 @@ export default function ChannelSearch() {
         </div>
       )}
       
-      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-320px)] px-2">
+      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-363px)] px-2">
+        <div ref={topRef} />
         {rooms.map((r: RoomInterface) => {
           return (
             <RoomCard key={r.id} room={r} />
           );
         })}
+      </div>
+
+      {/* Pagination  */}
+      <div className="flex relative justify-center py-2">
+        <Stack spacing={2}>
+          <Pagination 
+            count={totalPages} 
+            onChange={handleChangePage}
+          />
+        </Stack>
+        <div className='absolute right-2'>
+          <Select
+            value={userPerPage}
+            onChange={handleChangeUserPerPage}
+            label="Cards per page"
+            sx={{ height: '35px' }}
+          >
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={30}>30</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+          </Select>
+        </div>
       </div>
     </div>
   );

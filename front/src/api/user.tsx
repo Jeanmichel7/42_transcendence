@@ -10,23 +10,6 @@ export async function getUserData()
   );
 }
 
-// export async function fetchUserAccount(): Promise< UserInterface | ApiErrorResponse> {
-//   try {
-//     const response = await api.get< UserInterface >('users/allDatass');
-//     if (response.status === 200) {
-//       return response.data;
-//     }
-//   } catch (e: unknown) {
-//     console.log('e : ', e)
-//     if (e instanceof Error && 'response' in e) {
-//       // const errorResponse = e.response.data ;
-//       return e.response.data;
-//     }
-//     throw new Error('Failed to check auth: ' + e);
-//   }
-//   throw new Error('Unexpected error');
-// }
-
 export async function fetchUserAccount()
 : Promise< UserInterface | ApiErrorResponse > {
   return apiRequest<UserInterface>(
@@ -57,11 +40,22 @@ export async function patchUserAccount(
   );
 }
 
-export async function getAllUsers()
-: Promise< UserInterface[] | ApiErrorResponse > {
+export async function getAllUsers(
+  page: number,
+  limit: number,
+): Promise< UserInterface[] | ApiErrorResponse > {
   return apiRequest<UserInterface[]>(
     'get',
-    '/users/all',
+    `/users/all?page=${page}&limit=${limit}`,
     'Failed to get all users: ',
+  );
+}
+
+export async function getAllUsersCount()
+: Promise< number | ApiErrorResponse > {
+  return apiRequest<number>(
+    'get',
+    '/users/all/count',
+    'Failed to get all users count: ',
   );
 }

@@ -13,7 +13,7 @@ import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, ConversationInterfac
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { reduxSetNotifications } from '../store/notificationSlice';
 import { reduxSetConversationList } from '../store/convListSlice';
-import { StyledLink } from '../components/Chat/Conversation/style';
+import { StyledLink } from '../components/Chat/PriveConv/style';
 import styled from 'styled-components';
 
 function ConnectPage() {

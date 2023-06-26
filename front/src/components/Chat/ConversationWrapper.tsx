@@ -1,5 +1,5 @@
 import { useParams, useLocation } from 'react-router-dom';
-import PrivateConversation from './Conversation/PrivateConversation';
+import PrivateConversation from './PriveConv/PrivateConversation';
 import ChannelConversation from './Channel/ChannelConversation';
 import { useEffect, useRef } from 'react';
 import { Socket, io } from 'socket.io-client';

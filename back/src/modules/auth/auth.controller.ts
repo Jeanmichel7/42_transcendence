@@ -109,6 +109,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const jwtCookie: string = req.cookies['jwt'];
+    if (!jwtCookie) return;
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({

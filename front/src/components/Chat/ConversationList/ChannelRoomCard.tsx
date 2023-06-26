@@ -43,8 +43,9 @@ const RoomCard = ({ room }: RoomCardProps) => {
       return dispatch(setErrorSnackbar('Password required'));
 
     setIsLoading(true);
-    const res: RoomInterface | ApiErrorResponse = await joinRoom(room.id, {
-      password: inputPwd,
+    const res: RoomInterface | ApiErrorResponse = await joinRoom({
+      roomId: room.id,
+      password: inputPwd ? inputPwd : undefined,
     });
 
     if ('error' in res) {

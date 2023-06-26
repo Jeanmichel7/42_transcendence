@@ -24,8 +24,6 @@ const useConnection = () => {
   useEffect(() => {
     /* MP */
     socketRef.current?.on('notification_private_message', (message: MessageInterface) => {
-      console.log('recu du socket notification_private_message : ', message.ownerUser.id);
-      // console.log('pathname', pathRef.current.split('/'));
       if (pathRef.current.split('/')[1] === 'chat' && pathRef.current.split('/')[4] === message.ownerUser.id.toString())
         return;
 
@@ -125,7 +123,7 @@ const useConnection = () => {
 
     return () => {
       if (userIsLogged) return; 
-      console.log('disconnect socket');
+      // console.log('disconnect socket');
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');
       socket.off('notification_friend_request_declined');

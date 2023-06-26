@@ -102,7 +102,9 @@ export class MessageService {
       page = page + Math.floor(offset / limit);
       offset = offset % limit;
     }
-    const skip = (page - 1) * limit - offset;
+    let skip = (page - 1) * limit - offset;
+    if (skip < 0) skip = 0;
+
     const messages: MessageEntity[] = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.ownerUser', 'ownerUser')
@@ -178,7 +180,6 @@ export class MessageService {
     await userReceive.save();
 
     const result: MessageInterface = await this.messageRepository.findOne({
-      // select: ["id", "text", "createdAt", "updatedAt" ],
       select: {
         id: true,
         text: true,

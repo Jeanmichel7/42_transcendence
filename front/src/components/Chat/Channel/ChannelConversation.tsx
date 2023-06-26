@@ -6,7 +6,7 @@ import { setErrorSnackbar, setMsgSnackbar, setWarningSnackbar } from '../../../s
 
 import MessageItem from '../MessageItem';
 
-import { chatOldMessages, deleteChannel, deleteChatMessage, getRoomData } from '../../../api/chat';
+import { chatOldMessages, deleteChatMessage, getRoomData } from '../../../api/chat';
 
 import { ApiErrorResponse } from '../../../types';
 import { ChatMsgInterface, ConversationInterface, RoomInterface } from '../../../types/ChatTypes';
@@ -19,7 +19,7 @@ import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../..
 import ChatMembers from './Members';
 import InvitationRoom from './admin/InvitationRoom';
 import { useConnectionSocketChannel } from './useSocketChannel';
-import FormChannel from '../Conversation/FormChannel';
+import FormChannel from './FormChannel';
 // import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
 // import ErrorBoundary from './errorBoundaries';
 
@@ -43,7 +43,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
       const { userBlocked } = useSelector((state: RootState) => state.user);
 
       const [isAdmin, setIsAdmin] = useState<boolean>(false);
-      const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
+      // const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
       const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
       const [pageDisplay, setPageDisplay] = useState<number>(1);
       const [messages, setMessages] = useState<(ChatMsgInterface)[]>([]);
@@ -216,21 +216,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
         }
       };
 
-
-      const handleDeleteChannel = async () => {
-        if (!room) return;
-        const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
-        if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
-          dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
-        else {
-          dispatch(setMsgSnackbar('Channel deleted'));
-          dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
-          setIsAdminMenuOpen(false);
-          navigate('/chat');
-        }
-      };
-
-
       return (
         <>
           {!room ? <p>loading...</p> : 
@@ -242,8 +227,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
                 {isAdmin && room &&
                   <SideBarAdmin
                     room={room}
-                    setIsAdminMenuOpen={setIsAdminMenuOpen}
-                    handleDeleteChannel={handleDeleteChannel}
+                    convId={conv.id}
+                    // setIsAdminMenuOpen={setIsAdminMenuOpen}
                   />}
               </div>
 
@@ -263,7 +248,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> =
                           message={message}
                           isLoadingDeleteMsg={isLoadingDeleteMsg}
                           handleDeleteMessage={handleDeleteMessage}
-                          isAdminMenuOpen={isAdminMenuOpen}
+                          // isAdminMenuOpen={isAdminMenuOpen}
                         />
                       // </ErrorBoundary>
                     ))}

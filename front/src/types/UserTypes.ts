@@ -7,6 +7,7 @@ export interface UserInterface {
   lastName: string,
   status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive',
   avatar: string,
+  score: number,
   description?: string,
   role?: 'user' | 'admin',
   is2FAEnabled?: boolean,

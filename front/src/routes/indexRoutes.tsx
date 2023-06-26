@@ -16,6 +16,7 @@ import ChannelSearch from '../components/Chat/ConversationList/ChannelSearchInte
 import FriendsSearch from '../components/Chat/ConversationList/FriendsSearchInterface';
 import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
+import LeaderBoard from '../pages/LeaderBoard';
 
 const HomeChat = () => {
   return (
@@ -40,6 +41,7 @@ const AppRoutes: React.FC = () => (
       <Route path='addChannels' element={<ChannelSearch />} />
       <Route path='*' element={<HomeChat />} />
     </Route>
+    <Route path='/leaderboard' element={<LeaderBoard />} />
     <Route path='/friends' element={<FriendsPage />} />
     <Route path='/connection' element={<ConnectPage />} />
     <Route path='/fakeconnection' element={<FakeConnection />} />
