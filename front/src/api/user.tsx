@@ -40,11 +40,22 @@ export async function patchUserAccount(
   );
 }
 
-export async function getAllUsers()
-: Promise< UserInterface[] | ApiErrorResponse > {
+export async function getAllUsers(
+  page: number,
+  limit: number,
+): Promise< UserInterface[] | ApiErrorResponse > {
   return apiRequest<UserInterface[]>(
     'get',
-    '/users/all',
+    `/users/all?page=${page}&limit=${limit}`,
     'Failed to get all users: ',
+  );
+}
+
+export async function getAllUsersCount()
+: Promise< number | ApiErrorResponse > {
+  return apiRequest<number>(
+    'get',
+    '/users/all/count',
+    'Failed to get all users count: ',
   );
 }

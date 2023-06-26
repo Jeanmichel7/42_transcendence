@@ -49,8 +49,20 @@ export class UsersController {
   }
 
   @Get('all')
-  async findAllUsers(): Promise<UserInterface[]> {
-    const result: UserInterface[] = await this.usersService.findAllUsers();
+  async findAllUsers(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<UserInterface[]> {
+    const result: UserInterface[] = await this.usersService.findAllUsers(
+      page,
+      limit,
+    );
+    return result;
+  }
+
+  @Get('all/count')
+  async countAllUsers(): Promise<number> {
+    const result: number = await this.usersService.countAllUsers();
     return result;
   }
 

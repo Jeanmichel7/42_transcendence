@@ -52,21 +52,31 @@ export async function deleteChannel(
 }
 
 export async function getAllPublicRooms(
+  page: number,
+  limit: number,
 ): Promise< RoomInterface[] | ApiErrorResponse> {
   return apiRequest(
     'get',
-    'chat/rooms/public',
+    'chat/rooms/public?page=' + page + '&limit=' + limit,
     'Failed to get public rooms: ',
   );
 }
 
+export async function getAllPublicRoomsCount(
+): Promise< number | ApiErrorResponse> {
+  return apiRequest(
+    'get',
+    'chat/rooms/public/count',
+    'Failed to get public rooms count: ',
+  );
+}
+
 export async function joinRoom(
-  roomId: number,
   data: JoinRoomDTO,
 ): Promise< RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'post',
-    'chat/rooms/' + roomId + '/join',
+    'chat/rooms/' + data.roomId + '/join',
     'Failed to get public rooms: ',
     data,
   );

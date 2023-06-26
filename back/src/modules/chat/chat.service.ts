@@ -1418,7 +1418,10 @@ export class ChatService {
     return true;
   }
 
-  async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
+  async getAllRoomsToDisplay(
+    page: number,
+    limit: number,
+  ): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomEntity[] = await ChatRoomEntity.createQueryBuilder(
       'chat_rooms',
     )
@@ -1466,12 +1469,20 @@ export class ChatService {
         'mutedUsers.avatar',
         'mutedUsers.status',
       ])
+      .orderBy('chat_rooms.updatedAt', 'DESC')
+      .where('chat_rooms.type = :type', { type: 'public' })
+      .skip((page - 1) * limit)
+      .take(limit)
       .getMany();
 
-    const result: ChatRoomInterface[] = rooms.filter(
-      (room) => room.type === 'public',
-    );
-    return result;
+    return rooms;
+  }
+
+  async getAllRoomsToDisplayCount(): Promise<number> {
+    const rooms: ChatRoomEntity[] = await this.roomRepository.find({
+      where: { type: 'public' },
+    });
+    return rooms.length;
   }
 
   /* ************************************************ */
