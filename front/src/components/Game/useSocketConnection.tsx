@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import io, { Socket } from 'socket.io-client';
-import { ClientToServerEvents, ServerToClientEvents } from './Interface';
-import { GROUND_MAX_SIZE } from './Game';
+import { useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvents } from "./Interface";
+import { GROUND_MAX_SIZE } from "./Game";
 
 const useSocketConnection = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
@@ -14,7 +14,7 @@ const useSocketConnection = (
   bonusIsLoading: any,
   bonusValueRef: any,
   racketHeightRef: any,
-  laser: any,
+  laser: any
 ) => {
   const data = useRef({});
 
@@ -55,26 +55,25 @@ const useSocketConnection = (
   useEffect(() => {
     if (!socket) return;
     const intervalId: NodeJS.Timeout = setInterval(() => {
-      socket.emit('clientUpdate', {
+      socket.emit("clientUpdate", {
         posRacket: posRacket.current.left,
         ArrowDown: keyStateRef.current.ArrowDown,
         ArrowUp: keyStateRef.current.ArrowUp,
         gameId: gameId.current,
-        useBonus: keyStateRef.current[' '],
+        useBonus: keyStateRef.current[" "],
       });
     }, 1000 / 60);
 
-    socket.on('gameUpdate', (serverData) => {
+    socket.on("gameUpdate", (serverData) => {
       data.current = normalizeGameData(serverData);
       if (data.current.gameStart) {
         setGameStarted(true);
       }
-      
     });
 
     return () => {
       if (intervalId) clearInterval(intervalId);
-      socket.off('gameUpdate');
+      socket.off("gameUpdate");
     };
   }, []);
 

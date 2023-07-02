@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { Game } from './game.service';
+import { Game } from './game.class';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -92,6 +92,42 @@ export class GameEvents {
   handleDisconnect(client: Socket) {
     console.log('client disconnected: ' + client.id);
     this.gameService.removeFromQueue(client.id);
+  }
+
+  @SubscribeMessage('privateLobby')
+  async handlePrivateLobby(
+    @MessageBody()
+    update: { gameId: bigint; mode: string; ready: boolean; player1: boolean },
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (
+      !client.data.userId ||
+      this.gameService.checkAlreadyInGame(client.data.userId)
+    )
+      return 'error when joining/creating private lobby';
+    let data = {
+      username: client.data.userId,
+      socketId: client.id,
+      gameId: update.gameId,
+      mode: update.mode,
+      ready: update.ready,
+    };
+    const gameStarted = this.gameService.updatePrivateLobby(
+      update.player1,
+      data,
+    );
+    const socket = this.gameService.getOtherPlayerSockerId(
+      update.gameId,
+      update.player1,
+    );
+    if (gameStarted) {
+      this.server.to(socket).emit('userGameStatus', 'alreadyInGame');
+      this.server.to(client.id).emit('userGameStatus', 'alreadyInGame');
+      console.log('game started');
+      return;
+    }
+    let { socketId, ...newData } = data;
+    if (socket) this.server.to(socket).emit('privateLobby', newData);
   }
 
   @SubscribeMessage('userGameStatus')

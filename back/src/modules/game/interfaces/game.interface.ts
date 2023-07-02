@@ -13,3 +13,18 @@ export interface GameInterface {
   player2?: UserInterface;
   winner?: UserInterface;
 }
+
+
+export interface clientUpdate {
+  posRacket: number;
+  ArrowDown: boolean;
+  ArrowUp: boolean;
+  gameId: bigint;
+  useBonus: boolean;
+}
+
+export interface BonusPosition {
+  x: number;
+  y: number;
+  boxSize: number;
+}

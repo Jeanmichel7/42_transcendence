@@ -1,18 +1,19 @@
-import Game from '../components/Game/Game';
-import { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import EndGame from '../components/Game/EndGame';
-import { Socket, io } from 'socket.io-client';
-import Lobby from '../components/Game/Lobby';
-import SearchingOpponent from '../components/Game/SearchingOpponent';
-import { Overlay } from '../components/Game/Overlay';
-import '../components/Game/font.css';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ApiErrorResponse, GameInterface } from '../types';
-import { getGame } from '../api/game';
-import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar } from '../store/snackbarSlice';
-import { RootState } from '../store';
+import Game from "../components/Game/Game";
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import EndGame from "../components/Game/EndGame";
+import { Socket, io } from "socket.io-client";
+import Lobby from "../components/Game/Lobby";
+import SearchingOpponent from "../components/Game/SearchingOpponent";
+import { Overlay } from "../components/Game/Overlay";
+import "../components/Game/font.css";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ApiErrorResponse, GameInterface } from "../types";
+import { getGame } from "../api/game";
+import { useDispatch, useSelector } from "react-redux";
+import { setErrorSnackbar } from "../store/snackbarSlice";
+import { RootState } from "../store";
+import PrivateLobby from "../components/Game/PrivateLobby";
 
 export const GameWrapper = styled.div`
   width: 80vw;
@@ -26,91 +27,114 @@ export const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
+interface PlayerStatus {
+  gameId: number;
+  mode: string;
+  ready: boolean;
+  player1: boolean;
+}
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
   // const socketRef = useRef<Socket | null>(null);
-  const [connectStatus, setConnectStatus] = useState('disconnected');
-  const [currentPage, setCurrentPage] = useState<string>('lobby');
+  const [connectStatus, setConnectStatus] = useState("disconnected");
+  const [currentPage, setCurrentPage] = useState<string>("lobby");
   const { userData } = useSelector((state: RootState) => state.user);
   const lastGameInfo = useRef({} as any);
+  const [isPlayer1, setIsPlayer1] = useState(true);
   const [bonus, setBonus] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const gameId = searchParams.get('id');
+  const gameId = searchParams.get("id");
 
   useEffect(() => {
     if (!gameId || !userData.id || userData.id == -1) return;
-    console.log('gameId', gameId);
 
     const fetchGame = async () => {
-      const retFetchGame: GameInterface | ApiErrorResponse = await getGame(parseInt(gameId));
-      console.log('retFetchGame', retFetchGame);
-      if ('error' in retFetchGame) {
-        dispatch(setErrorSnackbar(retFetchGame.error + retFetchGame.message ? ': ' + retFetchGame.message : ''));
-        return navigate('/game');
+      const retFetchGame: GameInterface | ApiErrorResponse = await getGame(
+        parseInt(gameId)
+      );
+      if ("error" in retFetchGame) {
+        dispatch(
+          setErrorSnackbar(
+            retFetchGame.error + retFetchGame.message
+              ? ": " + retFetchGame.message
+              : ""
+          )
+        );
+        return navigate("/game");
       }
-      if (retFetchGame.player1.id != userData.id && retFetchGame.player2.id != userData.id)
-        return dispatch(setErrorSnackbar('You are not in this game'));
+      if (
+        retFetchGame.player1.id != userData.id &&
+        retFetchGame.player2.id != userData.id
+      )
+        return dispatch(setErrorSnackbar("You are not in this game"));
+      console.log(
+        "first check is player1",
+        retFetchGame.player1.id == userData.id
+      );
+      setIsPlayer1(retFetchGame.player1.id == userData.id);
+      setCurrentPage("privateLobby");
     };
     fetchGame();
-  }, [gameId, userData.id, dispatch, navigate]);
+  }, [socket, userData.id, dispatch, navigate]);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3000/game', {
+    const newSocket = io("http://localhost:3000/game", {
       withCredentials: true,
     });
-    newSocket.on('connect', () => {
-      setConnectStatus('connected');
-      console.log('connected');
-    });
-    
-    newSocket.on('disconnect', () => {
-      setConnectStatus('disconnected');
-      console.log('ERROR SOCKET DISCONNECTED');
+    newSocket.on("connect", () => {
+      setConnectStatus("connected");
     });
 
-    newSocket.on('userGameStatus', (message) => {
-      console.log('Pong status update', message);
-      if (message === 'foundNormal') {
-        setCurrentPage('game');
+    newSocket.on("disconnect", () => {
+      setConnectStatus("disconnected");
+      console.log("ERROR SOCKET DISCONNECTED");
+    });
+
+    newSocket.on("userGameStatus", (message) => {
+      if (message === "foundNormal") {
         setBonus(false);
+        setCurrentPage("game");
       }
-      if (message === 'foundBonus') {
-        setCurrentPage('game');
+      if (message === "foundBonus") {
         setBonus(true);
+        setCurrentPage("game");
       }
-      if (message === 'alreadyInGame') {
-        setCurrentPage('game');
+      if (message === "alreadyInGame") {
+        console.log("bonus value", bonus);
+        setCurrentPage("game");
       }
-      if (message === 'notInGame') {
-        setCurrentPage('lobby');
+      if (message === "notInGame") {
+        setCurrentPage("lobby");
       }
     });
-    
+
     setSocket(newSocket);
-    console.log('socket', socket);
 
     return () => {
+      newSocket.off("connect");
+      newSocket.off("disconnect");
+      newSocket.off("userGameStatus");
       newSocket.disconnect();
       setSocket({} as Socket);
     };
   }, []);
 
   let statusComponent;
-  if (connectStatus === 'connecting') {
+  if (connectStatus === "connecting") {
     statusComponent = <p>Connecting...</p>;
   } else {
     statusComponent = undefined;
   }
   let pageContent;
-  if (currentPage === 'lobby') {
+  if (currentPage === "lobby" && !gameId) {
     pageContent = <Lobby setCurrentPage={setCurrentPage} socket={socket} />;
-  } else if (currentPage === 'finished') {
+  } else if (currentPage === "finished") {
     pageContent = (
       <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
     );
-  } else if (currentPage === 'game') {
+  } else if (currentPage === "game") {
     pageContent = (
       <Game
         socket={socket}
@@ -119,14 +143,23 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === 'searchOpponent') {
+  } else if (currentPage === "searchOpponent") {
     pageContent = (
       <SearchingOpponent socket={socket} setCurrentPage={setCurrentPage} />
+    );
+  } else if (currentPage === "privateLobby") {
+    pageContent = (
+      <PrivateLobby
+        setCurrentPage={setCurrentPage}
+        socket={socket}
+        gameId={gameId}
+        isPlayer1={isPlayer1}
+      />
     );
   }
   return (
     <GameWrapper>
-      {connectStatus === 'disconnected' && <Overlay />}
+      {connectStatus === "disconnected" && <Overlay />}
       {statusComponent}
       {pageContent}
     </GameWrapper>

@@ -20,13 +20,9 @@ import { UserStatusInterface } from 'src/modules/users/interfaces/status.interfa
 export class NotificationGateway {
   @WebSocketServer() server: Server;
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected to NOTIF', client.id);
-  }
+  async handleConnection(@ConnectedSocket() client: Socket) {}
 
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected to NOTIF', client.id);
-  }
+  async handleDisconnect(@ConnectedSocket() client: Socket) {}
 
   @SubscribeMessage('joinNotificationRoom')
   async handleJoinNotificationRoom(
