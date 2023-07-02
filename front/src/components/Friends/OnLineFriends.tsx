@@ -42,10 +42,6 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
        await inviteGameUser(userToDefie.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
-    //recupe url de ;invite ?
-
-    //send bot message to invited ?
-
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 

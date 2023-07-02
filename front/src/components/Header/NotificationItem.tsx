@@ -33,10 +33,6 @@ const NotificationItem = ({
 
 
 
-
-
-
-
   /* helper action FriendShip action */
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
@@ -85,9 +81,7 @@ const NotificationItem = ({
 
   /* helper action Game action */
   const handleAcceptGameInvite = async (notif: NotificationInterface) => {
-    console.log('notif', notif);
     const extractGameId: number = parseInt(notif.invitationLink?.split('?id=')[1] as string);
-    console.log('extractGameId', extractGameId);
 
     setIsLoading(true);
     const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(extractGameId);
@@ -139,7 +133,7 @@ const NotificationItem = ({
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
     if (notif.type === 'roomInvite')
-      return navigate(notif.invitationLink ? notif.invitationLink : '/chat');
+      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
     if (notif.type === 'gameInvite')
       await handleAcceptGameInvite(notif);
     if (notif.type === 'gameInviteAccepted')

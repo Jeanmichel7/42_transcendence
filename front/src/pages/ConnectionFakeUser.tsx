@@ -1,5 +1,5 @@
 import { Box, Button, TextField } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { loginFakeUser, registerFakeUser } from '../api/auth';
 import { useDispatch } from 'react-redux';
 import { ApiErrorResponse, AuthInterface, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
@@ -7,19 +7,20 @@ import { setErrorSnackbar } from '../store/snackbarSlice';
 import { getUserData } from '../api/user';
 import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from '../store/userSlice';
 import { getBlockedUsers, getFriends } from '../api/relation';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 import { reduxSetNotifications } from '../store/notificationSlice';
 import { reduxSetConversationList } from '../store/convListSlice';
+import { Link } from 'react-router-dom';
 
 export default function FakeConnection() {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('Password1!');
   const [usersCreated, setUsersCreated] = useState<UserInterface[]>([]);
+  const [userIsConnected, setUserIsConnected] = useState<boolean>(false);
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
@@ -73,7 +74,8 @@ export default function FakeConnection() {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       await saveUserData(res.user.id);
-      navigate('/home');
+      setUserIsConnected(true);
+      // navigate('/home');
     }
   };
 
@@ -100,41 +102,45 @@ export default function FakeConnection() {
   }
 
   async function createUsers() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 1; i++) {
       const res = await createUser();
       if (!res) return;
       setUsersCreated(prev => [...prev, res]);
     }
   }
 
+  useEffect(() => {
+    if (userIsConnected)
+      window.opener.postMessage('user connected', 'http://localhost:3006');
+  }, [userIsConnected]);
+
   return (
     <div className="flex flex-col items-center justify-center h-screen">
+      {/* link prev page */}
+      <div className="absolute top-0 right-0 m-5">
+        <Link to='https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code'>
+          Login Intra
+        </Link>
+      </div>
+
+
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-4xl font-bold mb-5">Fake Connection</h1>
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold">Generate 10 fake users</h2>
-        <Box
-          component="form"
-          sx={{
-            '& > :not(style)': { m: 1, width: '25ch' },
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createUsers}
-          >
-            Generate
-          </Button>
-        </Box>
-      </div>
+      <h2 className="text-2xl font-bold text-center">
+        Generate a fake users
+      </h2>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={createUsers}
+        sx={{ my: 1 }}
+      >
+        Generate
+      </Button>
 
-      <div>
-        <h2 className="text-2xl font-bold">Login</h2>
+      <div className='w-full text-center'>
         <Box
           component="form"
           onSubmit={handleConnection}
@@ -147,7 +153,7 @@ export default function FakeConnection() {
           <TextField
             id="outlined-basic"
             label="Login"
-            defaultValue={'login1'}
+            defaultValue={usersCreated.length > 0 ? usersCreated[0].login : 'user1'}
             variant="outlined"
             onChange={handleLoginChange}
           />
@@ -158,6 +164,7 @@ export default function FakeConnection() {
             variant="outlined"
             onChange={handlePasswordChange}
             onKeyDown={(e) => { if (e.key === 'Enter') handleConnection(e); }}
+            helperText="keep the default password"
           />
           <Button
             variant="contained"
@@ -175,8 +182,8 @@ export default function FakeConnection() {
         <div>
           <h2 className="text-2xl font-bold">Users created</h2>
           <ul>
-            {usersCreated.map((u, i) => (
-              <li key={i}>{u.login}</li>
+            {usersCreated.map((u) => (
+              <li key={u.id}>{u.login}</li>
             ))}
           </ul>
         </div>

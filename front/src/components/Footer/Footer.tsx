@@ -12,8 +12,7 @@ function Footer() {
           <h3 className="text-2xl font-bold underline underline-offset-4 mb-5">Contact</h3>
           <h3>Jsaispas</h3>
           <h3>Jsaispas</h3>
-
-          </div>
+        </div>
       </div>
       <div className="bg-indigo-700 w-full text-center" >Copyright truc machin</div>
     </div>

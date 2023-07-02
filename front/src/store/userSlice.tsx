@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiErrorResponse, NotificationInterface, UserInterface, UserStatusInterface } from '../types';
+import { NotificationInterface, UserInterface, UserStatusInterface } from '../types';
 
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
-  error: null | ApiErrorResponse;
   userFriends: UserInterface[] | null,
   userBlocked: UserInterface[] | null,
   waitingFriendsRequestReceived: UserInterface[] | null,
@@ -111,7 +110,6 @@ export const userSlice = createSlice({
   name: 'user',
   initialState: {
     isLogged: false,
-    error: null,
     userFriends: null,
     userBlocked: null,
     waitingFriendsRequestReceived: null,
@@ -126,6 +124,7 @@ export const userSlice = createSlice({
       avatar: '',
       description: '',
       role: 'user',
+      score: 1500,
       is2FAEnabled: false,
     },
   } as UserState,
@@ -144,7 +143,6 @@ export const userSlice = createSlice({
       state.userData.description = action.payload.description;
       state.userData.is2FAEnabled = action.payload.is2FAEnabled;
       state.isLogged = true;
-      state.error = null;
     },
     setLogged: (state, action: PayloadAction<boolean>) => {
       state.isLogged = action.payload;
@@ -162,12 +160,13 @@ export const userSlice = createSlice({
         role: 'user',
         description: '',
         is2FAEnabled: false,
+        score: 1500,
       };
-      state.error = null;
-      // state.userFriends = [];
-      // state.userBlocked = [];
-      // state.waitingFriendsRequestReceived = [];
-      // state.waitingFriendsRequestSent = [];
+    },
+
+    // score
+    reduxUpdateScore: (state, action: PayloadAction<number>) => {
+      state.userData.score = action.payload;
     },
 
     // status
@@ -230,10 +229,6 @@ export const userSlice = createSlice({
       removeWaitingFriendsSent(state, action.payload.sender);
     },
 
-    //manage error
-    setError: (state, action: PayloadAction<ApiErrorResponse>) => {
-      state.error = action.payload;
-    },
   },
 
 });
@@ -246,7 +241,6 @@ export const {
   reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
   reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
   reduxAcceptedRequest, reduxDeclinedRequest,
-  setError,
 } = userSlice.actions;
 
 

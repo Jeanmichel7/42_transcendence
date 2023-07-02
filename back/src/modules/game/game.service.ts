@@ -53,6 +53,9 @@ class PrivateLobby {
   creationDate: Date;
   gameId: bigint;
 }
+import { UserStatusInterface } from '../users/interfaces/status.interface';
+import { UserUpdateEvent } from '../notification/events/notification.event';
+import { UserInterface } from '../users/interfaces/users.interface';
 
 @Injectable()
 export class GameService {
@@ -64,6 +67,8 @@ export class GameService {
   playerWaiting2Bonus: any;
   createdWaitingGameBonus: GameInterface;
   createdWaitingGame: GameInterface;
+
+  leaderBoardLimitPerPage = 20;
 
   constructor(
     @InjectRepository(GameEntity)
@@ -330,7 +335,7 @@ export class GameService {
 
     //create message
     const newBotMessage: MessageCreateDTO = {
-      text: `Invitation Game http://localhost:3006/game?id=${newGameCreated.id}`,
+      text: `http://localhost:3006/game?id=${newGameCreated.id}`,
     };
 
     const res = await this.messageService.createInvitationBotMessage(
@@ -344,7 +349,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInvite',
-        content: `${user.login} challenges you}`,
+        content: `challenges you`,
         receiver: userToInvite,
         sender: {
           id: user.id,
@@ -383,7 +388,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInviteAccepted',
-        content: `${user.login} accept challenge, let's play`,
+        content: `'s challenge accepted, let's play`,
         receiver: {
           id: game.player1.id,
           login: game.player1.login,
@@ -424,7 +429,7 @@ export class GameService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'gameInviteDeclined',
-        content: `${user.login} decline challenge`,
+        content: `decline challenge`,
         receiver: {
           id: game.player1.id,
           login: game.player1.login,
@@ -462,6 +467,11 @@ export class GameService {
     });
     if (!findWaitingGame) throw new NotFoundException('game not found');
 
+    const player1 = await this.userRepository.findOne({
+      where: { login: findWaitingGame.player1.login },
+    });
+    if (!player1) throw new NotFoundException('player1 not found');
+
     const player2 = await this.userRepository.findOne({
       where: { login: userlogin2 },
     });
@@ -471,8 +481,38 @@ export class GameService {
     findWaitingGame.status = 'playing';
     findWaitingGame.updatedAt = new Date();
 
-    const test: GameEntity = await this.gameRepository.save(findWaitingGame);
-    const result: GameInterface = test;
+    const gameSaved: GameEntity = await this.gameRepository.save(
+      findWaitingGame,
+    );
+
+    player1.status = 'in game';
+    player1.updatedAt = new Date();
+    await this.userRepository.save(player1);
+    player2.status = 'in game';
+    player2.updatedAt = new Date();
+    await this.userRepository.save(player2);
+
+    //event update status
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: player1.id,
+        status: player1.status,
+        login: player1.login,
+      }),
+    );
+
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: player2.id,
+        status: player2.status,
+        login: player2.login,
+      }),
+    );
+
+    const result: GameInterface = gameSaved;
+    // console.log('result create game : ', result);
     return result;
   }
 
@@ -492,6 +532,7 @@ export class GameService {
   ): Promise<GameInterface> {
     const game: GameEntity = await this.gameRepository.findOne({
       where: { id: gameId },
+      relations: ['player1', 'player2'],
     });
     game.status = 'finished';
     game.finishAt = new Date();
@@ -502,7 +543,45 @@ export class GameService {
     });
     await this.gameRepository.save(game);
 
+    let scoreEloP1 = game.player1.score;
+    let scoreEloP2 = game.player2.score;
+    ({ scoreEloP1, scoreEloP2 } = this.updateEloScore(
+      game.player1,
+      game.player2,
+      game.winner,
+    ));
+
+    // update status players to online
+    game.player1.status = 'online';
+    game.player1.score = scoreEloP1;
+    game.player1.updatedAt = new Date();
+    await this.userRepository.save(game.player1);
+
+    game.player2.status = 'online';
+    game.player2.score = scoreEloP2;
+    game.player2.updatedAt = new Date();
+    await this.userRepository.save(game.player2);
+
+    //event update status
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: game.player1.id,
+        status: game.player1.status,
+        login: game.player1.login,
+      }),
+    );
+
+    this.eventEmitter.emit(
+      'user_status.updated',
+      new UserUpdateEvent({
+        id: game.player2.id,
+        status: game.player2.status,
+        login: game.player2.login,
+      }),
+    );
     const result: GameInterface = game;
+    // console.log('result end game : ', result);
     return result;
   }
 
@@ -528,10 +607,60 @@ export class GameService {
         'winner.login',
       ])
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
+      .andWhere('games.status IN (:...statuses)', {
+        statuses: ['finished', 'playing'],
+      })
       .orderBy('games.createdAt', 'DESC')
       .getMany();
 
     const result: GameInterface[] = games;
     return result;
+  }
+
+  /** **********************
+   *       ELO SCORE
+   * *********************** */
+
+  // https://fr.wikipedia.org/wiki/Classement_Elo
+
+  //    Rn = Ro + K * (S - Se)
+  // Où :
+
+  // Rn est le nouveau classement ELO
+  // Ro est l'ancien classement ELO (avant le match)
+  // K est un coefficient défini qui représente l'importance du match (généralement, c'est 32 pour les échecs)
+  // S est le score réel (1 pour une victoire, 0.5 pour une égalité, 0 pour une défaite)
+  // Se est le score attendu
+  // Le score attendu est calculé avec cette formule :
+
+  // Se = 1 / (1 + 10^((Rb-Ra) / 400))
+  // Où :
+
+  // Rb est le classement ELO de l'adversaire
+  // Ra est votre propre classement ELO
+
+  updateEloScore(
+    player1: UserEntity,
+    player2: UserEntity,
+    winner: UserEntity,
+  ): { scoreEloP1: number; scoreEloP2: number } {
+    const k = 32;
+    const scoreEloP1 = player1.score;
+    const scoreEloP2 = player2.score;
+    const expectedScoreP1 =
+      1 / (1 + Math.pow(10, (scoreEloP2 - scoreEloP1) / 400));
+    const expectedScoreP2 =
+      1 / (1 + Math.pow(10, (scoreEloP1 - scoreEloP2) / 400));
+    let newScoreEloP1 = scoreEloP1;
+    let newScoreEloP2 = scoreEloP2;
+
+    if (winner.id === player1.id) {
+      newScoreEloP1 = scoreEloP1 + k * (1 - expectedScoreP1);
+      newScoreEloP2 = scoreEloP2 + k * (0 - expectedScoreP2);
+    } else if (winner.id === player2.id) {
+      newScoreEloP1 = scoreEloP1 + k * (0 - expectedScoreP1);
+      newScoreEloP2 = scoreEloP2 + k * (1 - expectedScoreP2);
+    }
+    return { scoreEloP1: newScoreEloP1, scoreEloP2: newScoreEloP2 };
   }
 }

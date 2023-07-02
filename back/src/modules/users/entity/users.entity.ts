@@ -70,6 +70,12 @@ export class UserEntity extends BaseEntity {
   description: string;
 
   @Column({
+    type: 'float',
+    default: 1500,
+  })
+  score: number;
+
+  @Column({
     type: 'boolean',
     default: false,
     nullable: true,

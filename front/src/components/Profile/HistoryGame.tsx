@@ -15,7 +15,7 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
       return;
     async function fetchAndSetFriendsProfile() {
       const gamesFetched = await getHistoryGames(user.id);
-      console.log(gamesFetched);
+      // console.log(gamesFetched);
       if ('error' in gamesFetched) {
         // console.log(res);
       } else {

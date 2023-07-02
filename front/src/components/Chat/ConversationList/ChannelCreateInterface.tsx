@@ -21,22 +21,22 @@ import { Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, MenuIt
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { createChannel } from '../../../api/chat';
 import { reduxAddConversationList } from '../../../store/convListSlice';
-import RowOfFriendToInvit from './admin/RowInvitation';
+import RowOfFriendToInvit from '../Channel/admin/RowInvitation';
 
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const channelType = ['public', 'private'];
+  const dispatch = useDispatch();
+  
+  const { userFriends } = useSelector((state: RootState) => state.user);
+  const { userData } = useSelector((state: RootState) => state.user);
   const [form, setForm] = useState({
     name: '',
     type: 'public',
     password: null as string | null,
     acceptedUsers: null as UserInterface[] | null,
   });
-
-  const { userFriends } = useSelector((state: RootState) => state.user);
-  const { userData } = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
 
   const handleChangeInput = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const { name, value } = e.target as HTMLInputElement;
@@ -48,9 +48,13 @@ const CreateGroupInterface = () => {
 
   const handleSelectUser = (user: UserInterface, isChecked: boolean) => {
     if (isChecked) {
-      setForm(prev => prev.acceptedUsers ? { ...prev, acceptedUsers: [...prev.acceptedUsers, user] } : { ...prev, acceptedUsers: [user] });
+      setForm(prev => prev.acceptedUsers
+        ? { ...prev, acceptedUsers: [...prev.acceptedUsers, user] } 
+        : { ...prev, acceptedUsers: [user] });
     } else {
-      setForm(prev => prev.acceptedUsers ? { ...prev, acceptedUsers: prev.acceptedUsers.filter(u => u.id !== user.id) } : { ...prev, acceptedUsers: null });
+      setForm(prev => prev.acceptedUsers 
+        ? { ...prev, acceptedUsers: prev.acceptedUsers.filter(u => u.id !== user.id) } 
+        : { ...prev, acceptedUsers: null });
     }
   };
 
@@ -86,8 +90,6 @@ const CreateGroupInterface = () => {
         acceptedUsers: null,
       });
     }
-
-    // console.log(form);
   };
 
 

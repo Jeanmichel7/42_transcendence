@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -172,25 +173,18 @@ export class ChatService {
 
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
-      select: ['id', 'type'],
-      relations: [
-        'users',
-        'ownerUser',
-        'admins',
-        'bannedUsers',
-        'mutedUsers',
-        'acceptedUsers',
-      ],
+      select: ['id', 'name', 'type', 'password', 'isProtected'],
+      relations: ['ownerUser'],
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     if (room.ownerUser.id !== userId)
-      throw new Error('User is not owner of room');
+      throw new UnauthorizedException('User is not owner of room');
 
     if (roomToUpdate.isProtected != null) {
       if (roomToUpdate.isProtected === true) {
         if (roomToUpdate.password === null)
-          throw new Error('Room is protected but no password');
+          throw new ConflictException('Room is protected but no password');
         room.isProtected = true;
       }
       if (roomToUpdate.isProtected === false) {
@@ -227,12 +221,37 @@ export class ChatService {
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
       .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
+      .leftJoinAndSelect('chat_rooms.users', 'acceptedUsers')
+      .leftJoinAndSelect('chat_rooms.admins', 'admins')
+      .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
+      .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
       .select([
-        'chat_rooms',
+        'chat_rooms.id',
+        'chat_rooms.name',
+        'chat_rooms.type',
+        'chat_rooms.isProtected',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
-        'ownerUser.firstName',
-        'ownerUser.lastName',
         'ownerUser.login',
+        'ownerUser.avatar',
+        'ownerUser.status',
+        'acceptedUsers.id',
+        'acceptedUsers.login',
+        'acceptedUsers.avatar',
+        'acceptedUsers.status',
+        'admins.id',
+        'admins.login',
+        'admins.avatar',
+        'admins.status',
+        'bannedUsers.id',
+        'bannedUsers.login',
+        'bannedUsers.avatar',
+        'bannedUsers.status',
+        'mutedUsers.id',
+        'mutedUsers.login',
+        'mutedUsers.avatar',
+        'mutedUsers.status',
       ])
       .where('chat_rooms.id = :roomId', { roomId: room.id })
       .getOne();
@@ -1212,7 +1231,8 @@ export class ChatService {
       page = page + Math.floor(offset / limit);
       offset = offset % limit;
     }
-    const skip = (page - 1) * limit - offset;
+    let skip = (page - 1) * limit - offset;
+    if (skip < 0) skip = 0;
 
     const messages: ChatMessageEntity[] = await this.messageRepository
       .createQueryBuilder('chat_messages')
@@ -1398,7 +1418,10 @@ export class ChatService {
     return true;
   }
 
-  async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
+  async getAllRoomsToDisplay(
+    page: number,
+    limit: number,
+  ): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomEntity[] = await ChatRoomEntity.createQueryBuilder(
       'chat_rooms',
     )
@@ -1446,12 +1469,20 @@ export class ChatService {
         'mutedUsers.avatar',
         'mutedUsers.status',
       ])
+      .orderBy('chat_rooms.updatedAt', 'DESC')
+      .where('chat_rooms.type = :type', { type: 'public' })
+      .skip((page - 1) * limit)
+      .take(limit)
       .getMany();
 
-    const result: ChatRoomInterface[] = rooms.filter(
-      (room) => room.type === 'public',
-    );
-    return result;
+    return rooms;
+  }
+
+  async getAllRoomsToDisplayCount(): Promise<number> {
+    const rooms: ChatRoomEntity[] = await this.roomRepository.find({
+      where: { type: 'public' },
+    });
+    return rooms.length;
   }
 
   /* ************************************************ */
@@ -1484,55 +1515,35 @@ export class ChatService {
       .leftJoinAndSelect('chat_rooms.admins', 'admins')
       .leftJoinAndSelect('chat_rooms.bannedUsers', 'bannedUsers')
       .leftJoinAndSelect('chat_rooms.mutedUsers', 'mutedUsers')
-      // .leftJoinAndSelect('chat_rooms.messages', 'messages')
       .leftJoinAndSelect('chat_rooms.acceptedUsers', 'acceptedUsers')
-      // .leftJoinAndSelect('messages.ownerUser', 'ownerMessage')
       .select([
-        'chat_rooms',
+        'chat_rooms.id',
+        'chat_rooms.name',
+        'chat_rooms.type',
+        'chat_rooms.isProtected',
+        'chat_rooms.createdAt',
+        'chat_rooms.updatedAt',
         'ownerUser.id',
-        'ownerUser.firstName',
-        'ownerUser.lastName',
         'ownerUser.login',
         'ownerUser.avatar',
         'ownerUser.status',
         'users.id',
-        'users.firstName',
-        'users.lastName',
         'users.login',
         'users.avatar',
         'users.status',
         'admins.id',
-        'admins.firstName',
-        'admins.lastName',
         'admins.login',
         'admins.avatar',
         'admins.status',
         'bannedUsers.id',
-        'bannedUsers.firstName',
-        'bannedUsers.lastName',
         'bannedUsers.login',
         'bannedUsers.avatar',
         'bannedUsers.status',
         'mutedUsers.id',
-        'mutedUsers.firstName',
-        'mutedUsers.lastName',
         'mutedUsers.login',
         'mutedUsers.avatar',
         'mutedUsers.status',
-        // 'messages.id',
-        // 'messages.text',
-        // 'messages.createdAt',
-        // 'messages.updatedAt',
-        // 'ownerMessage.id',
-        // 'ownerMessage.firstName',
-        // 'ownerMessage.lastName',
-        // 'ownerMessage.login',
-        // 'ownerMessage.avatar',
-        // 'ownerMessage.status',
-        'acceptedUsers', //// a verfier ///
         'acceptedUsers.id',
-        'acceptedUsers.firstName',
-        'acceptedUsers.lastName',
         'acceptedUsers.login',
         'acceptedUsers.avatar',
         'acceptedUsers.status',

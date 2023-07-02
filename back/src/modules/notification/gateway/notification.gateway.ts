@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { NotificationInterface } from '../interfaces/notification.interface';
 import { UserStatusInterface } from 'src/modules/users/interfaces/status.interface';
+import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
 
 @WebSocketGateway({
   namespace: 'notification',
@@ -30,7 +31,7 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.join('notification_room_' + data.userId);
-    // console.log('joined room notification_' + data.userId, data);
+    console.log('joined room notification_' + data.userId, data);
   }
 
   // @SubscribeMessage('leaveRoom')
@@ -39,7 +40,7 @@ export class NotificationGateway {
     @ConnectedSocket() client: Socket,
   ) {
     client.leave('notification_room_' + data.userId);
-    // console.log('left private room notification_' + data.userId);
+    console.log('left private room notification_' + data.userId);
   }
 
   emitNotificationFriendRequest(data: NotificationInterface) {
@@ -99,7 +100,7 @@ export class NotificationGateway {
 
   /* UPDATE USER STATUS */
   emitUpdateUserStatus(updateStatusUser: UserStatusInterface) {
-    console.log('SEND updateStatusUser : ', updateStatusUser);
+    // console.log('SEND updateStatusUser : ', updateStatusUser);
     this.server.emit('update_user_status', updateStatusUser, (ack) => {
       if (ack) {
         // console.log('update status sent to room' + updateStatusUser);
@@ -126,5 +127,12 @@ export class NotificationGateway {
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_game_invite_declined', data);
+  }
+
+  /* Private Message */
+  emitNotificationPrivateMessage(data: MessageInterface) {
+    this.server
+      .to('notification_room_' + data.destUser.id)
+      .emit('notification_private_message', data);
   }
 }

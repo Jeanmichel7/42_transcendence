@@ -32,21 +32,18 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   // const [ isFriendRequestSent, setIsFriendRequestSent ] = useState(false);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
-  const badgeColor: 'success' | 'warning' | 'error'
-  = friend.status === 'online' ? 'success' :
-    friend.status === 'absent' ? 'warning' : 'error';
+  const badgeColor = 
+    friend.status === 'online' ? 'success' :
+      friend.status === 'absent' ? 'warning' :
+        friend.status === 'inactive' ? 'secondary' :
+          friend.status === 'in game' ? 'info' :
+            'error';
 
   const handleDefi = async () => {
-    console.log('user to defi : ', friend.id, friend.login);
-
     const resInvitGameUser: GameInterface | ApiErrorResponse =
        await inviteGameUser(friend.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
-    //recupe url de ;invite ?
-
-    //send bot message to invited ?
-
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 
@@ -115,7 +112,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
               component="img"
               image={friend.avatar}
               alt={friend.login}
-              sx={{ height: 130, objectFit: 'cover' }}
+              sx={{ height: 140, objectFit: 'cover' }}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;

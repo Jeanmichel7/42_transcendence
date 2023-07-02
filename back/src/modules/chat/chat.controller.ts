@@ -47,10 +47,19 @@ export class ChatController {
   /* ************************************************ */
 
   @Get('rooms/public')
-  async getAllRoomsToDisplay(): Promise<ChatRoomInterface[]> {
+  async getAllRoomsToDisplay(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] =
-      await this.ChatService.getAllRoomsToDisplay();
+      await this.ChatService.getAllRoomsToDisplay(page, limit);
     return rooms;
+  }
+
+  @Get('rooms/public/count')
+  async getAllRoomsToDisplayCount(): Promise<number> {
+    const count: number = await this.ChatService.getAllRoomsToDisplayCount();
+    return count;
   }
 
   @Get('rooms/:roomId')

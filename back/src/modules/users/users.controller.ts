@@ -15,6 +15,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -48,8 +49,20 @@ export class UsersController {
   }
 
   @Get('all')
-  async findAllUsers(): Promise<UserInterface[]> {
-    const result: UserInterface[] = await this.usersService.findAllUsers();
+  async findAllUsers(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<UserInterface[]> {
+    const result: UserInterface[] = await this.usersService.findAllUsers(
+      page,
+      limit,
+    );
+    return result;
+  }
+
+  @Get('all/count')
+  async countAllUsers(): Promise<number> {
+    const result: number = await this.usersService.countAllUsers();
     return result;
   }
 
@@ -120,6 +133,19 @@ export class UsersController {
       req.user.id,
     );
     return result;
+  }
+
+  /* ************************************************ */
+  /*                   LEADERBOARD                    */
+  /* ************************************************ */
+
+  @Get('leaderboard')
+  async getLeaderboard(
+    @Req() req: RequestWithUser,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('offset', ParseIntPipe) offset: number,
+  ): Promise<UserInterface[]> {
+    return await this.usersService.getLeaderboard(req.user.id, page, offset);
   }
 
   /* ************************************************ */

@@ -31,6 +31,7 @@ import { UserUpdateEvent } from '../notification/events/notification.event';
 @Injectable()
 export class UsersService {
   private intervalId: NodeJS.Timeout;
+  leaderBoardLimitPerPage = 20;
 
   constructor(
     @InjectRepository(UserEntity)
@@ -62,6 +63,7 @@ export class UsersService {
         'avatar',
         'role',
         'is2FAEnabled',
+        'score',
       ],
     });
 
@@ -82,10 +84,12 @@ export class UsersService {
         'description',
         'avatar',
         'status',
+        'score',
       ],
     });
     if (!user) throw new NotFoundException(`User ${login} not found`);
     const result: ProfilInterface = { ...user };
+    console.log('result : ', result);
     return result;
   }
 
@@ -101,6 +105,7 @@ export class UsersService {
         'description',
         'avatar',
         'status',
+        'score',
       ],
     });
     if (!user) throw new NotFoundException(`User ${userId} not found`);
@@ -108,7 +113,7 @@ export class UsersService {
     return result;
   }
 
-  async findAllUsers(): Promise<UserInterface[]> {
+  async findAllUsers(page: number, limit: number): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
         'id',
@@ -119,11 +124,19 @@ export class UsersService {
         'status',
         'description',
         'avatar',
+        'score',
       ],
+      skip: (page - 1) * limit,
+      take: limit,
     });
     if (!users) throw new NotFoundException(`No users found`);
     const result: UserInterface[] = users.map((user) => ({ ...user }));
     return result;
+  }
+
+  async countAllUsers(): Promise<number> {
+    const count: number = await this.userRepository.count();
+    return count;
   }
 
   async findAllData(id: bigint): Promise<UserInterface> {
@@ -380,6 +393,7 @@ export class UsersService {
       const inactivityDuration =
         Date.now() - new Date(user.lastActivity).getTime();
       if (inactivityDuration < absentDuration) continue;
+
       let newStatus: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
       if (inactivityDuration > 8 * absentDuration) newStatus = 'offline';
       else if (inactivityDuration > 4 * absentDuration) newStatus = 'inactive';
@@ -417,9 +431,44 @@ export class UsersService {
   }
 
   /* ************************************************ */
-  /*                                                  */
+  /*                    LEADERBOARD                   */
+  /* ************************************************ */
+  async getLeaderboard(
+    userId: bigint,
+    page: number,
+    offset: number,
+  ): Promise<UserInterface[]> {
+    if (page < 1) page = 1;
+    if (offset < 0) offset = 0;
+    if (offset > this.leaderBoardLimitPerPage) {
+      page = page + Math.floor(offset / this.leaderBoardLimitPerPage);
+      offset = offset % this.leaderBoardLimitPerPage;
+    }
+    let skip = (page - 1) * this.leaderBoardLimitPerPage - offset;
+    if (skip < 0) skip = 0;
+
+    const users: UserEntity[] = await this.userRepository
+      .createQueryBuilder('users')
+      .select([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.login',
+        'users.status',
+        'users.avatar',
+        'users.score',
+      ])
+      .orderBy('users.score', 'DESC')
+      .skip(skip)
+      .take(this.leaderBoardLimitPerPage)
+      .getMany();
+
+    // if (!users) throw new NotFoundException(`No users found`);
+    return users;
+  }
+
+  /* ************************************************ */
   /*                       ADMIN                      */
-  /*                                                  */
   /* ************************************************ */
 
   async findUserAllData(id: bigint): Promise<UserInterface> {

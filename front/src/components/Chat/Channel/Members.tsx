@@ -18,7 +18,8 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
                   user.status === 'inactive' ? 'secondary' :
-                    'error' 
+                    user.status === 'in game' ? 'info' :
+                      'error' 
             }
             overlap="circular"
             badgeContent=" "
