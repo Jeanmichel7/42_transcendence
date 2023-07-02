@@ -434,6 +434,7 @@ export class Game {
   }
 
   getState() {
+    console.log('id dans le return : ', this.id);
     return {
       ball: this.ball,
       racketRight: this.racketRight,

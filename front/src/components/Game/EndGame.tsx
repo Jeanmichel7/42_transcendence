@@ -1,9 +1,9 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 // import { StyledButton } from './Lobby';
-import { StyledButton } from './Lobby';
-import confetti from 'canvas-confetti';
-import { useEffect } from 'react';
-import './font.css' ;
+import { StyledButton } from "./Lobby";
+import confetti from "canvas-confetti";
+import { useEffect } from "react";
+import "./font.css";
 
 const LooseWrapper = styled.div`
   position: absolute;
@@ -20,8 +20,7 @@ const LooseWrapper = styled.div`
   -moz-osx-font-smoothing: grayscale;
 `;
 
-
-const flicker  = keyframes`{
+const flicker = keyframes`{
   40% {
     opacity: 1;
   }
@@ -49,8 +48,10 @@ const StyledNeonH1 = styled.h1`
   color: #fff;
   -webkit-animation: ${buzz} 0.1s infinite alternate;
   font-size: 4rem;
-  text-shadow: 0 0 0 transparent, 0 0 10px #2695ff, 0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff, 0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
-  `;
+  text-shadow: 0 0 0 transparent, 0 0 10px #2695ff,
+    0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff,
+    0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
+`;
 
 const neonAnimationStartUp = keyframes`
 0% { 
@@ -74,7 +75,7 @@ const neonAnimationStartUp = keyframes`
               0 0 2.8rem #bc13fe,
               inset 0 0 1.3rem #bc13fe; 
 }
-`; 
+`;
 
 const NeonSign = styled.div`
   font-size: 1em;
@@ -90,16 +91,11 @@ const StyledNeonH2 = styled.h2`
   color: #fff;
   animation: ${flicker} 4s infinite alternate;
   font-size: 2rem;
-  text-shadow:
-  -1px 0px 7px #fff,
-  -1px 0px 10px #fff,
-  -1px 0px 21px #fff,
-  -1px 0px 42px #800080, /* Ici, je remplace #0fa par #800080 */
-  -1px 0px 82px #800080,
-  -1px 0px 92px #800080,
-  -1px 0px 102px #800080,
-  -1px 0px 151px #800080; `;
-
+  text-shadow: -1px 0px 7px #fff, -1px 0px 10px #fff, -1px 0px 21px #fff,
+    -1px 0px 42px #800080,
+    /* Ici, je remplace #0fa par #800080 */ -1px 0px 82px #800080,
+    -1px 0px 92px #800080, -1px 0px 102px #800080, -1px 0px 151px #800080;
+`;
 
 // interface setCurrentPage {
 //   setLoose: React.Dispatch<React.SetStateAction<string>>;
@@ -111,23 +107,26 @@ const FullScreenCanvas = styled.canvas`
   left: 0;
   width: 100vw;
   height: 100vh;
-  pointer-events: none; 
+  pointer-events: none;
 `;
 
-
-
+interface LastGameInfo {
+  win: Boolean;
+  winnerName: string;
+  looserName: string;
+}
 interface LooseProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
-  lastGameInfo: any;
+  lastGameInfo: React.RefObject<LastGameInfo>;
 }
-function Loose({
-  setCurrentPage,
-  lastGameInfo,
-}: LooseProps) {
+function Loose({ setCurrentPage, lastGameInfo }: LooseProps) {
   useEffect(() => {
     if (lastGameInfo.current.win) {
       setTimeout(() => {
-        const myConfetti = confetti.create(document.getElementById('myCanvas'), { useWorker: true, resize: true });
+        const myConfetti = confetti.create(
+          document.getElementById("myCanvas"),
+          { useWorker: true, resize: true }
+        );
         myConfetti({
           particleCount: 100,
           spread: 160,
@@ -135,23 +134,29 @@ function Loose({
       }, 2000);
     }
   }, [lastGameInfo.current.win]);
-  
+
   return (
     <LooseWrapper>
       {lastGameInfo.current.win ? (
         <>
-        <StyledNeonH1>Victoire<br/>Vainqueur: {lastGameInfo.current.winnerName} </StyledNeonH1>
-        <NeonSign>Bien Joue</NeonSign>
-        <FullScreenCanvas id='myCanvas'></FullScreenCanvas>
+          <StyledNeonH1>
+            Victoire
+            <br />
+            Vainqueur: {lastGameInfo.current.winnerName}{" "}
+          </StyledNeonH1>
+          <NeonSign>Bien Joue</NeonSign>
+          <FullScreenCanvas id="myCanvas"></FullScreenCanvas>
         </>
       ) : (
         <>
-        <StyledNeonH1>Defaite</StyledNeonH1>
-        <NeonSign>Dommage</NeonSign>
+          <StyledNeonH1>Defaite</StyledNeonH1>
+          <NeonSign>Dommage</NeonSign>
         </>
       )}
       <StyledNeonH2>Perdant: {lastGameInfo.current.looserName}</StyledNeonH2>
-      <StyledButton onClick={() => setCurrentPage('searchOpponent')}>Proposer une nouvelle partie</StyledButton>
+      <StyledButton onClick={() => setCurrentPage("searchOpponent")}>
+        Proposer une nouvelle partie
+      </StyledButton>
     </LooseWrapper>
   );
 }

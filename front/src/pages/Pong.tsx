@@ -1,5 +1,5 @@
 import Game from "../components/Game/Game";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import EndGame from "../components/Game/EndGame";
 import { Socket, io } from "socket.io-client";
@@ -127,7 +127,7 @@ function Pong() {
   } else {
     statusComponent = undefined;
   }
-  let pageContent;
+  let pageContent: ReactNode;
   if (currentPage === "lobby" && !gameId) {
     pageContent = <Lobby setCurrentPage={setCurrentPage} socket={socket} />;
   } else if (currentPage === "finished") {

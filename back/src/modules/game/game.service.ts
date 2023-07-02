@@ -91,7 +91,7 @@ export class GameService {
   updatePrivateLobby(player1: boolean, playerInfo: PlayerInfoPrivateLobby) {
     if (!playerInfo.gameId) {
       console.error(
-        'Error when receiving client update: gameId is not defined',
+        'error when receiving client update: gameId is not defined',
       );
     }
     if (!this.privatesLobby.has(playerInfo.gameId)) {
@@ -99,10 +99,8 @@ export class GameService {
       this.privatesLobby.set(playerInfo.gameId, newLob);
     }
     if (player1 === true) {
-      console.log('player1 UPDATE', playerInfo);
       this.privatesLobby.get(playerInfo.gameId).player1 = playerInfo;
     } else {
-      console.log('player2 UPDATE', playerInfo);
       this.privatesLobby.get(playerInfo.gameId).player2 = playerInfo;
     }
     if (
@@ -111,23 +109,19 @@ export class GameService {
       this.privatesLobby.get(playerInfo.gameId).player1?.mode ===
         this.privatesLobby.get(playerInfo.gameId).player2?.mode
     ) {
-      console.log(
-        'player1username',
-        this.privatesLobby.get(playerInfo.gameId).player1.username,
-      );
-      console.log(
-        'player2username',
-        this.privatesLobby.get(playerInfo.gameId).player2.username,
-      );
+      console.log(this.privatesLobby.get(playerInfo.gameId).player1.gameId);
       const game = new Game(
         this.privatesLobby.get(playerInfo.gameId).player1.socketId,
         this.privatesLobby.get(playerInfo.gameId).player1.username,
         this.privatesLobby.get(playerInfo.gameId).player2.socketId,
         this.privatesLobby.get(playerInfo.gameId).player2.username,
-        this.privatesLobby.get(playerInfo.gameId).gameId,
+        this.privatesLobby.get(playerInfo.gameId).player1.gameId,
         this.privatesLobby.get(playerInfo.gameId).player1.mode === 'bonus',
       );
-      this.games.set(this.privatesLobby.get(playerInfo.gameId).gameId, game);
+      this.games.set(
+        this.privatesLobby.get(playerInfo.gameId).player1.gameId,
+        game,
+      );
       return true;
     }
   }

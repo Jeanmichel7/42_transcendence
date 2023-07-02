@@ -138,9 +138,7 @@ export class GameEvents {
     if (!client.data.userId) {
       return 'error';
     }
-    console.log('userGameStatus: ' + message);
     if (message === 'cancel') {
-      console.log('canceling search for: ' + client.id);
       this.gameService.removeFromQueue(client.data.userId);
       return;
     } else if (message === 'searchNormal' || message === 'searchBonus') {
@@ -149,9 +147,7 @@ export class GameEvents {
         client.data.userId,
         message === 'searchBonus',
       );
-      console.log('searching opponent for: ' + client.id);
       if (opponent) {
-        console.log('opponent found: ' + opponent);
         if (message === 'searchBonus') {
           this.server.to(client.id).emit('userGameStatus', 'foundBonus');
           this.server.to(opponent).emit('userGameStatus', 'foundBonus');

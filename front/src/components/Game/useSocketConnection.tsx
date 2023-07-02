@@ -54,6 +54,7 @@ const useSocketConnection = (
 
   useEffect(() => {
     if (!socket) return;
+    console.log(gameId.current);
     const intervalId: NodeJS.Timeout = setInterval(() => {
       socket.emit("clientUpdate", {
         posRacket: posRacket.current.left,
@@ -65,6 +66,7 @@ const useSocketConnection = (
     }, 1000 / 60);
 
     socket.on("gameUpdate", (serverData) => {
+      console.log("NIQUE TA MERE");
       data.current = normalizeGameData(serverData);
       if (data.current.gameStart) {
         setGameStarted(true);
