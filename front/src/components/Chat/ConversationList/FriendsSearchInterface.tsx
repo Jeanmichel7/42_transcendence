@@ -5,7 +5,7 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
 import FriendCard from '../../Profile/FriendsCard';
-import { getAllUsers, getAllUsersCount } from '../../../api/user';
+import { getAllUsers, getAllUsersCount, getAllUsersPaginate } from '../../../api/user';
 import { requestAddFriend } from '../../../api/relation';
 import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
 
@@ -35,7 +35,7 @@ export default function FriendsSearch() {
     async function fetchUsers() {
       if ( !userData || !userFriends || !userBlocked || !waitingFriendsRequestSent ) return;
       setIsLoading(true);
-      const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers(currentPage, userPerPage);
+      const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsersPaginate(currentPage, userPerPage);
       setIsLoading(false);
 
       if ('error' in allUsers)

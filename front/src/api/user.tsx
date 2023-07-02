@@ -41,6 +41,15 @@ export async function patchUserAccount(
 }
 
 export async function getAllUsers(
+): Promise< UserInterface[] | ApiErrorResponse > {
+  return apiRequest<UserInterface[]>(
+    'get',
+    `/users/all`,
+    'Failed to get all users: ',
+  );
+}
+
+export async function getAllUsersPaginate(
   page: number,
   limit: number,
 ): Promise< UserInterface[] | ApiErrorResponse > {

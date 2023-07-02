@@ -113,7 +113,25 @@ export class UsersService {
     return result;
   }
 
-  async findAllUsers(page: number, limit: number): Promise<UserInterface[]> {
+  async findAllUsers(): Promise<UserInterface[]> {
+    const users: UserEntity[] = await this.userRepository.find({
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
+        'email',
+        'status',
+        'description',
+        'avatar',
+        'score',
+      ],
+    });
+    const result: UserInterface[] = users.map((user) => ({ ...user }));
+    return result;
+  }
+
+  async findAllUsersPaginate(page: number, limit: number): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
         'id',
@@ -129,7 +147,6 @@ export class UsersService {
       skip: (page - 1) * limit,
       take: limit,
     });
-    if (!users) throw new NotFoundException(`No users found`);
     const result: UserInterface[] = users.map((user) => ({ ...user }));
     return result;
   }

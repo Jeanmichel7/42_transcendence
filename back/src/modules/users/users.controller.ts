@@ -53,10 +53,11 @@ export class UsersController {
     @Query('page') page: number,
     @Query('limit') limit: number,
   ): Promise<UserInterface[]> {
-    const result: UserInterface[] = await this.usersService.findAllUsers(
-      page,
-      limit,
-    );
+    let result: UserInterface[];
+    if(page)
+      result = await this.usersService.findAllUsersPaginate(page, limit);
+    else
+      result = await this.usersService.findAllUsers();
     return result;
   }
 
