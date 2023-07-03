@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
@@ -7,31 +7,50 @@ import {
 } from "./Interface";
 
 export const StyledButton = styled.button`
-  border: 0.2rem solid #fff;
-  border-radius: 2rem;
-  padding: 1em;
-  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
-    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
-  font-size: 1.5rem;
+  position: relative;
+  font-family: "Exo", sans-serif;
+  margin-left: 2rem;
+  color: #fff;
+  text-decoration: none;
+  font-size: 2rem;
   font-weight: bold;
-  cursor: pointer;
-  color: black;
-  &:hover {
-    background-color: grey;
-    color: #fff;
+  text-align: center;
+  padding: 1rem 1rem;
+  border: 2px solid #fff;
+  border-radius: 3rem;
+  transition: color 0.3s ease;
+  z-index: 10;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 5rem;
+    width: 5rem;
+    background-color: #fff;
+    border-radius: 3rem;
+    transition: width 0.3s ease;
+    z-index: -1;
+    left: -50%;
   }
-  text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #bc13fe,
-    0 0 82px #bc13fe, 0 0 92px #bc13fe, 0 0 102px #bc13fe, 0 0 151px #bc13fe;
+
+  &:hover {
+    color: ${(props) => (!props.expand ? "#000" : "#fff")};
+    &::before {
+      width: 150%;
+    }
+  }
 `;
 
 const ButtonWrapper = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-around;
   flex-direction: column;
   position: absolute;
+  left: 40%;
 `;
 
 interface LobbyProps {

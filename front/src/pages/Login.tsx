@@ -1,9 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
-import '../utils/login.scss';
-import styled, { keyframes, css } from 'styled-components';
-import '../fonts/fonts.css';
-import { Button } from '@mui/material';
-import { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import "../utils/login.scss";
+import styled, { keyframes, css } from "styled-components";
+import "../fonts/fonts.css";
+import { Button } from "@mui/material";
+import { useState } from "react";
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -99,7 +99,7 @@ const StyledLink = styled(Link)`
   }
 
   &:hover {
-    color: ${(props) => (!props.expand ? '#000' : '#fff')};
+    color: ${(props) => (!props.expand ? "#000" : "#fff")};
     &::before {
       width: 100%;
     }
@@ -124,6 +124,7 @@ export default function Login() {
   // ) => {
   //   e.preventDefault();
   //   setExpand(true);
+
   //   setTimeout(() => {
   //     // redirect after 1s
   //     window.location = e.target.href;
@@ -131,7 +132,7 @@ export default function Login() {
   // };
 
   const handleConnection = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
     const width = 600;
@@ -140,23 +141,24 @@ export default function Login() {
     const top = window.innerHeight / 2 - height / 2;
 
     const newWindow = window.open(
-      'http://localhost:3006/connection',
-      '_blank',
+      "http://localhost:3006/connection",
+      "_blank",
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
-        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
+        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
     );
-    if (!newWindow)
-      return console.log('erreur new windos  ');
+    if (!newWindow) return console.log("erreur new windos  ");
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", (event) => {
       if (event.source !== newWindow) return;
-      if (event.data === 'user connected') {
+      if (event.data === "user connected") {
         newWindow.close();
-        navigate('/home');
+        setExpand(true);
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
       }
     });
   };
-
 
   return (
     <LoginWrapper>
