@@ -32,14 +32,27 @@ const Number = styled.span`
   font-size: 8em; // Augmenter la taille de la police
   color: #;
   animation: ${fadeAndZoomIn} 1s ease-out;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  transition: opacity 0.3s ease-out;
 `;
 
-const Countdown = () => {
+const Countdown = ({ gameStarted }: { gameStarted: bool }) => {
+  const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
+  useEffect(() => {
+    console.log("GameStarder value : ", gameStarted);
+    if (gameStarted) {
+      setVisible(false);
+    } else {
+      setVisible(true);
+    }
+  }, [gameStarted]);
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
-      setCount((currentCount) => (currentCount - 1 <= 0 ? 0 : currentCount - 1));
+      setCount((currentCount) =>
+        currentCount - 1 <= 0 ? 0 : currentCount - 1
+      );
     }, 1000);
 
     // Cleanup on unmount or when count reaches 0
@@ -50,7 +63,7 @@ const Countdown = () => {
 
   return (
     <CountdownWrapper>
-      <Number key={count}>
+      <Number visible={visible} key={count}>
         {count > 0 ? count : "Go!"}
       </Number>
     </CountdownWrapper>

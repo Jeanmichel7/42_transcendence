@@ -1,9 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import "../utils/login.scss";
 import styled, { keyframes, css } from "styled-components";
-import "../fonts/fonts.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
+import { CircleBackground } from "../utils/CircleBackground";
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -50,8 +49,7 @@ const TitleWrapper = styled.div`
 const Title = styled.h1`
   font-size: 8rem;
   animation: ${slideInFromBottom} 2s ease-out;
-  color: white;
-  font-family: "Exo", sans-serif;
+  color: #f4def8;
 `;
 
 const BigCircle = styled.span`
@@ -69,9 +67,31 @@ const BigCircle = styled.span`
   transition: transform 1s ease-out, opacity 1s ease-out;
 `;
 
-const StyledLink = styled(Link)`
+export const animationCircle = keyframes`
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-150%, -50%);
+  }
+`;
+
+export const TransitionCircle = styled.span`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(${(props) => (props.expand ? "-50%" : "-150%")}, -50%);
+  animation: ${animationCircle} 1s ease-out;
+  width: 200vh;
+  height: 200vh;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 3;
+  transition: transform 1s ease-out;
+`;
+
+const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   position: relative;
-  font-family: "Exo", sans-serif;
   margin-left: 2rem;
   color: #fff;
   text-decoration: none;
@@ -79,6 +99,7 @@ const StyledLink = styled(Link)`
   font-weight: bold;
   text-align: center;
   padding: 1rem 1rem;
+  width: 10rem;
   border: 2px solid #fff;
   border-radius: 2rem;
   animation: ${slideInFromBottomLink} 3s ease-out;
@@ -112,24 +133,13 @@ const LoginWrapper = styled.div`
   height: 100%;
   top: 0;
   left: 0;
+  overflow: hidden;
 `;
 
 export default function Login() {
   const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
   const navigate = useNavigate();
-
-  // const handleClick = (
-  //   e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-  // ) => {
-  //   e.preventDefault();
-  //   setExpand(true);
-
-  //   setTimeout(() => {
-  //     // redirect after 1s
-  //     window.location = e.target.href;
-  //   }, 1000);
-  // };
 
   const handleConnection = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
@@ -154,54 +164,21 @@ export default function Login() {
         newWindow.close();
         setExpand(true);
         setTimeout(() => {
-          navigate("/home");
-        }, 2000);
+          navigate("/game");
+        }, 1000);
       }
     });
   };
 
   return (
     <LoginWrapper>
-      <div className="particle-container">
-        <div className="particles">
-          <span className="circle"></span>
-          <span className="circle 1"></span>
-          <span className="circle 2"></span>
-          <span className="circle 3"></span>
-          <span className="circle 4"></span>
-          <span className="circle 5"></span>
-          <span className="circle 6"></span>
-          <span className="circle 7"></span>
-          <span className="circle 8"></span>
-          <span className="circle 9"></span>
-          <span className="circle 10"></span>
-          <span className="circle 11"></span>
-          <span className="circle 12"></span>
-          <span className="circle 13"></span>
-          <span className="circle 14"></span>
-          <span className="circle 15"></span>
-          <span className="circle 16"></span>
-          <span className="circle 17"></span>
-          <span className="circle 18"></span>
-          <span className="circle 19"></span>
-          <span className="circle 20"></span>
-          <span className="circle 21"></span>
-          <span className="circle 22"></span>
-          <span className="circle 23"></span>
-          <span className="circle 24"></span>
-          <span className="circle 25"></span>
-          <span className="circle 26"></span>
-          <span className="circle 27"></span>
-          <span className="circle 28"></span>
-          <span className="circle 29"></span>
-        </div>
-      </div>
+      {/*<TransitionCircle expand={expand} />
       <BigCircle hovered={isHovered} expand={expand} />
+  */}
       <TitleWrapper>
         <Title>Pong</Title>
         <StyledLink
           onClick={handleConnection}
-          // to=""
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           expand={expand}

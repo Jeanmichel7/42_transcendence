@@ -2,100 +2,116 @@
 /*** Inspired by Tuts Plus https://codepen.io/tutsplus/pen/MrjYJK ***/
 /*** and particles.js ***/
 
-@import url('https://fonts.googleapis.com/css?family=Coustard:900&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Coustard:900&display=swap");
 
 // Color Vars
-$sapling: hsl(0, 0%, 0%);
-$space: #ffffff;
-$cream: #ffffff;
-
+$sapling: #1976d2;
+$space: #c95ddc;
+$cream: #9c27b0;
+@function color-variation($base-color, $variation: 50%) {
+  $random-adjust: random($variation);
+  // Adjust the brightness of the base color
+  $color: adjust-color($base-color, $lightness: $random-adjust + 2);
+  @return $color;
+}
 
 .particle-container {
   background-color: $sapling;
-  z-index: 0;
-  position: relative;
+  transition: background-color 0.5s ease-in-out;
+  z-index: -1;
+  position: absolute;
+  width: 100vw;
   overflow: hidden;
   height: 100vh;
 }
 
+@keyframes moveToCenter {
+  100% {
+    transform: translate(50vw, 50vh);
+  }
+}
+
+.effectActivated {
+  animation-name: moveToCenter;
+  animation-duration: 2s; // Ou tout autre temps que vous voulez pour l'animation
+}
+
+@-webkit-keyframes fade-frames {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fade-frames {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 .circle {
   border-radius: 50%;
-  position:absolute;
+  position: absolute;
   z-index: 12;
 }
 //use a for loop to create a unique keyframe for each element
 //then apply randomized styles to them all
 @for $i from 1 through 31 {
-  @-webkit-keyframes particle-animation-#{$i} {
-    0% {
-      -webkit-transform:translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(90) + deg);
-      transform:translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(90) + deg);
-    }
-    100% {
-      -webkit-transform: translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(180) + deg);
-      transform: translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(180) + deg);
-		}
-	}
   @keyframes particle-animation-#{$i} {
     0% {
-      -webkit-transform:translate3d((random(110) * 1vw), (random(100) * 1vh), (random(110) * 1px)) rotate(random(90) + deg);
-      transform:translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(90) + deg);
+      transform: translate3d(
+          (random(110) * 1vw),
+          (random(100) * 1vh),
+          (random(400) * 1px)
+        )
+        rotate(random(90) + deg);
     }
     100% {
-      -webkit-transform: translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(180) + deg);
-      transform: translate3d((random(110) * 1vw), (random(100) * 1vh), (random(400) * 1px)) rotate(random(180) + deg);
-		}
-	}
-  
-  //fade in and out
-	@-webkit-keyframes fade-frames {
-    0% {
-      opacity: 0;
-    }
-    25% {
-      opacity: .5;
-    }
-    100% {
-      opacity: 1;
-    }
-    75% {
-      opacity: .5;
-    }
-    100% {
-      opacity: 0;
+      transform: translate3d(
+          (random(110) * 1vw),
+          (random(100) * 1vh),
+          (random(400) * 1px)
+        )
+        rotate(random(180) + deg);
     }
   }
-  @keyframes fade-frames {
-      0% {
-        opacity: 0;
-      }
-      25% {
-        opacity: .5;
-      }
-      100% {
-        opacity: 1;
-      }
-      75% {
-        opacity: .5;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
+
+  //fade in and out
 
   //apply keyframes to children of .particles - the circles
   //and make them a random size, color, and delay
-	.particles span:nth-child(#{$i}){
-    -webkit-animation: particle-animation-#{$i} 10s ease-in infinite, fade-frames 10s ease-in-out infinite;
-    animation: particle-animation-#{$i} 10s ease-in infinite, fade-frames 10s ease-in-out infinite;
-		$size: random(100) + 5 + px;
-		height: $size;
-		width: $size;
-    $color: random(255);
+
+  .particles span:nth-child(#{$i}) {
+    animation: particle-animation-#{$i} 10s ease-in infinite,
+      fade-frames 10s ease-in-out infinite;
+    $size: random(100) + 5 + px;
+    height: $size;
+    width: $size;
     //this will make them all a random shade of greyish
-    background-color: rgb($color, $color, $color);
-    -webkit-animation-delay: -$i + s;
+    background-color: color-variation($cream);
     animation-delay: -$i + s;
+    transition: background-color 0.5s ease-in-out;
     // -webkit-transform: translate3d((random(90) * 1vw), (random(90) * 1vh), (random(100) * 1px));
     // transform: translate3d((random(90) * 1vw), (random(90) * 1vh), (random(100) * 1px));
   }

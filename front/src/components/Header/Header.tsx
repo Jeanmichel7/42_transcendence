@@ -1,54 +1,85 @@
-import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { setLogout } from '../../store/userSlice';
-import { ApiErrorResponse, NotificationInterface, UserInterface } from '../../types';
-import { RootState } from '../../store';
-import { AuthLogout } from '../../types/AuthTypes';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { setLogout } from "../../store/userSlice";
+import {
+  ApiErrorResponse,
+  NotificationInterface,
+  UserInterface,
+} from "../../types";
+import { RootState } from "../../store";
+import { AuthLogout } from "../../types/AuthTypes";
+import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
 
-import NotificationItem from './NotificationItem';
-import { logout } from '../../api/auth';
+import NotificationItem from "./NotificationItem";
+import { logout } from "../../api/auth";
 
-import { Badge } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
+import { Badge } from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Menu from "@mui/material/Menu";
+import MenuIcon from "@mui/icons-material/Menu";
+import Container from "@mui/material/Container";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import MenuItem from "@mui/material/MenuItem";
 
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import useConnection from './useConnection';
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import useConnection from "./useConnection";
+import styled, { keyframes } from "styled-components";
 
+const animationAppBar = keyframes` 
+  0%{
+    transform: translateY(-100%);
+  }
+  100%{
+    transform: translateY(0%);
+  }
+`;
 
+const StyledAppBar = styled(AppBar)`
+  animation: ${animationAppBar} 1.5s ease-in-out;
+`;
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  const [anchorElNotification, setAnchorElNotification] = useState<null | HTMLElement>(null);
+  const [anchorElNotification, setAnchorElNotification] =
+    useState<null | HTMLElement>(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const userIsLogged: boolean = useSelector((state: RootState) => state.user.isLogged);
-  const { notifications } = useSelector((state: RootState) => state.notification);
+  const userData: UserInterface = useSelector(
+    (state: RootState) => state.user.userData
+  );
+  const userIsLogged: boolean = useSelector(
+    (state: RootState) => state.user.isLogged
+  );
+  const { notifications } = useSelector(
+    (state: RootState) => state.notification
+  );
 
   useConnection();
 
   useEffect(() => {
-    if (userData.id === undefined || userData.id == -1 || !notifications || notifications.length == 0) 
+    if (
+      userData.id === undefined ||
+      userData.id == -1 ||
+      !notifications ||
+      notifications.length == 0
+    )
       return;
-    localStorage.setItem('notifications' + userData.id, JSON.stringify(notifications));
+    localStorage.setItem(
+      "notifications" + userData.id,
+      JSON.stringify(notifications)
+    );
   }, [notifications, userData.id]);
 
   //handler nav menu
@@ -77,18 +108,19 @@ function Header() {
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
-    if ('error' in res) {
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+    if ("error" in res) {
+      dispatch(
+        setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+      );
     } else {
       dispatch(setLogout());
-      dispatch(setMsgSnackbar('Logout success'));
-      navigate('/');
+      dispatch(setMsgSnackbar("Logout success"));
+      navigate("/");
     }
   }
 
-
   const renderMobileNotification = (
-    <Box sx={{ display: { xs: 'flex flex-raw', md: 'none' } }}>
+    <Box sx={{ display: { xs: "flex flex-raw", md: "none" } }}>
       <MenuItem>
         <IconButton
           size="large"
@@ -96,11 +128,20 @@ function Header() {
           color="inherit"
           onClick={handleOpenNotificationMenu}
         >
-          <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
-            { notifications.filter((n: NotificationInterface) => !n.read).length ? <NotificationsActiveIcon /> :
-              notifications.length ? <NotificationsIcon /> :
-              <NotificationsNoneIcon /> 
+          <Badge
+            badgeContent={
+              notifications.filter((n: NotificationInterface) => !n.read).length
             }
+            color="error"
+          >
+            {notifications.filter((n: NotificationInterface) => !n.read)
+              .length ? (
+              <NotificationsActiveIcon />
+            ) : notifications.length ? (
+              <NotificationsIcon />
+            ) : (
+              <NotificationsNoneIcon />
+            )}
           </Badge>
         </IconButton>
         <p>Notifications</p>
@@ -109,20 +150,27 @@ function Header() {
   );
 
   const renderStandardNotification = (
-    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+    <Box sx={{ display: { xs: "none", md: "flex" } }}>
       <IconButton
         size="large"
         aria-label="show new notifications"
         color="inherit"
         onClick={handleOpenNotificationMenu}
       >
-        <Badge badgeContent={notifications.filter((n: NotificationInterface) => !n.read).length} color="error">
-          { notifications.filter((n: NotificationInterface) => !n.read).length 
-            ? <NotificationsActiveIcon />
-            : notifications.length
-              ? <NotificationsIcon />
-              : <NotificationsNoneIcon />
+        <Badge
+          badgeContent={
+            notifications.filter((n: NotificationInterface) => !n.read).length
           }
+          color="error"
+        >
+          {notifications.filter((n: NotificationInterface) => !n.read)
+            .length ? (
+            <NotificationsActiveIcon />
+          ) : notifications.length ? (
+            <NotificationsIcon />
+          ) : (
+            <NotificationsNoneIcon />
+          )}
         </Badge>
       </IconButton>
     </Box>
@@ -130,44 +178,46 @@ function Header() {
 
   const notificationMenu = (
     <Menu
-      sx={{ mt: '55px' }}
+      sx={{ mt: "55px" }}
       id="menu-appbar"
       anchorEl={anchorElNotification}
       anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       // keepMounted
       transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
+        vertical: "bottom",
+        horizontal: "right",
       }}
       open={Boolean(anchorElNotification) && notifications.length > 0}
       onClose={handleCloseNotificationMenu}
     >
-      {notifications.map((notification: NotificationInterface, index: number) => (
-        <NotificationItem
-          key={index}
-          notification={notification}
-          setAnchorElNotification={setAnchorElNotification}
-        />
-      ))}
+      {notifications.map(
+        (notification: NotificationInterface, index: number) => (
+          <NotificationItem
+            key={index}
+            notification={notification}
+            setAnchorElNotification={setAnchorElNotification}
+          />
+        )
+      )}
     </Menu>
   );
 
-
-  if (!userData.id)
-    return null;
+  if (!userData.id) return null;
   return (
-    <AppBar position="static">
+    <StyledAppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
           {/**
            * Display Icon and Title on large screen
            */}
-          <IconButton sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} >
-            <img src='/pong-nav.png' className="text-center p-2 rounded-full w-full h-12" />
+          <IconButton sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+            <img
+              src="/pong-nav.png"
+              className="text-center p-2 rounded-full w-full h-12"
+            />
           </IconButton>
           <Typography
             variant="h6"
@@ -176,13 +226,13 @@ function Header() {
             href="/game"
             sx={{
               mr: 2,
-              display: { xs: 'none', md: 'flex' },
+              display: { xs: "none", md: "flex" },
               flexGrow: 1,
-              fontFamily: 'monospace',
+              fontFamily: "monospace",
               fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              letterSpacing: ".3rem",
+              color: "inherit",
+              textDecoration: "none",
             }}
           >
             Pong
@@ -191,7 +241,7 @@ function Header() {
           {/**
            * Display Menu pages on small screen
            */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -206,58 +256,50 @@ function Header() {
               id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
+                vertical: "bottom",
+                horizontal: "left",
               }}
               keepMounted
               transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
+                vertical: "top",
+                horizontal: "left",
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{
-                display: { xs: 'block', md: 'none' },
+                display: { xs: "block", md: "none" },
               }}
             >
               <NavLink to="/game">
-                <MenuItem onClick={handleCloseNavMenu}>
-                  Play
-                </MenuItem>
+                <MenuItem onClick={handleCloseNavMenu}>Play</MenuItem>
               </NavLink>
 
               <NavLink to="/leaderboard">
-                <MenuItem onClick={handleCloseNavMenu}>
-                  Leaderboard
-                </MenuItem>
+                <MenuItem onClick={handleCloseNavMenu}>Leaderboard</MenuItem>
               </NavLink>
 
               <NavLink to="/chat">
-                <MenuItem onClick={handleCloseNavMenu}>
-                  Chat
-                </MenuItem>
+                <MenuItem onClick={handleCloseNavMenu}>Chat</MenuItem>
               </NavLink>
 
               <NavLink to="/friends">
-                <MenuItem onClick={handleCloseNavMenu}>
-                  Friends
-                </MenuItem>
-              </NavLink>
-              
-              <NavLink to={'/profile/' + userData.login}>
-                <MenuItem onClick={handleCloseNavMenu}>
-                  Profile
-                </MenuItem>
+                <MenuItem onClick={handleCloseNavMenu}>Friends</MenuItem>
               </NavLink>
 
+              <NavLink to={"/profile/" + userData.login}>
+                <MenuItem onClick={handleCloseNavMenu}>Profile</MenuItem>
+              </NavLink>
             </Menu>
           </Box>
 
           {/**
            * Display Icon and Title on small screen
            */}
-          <IconButton sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} >
-            <img src='/pong-nav.png' className="text-center p-2 rounded-full w-full h-12" />
+          <IconButton sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
+            <img
+              src="/pong-nav.png"
+              className="text-center p-2 rounded-full w-full h-12"
+            />
           </IconButton>
           <Typography
             variant="h5"
@@ -266,13 +308,13 @@ function Header() {
             href="/game"
             sx={{
               mr: 2,
-              display: { xs: 'flex', md: 'none' },
+              display: { xs: "flex", md: "none" },
               flexGrow: 1,
-              fontFamily: 'monospace',
+              fontFamily: "monospace",
               fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              letterSpacing: ".3rem",
+              color: "inherit",
+              textDecoration: "none",
             }}
           >
             Pong
@@ -281,38 +323,55 @@ function Header() {
           {/**
            * Display pages on large screen
            */}
-          <Box sx={{ 
-            flexGrow: 1, 
-            display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' },
-            justifyContent: 'space-around',
-            alignItems: 'center',
-          }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: userIsLogged ? "flex" : "none" },
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
             <NavLink to="/game">
-              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+              <Button
+                onClick={handleCloseNavMenu}
+                sx={{ color: "white", display: "block" }}
+              >
                 Play
               </Button>
             </NavLink>
 
             <NavLink to="/leaderboard">
-              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+              <Button
+                onClick={handleCloseNavMenu}
+                sx={{ color: "white", display: "block" }}
+              >
                 Leaderboard
               </Button>
             </NavLink>
 
             <NavLink to="/chat">
-              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+              <Button
+                onClick={handleCloseNavMenu}
+                sx={{ color: "white", display: "block" }}
+              >
                 Chat
               </Button>
             </NavLink>
 
             <NavLink to="/friends">
-              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+              <Button
+                onClick={handleCloseNavMenu}
+                sx={{ color: "white", display: "block" }}
+              >
                 Friends
               </Button>
             </NavLink>
 
-            <NavLink to={'/profile/' + userData.login}>
-              <Button onClick={handleCloseNavMenu} sx={{ color: 'white', display: 'block' }} >
+            <NavLink to={"/profile/" + userData.login}>
+              <Button
+                onClick={handleCloseNavMenu}
+                sx={{ color: "white", display: "block" }}
+              >
                 Profile
               </Button>
             </NavLink>
@@ -322,26 +381,32 @@ function Header() {
            * Display Menu icon user
            */}
           <Box sx={{ flexGrow: 1 }} />
-          {userIsLogged == false &&
-            <div className='flex'>
+          {userIsLogged == false && (
+            <div className="flex">
               <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
-                <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                <Button
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
                   Login Intra
                 </Button>
               </NavLink>
               <NavLink to="/fakeconnection">
-                <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
+                <Button
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
                   Login Fake
                 </Button>
               </NavLink>
             </div>
-          }
-          {userIsLogged &&
+          )}
+          {userIsLogged && (
             <>
-              { renderStandardNotification }
+              {renderStandardNotification}
               {/**
-              *       always display
-              */}
+               *       always display
+               */}
               <Tooltip title="Open settings">
                 <IconButton
                   size="large"
@@ -351,55 +416,54 @@ function Header() {
                   onClick={handleOpenUserMenu}
                   color="inherit"
                 >
-                  {userData.avatar &&
-                    <Avatar alt="avatar" src={userData.avatar}
+                  {userData.avatar && (
+                    <Avatar
+                      alt="avatar"
+                      src={userData.avatar}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                        target.src =
+                          "http://localhost:3000/avatars/defaultAvatar.png";
                       }}
-                    />}
+                    />
+                  )}
                 </IconButton>
               </Tooltip>
               <Menu
-                sx={{ mt: '45px' }}
+                sx={{ mt: "45px" }}
                 id="menu-appbar"
                 anchorEl={anchorElUser}
                 anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 keepMounted
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
                 {renderMobileNotification}
 
-                <NavLink to='/account'>
-                  <MenuItem onClick={handleCloseUserMenu}>
-                    Account
-                  </MenuItem>
+                <NavLink to="/account">
+                  <MenuItem onClick={handleCloseUserMenu}>Account</MenuItem>
                 </NavLink>
 
-                <NavLink to='/' onClick={handleLogout}>
-                  <MenuItem onClick={handleCloseUserMenu}>
-                    Logout
-                  </MenuItem>
+                <NavLink to="/" onClick={handleLogout}>
+                  <MenuItem onClick={handleCloseUserMenu}>Logout</MenuItem>
                 </NavLink>
               </Menu>
 
               {/** Menu notifications */}
               {notificationMenu}
             </>
-          }
+          )}
         </Toolbar>
       </Container>
-    </AppBar>
-
+    </StyledAppBar>
   );
 }
 export default Header;

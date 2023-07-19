@@ -190,8 +190,13 @@ export class GameService {
         );
       } else if (
         this.playerWaiting2Bonus === undefined &&
-        this.playerWaiting1Bonus !== username
+        this.playerWaiting1Bonus.username !== username
       ) {
+        console.log(
+          'player waiting Bonus username',
+          this.playerWaiting1Bonus.username,
+        );
+        console.log('username player two bonus : ', username);
         this.playerWaiting2Bonus = {
           socketId: socketId,
           username: username,
@@ -233,6 +238,11 @@ export class GameService {
         this.playerWaiting2Normal === undefined &&
         this.playerWaiting1Normal.username !== username
       ) {
+        console.log(
+          'player waiting username',
+          this.playerWaiting1Normal.username,
+        );
+        console.log('username', username);
         this.playerWaiting2Normal = {
           socketId: socketId,
           username: username,

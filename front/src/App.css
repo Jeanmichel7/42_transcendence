@@ -5,6 +5,12 @@
   text-align: center;
 }
 
+:root {
+  --color-primary: #1976d2;
+  --color-secondary: #c95ddc;
+  --color-tertiary: #9c27b0;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -26,8 +32,6 @@
     transform: rotate(360deg);
   }
 }
-
-
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {

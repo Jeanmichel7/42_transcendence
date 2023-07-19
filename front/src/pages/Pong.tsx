@@ -6,7 +6,6 @@ import { Socket, io } from "socket.io-client";
 import Lobby from "../components/Game/Lobby";
 import SearchingOpponent from "../components/Game/SearchingOpponent";
 import { Overlay } from "../components/Game/Overlay";
-import "../components/Game/font.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ApiErrorResponse, GameInterface } from "../types";
 import { getGame } from "../api/game";
@@ -16,14 +15,12 @@ import { RootState } from "../store";
 import PrivateLobby from "../components/Game/PrivateLobby";
 
 export const GameWrapper = styled.div`
-  width: 80vw;
-  height: 50vh;
-  background-color: black;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: row;
   margin: 0 auto;
   position: relative;
-  font-family: "neontubes";
   overflow: hidden;
 `;
 
@@ -46,6 +43,7 @@ function Pong() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const gameId = searchParams.get("id");
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     if (!gameId || !userData.id || userData.id == -1) return;
@@ -80,6 +78,18 @@ function Pong() {
   }, [socket, userData.id, dispatch, navigate]);
 
   useEffect(() => {
+    let timeoutId;
+    if (connectStatus === "disconnected") {
+      timeoutId = setTimeout(() => setShowOverlay(true), 1000); // 1s delay
+    } else {
+      setShowOverlay(false);
+    }
+
+    // Cleanup function to clear the timeout when component unmounts or re-renders
+    return () => clearTimeout(timeoutId);
+  }, [connectStatus]);
+
+  useEffect(() => {
     const newSocket = io("http://localhost:3000/game", {
       withCredentials: true,
     });
@@ -98,6 +108,12 @@ function Pong() {
         setCurrentPage("game");
       }
       if (message === "foundBonus") {
+        const circles = document.querySelectorAll(".circle");
+        const particleContainer = document.querySelector(".particle-container");
+        particleContainer.style.backgroundColor = "black";
+        circles.forEach(function (circle) {
+          circle.style.backgroundColor = "#330207";
+        });
         setBonus(true);
         setCurrentPage("game");
       }
@@ -129,8 +145,20 @@ function Pong() {
   }
   let pageContent: ReactNode;
   if (currentPage === "lobby" && !gameId) {
-    pageContent = <Lobby setCurrentPage={setCurrentPage} socket={socket} />;
+    pageContent = (
+      <Lobby
+        setCurrentPage={setCurrentPage}
+        socket={socket}
+        setBonus={setBonus}
+      />
+    );
   } else if (currentPage === "finished") {
+    const circles = document.querySelectorAll(".circle");
+    const particleContainer = document.querySelector(".particle-container");
+    particleContainer.style.backgroundColor = "";
+    circles.forEach(function (circle) {
+      circle.style.backgroundColor = "";
+    });
     pageContent = (
       <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
     );
@@ -145,7 +173,11 @@ function Pong() {
     );
   } else if (currentPage === "searchOpponent") {
     pageContent = (
-      <SearchingOpponent socket={socket} setCurrentPage={setCurrentPage} />
+      <SearchingOpponent
+        socket={socket}
+        setCurrentPage={setCurrentPage}
+        bonus={bonus}
+      />
     );
   } else if (currentPage === "privateLobby") {
     pageContent = (
@@ -159,7 +191,7 @@ function Pong() {
   }
   return (
     <GameWrapper>
-      {connectStatus === "disconnected" && <Overlay />}
+      {showOverlay && <Overlay />}
       {statusComponent}
       {pageContent}
     </GameWrapper>

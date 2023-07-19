@@ -247,6 +247,10 @@ const Laser = styled.div<string>`
   left: 100%;
 `;
 
+const GameWrapper = styled.div`
+  animation: ${fadeIn} 2s ease;
+`;
+
 function Game({
   socket,
   lastGameInfo,
@@ -479,8 +483,8 @@ function Game({
   }, []);
 
   return (
-    <div>
-      {!gameStarted && <CountDown />}
+    <GameWrapper>
+      <CountDown gameStarted={gameStarted} />
       <Score
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
@@ -529,7 +533,7 @@ function Game({
           bonusName={bonusValueRef.current}
         />
       )}
-    </div>
+    </GameWrapper>
   );
 }
 
