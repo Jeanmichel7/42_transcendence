@@ -1,23 +1,34 @@
 import styled, { keyframes } from "styled-components";
 // import { StyledButton } from './Lobby';
-import { StyledButton } from "./Lobby";
 import confetti from "canvas-confetti";
 import { useEffect } from "react";
+import { Smiley } from "./SmileyWrapper";
 import "./font.css";
+import { StyledButton } from "./Lobby";
+
+const fadeIn = keyframes`
+0% {
+  opacity: 0;
+}
+75% {
+  opacity: 0;
+}
+100% {
+  opacity: 1;
+}
+`;
 
 const LooseWrapper = styled.div`
   position: absolute;
-  background-color: black;
   color: black;
   align-items: center;
   height: 100%;
+  justify-content: center;
   width: 100%;
-  justify-content: space-around;
   text-align: center;
   display: flex;
   flex-direction: column;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  animation: ${fadeIn} 4s ease-out;
 `;
 
 const flicker = keyframes`{
@@ -47,7 +58,7 @@ const buzz = keyframes`
 const StyledNeonH1 = styled.h1`
   color: #fff;
   -webkit-animation: ${buzz} 0.1s infinite alternate;
-  font-size: 4rem;
+  font-size: 3rem;
   text-shadow: 0 0 0 transparent, 0 0 10px #2695ff,
     0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff,
     0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
@@ -80,8 +91,8 @@ const neonAnimationStartUp = keyframes`
 const NeonSign = styled.div`
   font-size: 1em;
   position: absolute;
-  left: 75%;
-  top: 15%;
+  left: 58%;
+  top: 25%;
   rotate: 30deg;
   text-align: center;
   animation: ${neonAnimationStartUp} steps(1) 1s forwards;
@@ -119,7 +130,7 @@ interface LooseProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   lastGameInfo: React.RefObject<LastGameInfo>;
 }
-function Loose({ setCurrentPage, lastGameInfo }: LooseProps) {
+function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
   useEffect(() => {
     if (lastGameInfo.current.win) {
       setTimeout(() => {
@@ -131,34 +142,44 @@ function Loose({ setCurrentPage, lastGameInfo }: LooseProps) {
           particleCount: 100,
           spread: 160,
         });
-      }, 2000);
+      }, 3500);
     }
   }, [lastGameInfo.current.win]);
 
   return (
-    <LooseWrapper>
-      {lastGameInfo.current.win ? (
-        <>
-          <StyledNeonH1>
-            Victoire
-            <br />
-            Vainqueur: {lastGameInfo.current.winnerName}{" "}
-          </StyledNeonH1>
-          <NeonSign>Bien Joue</NeonSign>
-          <FullScreenCanvas id="myCanvas"></FullScreenCanvas>
-        </>
-      ) : (
-        <>
-          <StyledNeonH1>Defaite</StyledNeonH1>
-          <NeonSign>Dommage</NeonSign>
-        </>
-      )}
-      <StyledNeonH2>Perdant: {lastGameInfo.current.looserName}</StyledNeonH2>
-      <StyledButton onClick={() => setCurrentPage("searchOpponent")}>
-        Proposer une nouvelle partie
-      </StyledButton>
-    </LooseWrapper>
+    <Smiley mood={lastGameInfo.current.win ? "happy" : "sad"}>
+      <LooseWrapper>
+        {lastGameInfo.current.win ? (
+          <>
+            <StyledNeonH1>
+              Victory
+              <br />
+              Winner: <br />
+              {lastGameInfo.current.winnerName}{" "}
+            </StyledNeonH1>
+            <NeonSign>Good Game</NeonSign>
+            <FullScreenCanvas id="myCanvas"></FullScreenCanvas>
+          </>
+        ) : (
+          <>
+            <StyledNeonH1>
+              Defeate
+              <br />
+              Winner: <br /> {lastGameInfo.current.winnerName}{" "}
+            </StyledNeonH1>
+            <NeonSign>Nice Try</NeonSign>
+          </>
+        )}
+        <StyledNeonH2>Looser: {lastGameInfo.current.looserName}</StyledNeonH2>
+        <StyledButton
+          onClick={() => setCurrentPage("searchOpponent")}
+          activateEffect
+        >
+          propose a new part
+        </StyledButton>
+      </LooseWrapper>
+    </Smiley>
   );
 }
 
-export default Loose;
+export default EndGame;

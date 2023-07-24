@@ -1,19 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import { setErrorSnackbar, setMsgSnackbar } from "../../../store/snackbarSlice";
 
-import { ApiErrorResponse, RoomInterface } from '../../../types';
+import { ApiErrorResponse, RoomInterface } from "../../../types";
 
-import { Autocomplete, Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, OutlinedInput, Pagination, Select, Stack, TextField } from '@mui/material';
-import { getAllPublicRooms, getAllPublicRoomsCount, joinRoom } from '../../../api/chat';
-import RoomCard from './ChannelRoomCard';
-import { reduxAddConversationList } from '../../../store/convListSlice';
-import { isConvAlreadyExist } from '../../../utils/utils';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Pagination,
+  Select,
+  Stack,
+  TextField,
+} from "@mui/material";
+import {
+  getAllPublicRooms,
+  getAllPublicRoomsCount,
+  joinRoom,
+} from "../../../api/chat";
+import RoomCard from "./ChannelRoomCard";
+import { reduxAddConversationList } from "../../../store/convListSlice";
+import { isConvAlreadyExist } from "../../../utils/utils";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-import DoneIcon from '@mui/icons-material/Done';
-import CloseIcon from '@mui/icons-material/Close';
+import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function ChannelSearch() {
   const [inputPwd, setInputPwd] = useState<string | null>(null);
@@ -30,37 +48,40 @@ export default function ChannelSearch() {
   const [userPerPage, setUserPerPage] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
   const dispatch = useDispatch();
-  
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
+  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
 
   const handleJoinRoom = async (room: RoomInterface | null) => {
-    if (!room)
-      return;
+    if (!room) return;
     if (isConvAlreadyExist(room, conversationsList))
-      return dispatch(setErrorSnackbar('Room already in conversation list'));
-    if (room.isProtected && !displayInputPwd)
-      return setDisplayInputPwd(true);
+      return dispatch(setErrorSnackbar("Room already in conversation list"));
+    if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
-      return dispatch(setErrorSnackbar('Password required'));
+      return dispatch(setErrorSnackbar("Password required"));
 
     setIsLoading(true);
     const res: RoomInterface | ApiErrorResponse = await joinRoom({
       roomId: room.id,
       password: inputPwd ? inputPwd : undefined,
     });
-    
-    if ('error' in res) {
-      if (res.error === 'Conflict' && res.message.includes('already in room')) {
+
+    if ("error" in res) {
+      if (res.error === "Conflict" && res.message.includes("already in room")) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         if (isConvAlreadyExist(room, conversationsList))
-          dispatch(setErrorSnackbar('Room already in conversation list jtevois toi ?'));
-        else
-          dispatch(setMsgSnackbar('Add room to conversation list'));
+          dispatch(
+            setErrorSnackbar("Room already in conversation list jtevois toi ?")
+          );
+        else dispatch(setMsgSnackbar("Add room to conversation list"));
       } else
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+        dispatch(
+          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+        );
     } else {
-      dispatch(setMsgSnackbar('Room joint'));
+      dispatch(setMsgSnackbar("Room joint"));
       dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
@@ -71,24 +92,27 @@ export default function ChannelSearch() {
   useEffect(() => {
     async function fetchTotalRooms() {
       const res: number | ApiErrorResponse = await getAllPublicRoomsCount();
-      if (typeof res != 'number' && 'error' in res)
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
-      else
-        setTotalPages(Math.ceil(res / userPerPage));
+      if (typeof res != "number" && "error" in res)
+        dispatch(
+          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+        );
+      else setTotalPages(Math.ceil(res / userPerPage));
     }
     async function fetchRooms() {
       setIsLoading(true);
-      const allRooms: RoomInterface[] | ApiErrorResponse = await getAllPublicRooms(
-        currentPage,
-        userPerPage,
-      );
+      const allRooms: RoomInterface[] | ApiErrorResponse =
+        await getAllPublicRooms(currentPage, userPerPage);
       setIsLoading(false);
 
-      if ('error' in allRooms)
-        dispatch(setErrorSnackbar(allRooms.error + allRooms.message ? ': ' + allRooms.message : ''));
+      if ("error" in allRooms)
+        dispatch(
+          setErrorSnackbar(
+            allRooms.error + allRooms.message ? ": " + allRooms.message : ""
+          )
+        );
       else {
         setRooms(allRooms);
-        topRef.current?.scrollIntoView({ behavior: 'smooth' });
+        topRef.current?.scrollIntoView({ behavior: "smooth" });
       }
       setSelectedRoom(null);
     }
@@ -96,60 +120,68 @@ export default function ChannelSearch() {
     fetchRooms();
   }, [conversationsList, dispatch, currentPage, userPerPage]);
 
-
-
   const handleChangePage = (
     event: React.ChangeEvent<unknown> | null,
-    value: number,
+    value: number
   ) => {
     setCurrentPage(value);
   };
 
-  const handleChangeUserPerPage = (
-    event: any,
-  ) => {
+  const handleChangeUserPerPage = (event: any) => {
     setUserPerPage(event.target.value);
     setCurrentPage(1);
   };
 
-
-
   return (
     <div className="h-full">
-      <div className='flex p-3 border'>
+      <div className="flex p-3 border">
         <Autocomplete
           id="searchFriends"
           fullWidth
           options={rooms}
-          getOptionLabel={(option: RoomInterface) => option.name + ' (' + option.id + ')'}
-          onChange={(event: React.ChangeEvent<object>, newValue: RoomInterface | null) => {
+          getOptionLabel={(option: RoomInterface) =>
+            option.name + " (" + option.id + ")"
+          }
+          onChange={(
+            event: React.ChangeEvent<object>,
+            newValue: RoomInterface | null
+          ) => {
             event.stopPropagation();
             setSelectedRoom(newValue);
           }}
           value={selectedRoom}
-          renderInput={(params) => <TextField {...params} label="Search Channels" variant="outlined" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Search Channels" variant="outlined" />
+          )}
         />
         <Button
           onClick={() => handleJoinRoom(selectedRoom)}
           variant="contained"
           color="primary"
-          sx={{ ml: 2, height: '40px', alignSelf: 'center' }}
+          sx={{ ml: 2, height: "40px", alignSelf: "center" }}
           disabled={!selectedRoom || isLoading}
-        > Add </Button>
+        >
+          {" "}
+          Add{" "}
+        </Button>
       </div>
 
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
-          <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password-room">Password</InputLabel>
+          <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+            <InputLabel htmlFor="outlined-adornment-password-room">
+              Password
+            </InputLabel>
             <OutlinedInput
               autoFocus
-              name='password'
+              name="password"
               id="outlined-adornment-password-roon"
-              type={showPassword ? 'text' : 'password'}
-              value={inputPwd ? inputPwd : ''}
+              type={showPassword ? "text" : "password"}
+              value={inputPwd ? inputPwd : ""}
               onChange={(e) => setInputPwd(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom(selectedRoom)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && handleJoinRoom(selectedRoom)
+              }
               disabled={isLoading}
               endAdornment={
                 <InputAdornment position="end">
@@ -167,7 +199,7 @@ export default function ChannelSearch() {
             />
           </FormControl>
 
-          <div className=''>
+          <div className="">
             <IconButton
               onClick={() => handleJoinRoom(selectedRoom)}
               color="primary"
@@ -187,30 +219,25 @@ export default function ChannelSearch() {
           {isLoading && <CircularProgress />}
         </div>
       )}
-      
-      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-363px)] px-2">
+
+      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-225px)] px-2">
         <div ref={topRef} />
         {rooms.map((r: RoomInterface) => {
-          return (
-            <RoomCard key={r.id} room={r} />
-          );
+          return <RoomCard key={r.id} room={r} />;
         })}
       </div>
 
       {/* Pagination  */}
       <div className="flex relative justify-center py-2">
         <Stack spacing={2}>
-          <Pagination 
-            count={totalPages} 
-            onChange={handleChangePage}
-          />
+          <Pagination count={totalPages} onChange={handleChangePage} />
         </Stack>
-        <div className='absolute right-2'>
+        <div className="absolute right-2">
           <Select
             value={userPerPage}
             onChange={handleChangeUserPerPage}
             label="Cards per page"
-            sx={{ height: '35px' }}
+            sx={{ height: "35px" }}
           >
             <MenuItem value={10}>10</MenuItem>
             <MenuItem value={20}>20</MenuItem>

@@ -71,6 +71,12 @@ export const ButtonWrapper = styled.div`
   animation: ${(props) => (props.animation ? fadeIn : "")} 1s ease-out;
   left: 50%;
   z-index: 10;
+  @media (max-width: 768px) {
+    width: 50%;
+  }
+  @media (max-width: 420px) {
+    width: 80%;
+  }
 `;
 
 const StyledCircle = styled.div`

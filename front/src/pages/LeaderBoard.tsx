@@ -18,8 +18,8 @@ const LeaderBoard = () => {
   }, []);
 
   return (
-    <div className="bg-gray-200 ">
-      <div className="flex items-center justify-around ">
+    <div className="bg-[var(--background-color)] ">
+      <div className="flex items-center justify-around z-10">
         <svg
           version="1.1"
           id="Layer_1"
@@ -92,9 +92,13 @@ const LeaderBoard = () => {
           </g>
         </svg>
 
-        <h1 className="text-8xl text-center mb-5 animate-pulse border-4 rounded-lg border-gray-400 text-blue-600">
-          Leaderboard
-        </h1>
+        <div className="relative mb-5 mt-5">
+          <h1 className="text-8xl border-2 border-black text-center   bg-blue-500 -skew-x-12 rounded-lg relative z-10 text-white">
+            Leaderboard
+          </h1>
+          <div className="absolute top-2 left-2  w-full h-full bg-black  rounded-lg z-0 -skew-x-12"></div>
+        </div>
+
         <svg
           version="1.1"
           id="Layer_1"
@@ -168,8 +172,8 @@ const LeaderBoard = () => {
         </svg>
       </div>
 
-      <div className="overflow-x-auto bg-gray-100 shadow-xl rounded-xl p-3">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto bg-gray-100 shadow-xl rounded-xl p-3 ml-10 mr-10">
+        <table className="min-w-full bg-yellow-400 divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -184,26 +188,35 @@ const LeaderBoard = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {leaderBoard.map((user, index) => (
-              <tr
-                key={index}
-                className={`${
-                  index % 2 === 0
-                    ? "bg-blue-600 text-white"
-                    : "bg-purple-600 text-white"
-                } transform hover:scale-105 transition-transform duration-200`}
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {user.firstName + " " + user.lastName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {user.score.toFixed(2)}
-                </td>
-              </tr>
-            ))}
+            {leaderBoard.map((user, index) => {
+              let colorClass;
+              if (index === 0) {
+                colorClass = "bg-yellow-400 text-black"; // Or
+              } else if (index === 1) {
+                colorClass = "bg-gray-300 text-black"; // Argent
+              } else if (index === 2) {
+                colorClass = "bg-orange-500 text-white"; // Bronze
+              } else {
+                colorClass = "bg-yellow-900 text-white"; // Cuivre
+              }
+
+              return (
+                <tr
+                  key={index}
+                  className={`${colorClass} transform hover:scale-105 transition-transform duration-200`}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {user.firstName + " " + user.lastName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {user.score.toFixed(2)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

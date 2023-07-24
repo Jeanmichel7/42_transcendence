@@ -13,6 +13,15 @@ const slideInFromBottom = keyframes`{
   }
 }`;
 
+const slideInFromBottomSmallScreen = keyframes`{
+  0% {
+    transform: translateY(400%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}`;
+
 const slideInFromBottomLink = keyframes`{
   0% {
     transform: translateY(200%);
@@ -107,6 +116,9 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   transition: color 0.3s ease;
   z-index: 10;
 
+  @media (max-width: 768px) {
+    animation: ${slideInFromBottomSmallScreen} 3s ease-out;
+  }
   &::before {
     content: "";
     position: absolute;

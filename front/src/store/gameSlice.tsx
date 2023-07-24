@@ -2,15 +2,15 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const gameSlice = createSlice({
   name: "game",
-  initialState: false,
+  initialState: {
+    isEffectActivated: false,
+  },
   reducers: {
-    activateEffect: (state, action) => {
-      state = true;
-      return state;
+    activateEffect: (state) => {
+      state.isEffectActivated = true;
     },
-    desactivateEffect: (state, action) => {
-      state = false;
-      return state;
+    desactivateEffect: (state) => {
+      state.isEffectActivated = false;
     },
   },
 });

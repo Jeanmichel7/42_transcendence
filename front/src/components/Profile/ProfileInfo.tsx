@@ -2,7 +2,7 @@ import { requestAddFriend } from "../../api/relation";
 import { ApiErrorResponse, UserInterface, UserRelation } from "../../types";
 import { useDispatch, useSelector } from "react-redux";
 import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { RootState } from "../../store";
 import { reduxAddWaitingFriendsSent } from "../../store/userSlice";
 
@@ -27,12 +27,12 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-between  text-white p-5 rounded-xl shadow-xl">
-      <div className="mb-5 md:w-1/4">
+    <div className="flex flex-col md:flex-row  justify-between  text-white p-5 rounded-xl ">
+      <div className="mb-5 mt-5 md:w-1/4">
         {user.avatar && (
           <img
             src={user.avatar}
-            className="w-full rounded-[16px] shadow-lg mb-2"
+            className="w-full rounded-[16px] shadow-lg mb-2  "
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -41,14 +41,17 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
             }}
           />
         )}
-        <p className="bg-white text-purple-600 p-3 rounded-lg">
+        <p className=" text-purple-600 p-3  rounded-lg bg-white shadow-custom	">
           {" "}
           {user.description ? user.description : "No description"}{" "}
         </p>
       </div>
 
-      <div className="md:w-3/4 m-5 border-2 rounded-lg bg-white text-purple-600 p-5">
-        <h2 className="text-3xl text-center mb-5 font-bold">
+      <div className="md:w-3/4 m-5 box-border z-0 relative rounded bg-white shadow-custom	overflow-auto text-black p-5 ">
+        <h2
+          className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
+        before:top-0 z-10  text-white text-center mb-5 font-bold"
+        >
           {user.firstName + " " + user.lastName}
         </h2>
         {userData.id &&
@@ -64,18 +67,18 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               Add friend
             </Button>
           )}
-        <div className="flex justify-between">
-          <div className="w-1/4 font-bold">
-            <p className="text-xl">Pseudo</p>
-            <p className="text-xl">Email</p>
-            <p className="text-xl">Status</p>
-            <p className="text-xl">Score</p>
+        <div className="flex justify-between ">
+          <div className="w-1/4  space-y-2">
+            <p className="text-xl opacity-60 ">Pseudo</p>
+            <p className="text-xl opacity-60">Email</p>
+            <p className="text-xl opacity-60">Status</p>
+            <p className="text-xl opacity-60">Score</p>
           </div>
-          <div className="w-3/4">
-            <p className="text-xl">{user.login}</p>
-            <p className="text-xl">{user.email}</p>
-            <p className="text-xl">{user.status}</p>
-            <p className="text-xl">{Math.floor(user.score)}</p>
+          <div className="w-3/4 space-y-2">
+            <p className="text-xl ">{user.login}</p>
+            <p className="text-xl ">{user.email}</p>
+            <p className="text-xl ">{user.status}</p>
+            <p className="text-xl ">{Math.floor(user.score)}</p>
           </div>
         </div>
       </div>

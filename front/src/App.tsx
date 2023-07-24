@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import "./App.css";
 // import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from "./routes/indexRoutes";
@@ -171,8 +172,8 @@ function App() {
         {(location?.pathname == "/" || location?.pathname == "/game") && (
           <CircleBackground />
         )}
-        <div className="flex-grow w-full">
-          <div className="h-full">
+        <div className="flex-grow w-full ">
+          <div className="h-full  ">
             <AppRoutes />
           </div>
         </div>

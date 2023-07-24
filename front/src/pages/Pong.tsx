@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setErrorSnackbar } from "../store/snackbarSlice";
 import { RootState } from "../store";
 import PrivateLobby from "../components/Game/PrivateLobby";
+import { activateEffect, desactivateEffect } from "../store/gameSlice";
 
 export const GameWrapper = styled.div`
   width: 100%;
@@ -108,12 +109,7 @@ function Pong() {
         setCurrentPage("game");
       }
       if (message === "foundBonus") {
-        const circles = document.querySelectorAll(".circle");
-        const particleContainer = document.querySelector(".particle-container");
-        particleContainer.style.backgroundColor = "black";
-        circles.forEach(function (circle) {
-          circle.style.backgroundColor = "#330207";
-        });
+        dispatch(activateEffect());
         setBonus(true);
         setCurrentPage("game");
       }
@@ -145,6 +141,7 @@ function Pong() {
   }
   let pageContent: ReactNode;
   if (currentPage === "lobby" && !gameId) {
+    dispatch(desactivateEffect());
     pageContent = (
       <Lobby
         setCurrentPage={setCurrentPage}
@@ -153,12 +150,6 @@ function Pong() {
       />
     );
   } else if (currentPage === "finished") {
-    const circles = document.querySelectorAll(".circle");
-    const particleContainer = document.querySelector(".particle-container");
-    particleContainer.style.backgroundColor = "";
-    circles.forEach(function (circle) {
-      circle.style.backgroundColor = "";
-    });
     pageContent = (
       <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
     );
@@ -180,6 +171,7 @@ function Pong() {
       />
     );
   } else if (currentPage === "privateLobby") {
+    dispatch(desactivateEffect());
     pageContent = (
       <PrivateLobby
         setCurrentPage={setCurrentPage}

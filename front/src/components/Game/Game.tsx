@@ -9,6 +9,7 @@ import BonusBox from "./BonusBox";
 import spriteBonus from "../../assets/spriteBonus.png";
 import spriteBonusExplode from "../../assets/spriteBonusExplode.png";
 import "./font.css";
+import EndGame from "./EndGame";
 
 const Playground = styled.div`
   width: 100%;
@@ -303,6 +304,7 @@ function Game({
   );
   const fail = useRef(false);
   const correctionFactor = useRef(0);
+  const [ShowEndGame, setShowEndGame] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -451,8 +453,7 @@ function Game({
           lastGameInfo.current.win = gameData.current.isPlayerRight;
           lastGameInfo.current.looserName = gameData.current.player1Username;
         }
-
-        setCurrentPage("finished");
+        setShowEndGame(true);
       }
     }
     upLoop();
@@ -484,6 +485,9 @@ function Game({
 
   return (
     <GameWrapper>
+      {ShowEndGame && (
+        <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
+      )}
       <CountDown gameStarted={gameStarted} />
       <Score
         scorePlayerLeft={scorePlayers.current.left}
