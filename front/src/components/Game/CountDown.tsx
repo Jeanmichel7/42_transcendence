@@ -27,8 +27,10 @@ const CountdownWrapper = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 `;
-
-const Number = styled.span`
+interface NumberProps {
+  visible: boolean;
+}
+const Number = styled.span<NumberProps>`
   font-size: 8em; // Augmenter la taille de la police
   color: #;
   animation: ${fadeAndZoomIn} 1s ease-out;
@@ -36,7 +38,7 @@ const Number = styled.span`
   transition: opacity 0.3s ease-out;
 `;
 
-const Countdown = ({ gameStarted }: { gameStarted: bool }) => {
+const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
   useEffect(() => {

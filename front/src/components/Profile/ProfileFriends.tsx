@@ -4,7 +4,9 @@ import { ApiErrorResponse, UserInterface } from "../../types";
 import FriendCard from "./FriendsCard";
 import { useDispatch } from "react-redux";
 import { setErrorSnackbar } from "../../store/snackbarSlice";
-
+import { Sticker } from "../../utils/StyledTitle";
+import { Nothing } from "../Friends/Nothing";
+import { NavLink } from "react-router-dom";
 export default function ProfileFriends({ user }: { user: UserInterface }) {
   const [friends, setFriends] = useState<UserInterface[]>([]);
   const dispatch = useDispatch();
@@ -31,11 +33,16 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
 
   return (
     <>
-      <h2 className="text-3xl text-center mb-5">Friends</h2>
+      <Sticker dataText={"friends"} />
 
-      <div className="flex flex-wrap items-center w-full pb-3">
+      <div className="flex flex-wrap items-center w-full pb-3 p-5">
         {friends.length == 0 ? (
-          <p> No friends </p>
+          <NavLink to="/friends?tab=add">
+            <Nothing
+              text="Sorry... go to Add Friends for adding new friends!"
+              angry={false}
+            />
+          </NavLink>
         ) : (
           friends.map((friend) => {
             if (friend.login != user.login)

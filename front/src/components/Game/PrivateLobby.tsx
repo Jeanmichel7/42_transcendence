@@ -7,8 +7,7 @@ import {
 } from "./Interface";
 import { StyledButton } from "./Lobby";
 import { useEffect, useState } from "react";
-import { json } from "react-router-dom";
-
+import { PlayerStatus } from "./Interface";
 const ButtonWrapper = styled.div`
   height: 100%;
   width: 100%;
@@ -19,7 +18,11 @@ const ButtonWrapper = styled.div`
   position: absolute;
 `;
 
-export const StyledValidationButton = styled.button`
+interface StyledValidationButtonProps {
+  ready: boolean;
+}
+
+export const StyledValidationButton = styled.button<StyledValidationButtonProps>`
   border: 0.2rem solid #fff;
   border-radius: 2rem;
   padding: 1em;
@@ -35,14 +38,16 @@ export const StyledValidationButton = styled.button`
     0 0 82px #bc13fe, 0 0 92px #bc13fe, 0 0 102px #bc13fe, 0 0 151px #bc13fe;
 `;
 
-const ChoiceIndicator = styled.div`
+interface ChoiceIndicatorProps {
+  side: string | undefined;
+  mode: string | undefined;
+}
+const ChoiceIndicator = styled.div<ChoiceIndicatorProps>`
   width: 20px;
   height: 20px;
   background-color: white;
-  left: ${(props: { side: string; mode: string }) =>
-    props.side === "left" ? "12%" : "85%"};
-  top: ${(props: { side: string; mode: string }) =>
-    props.mode === "bonus" ? "50%" : "15%"};
+  left: ${(props) => (props.side === "left" ? "12%" : "85%")};
+  top: ${(props) => (props.mode === "bonus" ? "50%" : "15%")};
   border-radius: 50%;
   position: absolute;
   color: blue;
@@ -51,14 +56,7 @@ const ChoiceIndicator = styled.div`
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  PrivateGameId: number;
-  isPlayer1: boolean;
-}
-
-interface PlayerStatus {
-  gameId: bigint;
-  mode: string;
-  ready: boolean;
+  gameId: string;
   isPlayer1: boolean;
 }
 

@@ -4,7 +4,9 @@ import confetti from "canvas-confetti";
 import { useEffect } from "react";
 import { Smiley } from "./SmileyWrapper";
 import "./font.css";
-import { StyledButton } from "./Lobby";
+import { ClientToServerEvents, ServerToClientEvents } from "./Interface";
+import { Socket } from "socket.io-client";
+import neonBrickWall from "../../assets/neonBrickWall.jpeg";
 
 const fadeIn = keyframes`
 0% {
@@ -18,6 +20,123 @@ const fadeIn = keyframes`
 }
 `;
 
+const StyledButton = styled.button`
+  align-items: center;
+  appearance: none;
+  background-clip: padding-box;
+  background-color: initial;
+  background-image: none;
+  border-style: none;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  flex-direction: row;
+  flex-shrink: 0;
+  font-family: Eina01, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 24px;
+  margin: 0;
+  min-height: 64px;
+  outline: none;
+  overflow: visible;
+  padding: 19px 26px;
+  pointer-events: auto;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: auto;
+  word-break: keep-all;
+  z-index: 0;
+
+  @media (min-width: 768px) {
+    padding: 19px 32px;
+  }
+
+  &:before,
+  &:after {
+    border-radius: 80px;
+  }
+
+  &:before {
+    background-image: linear-gradient(92.83deg, #1976d2 0, #132ef9 100%);
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -2;
+  }
+
+  &:after {
+    background-color: initial;
+    background-image: linear-gradient(#0f1454 0, #000000 100%);
+    bottom: 4px;
+    content: "";
+    display: block;
+    left: 4px;
+    overflow: hidden;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    transition: all 100ms ease-out;
+    z-index: -1;
+  }
+
+  &:hover:not(:disabled):before {
+    background: linear-gradient(
+      92.83deg,
+      rgb(38, 147, 255) 0%,
+      rgb(19, 96, 249) 100%
+    );
+  }
+
+  &:hover:not(:disabled):after {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    transition-timing-function: ease-in;
+    opacity: 0;
+  }
+
+  &:active:not(:disabled) {
+    color: #ccc;
+  }
+
+  &:active:not(:disabled):before {
+    background-image: linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.2)
+      ),
+      linear-gradient(92.83deg, #ff7426 0, #f93a13 100%);
+  }
+
+  &:active:not(:disabled):after {
+    background-image: linear-gradient(#541a0f 0, #0c0d0d 100%);
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    top: 4px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.24;
+  }
+`;
+
 const LooseWrapper = styled.div`
   position: absolute;
   color: black;
@@ -29,6 +148,7 @@ const LooseWrapper = styled.div`
   display: flex;
   flex-direction: column;
   animation: ${fadeIn} 4s ease-out;
+  overflow: hidden;
 `;
 
 const flicker = keyframes`{
@@ -91,16 +211,42 @@ const neonAnimationStartUp = keyframes`
 const NeonSign = styled.div`
   font-size: 1em;
   position: absolute;
-  left: 58%;
+  left: 63%;
   top: 25%;
   rotate: 30deg;
   text-align: center;
   animation: ${neonAnimationStartUp} steps(1) 1s forwards;
   animation-delay: 1s; // The sign will start glowing after 1 second
 `;
+
+const detachAndFall = keyframes`
+  0% {
+    transform-origin: top left;
+    transform: rotate(0deg);
+  }
+  25% {
+    transform-origin: top left;
+    transform: rotate(100deg);
+  }
+  50% {
+    transform-origin: top left;
+    transform: rotate(80deg) ;
+  }
+  75% {
+    transform-origin: top left;
+    transform: rotate(100deg) ;
+  }
+  100% {
+    transform-origin: top left;
+    transform: rotate(90deg) translateX(400%);
+  }
+`;
+
 const StyledNeonH2 = styled.h2`
   color: #fff;
-  animation: ${flicker} 4s infinite alternate;
+  animation: ${flicker} 4s infinite alternate,
+    ${detachAndFall} 7s ease-in-out forwards;
+  animation-delay: 5s;
   font-size: 2rem;
   text-shadow: -1px 0px 7px #fff, -1px 0px 10px #fff, -1px 0px 21px #fff,
     -1px 0px 42px #800080,
@@ -129,10 +275,11 @@ interface LastGameInfo {
 interface LooseProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   lastGameInfo: React.RefObject<LastGameInfo>;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
-function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
+function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
   useEffect(() => {
-    if (lastGameInfo.current.win) {
+    if (lastGameInfo.current && lastGameInfo.current.win) {
       setTimeout(() => {
         const myConfetti = confetti.create(
           document.getElementById("myCanvas"),
@@ -144,15 +291,22 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
         });
       }, 3500);
     }
-  }, [lastGameInfo.current.win]);
+  }, [lastGameInfo]);
+  if (!lastGameInfo.current) {
+    return null;
+  }
+
+  const opponent = lastGameInfo.current.win
+    ? lastGameInfo.current.looserName
+    : lastGameInfo.current.winnerName;
 
   return (
     <Smiley mood={lastGameInfo.current.win ? "happy" : "sad"}>
       <LooseWrapper>
         {lastGameInfo.current.win ? (
           <>
-            <StyledNeonH1>
-              Victory
+            <StyledNeonH1 victory={true}>
+              Victory !
               <br />
               Winner: <br />
               {lastGameInfo.current.winnerName}{" "}
@@ -172,10 +326,12 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
         )}
         <StyledNeonH2>Looser: {lastGameInfo.current.looserName}</StyledNeonH2>
         <StyledButton
-          onClick={() => setCurrentPage("searchOpponent")}
+          onClick={() => {
+            setCurrentPage("lobby");
+          }}
           activateEffect
         >
-          propose a new part
+          Return to Lobby
         </StyledButton>
       </LooseWrapper>
     </Smiley>

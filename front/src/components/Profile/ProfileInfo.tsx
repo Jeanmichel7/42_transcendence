@@ -5,6 +5,7 @@ import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
 import { Button, Typography } from "@mui/material";
 import { RootState } from "../../store";
 import { reduxAddWaitingFriendsSent } from "../../store/userSlice";
+import cuteBallsClimbingVines from "../../assets/cuteBallsClimbingVines.png";
 
 export default function ProfileInfo({ user }: { user: UserInterface }) {
   const { userData, userFriends } = useSelector(
@@ -47,7 +48,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
         </p>
       </div>
 
-      <div className="md:w-3/4 m-5 box-border z-0 relative rounded bg-white shadow-custom	overflow-auto text-black p-5 ">
+      <div className="md:w-3/4 md:m-5 box-border z-0 relative rounded bg-white shadow-custom	 text-black p-5 ">
         <h2
           className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
         before:top-0 z-10  text-white text-center mb-5 font-bold"
@@ -67,19 +68,24 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               Add friend
             </Button>
           )}
-        <div className="flex justify-between ">
-          <div className="w-1/4  space-y-2">
-            <p className="text-xl opacity-60 ">Pseudo</p>
-            <p className="text-xl opacity-60">Email</p>
-            <p className="text-xl opacity-60">Status</p>
-            <p className="text-xl opacity-60">Score</p>
+        <div className="flex justify-between items-stretch h-3/4">
+          <div className="w-1/4 space-y-2 flex flex-col justify-between">
+            <p className="md:text-xl opacity-60">Pseudo</p>
+            <p className="md:text-xl opacity-60">Email</p>
+            <p className="md:text-xl opacity-60">Status</p>
+            <p className="md:text-xl opacity-60">Score</p>
           </div>
-          <div className="w-3/4 space-y-2">
-            <p className="text-xl ">{user.login}</p>
-            <p className="text-xl ">{user.email}</p>
-            <p className="text-xl ">{user.status}</p>
-            <p className="text-xl ">{Math.floor(user.score)}</p>
+          <div className="w-3/4 space-y-2 flex flex-col justify-between">
+            <p className="md:text-xl">{user.login}</p>
+            <p className="md:text-xl">{user.email}</p>
+            <p className="md:text-xl">{user.status}</p>
+            <p className="md:text-xl">{Math.floor(user.score)}</p>
           </div>
+          <img
+            src={cuteBallsClimbingVines}
+            alt="illustration"
+            className="absolute right-0 h-full hidden md:block bottom-0"
+          />
         </div>
       </div>
     </div>

@@ -25,12 +25,6 @@ export const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
-interface PlayerStatus {
-  gameId: number;
-  mode: string;
-  ready: boolean;
-  player1: boolean;
-}
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
   // const socketRef = useRef<Socket | null>(null);
@@ -68,10 +62,7 @@ function Pong() {
         retFetchGame.player2.id != userData.id
       )
         return dispatch(setErrorSnackbar("You are not in this game"));
-      console.log(
-        "first check is player1",
-        retFetchGame.player1.id == userData.id
-      );
+
       setIsPlayer1(retFetchGame.player1.id == userData.id);
       setCurrentPage("privateLobby");
     };
@@ -105,6 +96,7 @@ function Pong() {
 
     newSocket.on("userGameStatus", (message) => {
       if (message === "foundNormal") {
+        dispatch(activateEffect());
         setBonus(false);
         setCurrentPage("game");
       }
@@ -148,10 +140,6 @@ function Pong() {
         socket={socket}
         setBonus={setBonus}
       />
-    );
-  } else if (currentPage === "finished") {
-    pageContent = (
-      <EndGame setCurrentPage={setCurrentPage} lastGameInfo={lastGameInfo} />
     );
   } else if (currentPage === "game") {
     pageContent = (

@@ -124,7 +124,6 @@ export class Game {
         x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 ||
         x > RACKET_RIGHT_POS_X_10
       );
-      console.log('x : ', x);
       this.bonus = {
         x: x,
         y: Math.random() * GROUND_MAX_SIZE,

@@ -14,6 +14,7 @@ import { ApiErrorResponse, UserInterface } from "../types";
 import Box from "@mui/material/Box";
 import ErrorBoundary from "../utils/errorBoundaries";
 import ProfileInfo from "../components/Profile/ProfileInfo";
+import { Sticker } from "../utils/StyledTitle";
 
 function Profile() {
   const { pseudo } = useParams();
@@ -50,13 +51,11 @@ function Profile() {
   }, [pseudo, dispatch]);
 
   return (
-    <div className="bg-[var(--background-color)]">
+    <div className="bg-[var(--background-color)] relative z-10">
       <ProfileInfo user={userProfile} />
-
       <Box className="w-full">
         <ProfileFriends user={userProfile} />
       </Box>
-
       <Box className="w-full">
         <ErrorBoundary>
           <HistoryGame user={userProfile} />

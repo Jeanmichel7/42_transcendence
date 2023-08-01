@@ -52,6 +52,10 @@ class PrivateLobby {
   player2: PlayerInfoPrivateLobby;
   creationDate: Date;
   gameId: bigint;
+
+  constructor() {
+    this.creationDate = new Date();
+  }
 }
 import { UserStatusInterface } from '../users/interfaces/status.interface';
 import { UserUpdateEvent } from '../notification/events/notification.event';
@@ -106,6 +110,12 @@ export class GameService {
     if (
       this.privatesLobby.get(playerInfo.gameId).player1?.ready &&
       this.privatesLobby.get(playerInfo.gameId).player2?.ready &&
+      !this.checkAlreadyInGame(
+        this.privatesLobby.get(playerInfo.gameId).player1.username,
+      ) &&
+      !this.checkAlreadyInGame(
+        this.privatesLobby.get(playerInfo.gameId).player2.username,
+      ) &&
       this.privatesLobby.get(playerInfo.gameId).player1?.mode ===
         this.privatesLobby.get(playerInfo.gameId).player2?.mode
     ) {

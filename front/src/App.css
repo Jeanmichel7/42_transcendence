@@ -1,6 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+Sans&family=Alegreya+Sans+SC:ital,wght@1,900&family=Roboto:wght@300;400&display=swap");
 :root {
   --color-primary: #1976d2;
   --color-secondary: #c95ddc;
   --color-tertiary: #9c27b0;
   --background-color: #f2f2ff;
+  font-family: "Roboto", "Alegreya Sans SC", sans-serif;
 }

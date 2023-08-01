@@ -4,7 +4,6 @@ import laser from "../../assets/laser.png";
 import slow from "../../assets/slow.png";
 import bigRacket from "../../assets/bigRacket.png";
 import spriteBonusSelection from "../../assets/spriteBonusSelection.png";
-import { pulsate } from "./Animation";
 
 // Précharger les images
 const images = [laser, slow, bigRacket];
@@ -15,7 +14,7 @@ images.forEach((imgSrc) => {
 
 // Keyframes pour l'animation
 
-const getBonusImage = (bonusName) => {
+const getBonusImage = (bonusName: string) => {
   switch (bonusName) {
     case "laser":
       return `url(${laser})`;
@@ -54,7 +53,11 @@ const WhiteBackground = keyframes`
   }
   `;
 
-const BonusBoxWrapper = styled.div`
+interface BonusBoxWrapperProps {
+  isLoading: boolean;
+  bonusName: string;
+}
+const BonusBoxWrapper = styled.div<BonusBoxWrapperProps>`
   width: 75px;
   height: 75px;
   border: 1px solid white;

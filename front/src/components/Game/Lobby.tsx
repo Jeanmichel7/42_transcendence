@@ -19,7 +19,11 @@ export const fadeIn = keyframes`
   }
 `;
 
-export const StyledButton = styled.button`
+interface StyledButtonProps {
+  activateEffect?: boolean;
+}
+
+export const StyledButton = styled.button<StyledButtonProps>`
   position: relative;
   color: #fff;
   text-decoration: none;
@@ -50,15 +54,18 @@ export const StyledButton = styled.button`
     ${(props) =>
       props.activateEffect &&
       `
-    color: #000;
+    color: var(--color-primary);
       &::before {
-        width: 150%;
+        width: 200%;
       }
     `}
   }
 `;
 
-export const ButtonWrapper = styled.div`
+interface ButtonWrapperProps {
+  animation: boolean;
+}
+export const ButtonWrapper = styled.div<ButtonWrapperProps>`
   top: 20%;
   height: 60%;
   width: 30%;
@@ -79,7 +86,10 @@ export const ButtonWrapper = styled.div`
   }
 `;
 
-const StyledCircle = styled.div`
+interface StyledCircleProps {
+  pos: string;
+}
+const StyledCircle = styled.div<StyledCircleProps>`
   position: absolute;
   height: 5rem;
   width: 5rem;
@@ -130,7 +140,6 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
       }
     };
   }, []);
-  console.log(circlePostion);
   return (
     <ButtonWrapper animation={true}>
       <StyledCircle pos={circlePostion.current} ref={circleRef} />
@@ -143,7 +152,7 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
           }
         }}
         onClick={() => {
-          socket.emit("userGameStatus", "searchNormal", (response) => {
+          socket.emit("userGameStatus", "searchNormal", (response: string) => {
             if (response === "error") {
               setCurrentPage("lobby");
             }
@@ -163,7 +172,7 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
           }
         }}
         onClick={() => {
-          socket.emit("userGameStatus", "searchBonus", (response) => {
+          socket.emit("userGameStatus", "searchBonus", (response: string) => {
             if (response === "error") {
               setCurrentPage("lobby");
             }

@@ -1,4 +1,5 @@
 import styled, { keyframes, css } from "styled-components";
+import neonBrickWall from "../../assets/neonBrickWall.jpeg";
 
 const arrival = keyframes`
   0% {
@@ -76,7 +77,12 @@ const Eyebrow = styled.div`
   border-radius: 40%;
 `;
 
-const Eye = styled.div`
+interface EyeProps {
+  mood: "happy" | "sad";
+  isLeft: boolean;
+}
+
+const Eye = styled.div<EyeProps>`
   background-color: ${({ mood }) => (mood === "sad" ? "black" : "transparent")};
   width: 20px;
   height: 16px;
@@ -91,17 +97,24 @@ const Eye = styled.div`
     mood === "happy" ? "rotate(180deg)" : "rotate(0deg)"};
 `;
 
-const Mouth = styled.div`
+interface MouthProps {
+  mood: "happy" | "sad";
+}
+
+const Mouth = styled.div<MouthProps>`
   position: absolute;
   width: 50px;
   top: 70px;
   left: 35px;
   height: 20px;
-  background-color: ${({ mood }) =>
-    mood === "happy" ? "transparent" : "black"};
-  border-top: ${({ mood }) => (mood === "sad" ? "solid black 8px" : "none")};
+  background-image: url(${neonBrickWall});
+  background-size: cover; // Pour s'assurer que l'image couvre toute la zone, sans répétition
+  background-repeat: no-repeat; // Pour s'assurer que l'image ne se répète pas
+  background-position: ${({ mood }) => (mood === "sad" ? "bottom" : "top")};
+  border-top: ${({ mood }) =>
+    mood === "sad" ? "solid transparent 8px" : "none"};
   border-bottom: ${({ mood }) =>
-    mood === "happy" ? "solid black 8px" : "none"};
+    mood === "happy" ? "solid transparent 8px" : "none"};
   border-radius: 50%;
   box-sizing: content-box;
   animation: ${(props) =>

@@ -64,10 +64,10 @@ const StyledButtonOrder = styled(StyledButton)`
 
 const reduceSize = keyframes`
   0% {
-    width : 150%;
+    width : 200%;
   }
   30% {
-    width: 150%;
+    width: 200%;
   }
   100% {
     width: 5rem;
@@ -152,8 +152,8 @@ function SearchingOpponent({
       {loadingDot ? (
         <div>
           <StyledCircle3 top={bonus ? "bottom" : "top"} position={"-50%"} />
-          <StyledCircle2 top={bonus ? "bottom" : "top"} position={"40%"} />
-          <StyledCircle top={bonus ? "bottom" : "top"} position={"130%"} />
+          <StyledCircle2 top={bonus ? "bottom" : "top"} position={"37%"} />
+          <StyledCircle top={bonus ? "bottom" : "top"} position={"125%"} />
         </div>
       ) : (
         <div>

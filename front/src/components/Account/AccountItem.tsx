@@ -171,7 +171,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   }, [keyName]);
 
   return (
-    <div className="flex items-center w-full pb-3">
+    <div className="flex items-center w-full pb-3 ">
       <div className="w-1/4">
         <h2 className="font-bold"> {parseKeyName(keyName)} </h2>
       </div>

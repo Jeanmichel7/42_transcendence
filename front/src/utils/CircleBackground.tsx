@@ -14,12 +14,12 @@ export function CircleBackground() {
       className="particle-container"
       style={{ backgroundColor: colorBackground }}
     >
-      <div className="particles ">
+      <div className="particles">
         {Array(30)
           .fill(0)
           .map((_, i) => (
             <span
-              className="circle"
+              className="circle   blinking-effect"
               style={{ backgroundColor: colorCircle }}
               key={i}
             ></span>

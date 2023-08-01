@@ -55,6 +55,10 @@ function Header() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [activePath, setActivePath] = useState("/game");
+  const handleNavigation = (path: string) => {
+    setActivePath(path);
+  };
 
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData
@@ -333,8 +337,17 @@ function Header() {
           >
             <NavLink to="/game">
               <Button
-                onClick={handleCloseNavMenu}
-                sx={{ color: "white", display: "block" }}
+                onClick={() => handleNavigation("/game")}
+                sx={{
+                  color: "white",
+                  display: "block",
+                  backgroundColor:
+                    activePath === "/game" ? "#669bda" : "initial",
+                  "&:hover": {
+                    backgroundColor:
+                      activePath === "/game" ? "#669bda" : "initial",
+                  },
+                }}
               >
                 Play
               </Button>
@@ -342,8 +355,17 @@ function Header() {
 
             <NavLink to="/leaderboard">
               <Button
-                onClick={handleCloseNavMenu}
-                sx={{ color: "white", display: "block" }}
+                onClick={() => handleNavigation("/leaderboard")}
+                sx={{
+                  color: "white",
+                  display: "block",
+                  backgroundColor:
+                    activePath === "/leaderboard" ? "#669bda" : "initial",
+                  "&:hover": {
+                    backgroundColor:
+                      activePath === "/leaderboard" ? "#669bda" : "initial",
+                  },
+                }}
               >
                 Leaderboard
               </Button>
@@ -351,8 +373,17 @@ function Header() {
 
             <NavLink to="/chat">
               <Button
-                onClick={handleCloseNavMenu}
-                sx={{ color: "white", display: "block" }}
+                onClick={() => handleNavigation("/chat")}
+                sx={{
+                  color: "white",
+                  display: "block",
+                  backgroundColor:
+                    activePath === "/chat" ? "#669bda" : "initial",
+                  "&:hover": {
+                    backgroundColor:
+                      activePath === "/chat" ? "#669bda" : "initial",
+                  },
+                }}
               >
                 Chat
               </Button>
@@ -360,8 +391,17 @@ function Header() {
 
             <NavLink to="/friends">
               <Button
-                onClick={handleCloseNavMenu}
-                sx={{ color: "white", display: "block" }}
+                onClick={() => handleNavigation("/friends")}
+                sx={{
+                  color: "white",
+                  display: "block",
+                  backgroundColor:
+                    activePath === "/friends" ? "#669bda" : "initial",
+                  "&:hover": {
+                    backgroundColor:
+                      activePath === "/friends" ? "#669bda" : "initial",
+                  },
+                }}
               >
                 Friends
               </Button>
@@ -369,8 +409,17 @@ function Header() {
 
             <NavLink to={"/profile/" + userData.login}>
               <Button
-                onClick={handleCloseNavMenu}
-                sx={{ color: "white", display: "block" }}
+                onClick={() => handleNavigation("/profile/")}
+                sx={{
+                  color: "white",
+                  display: "block",
+                  backgroundColor:
+                    activePath === "/profile/" ? "#669bda" : "initial",
+                  "&:hover": {
+                    backgroundColor:
+                      activePath === "/profile/" ? "#669bda" : "initial",
+                  },
+                }}
               >
                 Profile
               </Button>

@@ -105,7 +105,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
       )}
 
       {userFriends?.length !== 0 &&
-        userFriends?.find((u) => u.status === "offline") && (
+        !userFriends?.find((u) => u.status === "online") && (
           <Nothing text="Sorry... you're alone" />
         )}
       {userFriends

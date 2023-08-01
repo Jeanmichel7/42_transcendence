@@ -165,18 +165,14 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col h-screen min-h-md relative">
+      <div className="flex flex-col h-screen min-h-md relative bg-[var(--backround-color)]">
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&
           location?.pathname != "/fakeconnection" && <Header />}
         {(location?.pathname == "/" || location?.pathname == "/game") && (
           <CircleBackground />
         )}
-        <div className="flex-grow w-full ">
-          <div className="h-full  ">
-            <AppRoutes />
-          </div>
-        </div>
+        <AppRoutes />
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&
           location?.pathname != "/fakeconnection" && <Footer />}
