@@ -14,6 +14,7 @@ import { GameModule } from './modules/game/game.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { NotificationModule } from './modules/notification/notification.module';
+import { TrophieModule } from './modules/trophies/trophies.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     ChatModule,
     GameModule,
     NotificationModule,
+    TrophieModule,
   ],
 })
 export class AppModule {}

@@ -39,10 +39,13 @@ export class GameEvents {
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
       games.forEach(async (game) => {
+        if (game.isBeingProcessed) return; // Skip si le jeu est en cours de traitement
+        game.isBeingProcessed = true;
         const update = await this.gameService.updateGame(game);
         this.server.to(game.socketPlayer1Id).emit('gameUpdate', update);
         update.isPlayerRight = true;
         this.server.to(game.socketPlayer2Id).emit('gameUpdate', update);
+        if (!game.isOver) game.isBeingProcessed = false;
       });
     }, 1000 / 60);
   }

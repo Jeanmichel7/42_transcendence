@@ -74,12 +74,14 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
             <p className="md:text-xl opacity-60">Email</p>
             <p className="md:text-xl opacity-60">Status</p>
             <p className="md:text-xl opacity-60">Score</p>
+            <p className="md:text-xl opacity-60">Level</p>
           </div>
           <div className="w-3/4 space-y-2 flex flex-col justify-between">
             <p className="md:text-xl">{user.login}</p>
             <p className="md:text-xl">{user.email}</p>
             <p className="md:text-xl">{user.status}</p>
             <p className="md:text-xl">{Math.floor(user.score)}</p>
+            <p className="md:text-xl">{Math.floor(user.level)}</p>
           </div>
           <img
             src={cuteBallsClimbingVines}

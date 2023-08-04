@@ -85,11 +85,11 @@ export class UsersService {
         'avatar',
         'status',
         'score',
+        'level',
       ],
     });
     if (!user) throw new NotFoundException(`User ${login} not found`);
     const result: ProfilInterface = { ...user };
-    console.log('result : ', result);
     return result;
   }
 

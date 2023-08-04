@@ -20,6 +20,7 @@ import { Game } from './game.class';
 
 // import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PlayerStats } from './game.class';
 
 // import { GameEntity } from './entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
@@ -60,6 +61,7 @@ class PrivateLobby {
 import { UserStatusInterface } from '../users/interfaces/status.interface';
 import { UserUpdateEvent } from '../notification/events/notification.event';
 import { UserInterface } from '../users/interfaces/users.interface';
+import { TrophiesService } from '../trophies/trophies.service';
 
 @Injectable()
 export class GameService {
@@ -83,6 +85,7 @@ export class GameService {
     // private readonly messageRepository: Repository<MessageEntity>,
     private readonly messageService: MessageService,
     private readonly notificationService: NotificationService,
+    private readonly trophiesService: TrophiesService,
   ) {
     this.games = new Map<bigint, Game>();
     this.privatesLobby = new Map<bigint, PrivateLobby>();
@@ -151,11 +154,15 @@ export class GameService {
   async updateGame(game: Game) {
     game.updateBallPosition();
     if (game.isOver) {
+      console.log('game is over');
       await this.saveEndGame(
         game.id,
         game.winner,
         game.player1Score,
         game.player2Score,
+        game.player1Stats,
+        game.player2Stats,
+        game.consecutiveExchangesWithoutBounce,
       );
       this.games.delete(game.id);
     }
@@ -538,13 +545,13 @@ export class GameService {
     await this.gameRepository.delete({ id: gameId });
   }
 
-  async saveEndGame(
+  async updateGameStatus(
     gameId: bigint,
     winnerId: string,
     scorePlayer1: number,
     scorePlayer2: number,
-  ): Promise<GameInterface> {
-    const game: GameEntity = await this.gameRepository.findOne({
+  ) {
+    const game = await this.gameRepository.findOne({
       where: { id: gameId },
       relations: ['player1', 'player2'],
     });
@@ -556,27 +563,85 @@ export class GameService {
       where: { login: winnerId },
     });
     await this.gameRepository.save(game);
+    return game;
+  }
 
-    let scoreEloP1 = game.player1.score;
-    let scoreEloP2 = game.player2.score;
-    ({ scoreEloP1, scoreEloP2 } = this.updateEloScore(
+  async updatePlayerStats(
+    player: UserEntity,
+    winnerId: string,
+    scoreElo: number,
+    playerStats: PlayerStats,
+    winWihoutLoseAPoint: boolean,
+  ) {
+    if (player.login == winnerId) {
+      player.experience += 10;
+      player.level = Math.floor(Math.sqrt(player.experience / 5));
+      player.numberOfConsecutiveWins += 1;
+    } else {
+      player.numberOfConsecutiveWins = 0;
+    }
+    if (winWihoutLoseAPoint) {
+      player.numberOfConsecutiveWins += 1;
+    }
+    player.bonusUsed += playerStats.numberOfBonusesUsed;
+    player.laserKill += playerStats.numberOfLaserKills;
+    player.numberOfGamesPlayed += 1;
+    player.status = 'online';
+    player.score = scoreElo;
+    player.updatedAt = new Date();
+    await this.userRepository.save(player);
+  }
+
+  async saveEndGame(
+    gameId: bigint,
+    winnerId: string,
+    scorePlayer1: number,
+    scorePlayer2: number,
+    player1Stats: PlayerStats,
+    player2Stats: PlayerStats,
+    consecutiveExchangesWithoutBounce: number,
+  ): Promise<GameInterface> {
+    const game = await this.updateGameStatus(
+      gameId,
+      winnerId,
+      scorePlayer1,
+      scorePlayer2,
+    );
+    const { scoreEloP1, scoreEloP2 } = this.updateEloScore(
       game.player1,
       game.player2,
       game.winner,
-    ));
-
-    // update status players to online
-    game.player1.status = 'online';
-    game.player1.score = scoreEloP1;
-    game.player1.updatedAt = new Date();
-    await this.userRepository.save(game.player1);
-
-    game.player2.status = 'online';
-    game.player2.score = scoreEloP2;
-    game.player2.updatedAt = new Date();
-    await this.userRepository.save(game.player2);
-
-    //event update status
+    );
+    this.updatePlayerStats(
+      game.player1,
+      winnerId,
+      scoreEloP1,
+      player1Stats,
+      scorePlayer2 === 0,
+    );
+    this.updatePlayerStats(
+      game.player2,
+      winnerId,
+      scoreEloP2,
+      player2Stats,
+      scorePlayer1 === 0,
+    );
+    this.trophiesService.updateTrophiesPlayer(
+      scorePlayer1,
+      scorePlayer2,
+      game.player1,
+      game,
+      player1Stats,
+      consecutiveExchangesWithoutBounce,
+    );
+    this.trophiesService.updateTrophiesPlayer(
+      scorePlayer1,
+      scorePlayer2,
+      game.player2,
+      game,
+      player2Stats,
+      consecutiveExchangesWithoutBounce,
+    );
     this.eventEmitter.emit(
       'user_status.updated',
       new UserUpdateEvent({
