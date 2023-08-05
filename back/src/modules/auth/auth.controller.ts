@@ -29,10 +29,10 @@ import { AuthDTO } from './dto/user2fa.auth.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // @Public()
   @Get('isAuthenticated')
   async isAuth(@Req() req: RequestWithUser): Promise<boolean> {
-    // console.log('test route isAutheticated : ', req.user);
-    if (req.user.id != undefined) return true;
+    if (req.user?.id != undefined) return true;
     else return false;
   }
 
@@ -52,7 +52,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
-    res.redirect(`http://localhost:3006/connection`);
+    res.redirect(`http://localhost:3006/connection?checked=true`);
   }
 
   // supprimer plus tard
@@ -109,6 +109,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const jwtCookie: string = req.cookies['jwt'];
+    console.log('jwt cookie : ', jwtCookie);
     if (!jwtCookie) return;
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {

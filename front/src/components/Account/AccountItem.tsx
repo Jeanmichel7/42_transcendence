@@ -28,6 +28,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { TransitionProps } from "@mui/material/transitions";
 import Slide from "@mui/material/Slide";
+import DoneIcon from '@mui/icons-material/Done';
 
 interface ItemProps {
   keyName: string;
@@ -47,9 +48,11 @@ const Transition = React.forwardRef(function Transition(
 export default function AccountItem({ keyName, value }: ItemProps) {
   const dispatch = useDispatch();
   const [edit, setEdit] = useState<boolean>(false);
+  const [editPwd, setEditPwd] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number | boolean>(
     value
   );
+  const [inputOldPwd, setInputOldPwd] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [QRCode, setQRCode] = useState<string>();
@@ -82,13 +85,20 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   }
 
   async function handleForm(): Promise<void> {
-    setLoading(true);
     await new Promise((r) => setTimeout(r, 300)); // pour le style
 
     const formData: FormData = new FormData();
     formData.append(keyName, inputValue as string);
+    if (keyName === "password")
+      formData.append("oldPassword", inputOldPwd);
+
+    console.log('formData', formData);
+
+    setLoading(true);
     const updatedUser: UserInterface | ApiErrorResponse =
       await patchUserAccount(formData);
+    setLoading(false);
+    console.log('res : ', updatedUser)
     if ("error" in updatedUser) {
       setError(updatedUser.message);
       dispatch(
@@ -105,19 +115,20 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setEdit(false);
       dispatch(setMsgSnackbar("Updated!"));
     }
-    setLoading(false);
   }
 
   function handleClose() {
     setEdit(false);
     setInputValue(value);
+    if(keyName == 'password')
+      setEditPwd(false);
   }
 
   function parseKeyName(valueKeyname: string | number | boolean) {
     if (typeof valueKeyname === "string") {
       const tmp =
         valueKeyname.substring(0, 1).toUpperCase() + valueKeyname.substring(1);
-      return tmp.replace(/([A-Z])/g, " $1").replace(/2 F A/, "2FA");
+      return tmp.replace(/([A-Z])/g, " $1").replace("Active 2 F A", "2FA");
     }
     if (typeof valueKeyname === "number") {
       return valueKeyname;
@@ -178,13 +189,13 @@ export default function AccountItem({ keyName, value }: ItemProps) {
 
       {/* Display or Input */}
       <div className="w-1/2">
-        {" "}
         {!edit ? (
           <>
-            {typeof value === "string" && <p> {inputValue} </p>}
+            {typeof value === "string" && 
+            keyName != 'password' && <p> {inputValue} </p>}
             {typeof value === "number" && <p> {inputValue} </p>}
             {typeof value === "boolean" && (
-              <p> {inputValue ? "true" : "false"} </p>
+              <p> {inputValue ? "Actived" : "Desactived"} </p>
             )}
           </>
         ) : (
@@ -200,7 +211,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleForm();
               }}
-              autoFocus
+            // autoFocus
             />
             <FormHelperText
               id={keyName + "_text"}
@@ -211,13 +222,66 @@ export default function AccountItem({ keyName, value }: ItemProps) {
               {error}
             </FormHelperText>
           </FormControl>
-        )}{" "}
+        )}
+
+        {keyName == 'password' &&
+          <>
+            {!editPwd ? (
+                <p> ********** </p>
+            ) : (
+              <div className='w-full'>
+                <FormControl variant="standard" className="w-full">
+                  <Input
+                    id={'oldPwd' + "_id"}
+                    aria-describedby={'oldPwd' + "_text"}
+                    className="w-full"
+                    name="oldPwd"
+                    placeholder="old password"
+                    // defaultValue={value}
+                    onChange={(e) => {
+                      setInputOldPwd(e.target.value);
+                    }}
+                    // onKeyDown={(e) => {
+                    //   if (e.key === "Enter") handleForm();
+                    // }}
+                  // autoFocus
+                  />
+                </FormControl>
+                <FormControl variant="standard" className="w-full">
+                  <Input
+                    id={keyName + "_id"}
+                    name="pwd"
+                    aria-describedby={keyName + "_text"}
+                    className="w-full"
+                    // defaultValue={value}
+                    placeholder="new password"
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleForm();
+                    }}
+                    // autoFocus
+                  />
+                  <FormHelperText
+                    id={keyName + "_text"}
+                    color="error"
+                    sx={{ color: "red" }}
+                    error={error != "" ? true : false}
+                  >
+                    {error}
+                  </FormHelperText>
+                </FormControl>
+              </div>
+            )}
+          </>
+        }
+
       </div>
 
       {/* Buttons */}
       <div className="w-auto ml-auto">
-        {" "}
-        {!edit ? (
+        {!edit && !editPwd? (
           // Class button or Switch
           keyName == "Active 2FA" ? (
             <Switch
@@ -225,6 +289,17 @@ export default function AccountItem({ keyName, value }: ItemProps) {
               onChange={handleChange2FA}
               inputProps={{ "aria-label": "controlled" }}
             />
+          ) : keyName == "password" ? (
+            <>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setEditPwd(true);
+                }}
+              >
+                <EditOutlinedIcon />
+              </Button>
+            </>
           ) : (
             <Button
               variant="outlined"
@@ -237,22 +312,21 @@ export default function AccountItem({ keyName, value }: ItemProps) {
           )
         ) : (
           <span className="flex">
-            <LoadingButton
-              endIcon={<SendIcon />}
+            <Button
               variant="outlined"
-              loading={loading}
-              disabled={!loading}
+              // loading={loading}
+              disabled={loading}
               onClick={() => {
                 handleForm();
               }}
             >
-              Modifier
-            </LoadingButton>
+              <DoneIcon />
+            </Button>
             <Button variant="outlined" onClick={handleClose}>
               <CloseIcon htmlColor="red" />
             </Button>
           </span>
-        )}{" "}
+        )}
       </div>
 
       <Dialog

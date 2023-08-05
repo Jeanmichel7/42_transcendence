@@ -135,8 +135,11 @@ function App() {
       dispatch(setLogged(false));
       //disconnect user
       if (
-        location?.pathname != "/connection" &&
-        location?.pathname != "/fakeconnection"
+        location &&
+        location.pathname != "/" &&
+        location.pathname != "/login" &&
+        location.pathname != "/connection" &&
+        location.pathname != "/fakeconnection"
       )
         navigate("/");
       setUserId(-1);
@@ -145,11 +148,14 @@ function App() {
 
   useEffect(() => {
     if (
-      location?.pathname != "/" &&
-      location?.pathname != "/connection" &&
-      location?.pathname != "/fakeconnection"
-    )
+      location &&
+      location.pathname != "/" &&
+      location.pathname != "/login" &&
+      location.pathname != "/connection" &&
+      location.pathname != "/fakeconnection"
+    ) {
       checkAuth();
+    }
   }, [dispatch, navigate, fetchData, checkAuth]);
 
   const handleClick = () => {
@@ -169,9 +175,9 @@ function App() {
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&
           location?.pathname != "/fakeconnection" && <Header />}
-        {(location?.pathname == "/" || location?.pathname == "/game") && (
+        {(location?.pathname == "/" || location?.pathname == "/game") && 
           <CircleBackground />
-        )}
+        }
         <AppRoutes />
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&

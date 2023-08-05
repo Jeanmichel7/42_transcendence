@@ -1,17 +1,18 @@
 import React, { useState, createRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { setUser } from "../../store/userSlice";
+import { setLogged, setUser } from "../../store/userSlice";
 // import { RootState } from '../../store';
 import { Sticker } from "../../utils/StyledTitle";
 
 import AccountItem from "./AccountItem";
 
-import { patchUserAccount } from "../../api/user";
+import { deleteAccount, patchUserAccount } from "../../api/user";
 import { UserInterface, ApiErrorResponse } from "../../types";
 
 import Box from "@mui/material/Box";
-import { Button } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, Slide } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 interface AccountProfileProps {
   user: UserInterface;
@@ -23,6 +24,8 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = React.useState(false);
   const fileInputRef = createRef<HTMLInputElement>();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +62,43 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
     }
     setIsLoading(false);
   };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+    const deletedUser: void | ApiErrorResponse = await deleteAccount();
+    if (typeof deletedUser === "object" && "error" in deletedUser) {
+      dispatch(setErrorSnackbar(deletedUser.error + deletedUser.message
+        ? ": " + deletedUser.message : ""
+      ));
+    } else {
+      dispatch(setMsgSnackbar("Account successfully deleted!"));
+      dispatch(setUser({
+        id: -1,
+        login: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        status: "offline",
+        avatar: "",
+        role: "user",
+        description: "",
+        is2FAEnabled: false,
+        score: 1500,
+      }));
+      dispatch(setLogged(false));
+      navigate("/");
+    }
+    setIsLoading(false);
+  };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
 
   return (
     <>
@@ -137,15 +177,11 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
             </Box>
           </div>
 
-          <div className="md:w-1/2 m-5 p-5 bg-white shadow-lg rounded-lg">
+          <div className="md:w-2/3 m-5 p-5 bg-white shadow-lg rounded-lg">
             <AccountItem keyName="login" value={user.login} />
-
             <AccountItem keyName="email" value={user.email} />
-
             <AccountItem keyName="firstName" value={user.firstName} />
-
             <AccountItem keyName="lastName" value={user.lastName} />
-
             <AccountItem keyName="password" value="********" />
 
             {user.description && (
@@ -155,9 +191,42 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
             {user.is2FAEnabled != null && user.is2FAEnabled != undefined && (
               <AccountItem keyName="Active 2FA" value={user.is2FAEnabled} />
             )}
+
+            <div className="w-full text-center">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleOpenDialog}
+              > Delete Account </Button>
+            </div>
           </div>
         </Box>
       )}
+        <Dialog
+          open={openDialog}
+          keepMounted
+          onClose={handleCloseDialog}
+        >
+          <DialogTitle>{"Are you sure you want to delete your account?"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              By deleting your account, all your data will be removed permanently. This action cannot be undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Cancel
+            </Button>
+            <Button 
+              onClick={async () => {
+                await handleDeleteAccount();
+                handleCloseDialog();
+              }} 
+              color="error">
+              Confirm Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
     </>
   );
 };

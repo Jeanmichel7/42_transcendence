@@ -59,3 +59,12 @@ export async function getAllUsersCount()
     'Failed to get all users count: ',
   );
 }
+
+export async function deleteAccount()
+: Promise< void | ApiErrorResponse > {
+  return apiRequest<void>(
+    'delete',
+    '/users',
+    'Failed to delete account: ',
+  );
+}

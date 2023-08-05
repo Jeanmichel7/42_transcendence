@@ -179,6 +179,7 @@ export class UserEntity extends BaseEntity {
 
   /* chat */
   @OneToMany(() => ChatMessageEntity, (message) => message.ownerUser, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   chatMessages: ChatMessageEntity[];
@@ -190,11 +191,13 @@ export class UserEntity extends BaseEntity {
   // rooms: ChatRoomEntity[];
 
   @OneToMany(() => ChatRoomEntity, (room) => room.ownerUser, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   roomOwner: ChatRoomEntity[];
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.acceptedUsers, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   roomAccepted: ChatRoomEntity[];

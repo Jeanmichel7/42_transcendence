@@ -1,8 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import { Button } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CircleBackground } from "../utils/CircleBackground";
+import { getFriends, getBlockedUsers } from "../api/relation";
+import { getUserData } from "../api/user";
+import { reduxSetConversationList } from "../store/convListSlice";
+import { reduxSetNotifications } from "../store/notificationSlice";
+import { setLogged, setUser, reduxSetFriends, reduxSetUserBlocked } from "../store/userSlice";
+import { NotificationInterface, ConversationInterface, ApiErrorResponse, UserActionInterface, UserInterface } from "../types";
+import { useDispatch } from "react-redux";
+import { setErrorSnackbar } from "../store/snackbarSlice";
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -152,6 +160,37 @@ export default function Login() {
   const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
+    apiFunction: () => Promise<T | ApiErrorResponse>,
+    action: ((payload: T) => UserActionInterface),
+  ): Promise<void> {
+    const result: T | ApiErrorResponse = await apiFunction();
+    if ('error' in result) {
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+    } else {
+      dispatch(action(result));
+    }
+  }, [dispatch]);
+
+  //save user data in redux
+  const saveUserData = useCallback(async function (id: number) {
+    dispatch(setLogged(true));
+    dispatch(reduxSetNotifications(
+      localStorage.getItem('notifications' + id)
+        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
+        : [] as NotificationInterface[],
+    ));
+    dispatch(reduxSetConversationList(
+      localStorage.getItem('conversationsList' + id)
+        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string)
+        : [] as ConversationInterface[],
+    ));
+    await fetchData(getUserData, setUser);
+    await fetchData(getFriends, reduxSetFriends);
+    await fetchData(getBlockedUsers, reduxSetUserBlocked);
+  }, [dispatch, fetchData]);
 
   const handleConnection = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
@@ -170,14 +209,13 @@ export default function Login() {
     );
     if (!newWindow) return console.log("erreur new windos  ");
 
-    window.addEventListener("message", (event) => {
+    window.addEventListener("message", async (event) => {
       if (event.source !== newWindow) return;
-      if (event.data === "user connected") {
-        newWindow.close();
+      if (event.data.msg === "user connected") {
         setExpand(true);
-        setTimeout(() => {
-          navigate("/game");
-        }, 1000);
+        if(event.data.id != -1) await saveUserData(event.data.id);
+        newWindow.close();
+        navigate("/game");
       }
     });
   };
@@ -185,8 +223,8 @@ export default function Login() {
   return (
     <LoginWrapper>
       {/*<TransitionCircle expand={expand} />
-      <BigCircle hovered={isHovered} expand={expand} />
-  */}
+        <BigCircle hovered={isHovered} expand={expand} />
+      */}
       <TitleWrapper>
         <Title>Pong</Title>
         <StyledLink

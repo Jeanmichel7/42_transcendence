@@ -52,10 +52,9 @@ export class GameEvents {
 
   //conexion
   async handleConnection(client: Socket) {
-    //const token = client.handshake.headers.cookies['jwt'];
-
+    if (client.handshake.headers.cookie === undefined) return;
     const cookieArray = client.handshake.headers.cookie.split(';');
-    // console.log(cookieArray);
+    console.log(cookieArray);
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
       const cookieParts = cookie.split('=');
@@ -65,7 +64,8 @@ export class GameEvents {
     });
 
     if (!jwtToken) {
-      throw new UnauthorizedException("You're not logged in", 'No token found');
+      // throw new UnauthorizedException("You're not logged in", 'No token found');
+      return;
     }
 
     try {

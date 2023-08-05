@@ -132,17 +132,18 @@ export class TrophiesService {
     newTrophy.description = description;
     return await this.trophyRepository.save(newTrophy);
   }
+
   async initializeTrophies(): Promise<void> {
     const count = await this.trophyRepository.count();
 
-    if (count === 0) {
-      console.log(
-        "Trophies table doesn't exist... Creating trophies table in dataBase/",
-      );
-      for (const trophy of trophies) {
-        await this.createTrophy(trophy.name, trophy.description);
-      }
-    }
+    // if (count === 0) {
+    //   console.log(
+    //     "Trophies table doesn't exist... Creating trophies table in dataBase/",
+    //   );
+    //   for (const trophy of trophies) {
+    //     await this.createTrophy(trophy.name, trophy.description);
+    //   }
+    // }
   }
 
   async assignTrophyToPlayer(

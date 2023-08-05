@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setLogout } from "../../store/userSlice";
+import { setLogged, setLogout } from "../../store/userSlice";
 import {
   ApiErrorResponse,
   NotificationInterface,
@@ -104,6 +104,7 @@ function Header() {
 
   // handler notifications
   const handleOpenNotificationMenu = (event: React.MouseEvent<HTMLElement>) => {
+    console.log('activ')
     setAnchorElNotification(event.currentTarget);
   };
   const handleCloseNotificationMenu = () => {
@@ -118,6 +119,7 @@ function Header() {
       );
     } else {
       dispatch(setLogout());
+      dispatch(setLogged(false));
       dispatch(setMsgSnackbar("Logout success"));
       navigate("/");
     }
@@ -154,7 +156,7 @@ function Header() {
   );
 
   const renderStandardNotification = (
-    <Box sx={{ display: { xs: "none", md: "flex" } }}>
+    <Box>
       <IconButton
         size="large"
         aria-label="show new notifications"
@@ -495,7 +497,6 @@ function Header() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {renderMobileNotification}
 
                 <NavLink to="/account">
                   <MenuItem onClick={handleCloseUserMenu}>Account</MenuItem>
@@ -505,6 +506,7 @@ function Header() {
                   <MenuItem onClick={handleCloseUserMenu}>Logout</MenuItem>
                 </NavLink>
               </Menu>
+              {/* {renderMobileNotification} */}
 
               {/** Menu notifications */}
               {notificationMenu}

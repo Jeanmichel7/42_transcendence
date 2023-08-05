@@ -1,13 +1,13 @@
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, FormHelperText, InputLabel, OutlinedInput, TextField } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { loginFakeUser, registerFakeUser } from '../api/auth';
+import { check2FACode, check2FACookie, loginFakeUser, registerFakeUser } from '../api/auth';
 import { useDispatch } from 'react-redux';
-import { ApiErrorResponse, AuthInterface, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
+import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, AuthInterface, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { getUserData } from '../api/user';
 import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from '../store/userSlice';
 import { getBlockedUsers, getFriends } from '../api/relation';
-// import { useNavigate } from 'react-router-dom';
+import SendIcon from '@mui/icons-material/Send';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
@@ -19,7 +19,13 @@ export default function FakeConnection() {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('Password1!');
   const [usersCreated, setUsersCreated] = useState<UserInterface[]>([]);
-  const [userIsConnected, setUserIsConnected] = useState<boolean>(false);
+
+  const [is2FAactiv, setIs2FAactiv] = useState(false);
+  const [code2FA, setCode2FA] = useState('');
+  const [userId, setUserId] = useState(0);
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('Wrong code');
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -61,6 +67,23 @@ export default function FakeConnection() {
     setPassword(e.target.value);
   };
 
+  const fetchAndSetIs2FAactived = useCallback(async () => {
+    setIsLoading(true);
+    const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+    console.log('res : ', res);
+    if ('error' in res) {
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+    } else {
+      if (res.is2FAactived) {
+        setIs2FAactiv(res.is2FAactived);
+        setUserId(res.user.id);
+      } else {
+        window.opener.postMessage({msg:'user connected', id: res.user.id}, 'http://localhost:3006')
+      }
+    }
+    setIsLoading(false);
+  }, [dispatch]);
+
   const handleConnection = async (
     e: React.FormEvent<HTMLFormElement> |
     React.MouseEvent<HTMLButtonElement, MouseEvent> |
@@ -73,11 +96,33 @@ export default function FakeConnection() {
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      await saveUserData(res.user.id);
-      setUserIsConnected(true);
+      
+      //check 2FA
+      await fetchAndSetIs2FAactived();
+      // await saveUserData(res.user.id);
+      // setUserIsConnected(true);
       // navigate('/home');
     }
   };
+
+  async function handleSendCode() {
+    setErrorMsg(
+      code2FA.length !== 6 ? 'Code must be 6 digits' :
+        !(/^[0-9]{6}$/).test(code2FA) ? 'Code must be digits' : 'Wrong Code',
+    );
+
+    setIsLoading(true);
+    const res: ApiLogin2FACode | ApiErrorResponse = await check2FACode(code2FA, userId);
+
+    if ('error' in res) {
+      setError(true);
+      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+    } else {
+      setError(false);
+      window.opener.postMessage({msg:'user connected', id: userId}, 'http://localhost:3006')
+    }
+    setIsLoading(false);
+  }
 
 
   // fack user generator
@@ -109,10 +154,10 @@ export default function FakeConnection() {
     }
   }
 
-  useEffect(() => {
-    if (userIsConnected)
-      window.opener.postMessage('user connected', 'http://localhost:3006');
-  }, [userIsConnected]);
+  // useEffect(() => {
+  //   if (userIsConnected)
+  //     window.opener.postMessage({msg:'user connected', id: -1}, 'http://localhost:3006');
+  // }, [userIsConnected]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
@@ -177,6 +222,53 @@ export default function FakeConnection() {
 
         </Box>
       </div>
+
+      {is2FAactiv && 
+      <section className="w-full flex flex-col">
+        <h1 className='font-mono font-bold text-xl text-center mb-5'>2FA Authentification</h1>
+        <div className='mx-auto '>
+          <FormControl
+            error={error}
+          >
+            <InputLabel htmlFor="component-outlined">Code</InputLabel>
+            <OutlinedInput
+              className=''
+              id="component-outlined"
+              placeholder="123456"
+              label="Name"
+              onChange={(e) => setCode2FA(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { handleSendCode(); } }}
+            />
+            <FormHelperText id="component-error-text">
+              {error && errorMsg}
+            </FormHelperText>
+          </FormControl>
+        </div>
+        <div className='m-auto mt-1'>
+          <Box sx={{ m: 1, position: 'relative' }}>
+            <Button
+              variant="contained"
+              onClick={handleSendCode}
+              disabled={isLoading}
+              endIcon={<SendIcon />}
+            > Send </Button>
+            {isLoading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: 'blue',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
+          </Box>
+        </div>
+      </section>
+      }
 
       {usersCreated.length > 0 && (
         <div>
