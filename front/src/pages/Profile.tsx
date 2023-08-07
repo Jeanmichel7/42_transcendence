@@ -33,7 +33,6 @@ function Profile() {
     trophies: [],
   });
   const dispatch = useDispatch();
-  console.log(userProfile.trophies);
 
   useEffect(() => {
     async function fetchAndSetUserProfile() {
