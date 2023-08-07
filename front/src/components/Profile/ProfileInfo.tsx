@@ -28,12 +28,12 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row  justify-between  text-white p-5 rounded-xl ">
+    <div className="flex flex-col md:flex-row justify-between   text-white p-5 rounded-xl ">
       <div className="mb-5 mt-5 md:w-1/4">
         {user.avatar && (
           <img
             src={user.avatar}
-            className="w-full rounded-[16px] shadow-lg mb-2  "
+            className="w-full rounded-[16px] shadow-lg h-2/3  "
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -42,13 +42,13 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
             }}
           />
         )}
-        <p className=" text-purple-600 p-3  rounded-lg bg-white shadow-custom	">
+        <p className=" text-purple-600 p-3  mt-5 rounded-lg bg-white shadow-custom h-1/3	">
           {" "}
           {user.description ? user.description : "No description"}{" "}
         </p>
       </div>
 
-      <div className="md:w-3/4 md:m-5 box-border z-0 relative rounded bg-white shadow-custom	 text-black p-5 ">
+      <div className="md:w-3/4 mt-5  md:ml-5  box-border self-stretch z-0 relative rounded bg-white shadow-custom	 text-black p-5 ">
         <h2
           className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
         before:top-0 z-10  text-white text-center mb-5 font-bold"

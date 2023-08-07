@@ -147,7 +147,7 @@ const LooseWrapper = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
-  animation: ${fadeIn} 4s ease-out;
+  animation: ${fadeIn} 8s ease-out;
   overflow: hidden;
 `;
 
@@ -246,7 +246,7 @@ const StyledNeonH2 = styled.h2`
   color: #fff;
   animation: ${flicker} 4s infinite alternate,
     ${detachAndFall} 7s ease-in-out forwards;
-  animation-delay: 5s;
+  animation-delay: 9s;
   font-size: 2rem;
   text-shadow: -1px 0px 7px #fff, -1px 0px 10px #fff, -1px 0px 21px #fff,
     -1px 0px 42px #800080,

@@ -163,6 +163,7 @@ export class GameService {
         game.player1Stats,
         game.player2Stats,
         game.consecutiveExchangesWithoutBounce,
+        game.bonusMode,
       );
       this.games.delete(game.id);
     }
@@ -339,6 +340,7 @@ export class GameService {
   ): Promise<GameInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
+      relations: ['trophies'],
     });
     if (!user) throw new BadRequestException('user not found');
 
@@ -553,7 +555,7 @@ export class GameService {
   ) {
     const game = await this.gameRepository.findOne({
       where: { id: gameId },
-      relations: ['player1', 'player2'],
+      relations: ['player1', 'player2', 'player1.trophies', 'player2.trophies'],
     });
     game.status = 'finished';
     game.finishAt = new Date();
@@ -600,6 +602,7 @@ export class GameService {
     player1Stats: PlayerStats,
     player2Stats: PlayerStats,
     consecutiveExchangesWithoutBounce: number,
+    bonusMode: boolean,
   ): Promise<GameInterface> {
     const game = await this.updateGameStatus(
       gameId,
@@ -612,35 +615,37 @@ export class GameService {
       game.player2,
       game.winner,
     );
-    this.updatePlayerStats(
+    await this.updatePlayerStats(
       game.player1,
       winnerId,
       scoreEloP1,
       player1Stats,
       scorePlayer2 === 0,
     );
-    this.updatePlayerStats(
+    await this.updatePlayerStats(
       game.player2,
       winnerId,
       scoreEloP2,
       player2Stats,
       scorePlayer1 === 0,
     );
-    this.trophiesService.updateTrophiesPlayer(
+    await this.trophiesService.updateTrophiesPlayer(
       scorePlayer1,
       scorePlayer2,
       game.player1,
       game,
       player1Stats,
       consecutiveExchangesWithoutBounce,
+      bonusMode,
     );
-    this.trophiesService.updateTrophiesPlayer(
+    await this.trophiesService.updateTrophiesPlayer(
       scorePlayer1,
       scorePlayer2,
       game.player2,
       game,
       player2Stats,
       consecutiveExchangesWithoutBounce,
+      bonusMode,
     );
     this.eventEmitter.emit(
       'user_status.updated',

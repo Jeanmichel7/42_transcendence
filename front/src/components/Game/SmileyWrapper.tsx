@@ -4,9 +4,26 @@ import neonBrickWall from "../../assets/neonBrickWall.jpeg";
 const arrival = keyframes`
   0% {
     top: -100%;
-    opacity: 0;
-    left: 80%;
+    left: -100%;
     transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    opacity: 1;
+  }
+  60% {
+    top: 120%;
+    left: 120%;
+    transform: translate(-50%, -50%) scale(0.5) rotate(1440deg);
+    opacity: 1;
+  }
+  61% {
+    opacity: 0;
+  }
+  69% {
+    opacity: 1;
+  } 
+  70%{
+    left: 80%; 
+    top: -100%;
+    transform: translate(-50%, -50%) scale(5) rotate(0deg);
   }
   100% {
     left: 50%;
@@ -61,7 +78,7 @@ const Pacman = styled.div`
   border-radius: 50%;
   left: 50%;
   top: -100%;
-  animation: ${arrival} 2s forwards;
+  animation: ${arrival} 5s forwards;
   transform: translate(-50%, -50%);
 `;
 
@@ -92,7 +109,11 @@ const Eye = styled.div<EyeProps>`
   border-radius: 50%;
   border-bottom: solid black 4px;
   animation: ${({ mood }) =>
-    mood === "sad" ? css`sadEyes} 1.5s forwards` : "none"};
+    mood === "sad"
+      ? css`
+          ${sadEyes} 4.5s forwards
+        `
+      : "none"};
   transform: ${({ mood }) =>
     mood === "happy" ? "rotate(180deg)" : "rotate(0deg)"};
 `;
@@ -119,7 +140,7 @@ const Mouth = styled.div<MouthProps>`
   box-sizing: content-box;
   animation: ${(props) =>
     css`
-      ${eat} 3s forwards
+      ${eat} 6s forwards
     `};
 `;
 

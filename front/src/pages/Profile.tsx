@@ -15,6 +15,7 @@ import Box from "@mui/material/Box";
 import ErrorBoundary from "../utils/errorBoundaries";
 import ProfileInfo from "../components/Profile/ProfileInfo";
 import { Sticker } from "../utils/StyledTitle";
+import ProfileTrophies from "../components/Profile/ProfileTrophies";
 
 function Profile() {
   const { pseudo } = useParams();
@@ -29,8 +30,10 @@ function Profile() {
     avatar: "",
     score: 1500,
     status: "offline",
+    trophies: [],
   });
   const dispatch = useDispatch();
+  console.log(userProfile.trophies);
 
   useEffect(() => {
     async function fetchAndSetUserProfile() {
@@ -51,9 +54,10 @@ function Profile() {
   }, [pseudo, dispatch]);
 
   return (
-    <div className="bg-[var(--background-color)] relative z-10">
+    <div className="bg-[var(--background-color)] relative z-10 ">
       <ProfileInfo user={userProfile} />
-      <Box className="w-full">
+      <ProfileTrophies user={userProfile} />
+      <Box className="w-full ">
         <ProfileFriends user={userProfile} />
       </Box>
       <Box className="w-full">

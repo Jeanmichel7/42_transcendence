@@ -7,109 +7,107 @@ import { UserEntity } from '../users/entity/users.entity';
 import { PlayerStats } from '../game/game.class';
 
 const trophies = [
-  [
-    {
-      name: 'Warrior',
-      description: 'Win 3 games in a row',
-      imagePath: '../../assets/warrior.jpeg',
-    },
-    {
-      name: 'Lord',
-      description: 'Win 5 games in a row',
-      imagePath: '../../assets/lord.jpeg',
-    },
-    {
-      name: 'Emperor',
-      description: 'Win 10 games in a row',
-      imagePath: '../../assets/emperor.jpeg',
-    },
-    {
-      name: 'Laser Pointer',
-      description: 'Kill an opponent with a Laser',
-      imagePath: '../../assets/laser_pointer.jpeg',
-    },
-    {
-      name: 'Gamma Laser',
-      description: 'Kill 5 opponents with a laser',
-      imagePath: '../../assets/gamma_laser.jpeg',
-    },
-    {
-      name: 'Scorificator',
-      description: 'Kill 10 opponents with a laser',
-      imagePath: '../../assets/scorificator.jpeg',
-    },
-    {
-      name: 'Regular',
-      description: 'Play 20 games',
-      imagePath: '../../assets/regular.jpeg',
-    },
-    {
-      name: 'Addict',
-      description: 'Play 50 games',
-      imagePath: '../../assets/addict.jpeg',
-    },
-    {
-      name: 'NoLife',
-      description: 'Play 100 games',
-      imagePath: '../../assets/nolife.jpeg',
-    },
-    {
-      name: 'Bonus Master',
-      description: 'Use 3 bonuses in one game',
-      imagePath: '../../assets/bonus_master.jpeg',
-    },
-    {
-      name: 'Bonus Pro',
-      description: 'Use 5 bonuses in one game',
-      imagePath: '../../assets/bonus_pro.jpeg',
-    },
-    {
-      name: 'Bonus Cheater',
-      description: 'Use 10 bonuses in one game',
-      imagePath: '../../assets/bonus_cheater.jpeg',
-    },
-    {
-      name: 'Pong-tastic',
-      description: 'Win 5 games without missing a single ball',
-      imagePath: '../../assets/pong_tastic.jpeg',
-    },
-    {
-      name: 'Tireless Returner',
-      description:
-        'Return the ball 10 times in a row without it touching the sides',
-      imagePath: '../../assets/tireless_returner.jpeg',
-    },
-    {
-      name: 'Why Not',
-      description: 'Win a bonus game without using any bonuses',
-      imagePath: '../../assets/why_not.jpeg',
-    },
-    {
-      name: 'Ping King',
-      description: 'Score a point when the ball is at high speed',
-      imagePath: '../../assets/ping_king.jpeg',
-    },
-    {
-      name: 'Faster Than Light',
-      description: 'Score a point when the ball is at maximum speed',
-      imagePath: '../../assets/faster_than_light.jpeg',
-    },
-    {
-      name: 'Blitz Pong',
-      description: 'Win a game in less than 2 minutes',
-      imagePath: '../../assets/blitz_pong.jpeg',
-    },
-    {
-      name: 'Invincible Resistant',
-      description: 'Win a game without losing a single point',
-      imagePath: '../../assets/invincible_resistant.jpeg',
-    },
-    {
-      name: 'Point Prospector',
-      description: 'Win a game with a minimum of 30 points scored',
-      imagePath: '../../assets/point_prospector.jpeg',
-    },
-  ],
+  {
+    name: 'Warrior',
+    description: 'Win 3 games in a row',
+    imagePath: 'warrior.jpeg',
+  },
+  {
+    name: 'Lord',
+    description: 'Win 5 games in a row',
+    imagePath: 'lord.jpeg',
+  },
+  {
+    name: 'Emperor',
+    description: 'Win 10 games in a row',
+    imagePath: 'emperor.jpeg',
+  },
+  {
+    name: 'Laser Pointer',
+    description: 'Kill an opponent with a Laser',
+    imagePath: 'laser_pointer.jpeg',
+  },
+  {
+    name: 'Gamma Laser',
+    description: 'Kill 5 opponents with a laser',
+    imagePath: 'gamma_laser.jpeg',
+  },
+  {
+    name: 'Scorificator',
+    description: 'Kill 10 opponents with a laser',
+    imagePath: 'scorificator.jpeg',
+  },
+  {
+    name: 'Regular',
+    description: 'Play 20 games',
+    imagePath: 'regular.jpeg',
+  },
+  {
+    name: 'Addict',
+    description: 'Play 50 games',
+    imagePath: 'addict.jpeg',
+  },
+  {
+    name: 'NoLife',
+    description: 'Play 100 games',
+    imagePath: 'nolife.jpeg',
+  },
+  {
+    name: 'Bonus Master',
+    description: 'Use 3 bonuses in one game',
+    imagePath: 'bonus_master.jpeg',
+  },
+  {
+    name: 'Bonus Pro',
+    description: 'Use 5 bonuses in one game',
+    imagePath: 'bonus_pro.jpeg',
+  },
+  {
+    name: 'Bonus Cheater',
+    description: 'Use 10 bonuses in one game',
+    imagePath: 'bonus_cheater.jpeg',
+  },
+  {
+    name: 'Pong-tastic',
+    description: 'Win 5 games without missing a single ball',
+    imagePath: 'pong_tastic.jpeg',
+  },
+  {
+    name: 'Tireless Returner',
+    description:
+      'Return the ball 10 times in a row without it touching the sides',
+    imagePath: 'tireless_returner.jpeg',
+  },
+  {
+    name: 'Why Not',
+    description: 'Win a bonus game without using any bonuses',
+    imagePath: 'why_not.jpeg',
+  },
+  {
+    name: 'Ping King',
+    description: 'Score a point when the ball is at high speed',
+    imagePath: 'ping_king.jpeg',
+  },
+  {
+    name: 'Faster Than Light',
+    description: 'Score a point when the ball is at maximum speed',
+    imagePath: 'faster_than_light.jpeg',
+  },
+  {
+    name: 'Blitz Pong',
+    description: 'Win a game in less than 2 minutes',
+    imagePath: 'blitz_pong.jpeg',
+  },
+  {
+    name: 'Invincible Resistant',
+    description: 'Win a game without losing a single point',
+    imagePath: 'invincible_resistant.jpeg',
+  },
+  {
+    name: 'Point Prospector',
+    description: 'Win a game with a minimum of 30 points scored',
+    imagePath: 'point_prospector.jpeg',
+  },
 ];
 
 @Injectable()
@@ -126,24 +124,31 @@ export class TrophiesService {
   async createTrophy(
     name: string,
     description: string,
+    path: string,
   ): Promise<TrophiesEntity> {
     const newTrophy = new TrophiesEntity();
     newTrophy.name = name;
     newTrophy.description = description;
+    newTrophy.imagePath = path;
+
     return await this.trophyRepository.save(newTrophy);
   }
 
   async initializeTrophies(): Promise<void> {
     const count = await this.trophyRepository.count();
 
-    // if (count === 0) {
-    //   console.log(
-    //     "Trophies table doesn't exist... Creating trophies table in dataBase/",
-    //   );
-    //   for (const trophy of trophies) {
-    //     await this.createTrophy(trophy.name, trophy.description);
-    //   }
-    // }
+    if (count === 0) {
+      console.log(
+        "Trophies table doesn't exist... Creating trophies table in dataBase/",
+      );
+      for (const trophy of trophies) {
+        await this.createTrophy(
+          trophy.name,
+          trophy.description,
+          trophy.imagePath,
+        );
+      }
+    }
   }
 
   async assignTrophyToPlayer(
@@ -172,6 +177,7 @@ export class TrophiesService {
     game: GameEntity,
     playerStats: PlayerStats,
     consecutiveExchangesWithoutBounce: number,
+    bonusMode: boolean,
   ): Promise<void> {
     const trophyNamesToAssign: string[] = [];
     if (playerStats.numberOfBonusesUsed >= 3) {
@@ -183,7 +189,7 @@ export class TrophiesService {
     if (playerStats.numberOfBonusesUsed >= 10) {
       trophyNamesToAssign.push('Bonus Cheater');
     }
-    if (playerStats.numberOfBonusesUsed === 0) {
+    if (playerStats.numberOfBonusesUsed === 0 && bonusMode) {
       trophyNamesToAssign.push('Why Not');
     }
     if (player.numberOfConsecutiveWins >= 3) {
@@ -199,19 +205,19 @@ export class TrophiesService {
       trophyNamesToAssign.push('Laser Pointer');
     }
     if (playerStats.numberOfLaserKills >= 5) {
-      trophyNamesToAssign.push('Laser Gamma');
+      trophyNamesToAssign.push('Gamma Laser');
     }
     if (playerStats.numberOfLaserKills >= 10) {
       trophyNamesToAssign.push('Scorificator');
     }
     if (playerStats.maxSpeedScoring >= 50) {
-      trophyNamesToAssign.push('King of Ping');
+      trophyNamesToAssign.push('Ping King');
     }
     if (playerStats.maxSpeedScoring >= 200) {
-      trophyNamesToAssign.push('Faster than Light');
+      trophyNamesToAssign.push('Faster Than Light');
     }
     if (consecutiveExchangesWithoutBounce >= 10) {
-      trophyNamesToAssign.push('Relentless Returner');
+      trophyNamesToAssign.push('Tireless Returner');
     }
     if (player.gamesPlayed >= 20) {
       trophyNamesToAssign.push('Regular');
@@ -226,24 +232,33 @@ export class TrophiesService {
       trophyNamesToAssign.push('Blitz Pong');
     }
     if (playerScore >= 30) {
-      trophyNamesToAssign.push('Prospector of Points');
+      trophyNamesToAssign.push('Point Prospector');
     }
     if (opponentScore == 0) {
-      trophyNamesToAssign.push('Invincible Resistor');
+      trophyNamesToAssign.push('Invincible Resistant');
     }
     if (player.numberOfGamesWonWithoutMissingBall >= 5) {
       trophyNamesToAssign.push('Pong-tastic');
     }
     // Récupérez les trophées par leurs noms
     const trophiesToAssign: TrophiesEntity[] = await Promise.all(
-      trophyNamesToAssign.map((name) => this.getTrophyByName(name)),
+      trophyNamesToAssign.map(async (name) => {
+        const trophy = await this.getTrophyByName(name);
+        return trophy;
+      }),
     );
 
     // Filtrer les trophées que le joueur possède déjà
-    const trophiesToAdd = trophiesToAssign.filter(
-      (trophy) =>
-        !player.trophies.some((playerTrophy) => playerTrophy.id === trophy.id),
-    );
+    console.log('trophiesToAssign', trophiesToAssign);
+    trophiesToAssign.filter((trophy) => trophy !== null);
+    const trophiesToAdd = trophiesToAssign?.filter((trophy) => {
+      return !player.trophies?.some(
+        (playerTrophy) => playerTrophy.id === trophy.id,
+      );
+    });
+    console.log('trophiesToAdd', trophiesToAdd);
+    console.log('trophiesPlayer', player.trophies);
+    console.log('playerId', player.id);
 
     // Ajouter les trophées au joueur
     if (trophiesToAdd.length > 0) {

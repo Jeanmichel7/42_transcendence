@@ -1,3 +1,5 @@
+import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
+
 export interface ProfilInterface {
   id: bigint;
   firstName: string;
@@ -9,4 +11,5 @@ export interface ProfilInterface {
   avatar?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  trophies?: TrophiesEntity[];
 }

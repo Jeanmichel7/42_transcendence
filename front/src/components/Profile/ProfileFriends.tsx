@@ -35,7 +35,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
     <>
       <Sticker dataText={"friends"} />
 
-      <div className="flex flex-wrap items-center w-full pb-3 p-5">
+      <div className="flex flex-wrap items-center justify-center w-full pb-3 p-5">
         {friends.length == 0 ? (
           <NavLink to="/friends?tab=add">
             <Nothing

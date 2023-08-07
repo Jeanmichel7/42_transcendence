@@ -57,7 +57,6 @@ const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
       );
     }, 1000);
 
-    // Cleanup on unmount or when count reaches 0
     return () => {
       clearInterval(countdownInterval);
     };

@@ -119,8 +119,7 @@ export default function FriendsPage() {
     <>
       <Box
         sx={{
-          bgcolor: "var(--background-color)  ",
-          height: "100%",
+          bgcolor: "var(--background-color)",
         }}
       >
         <AppBar position="static">

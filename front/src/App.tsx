@@ -170,8 +170,8 @@ function App() {
   };
 
   return (
-    <>
-      <div className="flex flex-col h-screen min-h-md relative bg-[var(--backround-color)]">
+    <div className="relative z-10">
+      <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] -z-10 ">
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&
           location?.pathname != "/fakeconnection" && <Header />}
@@ -182,51 +182,51 @@ function App() {
         {location?.pathname !== "/" &&
           location?.pathname != "/connection" &&
           location?.pathname != "/fakeconnection" && <Footer />}
-      </div>
 
-      <Snackbar
-        anchorOrigin={{
-          vertical: snackbar.vertical,
-          horizontal: snackbar.horizontal,
-        }}
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        onClick={handleClick}
-      >
-        {snackbar.link ? (
-          <SnackbarContent
-            message={
-              <Link to={snackbar.link} className="text-white">
-                <MessageIcon />
-                {" " + snackbar.message}
-              </Link>
-            }
-            action={
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClose();
-                }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-        ) : (
-          <Alert
-            onClose={handleClose}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        )}
-      </Snackbar>
-    </>
+        <Snackbar
+          anchorOrigin={{
+            vertical: snackbar.vertical,
+            horizontal: snackbar.horizontal,
+          }}
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          onClick={handleClick}
+        >
+          {snackbar.link ? (
+            <SnackbarContent
+              message={
+                <Link to={snackbar.link} className="text-white">
+                  <MessageIcon />
+                  {" " + snackbar.message}
+                </Link>
+              }
+              action={
+                <IconButton
+                  size="small"
+                  aria-label="close"
+                  color="inherit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose();
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              }
+            />
+          ) : (
+            <Alert
+              onClose={handleClose}
+              severity={snackbar.severity}
+              sx={{ width: "100%" }}
+            >
+              {snackbar.message}
+            </Alert>
+          )}
+        </Snackbar>
+      </div>
+    </div>
   );
 }
 export default App;

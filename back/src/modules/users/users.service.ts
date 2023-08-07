@@ -27,6 +27,7 @@ import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserUpdateEvent } from '../notification/events/notification.event';
+import { TrophiesEntity } from '../trophies/entity/trophies.entity';
 
 @Injectable()
 export class UsersService {
@@ -100,6 +101,7 @@ export class UsersService {
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { login: login },
+      relations: ['trophies'],
       select: [
         'id',
         'firstName',

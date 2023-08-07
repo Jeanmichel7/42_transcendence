@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import "../utils/login.scss";
+import "../utils/CircleBakcground.scss";
 
 export function CircleBackground() {
   const isEffectActivated = useSelector(

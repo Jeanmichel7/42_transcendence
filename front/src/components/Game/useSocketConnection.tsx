@@ -38,8 +38,8 @@ const useSocketConnection = (
       data.current!.ball.x = GROUND_MAX_SIZE - serverData.ball.x;
       data.current!.ball.vx = -serverData.ball.vx;
       posRacket.current!.right = serverData.racketLeft;
-      scorePlayers.current!.left = serverData.player1Score;
-      scorePlayers.current!.right = serverData.player2Score;
+      scorePlayers.current!.right = serverData.player1Score;
+      scorePlayers.current!.left = serverData.player2Score;
       racketHeightRef.current!.left = serverData.racketRightHeight;
       racketHeightRef.current!.right = serverData.racketLeftHeight;
       if (serverData.bonus) {
@@ -53,8 +53,8 @@ const useSocketConnection = (
     } else {
       racketHeightRef.current!.left = serverData.racketLeftHeight;
       racketHeightRef.current!.right = serverData.racketRightHeight;
-      scorePlayers.current!.left = serverData.player2Score;
-      scorePlayers.current!.right = serverData.player1Score;
+      scorePlayers.current!.right = serverData.player2Score;
+      scorePlayers.current!.left = serverData.player1Score;
       posRacket.current!.right = serverData.racketRight;
       bonusPositionRef.current = serverData.bonus;
       bonusIsLoading.current = serverData.bonusPlayer1Loading;

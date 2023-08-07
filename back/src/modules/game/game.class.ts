@@ -9,7 +9,7 @@ const SCORE_FOR_WIN = 0;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
-  { id: 'bigRacket', duration: 10001, timeStart: 0, activate: false },
+  { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
   { id: 'slow', duration: 0, timeStart: 0, activate: false },
   { id: 'laser', duration: 10000, timeStart: 0, activate: false },
 ];
@@ -427,6 +427,8 @@ export class Game {
       !this.isOver
     ) {
       this.player2Score += 1;
+      console.log('player1Score', this.player1Score);
+      console.log('player2Score', this.player2Score);
       if (this.ball.speed > this.player2Stats.maxSpeedScoring) {
         this.player2Stats.maxSpeedScoring = this.ball.speed;
       }
@@ -444,6 +446,8 @@ export class Game {
       !this.isOver
     ) {
       this.player1Score += 1;
+      console.log('player1Score', this.player1Score);
+      console.log('player2Score', this.player2Score);
       if (this.ball.speed > this.player1Stats.maxSpeedScoring) {
         this.player1Stats.maxSpeedScoring = this.ball.speed;
       }
@@ -459,7 +463,6 @@ export class Game {
     }
     this.ball.x += this.ball.vx * deltaTime;
     this.ball.y += this.ball.vy * deltaTime;
-    console.log(this.ball.vx, this.ball.vy);
   }
 
   getState() {
