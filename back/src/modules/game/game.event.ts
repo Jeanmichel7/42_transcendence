@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { Game } from './game.service';
+import { Game } from './game.class';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -39,20 +39,22 @@ export class GameEvents {
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
       games.forEach(async (game) => {
+        if (game.isBeingProcessed) return; // Skip si le jeu est en cours de traitement
+        game.isBeingProcessed = true;
         const update = await this.gameService.updateGame(game);
         this.server.to(game.socketPlayer1Id).emit('gameUpdate', update);
         update.isPlayerRight = true;
         this.server.to(game.socketPlayer2Id).emit('gameUpdate', update);
+        if (!game.isOver) game.isBeingProcessed = false;
       });
     }, 1000 / 60);
   }
 
   //conexion
   async handleConnection(client: Socket) {
-    //const token = client.handshake.headers.cookies['jwt'];
-
+    if (client.handshake.headers.cookie === undefined) return;
     const cookieArray = client.handshake.headers.cookie.split(';');
-    // console.log(cookieArray);
+    console.log(cookieArray);
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
       const cookieParts = cookie.split('=');
@@ -62,7 +64,8 @@ export class GameEvents {
     });
 
     if (!jwtToken) {
-      throw new UnauthorizedException("You're not logged in", 'No token found');
+      // throw new UnauthorizedException("You're not logged in", 'No token found');
+      return;
     }
 
     try {
@@ -94,6 +97,42 @@ export class GameEvents {
     this.gameService.removeFromQueue(client.id);
   }
 
+  @SubscribeMessage('privateLobby')
+  async handlePrivateLobby(
+    @MessageBody()
+    update: { gameId: bigint; mode: string; ready: boolean; player1: boolean },
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (
+      !client.data.userId ||
+      this.gameService.checkAlreadyInGame(client.data.userId)
+    )
+      return 'error when joining/creating private lobby';
+    let data = {
+      username: client.data.userId,
+      socketId: client.id,
+      gameId: update.gameId,
+      mode: update.mode,
+      ready: update.ready,
+    };
+    const gameStarted = this.gameService.updatePrivateLobby(
+      update.player1,
+      data,
+    );
+    const socket = this.gameService.getOtherPlayerSockerId(
+      update.gameId,
+      update.player1,
+    );
+    if (gameStarted) {
+      this.server.to(socket).emit('userGameStatus', 'alreadyInGame');
+      this.server.to(client.id).emit('userGameStatus', 'alreadyInGame');
+      console.log('game started');
+      return;
+    }
+    let { socketId, ...newData } = data;
+    if (socket) this.server.to(socket).emit('privateLobby', newData);
+  }
+
   @SubscribeMessage('userGameStatus')
   async handleSearchOpponent(
     @MessageBody() message: string,
@@ -102,9 +141,7 @@ export class GameEvents {
     if (!client.data.userId) {
       return 'error';
     }
-    console.log('userGameStatus: ' + message);
     if (message === 'cancel') {
-      console.log('canceling search for: ' + client.id);
       this.gameService.removeFromQueue(client.data.userId);
       return;
     } else if (message === 'searchNormal' || message === 'searchBonus') {
@@ -113,9 +150,7 @@ export class GameEvents {
         client.data.userId,
         message === 'searchBonus',
       );
-      console.log('searching opponent for: ' + client.id);
       if (opponent) {
-        console.log('opponent found: ' + opponent);
         if (message === 'searchBonus') {
           this.server.to(client.id).emit('userGameStatus', 'foundBonus');
           this.server.to(opponent).emit('userGameStatus', 'foundBonus');

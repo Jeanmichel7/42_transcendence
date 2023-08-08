@@ -12,6 +12,8 @@ import { MessageService } from '../messagerie/messages.service';
 import { MessageEntity } from '../messagerie/entity/messages.entity';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
+import { TrophiesService } from '../trophies/trophies.service';
+import { TrophiesEntity } from '../trophies/entity/trophies.entity';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { NotificationEntity } from '../notification/entity/notification.entity';
       UserEntity,
       MessageEntity,
       NotificationEntity,
+      TrophiesEntity,
     ]),
   ],
   controllers: [GameController],
@@ -30,6 +33,7 @@ import { NotificationEntity } from '../notification/entity/notification.entity';
     JwtService,
     MessageService,
     NotificationService,
+    TrophiesService,
   ],
 })
 export class GameModule {}

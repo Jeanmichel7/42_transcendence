@@ -21,13 +21,9 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 export class MessagerieWebsocketService {
   @WebSocketServer() server: Server;
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('user is connected to MESSAGERIE', client.id);
-  }
+  async handleConnection(@ConnectedSocket() client: Socket) {}
 
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log('user is disconnected to MESSAGERIE', client.id);
-  }
+  async handleDisconnect(@ConnectedSocket() client: Socket) {}
 
   @SubscribeMessage('joinPrivateRoom')
   async handleJoin(

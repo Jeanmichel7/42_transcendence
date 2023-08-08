@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinTable,
   // JoinColumn,
   // JoinTable,
   ManyToMany,
@@ -15,6 +16,7 @@ import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
 import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 import { GameEntity } from 'src/modules/game/entity/game.entity';
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
+import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -76,6 +78,42 @@ export class UserEntity extends BaseEntity {
   score: number;
 
   @Column({
+    type: 'integer',
+    default: 0,
+  })
+  level: number;
+
+  @Column({
+    type: 'integer',
+    default: 0,
+  })
+  experience: number;
+
+  @Column({
+    type: 'integer',
+    default: 0,
+  })
+  gamesPlayed: number;
+
+  @Column({
+    type: 'integer',
+    default: 0,
+  })
+  consecutiveWin: number;
+
+  @Column({
+    type: 'integer',
+    default: 0,
+  })
+  laserKill: number;
+
+  @Column({
+    type: 'integer',
+    default: 0,
+  })
+  bonusUsed: number;
+
+  @Column({
     type: 'boolean',
     default: false,
     nullable: true,
@@ -116,6 +154,18 @@ export class UserEntity extends BaseEntity {
   })
   lastActivity: Date;
 
+  @Column({ type: 'int', default: 0 })
+  numberOfConsecutiveWins: number;
+
+  @Column({ type: 'int', default: 0 })
+  numberOfEnemiesKilledWithLaser: number;
+
+  @Column({ type: 'int', default: 0 })
+  numberOfGamesPlayed: number;
+
+  @Column({ type: 'int', default: 0 })
+  numberOfGamesWonWithoutMissingBall: number;
+
   /* messagerie */
   @OneToMany(() => MessageEntity, (message) => message.ownerUser, {
     cascade: true,
@@ -129,6 +179,7 @@ export class UserEntity extends BaseEntity {
 
   /* chat */
   @OneToMany(() => ChatMessageEntity, (message) => message.ownerUser, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   chatMessages: ChatMessageEntity[];
@@ -140,11 +191,13 @@ export class UserEntity extends BaseEntity {
   // rooms: ChatRoomEntity[];
 
   @OneToMany(() => ChatRoomEntity, (room) => room.ownerUser, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   roomOwner: ChatRoomEntity[];
 
   @ManyToMany(() => ChatRoomEntity, (room) => room.acceptedUsers, {
+    onDelete: 'CASCADE',
     cascade: true,
   })
   roomAccepted: ChatRoomEntity[];
@@ -217,6 +270,10 @@ export class UserEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   notificationsReceived: NotificationEntity[];
+
+  @ManyToMany(() => TrophiesEntity, (trophie) => trophie.users)
+  @JoinTable()
+  trophies: TrophiesEntity[];
 
   /* helper */
   get relations(): UserRelationEntity[] {

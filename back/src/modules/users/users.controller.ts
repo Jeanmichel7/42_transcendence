@@ -103,6 +103,7 @@ export class UsersController {
     @Body() body: UserPatchDTO,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UserInterface> {
+    console.log('body : ', body);
     const result: UserInterface = await this.usersService.patchUser(
       req.user.id,
       body,

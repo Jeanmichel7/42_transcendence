@@ -1,13 +1,29 @@
-import { Link, useNavigate } from 'react-router-dom';
-import '../utils/login.scss';
-import styled, { keyframes, css } from 'styled-components';
-import '../fonts/fonts.css';
-import { Button } from '@mui/material';
-import { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import styled, { keyframes, css } from "styled-components";
+import { Button } from "@mui/material";
+import { useCallback, useState } from "react";
+import { CircleBackground } from "../utils/CircleBackground";
+import { getFriends, getBlockedUsers } from "../api/relation";
+import { getUserData } from "../api/user";
+import { reduxSetConversationList } from "../store/convListSlice";
+import { reduxSetNotifications } from "../store/notificationSlice";
+import { setLogged, setUser, reduxSetFriends, reduxSetUserBlocked } from "../store/userSlice";
+import { NotificationInterface, ConversationInterface, ApiErrorResponse, UserActionInterface, UserInterface } from "../types";
+import { useDispatch } from "react-redux";
+import { setErrorSnackbar } from "../store/snackbarSlice";
 
 const slideInFromBottom = keyframes`{
   0% {
     transform: translateY(200%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}`;
+
+const slideInFromBottomSmallScreen = keyframes`{
+  0% {
+    transform: translateY(400%);
   }
   100% {
     transform: translateY(0);
@@ -50,8 +66,7 @@ const TitleWrapper = styled.div`
 const Title = styled.h1`
   font-size: 8rem;
   animation: ${slideInFromBottom} 2s ease-out;
-  color: white;
-  font-family: "Exo", sans-serif;
+  color: #f4def8;
 `;
 
 const BigCircle = styled.span`
@@ -69,9 +84,31 @@ const BigCircle = styled.span`
   transition: transform 1s ease-out, opacity 1s ease-out;
 `;
 
-const StyledLink = styled(Link)`
+export const animationCircle = keyframes`
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-150%, -50%);
+  }
+`;
+
+export const TransitionCircle = styled.span`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(${(props) => (props.expand ? "-50%" : "-150%")}, -50%);
+  animation: ${animationCircle} 1s ease-out;
+  width: 200vh;
+  height: 200vh;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 3;
+  transition: transform 1s ease-out;
+`;
+
+const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   position: relative;
-  font-family: "Exo", sans-serif;
   margin-left: 2rem;
   color: #fff;
   text-decoration: none;
@@ -79,6 +116,7 @@ const StyledLink = styled(Link)`
   font-weight: bold;
   text-align: center;
   padding: 1rem 1rem;
+  width: 10rem;
   border: 2px solid #fff;
   border-radius: 2rem;
   animation: ${slideInFromBottomLink} 3s ease-out;
@@ -86,6 +124,9 @@ const StyledLink = styled(Link)`
   transition: color 0.3s ease;
   z-index: 10;
 
+  @media (max-width: 768px) {
+    animation: ${slideInFromBottomSmallScreen} 3s ease-out;
+  }
   &::before {
     content: "";
     position: absolute;
@@ -99,7 +140,7 @@ const StyledLink = styled(Link)`
   }
 
   &:hover {
-    color: ${(props) => (!props.expand ? '#000' : '#fff')};
+    color: ${(props) => (!props.expand ? "#000" : "#fff")};
     &::before {
       width: 100%;
     }
@@ -112,26 +153,47 @@ const LoginWrapper = styled.div`
   height: 100%;
   top: 0;
   left: 0;
+  overflow: hidden;
 `;
 
 export default function Login() {
   const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // const handleClick = (
-  //   e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-  // ) => {
-  //   e.preventDefault();
-  //   setExpand(true);
-  //   setTimeout(() => {
-  //     // redirect after 1s
-  //     window.location = e.target.href;
-  //   }, 1000);
-  // };
+  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
+    apiFunction: () => Promise<T | ApiErrorResponse>,
+    action: ((payload: T) => UserActionInterface),
+  ): Promise<void> {
+    const result: T | ApiErrorResponse = await apiFunction();
+    if ('error' in result) {
+      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+    } else {
+      dispatch(action(result));
+    }
+  }, [dispatch]);
+
+  //save user data in redux
+  const saveUserData = useCallback(async function (id: number) {
+    dispatch(setLogged(true));
+    dispatch(reduxSetNotifications(
+      localStorage.getItem('notifications' + id)
+        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
+        : [] as NotificationInterface[],
+    ));
+    dispatch(reduxSetConversationList(
+      localStorage.getItem('conversationsList' + id)
+        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string)
+        : [] as ConversationInterface[],
+    ));
+    await fetchData(getUserData, setUser);
+    await fetchData(getFriends, reduxSetFriends);
+    await fetchData(getBlockedUsers, reduxSetUserBlocked);
+  }, [dispatch, fetchData]);
 
   const handleConnection = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
     const width = 600;
@@ -140,66 +202,33 @@ export default function Login() {
     const top = window.innerHeight / 2 - height / 2;
 
     const newWindow = window.open(
-      'http://localhost:3006/connection',
-      '_blank',
+      "http://localhost:3006/connection",
+      "_blank",
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
-        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
+        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
     );
-    if (!newWindow)
-      return console.log('erreur new windos  ');
+    if (!newWindow) return console.log("erreur new windos  ");
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", async (event) => {
       if (event.source !== newWindow) return;
-      if (event.data === 'user connected') {
+      if (event.data.msg === "user connected") {
+        setExpand(true);
+        if(event.data.id != -1) await saveUserData(event.data.id);
         newWindow.close();
-        navigate('/home');
+        navigate("/game");
       }
     });
   };
 
-
   return (
     <LoginWrapper>
-      <div className="particle-container">
-        <div className="particles">
-          <span className="circle"></span>
-          <span className="circle 1"></span>
-          <span className="circle 2"></span>
-          <span className="circle 3"></span>
-          <span className="circle 4"></span>
-          <span className="circle 5"></span>
-          <span className="circle 6"></span>
-          <span className="circle 7"></span>
-          <span className="circle 8"></span>
-          <span className="circle 9"></span>
-          <span className="circle 10"></span>
-          <span className="circle 11"></span>
-          <span className="circle 12"></span>
-          <span className="circle 13"></span>
-          <span className="circle 14"></span>
-          <span className="circle 15"></span>
-          <span className="circle 16"></span>
-          <span className="circle 17"></span>
-          <span className="circle 18"></span>
-          <span className="circle 19"></span>
-          <span className="circle 20"></span>
-          <span className="circle 21"></span>
-          <span className="circle 22"></span>
-          <span className="circle 23"></span>
-          <span className="circle 24"></span>
-          <span className="circle 25"></span>
-          <span className="circle 26"></span>
-          <span className="circle 27"></span>
-          <span className="circle 28"></span>
-          <span className="circle 29"></span>
-        </div>
-      </div>
-      <BigCircle hovered={isHovered} expand={expand} />
+      {/*<TransitionCircle expand={expand} />
+        <BigCircle hovered={isHovered} expand={expand} />
+      */}
       <TitleWrapper>
         <Title>Pong</Title>
         <StyledLink
           onClick={handleConnection}
-          // to=""
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           expand={expand}

@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { reduxRemoveFriends, reduxAddUserBlocked, reduxAddWaitingFriendsSent } from '../../store/userSlice';
 import { RootState } from '../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { deleteFriend, apiBlockUser, requestAddFriend } from '../../api/relation';
 import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../types';
@@ -15,6 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
 import { useState } from 'react';
 import { inviteGameUser } from '../../api/game';
+import ChatIcon from '@mui/icons-material/Chat';
 
 interface FriendCardProps {
   actualUserLogin?: string,
@@ -29,6 +30,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   // const [ isFriendRequestSent, setIsFriendRequestSent ] = useState(false);
   const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
@@ -154,23 +156,45 @@ const FriendCard:  React.FC<FriendCardProps> = ({
           </IconButton>
         </Tooltip>
 
-        { !isMyFriend() &&
+        { !isMyFriend() ?
         <Tooltip
           title={ isRequestFriendSent() ? 'Waiting accept' : 'Add friend' }
           arrow
-          TransitionComponent={Zoom}
-          TransitionProps={{ timeout: 600 }}
-        >
-          <div>
-            <IconButton aria-label="add friend" 
-              sx={{ margin:0, padding:0 }}
-              onClick={() => handleRequestAddFriend(friend.id)}
-              disabled={ isRequestFriendSent() || isLoading}
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+          >
+            <div>
+              <IconButton aria-label="add friend"
+                sx={{ margin: 0, padding: 0 }}
+                onClick={() => handleRequestAddFriend(friend.id)}
+                disabled={isRequestFriendSent() || isLoading}
               >
-              <AddIcon color={ isRequestFriendSent() ? 'disabled' : 'primary' }/>
-            </IconButton>
-          </div>
-        </Tooltip> }
+                <AddIcon color={isRequestFriendSent() ? 'disabled' : 'primary'} />
+              </IconButton>
+            </div>
+          </Tooltip> 
+          :
+        <>
+          { userData.id != friend.id &&
+            <Tooltip
+            title={'Chat'}
+            arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+          >
+            <div>
+              <IconButton aria-label="chat friend"
+                sx={{ margin: 0, padding: 0, paddingLeft:1 }}
+                onClick={() => navigate(`/chat/conv/x/${friend.id}/${friend.login}`)}
+              >
+                <ChatIcon color='primary' />
+              </IconButton>
+            </div>
+          </Tooltip>
+          }
+        </>
+
+        }
 
         {userData && userData.login == actualUserLogin &&
           <>
