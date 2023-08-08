@@ -1,7 +1,7 @@
-import styled, { keyframes } from 'styled-components';
-import React from 'react';
+import styled, { keyframes } from "styled-components";
+import React from "react";
 
-const dotAnimation = keyframes`
+export const dotAnimation = keyframes`
   0%, 80%, 100% { 
     opacity: 0;
   }

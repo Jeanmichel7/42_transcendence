@@ -5,6 +5,7 @@ import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 import { ChatMessageEntity } from 'src/modules/chat/entity/chat.message.entity';
 import { GameEntity } from 'src/modules/game/entity/game.entity';
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
+import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
 
 const entities = [
   UserEntity,
@@ -14,6 +15,7 @@ const entities = [
   ChatMessageEntity,
   GameEntity,
   NotificationEntity,
+  TrophiesEntity,
 ];
 
 export { UserEntity };

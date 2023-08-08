@@ -1,17 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
-import styled, { keyframes, css } from 'styled-components';
-import Score from './Score';
-import { Socket } from 'socket.io-client';
-import useSocketConnection from './useSocketConnection';
+import {
+  MutableRefObject,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import styled, { keyframes, css } from "styled-components";
+import Score from "./Score";
+import { Socket } from "socket.io-client";
+import useSocketConnection from "./useSocketConnection";
 import {
   ClientToServerEvents,
+  GameData,
   ServerToClientEvents,
-} from './Interface';
-import CountDown from './CountDown';
-import BonusBox from './BonusBox';
-import spriteBonus from '../../assets/spriteBonus.png';
-import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
-import './font.css';
+} from "./Interface";
+import CountDown from "./CountDown";
+import BonusBox from "./BonusBox";
+import spriteBonus from "../../assets/spriteBonus.png";
+import spriteBonusExplode from "../../assets/spriteBonusExplode.png";
+import "./font.css";
+import EndGame from "./EndGame";
+import { BonusPosition } from "./Interface";
 
 const Playground = styled.div`
   width: 100%;
@@ -51,12 +60,6 @@ const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
 
-interface BonusPosition {
-  x: number;
-  y: number;
-  boxSize: number;
-}
-
 const animationBonus = keyframes`
   0% { background-position: 0px; }
   100% { background-position: -1200px; } // Ajustez en fonction de la taille de votre sprite
@@ -65,7 +68,7 @@ const animationBonus = keyframes`
 const animationBonusExplode = keyframes`
   0% { background-position: 0px; opacity: 1; }
   100% { background-position: -2400px; opacity: 0;}
-  `; // Ajustez en fonction de la taille de votre sprite
+  `;
 
 const fadeIn = keyframes`
   from {
@@ -81,8 +84,8 @@ const BonusReady = styled.div<{ posX: number; posY: number }>`
   background: url(${spriteBonus}) repeat-x;
   position: absolute;
   transform: translate(-50%, -50%);
-  left: ${({ posX }: { posX: number }) => posX}px;
-  top: ${({ posY }: { posY: number }) => posY}px;
+  left: ${({ posX }) => posX}px;
+  top: ${({ posY }) => posY}px;
   animation: ${animationBonus} 1s steps(12) infinite, ${fadeIn} 1s ease-in-out;
 `;
 
@@ -92,8 +95,8 @@ const BonusExplode = styled.div<{ posX: number; posY: number }>`
   background: url(${spriteBonusExplode}) repeat-x;
   position: absolute;
   transform: translate(-50%, -50%);
-  left: ${({ posX }: { posX: number }) => posX}px;
-  top: ${({ posY }: { posY: number }) => posY}px;
+  left: ${({ posX }) => posX}px;
+  top: ${({ posY }) => posY}px;
   animation: ${animationBonusExplode} 1s steps(12);
   animation-fill-mode: forwards;
 `;
@@ -118,7 +121,7 @@ function Bonus({
       setIsBonusVisible(true);
       setPosition([posX, posY]);
     } else if (position[0] !== -1) {
-      console.log('bonus not detected');
+      console.log("bonus not detected");
       setIsBonusVisible(false);
       setBonusExplode(true);
     }
@@ -137,19 +140,32 @@ const explodeAnimation = keyframes`
   100% {opacity: 0; }
 `;
 
-const StyledRacket = styled.div.attrs(
-  (props): { posY: number; height: number; type: string } => ({
+type RacketProps = {
+  posY: number;
+  height: number;
+  type: string;
+  isExploding: boolean;
+};
+
+interface StyleProps {
+  style: {
+    transform: string;
+  };
+}
+
+const StyledRacket = styled.div.attrs<RacketProps>(
+  (props): StyleProps => ({
     style: {
       transform: `translateY(${props.posY * (100 / props.height)}%)`,
     },
-  }),
-)`
+  })
+)<RacketProps>`
   width: ${RACKET_WIDTH}%;
   height: ${(props) => props.height / 10}%;
   background-color: blue;
   position: absolute;
   left: ${(props) =>
-    props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
+    props.type === "left" ? RACKET_LEFT_POS_X + "%" : RACKET_RIGHT_POS_X + "%"};
   top: 0%;
   border-radius: 10px;
   z-index: 2;
@@ -158,13 +174,23 @@ const StyledRacket = styled.div.attrs(
       ? css`
           ${explodeAnimation} 1s forwards
         `
-      : 'none'};
+      : "none"};
   box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
     0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
 
 // Composant Raquette avec le Laser comme enfant
-const Racket = ({ posY, height, type, children }) => {
+const Racket = ({
+  posY,
+  height,
+  type,
+  children,
+}: {
+  posY: number;
+  height: number;
+  type: string;
+  children: ReactNode;
+}) => {
   const oldheight = useRef(height);
   if (height !== oldheight.current && height !== 0) {
     oldheight.current = height;
@@ -223,21 +249,25 @@ const laserFlowLeft = keyframes`
 `;
 
 // Utilisez les animations dans votre composant
-const Laser = styled.div<string>`
+
+interface LaserProps {
+  type: string;
+}
+const Laser = styled.div<LaserProps>`
   position: absolute;
 
   width: ${({ type }: { type: string }) =>
-    type === 'left' ? '10000px' : '10000px'};
+    type === "left" ? "10000px" : "10000px"};
   height: 10px;
   top: 50%;
   z-index: 1;
   background: ${({ type }: { type: string }) =>
-    type === 'left'
-      ? 'linear-gradient(to right, red, white, red)'
-      : 'linear-gradient(to left, red, white, red)'};
+    type === "left"
+      ? "linear-gradient(to right, red, white, red)"
+      : "linear-gradient(to left, red, white, red)"};
   background-size: 50px 100%;
   animation: ${({ type }: { type: string }) =>
-    type === 'left'
+    type === "left"
       ? css`
           ${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
         `
@@ -245,17 +275,14 @@ const Laser = styled.div<string>`
           ${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
         `};
   transform: ${({ type }: { type: string }) =>
-    type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'}
+      type === "left" ? "translateX(0%)" : "translateX(-10000px)"}
     translateY(-5px);
   left: 100%;
 `;
 
-
-
-
-
-
-
+const GameWrapper = styled.div`
+  animation: ${fadeIn} 2s ease;
+`;
 
 function Game({
   socket,
@@ -285,45 +312,47 @@ function Game({
   const gameDimensions = useRef({ width: 0, height: 0 });
   const lastDateTime = useRef(0);
   const gameId = useRef(0);
-  const [gameStarted, setGameStarted] = useState();
-  const bonusPositionRef = useRef({} as any);
+  const [gameStarted, setGameStarted] = useState(false);
+  const bonusPositionRef = useRef<BonusPosition | null>(null);
   const bonusIsLoading = useRef(false);
-  const bonusValueRef = useRef();
+  const bonusValueRef = useRef(null);
   const racketHeightRef = useRef({
     left: RACKET_HEIGHT_10,
     right: RACKET_HEIGHT_10,
   });
   const laser = useRef({ left: false, right: false } as any);
-  const { gameData }: { gameData: any } = useSocketConnection(
-    socket,
-    keyStateRef,
-    posRacket,
-    gameId,
-    scorePlayers,
-    bonusPositionRef,
-    setGameStarted,
-    bonusIsLoading,
-    bonusValueRef,
-    racketHeightRef,
-    laser,
-  );
+  const { gameData }: { gameData: MutableRefObject<GameData | undefined> } =
+    useSocketConnection(
+      socket,
+      keyStateRef,
+      posRacket,
+      gameId,
+      scorePlayers,
+      bonusPositionRef,
+      setGameStarted,
+      bonusIsLoading,
+      bonusValueRef,
+      racketHeightRef,
+      laser
+    );
   const fail = useRef(false);
   const correctionFactor = useRef(0);
+  const [ShowEndGame, setShowEndGame] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const gameWrapper = document.querySelector('#playground');
+      const gameWrapper = document.querySelector("#playground") as HTMLElement;
       if (gameWrapper) {
         gameDimensions.current.width = gameWrapper.offsetWidth;
         gameDimensions.current.height = gameWrapper.offsetHeight;
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -417,69 +446,60 @@ function Game({
         newBall.y += newBall.vy * deltaTime;
 
         if (
-          Math.sign(newBall.vx) === Math.sign(gameData.current.ball?.vx) ||
+          Math.sign(newBall.vx) === Math.sign(gameData.current!.ball?.vx) ||
           newBall.vx === 0 ||
-          gameData.current.ball?.vx === 0
+          gameData.current?.ball?.vx === 0
         ) {
-          newBall.vx = gameData.current.ball?.vx;
+          newBall.vx = gameData.current!.ball?.vx;
         }
 
         if (
-          Math.sign(newBall.vy) === Math.sign(gameData.current.ball?.vy) ||
+          Math.sign(newBall.vy) === Math.sign(gameData.current!.ball?.vy) ||
           newBall.vy === 0 ||
-          gameData.current.ball?.vy === 0
+          gameData.current!.ball?.vy === 0
         ) {
-          newBall.vy = gameData.current.ball?.vy;
+          newBall.vy = gameData.current!.ball?.vy;
         }
         if (
-          Math.abs(newBall.x - gameData.current.ball?.x) > POSITION_THRESHOLD ||
-          Math.abs(newBall.y - gameData.current.ball?.y) > POSITION_THRESHOLD
+          Math.abs(newBall.x - gameData.current!.ball?.x) >
+            POSITION_THRESHOLD ||
+          Math.abs(newBall.y - gameData.current!.ball?.y) > POSITION_THRESHOLD
         ) {
           fail.current = false;
-          newBall.x = gameData.current.ball?.x;
-          newBall.y = gameData.current.ball?.y;
-          newBall.vx = gameData.current.ball?.vx;
-          newBall.vy = gameData.current.ball?.vy;
-          newBall.speed = gameData.current.ball?.speed;
+          newBall.x = gameData.current!.ball?.x;
+          newBall.y = gameData.current!.ball?.y;
+          newBall.vx = gameData.current!.ball?.vx;
+          newBall.vy = gameData.current!.ball?.vy;
+          newBall.speed = gameData.current!.ball?.speed;
         }
 
-        console.log('speed', newBall.speed);
         return newBall;
       });
-      if (gameData.current.winner == null) {
+      if (gameData.current!.winner == null) {
         animationFrameId = requestAnimationFrame(upLoop);
       } else {
-        lastGameInfo.current.winnerName = gameData.current.winner;
-        if (gameData.current.isPlayerRight === true) {
-          if (gameData.current.winner === gameData.current.player1Username) {
-            lastGameInfo.current.win = true;
-          } else {
-            lastGameInfo.current.win = false;
-          }
-          lastGameInfo.current.looserName = gameData.current.player1Username;
+        lastGameInfo.current.winnerName = gameData.current!.winner;
+
+        if (gameData.current!.winner === gameData.current!.player1Username) {
+          lastGameInfo.current.win = !gameData.current!.isPlayerRight;
+          lastGameInfo.current.looserName = gameData.current!.player2Username;
         } else {
-          if (gameData.current.winner === gameData.current.player1Username) {
-            lastGameInfo.current.win = false;
-          } else {
-            lastGameInfo.current.win = true;
-          }
-          lastGameInfo.current.looserName = gameData.current.player2Username;
+          lastGameInfo.current.win = gameData.current!.isPlayerRight;
+          lastGameInfo.current.looserName = gameData.current!.player1Username;
         }
-        setCurrentPage('finished');
+        setShowEndGame(true);
       }
     }
     upLoop();
 
-
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-        console.log('cancelAnimationFrame');
+        console.log("cancelAnimationFrame");
       }
     };
   }, [gameStarted]);
 
-  
   useEffect(() => {
     function handleKeyDown(e: any) {
       keyStateRef.current[e.key] = true;
@@ -488,21 +508,25 @@ function Game({
     function handleKeyUp(e: any) {
       keyStateRef.current[e.key] = false;
     }
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
-
-
-
   return (
-    <div>
-      {!gameStarted && <CountDown />}
+    <GameWrapper>
+      {ShowEndGame && (
+        <EndGame
+          setCurrentPage={setCurrentPage}
+          lastGameInfo={lastGameInfo}
+          socket={socket}
+        />
+      )}
+      <CountDown gameStarted={gameStarted} />
       <Score
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
@@ -511,15 +535,15 @@ function Game({
         <Racket
           posY={posRacket.current.left}
           height={racketHeightRef.current.left}
-          type={'left'}
+          type={"left"}
         >
-          {laser.current.left && <Laser type={'left'} />}
+          {laser.current.left && <Laser type={"left"} />}
         </Racket>
         <Ball
           posX={ball.x * (gameDimensions.current.width / 1000)}
           posY={ball.y * (gameDimensions.current.height / 1000)}
         />
-        {gameData?.current.bonusMode && (
+        {gameStarted && gameData?.current!.bonusMode && (
           <Bonus
             bonus={gameData.current.bonus}
             posX={
@@ -540,18 +564,18 @@ function Game({
         <Racket
           posY={posRacket.current.right}
           height={racketHeightRef.current.right}
-          type={'right'}
+          type={"right"}
         >
-          {laser.current.right && <Laser type={'right'} />}
+          {laser.current.right && <Laser type={"right"} />}
         </Racket>
       </Playground>
-      {(bonus || gameData?.current.bonusMode) && (
+      {(bonus || (gameStarted && gameData?.current!.bonusMode)) && (
         <BonusBox
           bonusIsLoading={bonusIsLoading.current}
           bonusName={bonusValueRef.current}
         />
       )}
-    </div>
+    </GameWrapper>
   );
 }
 

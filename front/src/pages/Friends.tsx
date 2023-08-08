@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
-import WaitingAcceptRequest from '../components/Friends/WaitingAcceptRequest';
-import WaitingRequestSent from '../components/Friends/WaitingRequestSent';
-import AllFriends from '../components/Friends/AllFriends';
-import BlockedUser from '../components/Friends/BlockedUser';
-import OnLineFriends from '../components/Friends/OnLineFriends';
-import AddFriends from '../components/Friends/AddFriends';
+import WaitingAcceptRequest from "../components/Friends/WaitingAcceptRequest";
+import WaitingRequestSent from "../components/Friends/WaitingRequestSent";
+import AllFriends from "../components/Friends/AllFriends";
+import BlockedUser from "../components/Friends/BlockedUser";
+import OnLineFriends from "../components/Friends/OnLineFriends";
+import AddFriends from "../components/Friends/AddFriends";
 
-import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from "@mui/material";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -29,15 +29,18 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
-const tabMapReverse = ['online', 'all', 'waiting_received', 'waiting_sent', 'blocked', 'add'];
+const tabMapReverse = [
+  "online",
+  "all",
+  "waiting_received",
+  "waiting_sent",
+  "blocked",
+  "add",
+];
 const tabMap = {
   online: 0,
   all: 1,
@@ -47,7 +50,6 @@ const tabMap = {
   add: 5,
 };
 
-
 export default function FriendsPage() {
   // const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState<number>(0);
@@ -56,33 +58,37 @@ export default function FriendsPage() {
   const [blockedCount, setBlockedCount] = useState<number>(0);
   const [waitingRequestCount, setWaitingRequestCount] = useState<number>(0);
   const [waitingSentCount, setWaitingSentCount] = useState<number>(0);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, userFriends, userBlocked, waitingFriendsRequestReceived, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
-  
+  const {
+    userData,
+    userFriends,
+    userBlocked,
+    waitingFriendsRequestReceived,
+    waitingFriendsRequestSent,
+  } = useSelector((state: RootState) => state.user);
+
   //check query params
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const tabType = query.get('tab');
+    const tabType = query.get("tab");
     if (!tabType) return;
-    
+
     if (tabType in tabMap) {
       // console.log('params : ', serviceParam, userIdParam);
       setValue(tabMap[tabType as keyof typeof tabMap]);
     }
   }, [location.search]);
 
-
   // useEffect(() => {
   //   console.log('value : ', value);
   // }, [value]);
 
-
   useEffect(() => {
     if (userFriends) {
       setFriendsCount(userFriends.length);
-      setOnlineCount(userFriends.filter((f) => f.status !== 'offline').length);
+      setOnlineCount(userFriends.filter((f) => f.status !== "offline").length);
     }
   }, [userFriends]);
 
@@ -97,10 +103,9 @@ export default function FriendsPage() {
   }, [waitingFriendsRequestSent]);
 
   useEffect(() => {
-    if (userBlocked)
-      setBlockedCount(userBlocked.length);
+    if (userBlocked) setBlockedCount(userBlocked.length);
   }, [userBlocked]);
-  
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     navigate(`?tab=${tabMapReverse[newValue]}`, { replace: true });
@@ -112,7 +117,11 @@ export default function FriendsPage() {
 
   return (
     <>
-      <Box sx={{ bgcolor: 'background.paper' }}>
+      <Box
+        sx={{
+          bgcolor: "var(--background-color)",
+        }}
+      >
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" component="div">
@@ -121,7 +130,7 @@ export default function FriendsPage() {
             <Tabs
               value={value}
               onChange={handleChange}
-              indicatorColor={'secondary'}
+              indicatorColor={"secondary"}
               // selectionFollowsFocus={true}
               textColor="inherit"
               // variant="fullWidth"
@@ -130,22 +139,61 @@ export default function FriendsPage() {
               // visibleScrollbar={true}
               aria-label="nav friends"
             >
-              <Tab label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')}/>
-              <Tab label={'All Friends' + (friendsCount ? ' (' + friendsCount + ')' : '')} />
-              <Tab label={'Waiting received' + (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')} />
-              <Tab label={'Waiting sent' + (waitingSentCount ? ' (' + waitingSentCount + ')' : '')} />
-              <Tab label={'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')} />
+              <Tab
+                label={"Online" + (onlineCount ? " (" + onlineCount + ")" : "")}
+              />
+              <Tab
+                label={
+                  "All Friends" +
+                  (friendsCount ? " (" + friendsCount + ")" : "")
+                }
+              />
+              <Tab
+                label={
+                  "Waiting received" +
+                  (waitingRequestCount ? " (" + waitingRequestCount + ")" : "")
+                }
+              />
+              <Tab
+                label={
+                  "Waiting sent" +
+                  (waitingSentCount ? " (" + waitingSentCount + ")" : "")
+                }
+              />
+              <Tab
+                label={
+                  "Blocked" + (blockedCount ? " (" + blockedCount + ")" : "")
+                }
+              />
               <Tab label="Add Friend" />
             </Tabs>
           </Toolbar>
         </AppBar>
 
-        <TabPanel value={value} index={0}> <OnLineFriends userDataId={userData.id}/> </TabPanel>
-        <TabPanel value={value} index={1}> <AllFriends userDataId={userData.id}/> </TabPanel>
-        <TabPanel value={value} index={2}> <WaitingAcceptRequest /> </TabPanel>
-        <TabPanel value={value} index={3}> <WaitingRequestSent /> </TabPanel>
-        <TabPanel value={value} index={4}> <BlockedUser /> </TabPanel>
-        <TabPanel value={value} index={5}> <AddFriends /> </TabPanel>
+        <TabPanel value={value} index={0}>
+          {" "}
+          <OnLineFriends userDataId={userData.id} />{" "}
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          {" "}
+          <AllFriends userDataId={userData.id} />{" "}
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          {" "}
+          <WaitingAcceptRequest />{" "}
+        </TabPanel>
+        <TabPanel value={value} index={3}>
+          {" "}
+          <WaitingRequestSent />{" "}
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          {" "}
+          <BlockedUser />{" "}
+        </TabPanel>
+        <TabPanel value={value} index={5}>
+          {" "}
+          <AddFriends />{" "}
+        </TabPanel>
       </Box>
     </>
   );

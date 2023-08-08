@@ -27,6 +27,7 @@ import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserUpdateEvent } from '../notification/events/notification.event';
+import { TrophiesEntity } from '../trophies/entity/trophies.entity';
 
 @Injectable()
 export class UsersService {
@@ -72,9 +73,35 @@ export class UsersService {
     return result;
   }
 
+  async findUserWithPwd(id: bigint): Promise<UserInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: id },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
+        'email',
+        'status',
+        'description',
+        'avatar',
+        'role',
+        'is2FAEnabled',
+        'score',
+        'password'
+      ],
+    });
+
+    if (!user) throw new NotFoundException(`User with id ${id} not found`);
+    const result: UserInterface = { ...user };
+    return result;
+  }
+
+
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { login: login },
+      relations: ['trophies'],
       select: [
         'id',
         'firstName',
@@ -85,11 +112,11 @@ export class UsersService {
         'avatar',
         'status',
         'score',
+        'level',
       ],
     });
     if (!user) throw new NotFoundException(`User ${login} not found`);
     const result: ProfilInterface = { ...user };
-    console.log('result : ', result);
     return result;
   }
 
@@ -221,7 +248,7 @@ export class UsersService {
     updateUser: UserPatchDTO,
     file: Express.Multer.File,
   ): Promise<UserInterface> {
-    const userToUpdate: UserInterface = await this.findUser(id);
+    const userToUpdate: UserInterface = await this.findUserWithPwd(id);
     if (!userToUpdate) throw new NotFoundException(`User ${id} not found`);
 
     const updateData: Partial<UserEntity> = {};
@@ -254,8 +281,8 @@ export class UsersService {
     if (updateUser.description) updateData.description = updateUser.description;
     if (updateUser.password) {
       const isMatch = await bcrypt.compare(
-        userToUpdate.password,
         updateUser.oldPassword,
+        userToUpdate.password
       );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
