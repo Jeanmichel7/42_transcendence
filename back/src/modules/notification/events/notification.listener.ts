@@ -87,4 +87,10 @@ export class NotificationListener {
     console.log('notif game invite declined', event.data);
     this.socketEvents.emitNotificationGameInviteDeclined(event.data);
   }
+
+  @OnEvent('notification.trophy')
+  handleNewTrophy(event: NotificationCreatedEvent) {
+    console.log('notif new trophy', event.data);
+    this.socketEvents.emitNotificationNewTrophy(event.data);
+  }
 }

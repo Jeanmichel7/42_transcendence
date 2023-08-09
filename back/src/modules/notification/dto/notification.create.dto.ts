@@ -21,8 +21,8 @@ export class NotificationCreateDTO {
     | 'gameInvite'
     | 'gameInviteAccepted'
     | 'gameInviteDeclined'
-    | 'message';
-
+    | 'message'
+    | 'trophy';
   @IsNotEmpty()
   sender: UserEntity;
 
@@ -32,4 +32,8 @@ export class NotificationCreateDTO {
   @IsOptional()
   @IsNotEmpty()
   invitationLink: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  imgTrophy: string;
 }

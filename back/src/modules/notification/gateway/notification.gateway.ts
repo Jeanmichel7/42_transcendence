@@ -21,9 +21,9 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 export class NotificationGateway {
   @WebSocketServer() server: Server;
 
-  async handleConnection(@ConnectedSocket() client: Socket) {}
+  // async handleConnection(@ConnectedSocket() client: Socket) {}
 
-  async handleDisconnect(@ConnectedSocket() client: Socket) {}
+  // async handleDisconnect(@ConnectedSocket() client: Socket) {}
 
   @SubscribeMessage('joinNotificationRoom')
   async handleJoinNotificationRoom(
@@ -134,5 +134,12 @@ export class NotificationGateway {
     this.server
       .to('notification_room_' + data.destUser.id)
       .emit('notification_private_message', data);
+  }
+
+  /* Trophee */
+  emitNotificationNewTrophy(data: NotificationInterface) {
+    this.server
+      .to('notification_room_' + data.receiver.id)
+      .emit('notification_trophee', data);
   }
 }

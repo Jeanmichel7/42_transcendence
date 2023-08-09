@@ -27,7 +27,7 @@ import {
   ConversationInterface,
   UserInterface,
 } from './types';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   NotificationInterface,
   UserActionInterface,
@@ -48,6 +48,8 @@ import { getNotifsNotRead } from './api/notification';
 import { Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { CircleBackground } from './utils/CircleBackground';
+
+import trophyImages from './components/Profile/TrophyImages';
 
 function App() {
   const dispatch = useDispatch();
@@ -179,7 +181,7 @@ function App() {
       dispatch(closeSnackbar());
       navigate(snackbar.link);
     }
-  }
+  };
 
   return (
       <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
@@ -228,6 +230,40 @@ function App() {
                     <p>{snackbar.loginFrom}</p>
                     {' ' + snackbar.message}
                   </div>
+                </div>
+              // </Link>
+            }
+            action={
+              <IconButton
+                size="small"
+                  aria-label="close"
+                  color="inherit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose();
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              }
+            />
+          ) : snackbar.trophyImg ? (
+            <SnackbarContent
+              message={
+                // <Link to={snackbar.link} className="text-white">
+                <div className='flex items-center' onClick={handleClickSnackbar}>
+                  <img
+                    className="w-10 h-10 rounded-full object-cover mr-2 "
+                    src={trophyImages[snackbar.trophyImg]}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src =
+                        'http://localhost:3000/avatars/defaultAvatar.png';
+                    }}
+                    alt="avatar"
+                  />
+                  <p>{snackbar.message}</p>
                 </div>
               // </Link>
             }

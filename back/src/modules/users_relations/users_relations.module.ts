@@ -18,7 +18,7 @@ import { NotificationEntity } from '../notification/entity/notification.entity';
     TypeOrmModule.forFeature([
       UserEntity,
       UserRelationEntity,
-      NotificationEntity,
+      NotificationEntity, //useless ?
     ]),
   ],
   providers: [

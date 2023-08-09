@@ -17,6 +17,7 @@ export const snackbarSlice = createSlice({
       vertical: 'bottom',
       horizontal: 'right',
       link: '',
+      trophyImg: '',
     } as SnackbarInterface,
   },
   reducers: {
@@ -53,6 +54,7 @@ export const snackbarSlice = createSlice({
       state.snackbar.loginFrom = '';
       state.snackbar.avatar = '';
       state.snackbar.link = '';
+      state.snackbar.trophyImg = '';
     },
     setSeveritySnackbar: (
       state,

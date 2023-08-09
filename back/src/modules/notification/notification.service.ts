@@ -23,15 +23,6 @@ export class NotificationService {
   ) {}
 
   async findNotifsNotRead(userId: bigint): Promise<NotificationInterface[]> {
-    // console.log('userId : ', userId);
-    // const user: UserEntity = await UserEntity.findOne({
-    //   where: { id: userId },
-    //   // relations: ['notificationsReceived'],
-    // });
-    // if (!user) {
-    //   throw new NotFoundException('User not found');
-    // }
-
     const notifications: NotificationInterface[] =
       await this.notificationRepository
         .createQueryBuilder('notifications')

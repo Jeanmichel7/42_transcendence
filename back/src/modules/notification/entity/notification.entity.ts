@@ -30,7 +30,8 @@ export class NotificationEntity extends BaseEntity {
     | 'gameInvite'
     | 'gameInviteAccepted'
     | 'gameInviteDeclined'
-    | 'message';
+    | 'message'
+    | 'trophy';
 
   @Column({
     type: 'text',

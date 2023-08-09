@@ -10,6 +10,7 @@ export interface SnackbarInterface {
   vertical: 'top' | 'bottom';
   horizontal: 'left' | 'center' | 'right';
   link: string;
+  trophyImg?: string;
 }
 
 export interface PutSnackbarInterface {
@@ -21,6 +22,7 @@ export interface PutSnackbarInterface {
   vertical?: 'top' | 'bottom';
   horizontal?: 'left' | 'center' | 'right';
   link?: string;
+  trophyImg?: string;
 }
 
 export interface UserActionInterface {
@@ -54,6 +56,7 @@ export interface NotificationInterface {
   receiver: UserInterface;
   sender: UserInterface;
   invitationLink?: string;
+  trophyImg?: string;
 }
 
 export interface UserStatusInterface {

@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TrophiesEntity } from './entity/trophies.entity'; // Assurez-vous que le chemin est correct
 import { GameEntity } from '../game/entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
 import { PlayerStats } from '../game/game.class';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationEntity } from '../notification/entity/notification.entity';
+import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
 
 const trophies = [
   {
@@ -119,6 +123,8 @@ export class TrophiesService {
     private readonly gameRepository: Repository<GameEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createTrophy(
@@ -264,6 +270,32 @@ export class TrophiesService {
     if (trophiesToAdd.length > 0) {
       player.trophies = [...(player.trophies || []), ...trophiesToAdd];
       await this.userRepository.save(player);
+
+      const bot: UserEntity = await this.userRepository.findOne({
+        where: { login: 'bot' },
+      });
+
+      const newNotif: NotificationEntity =
+        await this.notificationService.sendNotification({
+          type: 'trophy',
+          content: `You win a trophy : ${trophiesToAdd[0].name}`,
+          receiver: player,
+          sender: bot,
+        } as NotificationCreateDTO);
+      if (!newNotif)
+        throw new InternalServerErrorException(
+          `Can't create notification for user ${player.login}`,
+        );
+
+      // //notif trophées
+      // this.eventEmitter.emit(
+      //   'message.updated',
+      //   new NotificationCreatedEvent({
+      //     ...messageToUpdate,
+      //     text: newMessage.text,
+      //     updatedAt: new Date(),
+      //   }),
+      // );
     }
   }
 }
