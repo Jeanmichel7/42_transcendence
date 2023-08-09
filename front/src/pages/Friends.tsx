@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
-import WaitingAcceptRequest from "../components/Friends/WaitingAcceptRequest";
-import WaitingRequestSent from "../components/Friends/WaitingRequestSent";
-import AllFriends from "../components/Friends/AllFriends";
-import BlockedUser from "../components/Friends/BlockedUser";
-import OnLineFriends from "../components/Friends/OnLineFriends";
-import AddFriends from "../components/Friends/AddFriends";
+import WaitingAcceptRequest from '../components/Friends/WaitingAcceptRequest';
+import WaitingRequestSent from '../components/Friends/WaitingRequestSent';
+import AllFriends from '../components/Friends/AllFriends';
+import BlockedUser from '../components/Friends/BlockedUser';
+import OnLineFriends from '../components/Friends/OnLineFriends';
+import AddFriendsRaw from '../components/Friends/AddFriends';
 
-import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from "@mui/material";
+import GridViewIcon from '@mui/icons-material/GridView';
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+
+import { AppBar, Box, Tab, Tabs, Theme, useMediaQuery } from '@mui/material';
+import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSearchInterface';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -33,14 +37,16 @@ function TabPanel(props: TabPanelProps) {
     </div>
   );
 }
+
 const tabMapReverse = [
-  "online",
-  "all",
-  "waiting_received",
-  "waiting_sent",
-  "blocked",
-  "add",
+  'online',
+  'all',
+  'waiting_received',
+  'waiting_sent',
+  'blocked',
+  'add',
 ];
+
 const tabMap = {
   online: 0,
   all: 1,
@@ -58,6 +64,9 @@ export default function FriendsPage() {
   const [blockedCount, setBlockedCount] = useState<number>(0);
   const [waitingRequestCount, setWaitingRequestCount] = useState<number>(0);
   const [waitingSentCount, setWaitingSentCount] = useState<number>(0);
+  const [viewType, setViewType] = useState<string>('grid');
+
+  const matchesSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -72,7 +81,7 @@ export default function FriendsPage() {
   //check query params
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const tabType = query.get("tab");
+    const tabType = query.get('tab');
     if (!tabType) return;
 
     if (tabType in tabMap) {
@@ -88,7 +97,7 @@ export default function FriendsPage() {
   useEffect(() => {
     if (userFriends) {
       setFriendsCount(userFriends.length);
-      setOnlineCount(userFriends.filter((f) => f.status !== "offline").length);
+      setOnlineCount(userFriends.filter((f) => f.status !== 'offline').length);
     }
   }, [userFriends]);
 
@@ -111,90 +120,81 @@ export default function FriendsPage() {
     navigate(`?tab=${tabMapReverse[newValue]}`, { replace: true });
   };
 
+
   if (!userData) {
     return <p>Loading...</p>;
   }
 
   return (
     <>
-      <Box
-        sx={{
-          bgcolor: "var(--background-color)",
-        }}
-      >
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div">
-              Friends
-            </Typography>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              indicatorColor={"secondary"}
-              // selectionFollowsFocus={true}
-              textColor="inherit"
-              // variant="fullWidth"
-              variant="scrollable"
-              scrollButtons={true}
-              // visibleScrollbar={true}
-              aria-label="nav friends"
-            >
-              <Tab
-                label={"Online" + (onlineCount ? " (" + onlineCount + ")" : "")}
-              />
-              <Tab
-                label={
-                  "All Friends" +
-                  (friendsCount ? " (" + friendsCount + ")" : "")
-                }
-              />
-              <Tab
-                label={
-                  "Waiting received" +
-                  (waitingRequestCount ? " (" + waitingRequestCount + ")" : "")
-                }
-              />
-              <Tab
-                label={
-                  "Waiting sent" +
-                  (waitingSentCount ? " (" + waitingSentCount + ")" : "")
-                }
-              />
-              <Tab
-                label={
-                  "Blocked" + (blockedCount ? " (" + blockedCount + ")" : "")
-                }
-              />
-              <Tab label="Add Friend" />
-            </Tabs>
-          </Toolbar>
-        </AppBar>
+      <AppBar position="static">
+        <div className="flex bg-gray-800">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            selectionFollowsFocus={true}
+            textColor="inherit"
+            variant={matchesSmallScreen ? 'fullWidth' : 'scrollable'}
+            scrollButtons={true}
+            aria-label="nav friends"
+          >
+            <Tab label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')} />
+            <Tab label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')} />
+            <Tab label={'Invit received' + (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')} />
+            <Tab label={'Invit sent' + (waitingSentCount ? ' (' + waitingSentCount + ')' : '')} />
+            <Tab label={'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')} />
+          </Tabs>
+          <div className="flex-grow"></div>
+          <Tab
+            label="Add Friend"
+            sx={{ color: 'rgb(129 178 216 / 1)', fontWeight: 'bold' }}
+            onClick={() => {
+              setValue(5);
+              navigate(`?tab=${tabMapReverse[5]}`, { replace: true });
+            }}
+          />
+        </div>
+      </AppBar>
 
-        <TabPanel value={value} index={0}>
-          {" "}
-          <OnLineFriends userDataId={userData.id} />{" "}
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          {" "}
-          <AllFriends userDataId={userData.id} />{" "}
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          {" "}
-          <WaitingAcceptRequest />{" "}
-        </TabPanel>
-        <TabPanel value={value} index={3}>
-          {" "}
-          <WaitingRequestSent />{" "}
-        </TabPanel>
-        <TabPanel value={value} index={4}>
-          {" "}
-          <BlockedUser />{" "}
-        </TabPanel>
-        <TabPanel value={value} index={5}>
-          {" "}
-          <AddFriends />{" "}
-        </TabPanel>
-      </Box>
+      <TabPanel value={value} index={0}>
+        <OnLineFriends userDataId={userData.id} />
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        
+        <AllFriends userDataId={userData.id} />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        
+        <WaitingAcceptRequest />
+      </TabPanel>
+      <TabPanel value={value} index={3}>
+        
+        <WaitingRequestSent />
+      </TabPanel>
+      <TabPanel value={value} index={4}>
+        
+        <BlockedUser />
+      </TabPanel>
+      <TabPanel value={value} index={5}>
+        <div className="flex justify-end mb-4">
+          <p className='mr-2'>Display </p>
+          { viewType === 'list' 
+            ? (
+            <GridViewIcon
+              onClick={() => setViewType('grid')}
+              className="cursor-pointer"
+            />
+            ) : (
+            <ViewHeadlineIcon
+              onClick={() => setViewType('list')}
+              className="cursor-pointer"
+            />
+            )}
+        </div>
+        {
+          viewType === 'grid' ? <FriendsSearch setHeight={false}/> : <AddFriendsRaw/> 
+        }
+      </TabPanel>
     </>
   );
 }

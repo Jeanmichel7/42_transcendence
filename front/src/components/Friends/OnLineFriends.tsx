@@ -105,9 +105,10 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
       )}
 
       {userFriends?.length !== 0 &&
-        !userFriends?.find((u) => u.status === 'online') && (
+        !userFriends?.find((u) => u.status != 'offline') && (
           <Nothing text="Sorry... you're alone" />
       )}
+
       {userFriends
         ?.filter((u) => u.status != 'offline')
         .map((user) => (

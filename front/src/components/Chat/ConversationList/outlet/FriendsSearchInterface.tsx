@@ -20,7 +20,7 @@ import {
   TextField,
 } from '@mui/material';
 
-export default function FriendsSearch() {
+export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState<UserInterface[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
@@ -169,7 +169,9 @@ export default function FriendsSearch() {
           }}
         />
       )}
-      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-202px)] h-full px-2">
+      <div className={`flex flex-wrap justify-center 
+        overflow-auto ${setHeight ? 'max-h-[calc(100vh-202px)]' : ''} h-full px-2`}
+      >
         <div ref={topRef} />
         {users.map((user: UserInterface) => {
           if (user.id != userData.id && user.id != 0 && !isMyFriend(user.id))

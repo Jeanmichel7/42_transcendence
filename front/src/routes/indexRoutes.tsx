@@ -46,7 +46,7 @@ const AppRoutes: React.FC = () => (
           path="channel/invitation/:channelId/:channelName"
           element={<InvitationWrapper />}
         />
-        <Route path="addFriends" element={<FriendsSearch />} />
+        <Route path="addFriends" element={<FriendsSearch setHeight={true} />} />
         <Route path="createChannel" element={<CreateGroupInterface />} />
         <Route path="addChannels" element={<ChannelSearch />} />
         <Route path="*" element={<HomeChat />} />

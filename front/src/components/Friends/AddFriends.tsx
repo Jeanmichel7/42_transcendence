@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import { ApiErrorResponse, UserInterface, UserRelation } from "../../types";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllUsers } from "../../api/user";
-import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { RootState } from "../../store";
-import { CircularProgress } from "@mui/material";
-import FriendItem from "./FriendItem";
-import { requestAddFriend } from "../../api/relation";
-import { reduxAddWaitingFriendsSent } from "../../store/userSlice";
+import { useCallback, useEffect, useState } from 'react';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllUsers } from '../../api/user';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { RootState } from '../../store';
+import { CircularProgress } from '@mui/material';
+import FriendItem from './FriendItem';
+import { requestAddFriend } from '../../api/relation';
+import { reduxAddWaitingFriendsSent } from '../../store/userSlice';
 
 //todo pagination for all users
 
-const AddFriends = () => {
+const AddFriendsRaw = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [allUsers, setAllUsers] = useState<UserInterface[]>([]);
   const { userData, userFriends, userBlocked, waitingFriendsRequestSent } =
@@ -21,16 +21,16 @@ const AddFriends = () => {
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     const allUsersFetched: UserInterface[] | ApiErrorResponse =
-      await getAllUsers(1, 100);
+      await getAllUsers();
     setIsLoading(false);
 
-    if ("error" in allUsersFetched)
+    if ('error' in allUsersFetched)
       dispatch(
         setErrorSnackbar(
           allUsersFetched.error + allUsersFetched.message
-            ? ": " + allUsersFetched.message
-            : ""
-        )
+            ? ': ' + allUsersFetched.message
+            : '',
+        ),
       );
     else {
       const resFiltered = allUsersFetched.filter(
@@ -39,7 +39,7 @@ const AddFriends = () => {
           u.id != userData.id &&
           !userFriends?.find((f: UserInterface) => f.id === u.id) &&
           !userBlocked?.find((f: UserInterface) => f.id === u.id) &&
-          !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id)
+          !waitingFriendsRequestSent?.find((f: UserInterface) => f.id === u.id),
       );
       setAllUsers(resFiltered);
     }
@@ -75,16 +75,16 @@ const AddFriends = () => {
 
     setIsLoading(true);
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(
-      user.id
+      user.id,
     );
     setIsLoading(false);
 
-    if ("error" in res)
+    if ('error' in res)
       dispatch(
-        setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
       );
     else {
-      dispatch(setMsgSnackbar("Request sent"));
+      dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(user));
     }
   };
@@ -96,19 +96,19 @@ const AddFriends = () => {
       !userBlocked ||
       !waitingFriendsRequestSent ? (
         <p>Loading...</p>
-      ) : (
-        allUsers?.map((user) => (
+        ) : (
+          allUsers?.map((user) => (
           <FriendItem
             key={user.id}
             user={user}
-            actions={[{ name: "Add", callback: handleRequestAddFriend }]}
+            actions={[{ name: 'Add', callback: handleRequestAddFriend }]}
             isLoading={isLoading}
           />
-        ))
-      )}
+          ))
+        )}
       {isLoading && <CircularProgress />}
     </>
   );
 };
 
-export default AddFriends;
+export default AddFriendsRaw;
