@@ -88,7 +88,7 @@ const NotificationItem = ({
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
     else {
-      dispatch(setMsgSnackbar('Game invitation accepted'));
+      // dispatch(setMsgSnackbar('Game invitation accepted'));
       navigate(notif.invitationLink ? notif.invitationLink : '/chat');
     }
     setIsLoading(false);
@@ -97,10 +97,10 @@ const NotificationItem = ({
   const handleDeclineGameInvitation = async (notif: NotificationInterface) => {
     const extractGameId: number = parseInt(notif.invitationLink?.split('?id=')[1] as string);
     setIsLoading(true);
-
-    const resDeclineRequest: void | ApiErrorResponse = await declineRoom(extractGameId);
-    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest) 
-      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+    await declineRoom(extractGameId);
+    // const resDeclineRequest: void | ApiErrorResponse = await declineRoom(extractGameId);
+    // if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest) 
+    // dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
     setIsLoading(false);
   };
 

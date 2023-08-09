@@ -122,77 +122,9 @@ const useConnection = () => {
     // // socket.on('notification_game_invite_canceled', (notification: NotificationInterface) => {
 
 
-/*
-{
-    "type": "trophy",
-    "content": "You win a trophy : Warrior",
-    "receiver": {
-        "id": "29",
-        "firstName": "Darrin",
-        "lastName": "Kirlin",
-        "login": "Laron76",
-        "email": "Furman_Buckridge-Gusikowski@gmail.com",
-        "password": "$2b$10$c1j721RAxyGoIukxRC5suu2ALUFfYV2XoH51h8rryg7U1k40YmC/2",
-        "role": "user",
-        "avatar": "https://avatars.githubusercontent.com/u/82350039",
-        "description": "Quis blanditiis vel aut repellendus atque itaque.",
-        "score": 1567.7563222762817,
-        "level": 3,
-        "experience": 60,
-        "gamesPlayed": 0,
-        "consecutiveWin": 0,
-        "laserKill": 0,
-        "bonusUsed": 0,
-        "is2FAEnabled": false,
-        "status": "online",
-        "secret2FA": null,
-        "createdAt": "2023-06-19T18:24:15.304Z",
-        "updatedAt": "2023-08-09T18:10:50.437Z",
-        "lastActivity": "2023-08-09T18:10:35.727Z",
-        "numberOfConsecutiveWins": 11,
-        "numberOfEnemiesKilledWithLaser": 0,
-        "numberOfGamesPlayed": 7,
-        "numberOfGamesWonWithoutMissingBall": 0,
-        "trophies": [
-            {
-                "id": 1,
-                "name": "Warrior",
-                "description": "Win 3 games in a row",
-                "imagePath": "warrior.jpeg"
-            },
-            {
-                "id": 2,
-                "name": "Lord",
-                "description": "Win 5 games in a row",
-                "imagePath": "lord.jpeg"
-            },
-            {
-                "id": 3,
-                "name": "Emperor",
-                "description": "Win 10 games in a row",
-                "imagePath": "emperor.jpeg"
-            },
-            {
-                "id": 18,
-                "name": "Blitz Pong",
-                "description": "Win a game in less than 2 minutes",
-                "imagePath": "blitz_pong.jpeg"
-            }
-        ]
-    },
-    "sender": null,
-    "read": true,
-    "invitationLink": null,
-    "createdAt": "2023-08-09T18:10:50.496Z",
-    "updatedAt": "2023-08-09T18:10:50.496Z",
-    "id": "622"
-}
-*/
-
-
     /* TROPHY */
     socket.on('notification_trophee', (notif: NotificationInterface) => {
-      console.log('notif trophy : ', notif);
+      // console.log('notif trophy : ', notif);
       // dispatch(reduxAddNotification(notification));
 
       const trophyName = notif.content.split(' : ')[1];

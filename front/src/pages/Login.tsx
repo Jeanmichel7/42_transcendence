@@ -1,16 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
-import styled, { keyframes, css } from "styled-components";
-import { Button } from "@mui/material";
-import { useCallback, useState } from "react";
-import { CircleBackground } from "../utils/CircleBackground";
-import { getFriends, getBlockedUsers } from "../api/relation";
-import { getUserData } from "../api/user";
-import { reduxSetConversationList } from "../store/convListSlice";
-import { reduxSetNotifications } from "../store/notificationSlice";
-import { setLogged, setUser, reduxSetFriends, reduxSetUserBlocked } from "../store/userSlice";
-import { NotificationInterface, ConversationInterface, ApiErrorResponse, UserActionInterface, UserInterface } from "../types";
-import { useDispatch } from "react-redux";
-import { setErrorSnackbar } from "../store/snackbarSlice";
+import { Link, useNavigate } from 'react-router-dom';
+import styled, { keyframes, css } from 'styled-components';
+import { Button } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { CircleBackground } from '../utils/CircleBackground';
+import { getFriends, getBlockedUsers } from '../api/relation';
+import { getUserData } from '../api/user';
+import { reduxSetConversationList } from '../store/convListSlice';
+import { reduxSetNotifications } from '../store/notificationSlice';
+import { setLogged, setUser, reduxSetFriends, reduxSetUserBlocked } from '../store/userSlice';
+import { NotificationInterface, ConversationInterface, ApiErrorResponse, UserActionInterface, UserInterface } from '../types';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar } from '../store/snackbarSlice';
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -97,7 +97,7 @@ export const TransitionCircle = styled.span`
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(${(props) => (props.expand ? "-50%" : "-150%")}, -50%);
+  transform: translate(${(props) => (props.expand ? '-50%' : '-150%')}, -50%);
   animation: ${animationCircle} 1s ease-out;
   width: 200vh;
   height: 200vh;
@@ -140,7 +140,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   }
 
   &:hover {
-    color: ${(props) => (!props.expand ? "#000" : "#fff")};
+    color: ${(props) => (!props.expand ? '#000' : '#fff')};
     &::before {
       width: 100%;
     }
@@ -193,7 +193,7 @@ export default function Login() {
   }, [dispatch, fetchData]);
 
   const handleConnection = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const width = 600;
@@ -202,20 +202,20 @@ export default function Login() {
     const top = window.innerHeight / 2 - height / 2;
 
     const newWindow = window.open(
-      "http://localhost:3006/connection",
-      "_blank",
+      'http://localhost:3006/connection',
+      '_blank',
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
-        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
     );
-    if (!newWindow) return console.log("erreur new windos  ");
+    if (!newWindow) return console.log('erreur new windows  ');
 
-    window.addEventListener("message", async (event) => {
+    window.addEventListener('message', async (event) => {
       if (event.source !== newWindow) return;
-      if (event.data.msg === "user connected") {
+      if (event.data.msg === 'user connected') {
         setExpand(true);
-        if(event.data.id != -1) await saveUserData(event.data.id);
+        if (event.data.id != -1) await saveUserData(event.data.id);
         newWindow.close();
-        navigate("/game");
+        navigate('/game');
       }
     });
   };

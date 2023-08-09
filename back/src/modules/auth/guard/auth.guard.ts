@@ -62,12 +62,12 @@ export class AuthGuard implements CanActivate {
 
     user.lastActivity = new Date();
     if (user.status !== 'online') {
-      console.log(
-        'update user status to ONLINE, ',
-        user.id,
-        user.login,
-        user.status,
-      );
+      // console.log(
+      //   'update user status to ONLINE, ',
+      //   user.id,
+      //   user.login,
+      //   user.status,
+      // );
 
       const userUpdated = new UserUpdateEvent({
         id: user.id,
@@ -76,11 +76,11 @@ export class AuthGuard implements CanActivate {
         avatar: user.avatar,
         updatedAt: new Date(),
       });
-      console.log(
-        'userUpdated: ',
-        userUpdated.userStatus.id,
-        userUpdated.userStatus.login,
-      );
+      // console.log(
+      //   'userUpdated: ',
+      //   userUpdated.userStatus.id,
+      //   userUpdated.userStatus.login,
+      // );
       this.eventEmitter.emit('user_status.updated', userUpdated);
       user.status = 'online';
     }

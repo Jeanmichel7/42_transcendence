@@ -98,7 +98,6 @@ function Header() {
 
   // handler notifications
   const handleOpenNotificationMenu = (event: React.MouseEvent<HTMLElement>) => {
-    console.log('activ');
     setAnchorElNotification(event.currentTarget);
   };
   const handleCloseNotificationMenu = () => {

@@ -48,9 +48,9 @@ const PrivateConversation: React.FC = () => {
 
   const isFriends = userFriend?.some((friend) => friend.id === id) || false;
 
-  useEffect(() => {
-    console.log('userFriend : ', userFriend);
-  }, [userFriend]);
+  // useEffect(() => {
+  //   console.log('userFriend : ', userFriend);
+  // }, [userFriend]);
 
   const fetchOldMessages = useCallback(async () => {
     if (id == '-1' || userData.id == -1 ) return;

@@ -70,7 +70,7 @@ export default function FakeConnection() {
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading(true);
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-    console.log('res : ', res);
+    // console.log('res : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
@@ -92,7 +92,7 @@ export default function FakeConnection() {
     e.preventDefault();
 
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(login, password);
-    console.log('res connection : ', res);
+    // console.log('res connection : ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {

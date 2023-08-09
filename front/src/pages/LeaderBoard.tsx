@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { getLeaderboard } from "../api/leaderBoard";
-import { UserInterface } from "../types";
+import { useEffect, useState } from 'react';
+import { getLeaderboard } from '../api/leaderBoard';
+import { UserInterface } from '../types';
 
 const LeaderBoard = () => {
   const [leaderBoard, setLeaderBoard] = useState<UserInterface[]>([]);
@@ -10,7 +10,7 @@ const LeaderBoard = () => {
   useEffect(() => {
     const fetchLeaderBoard = async () => {
       const resFatchLeaderBoard = await getLeaderboard(page, offset);
-      if ("error" in resFatchLeaderBoard)
+      if ('error' in resFatchLeaderBoard)
         return console.warn(resFatchLeaderBoard.error);
       setLeaderBoard((prev) => [...prev, ...resFatchLeaderBoard]);
     };
@@ -24,9 +24,9 @@ const LeaderBoard = () => {
           version="1.1"
           id="Layer_1"
           xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 490 490"
-          xml:space="preserve"
+          xmlSpace="preserve"
           className="relative w-1/12 top-0 left-0  pt-8"
         >
           <g>
@@ -35,24 +35,24 @@ const LeaderBoard = () => {
                 <rect
                   x="220"
                   y="200"
-                  style={{ fill: "#F9A845" }}
+                  style={{ fill: '#F9A845' }}
                   width="50"
                   height="180"
                 />
                 <rect
                   x="160"
                   y="415"
-                  style={{ fill: "#E7ECED" }}
+                  style={{ fill: '#E7ECED' }}
                   width="170"
                   height="65"
                 />
                 <path
-                  style={{ fill: "#AFB6BB" }}
+                  style={{ fill: '#AFB6BB' }}
                   d="M365,400v80h-35v-65H160v65h-35v-80c0-10.996,9.004-20,20-20h75h50h75
 				C355.996,380,365,389.004,365,400z"
                 />
                 <path
-                  style={{ fill: "#FFD248" }}
+                  style={{ fill: '#FFD248' }}
                   d="M380,180c0,10.996-9.004,20-20,20h-90h-50h-90c-10.996,0-20-9.004-20-20V10h270V180z"
                 />
               </g>
@@ -60,23 +60,23 @@ const LeaderBoard = () => {
                 <rect
                   x="205"
                   y="440"
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   width="80"
                   height="20"
                 />
                 <path
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   d="M155,55h20V35h-30c-5.523,0-10,4.478-10,10v35h20V55z"
                 />
                 <rect
                   x="135"
                   y="95"
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   width="20"
                   height="20"
                 />
                 <path
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   d="M440,0H50c-5.522,0-10,4.477-10,10v105c0,0.474,0.033,0.945,0.101,1.414
 				c0.173,1.213,1.98,12.157,11.946,22.891c13.055,14.058,31.857,18.984,47.953,20.294V180c0,16.542,13.458,30,30,30h80v160h-65
 				c-16.542,0-30,13.458-30,30v70H90v20h310v-20h-25v-70c0-16.542-13.458-30-30-30h-65V210h80c16.542,0,30-13.458,30-30v-20.401
@@ -103,9 +103,9 @@ const LeaderBoard = () => {
           version="1.1"
           id="Layer_1"
           xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 490 490"
-          xml:space="preserve"
+          xmlSpace="preserve"
           className=" relative w-1/12 top-0 left-0  pt-8"
         >
           <g>
@@ -114,24 +114,24 @@ const LeaderBoard = () => {
                 <rect
                   x="220"
                   y="200"
-                  style={{ fill: "#F9A845" }}
+                  style={{ fill: '#F9A845' }}
                   width="50"
                   height="180"
                 />
                 <rect
                   x="160"
                   y="415"
-                  style={{ fill: "#E7ECED" }}
+                  style={{ fill: '#E7ECED' }}
                   width="170"
                   height="65"
                 />
                 <path
-                  style={{ fill: "#AFB6BB" }}
+                  style={{ fill: '#AFB6BB' }}
                   d="M365,400v80h-35v-65H160v65h-35v-80c0-10.996,9.004-20,20-20h75h50h75
 				C355.996,380,365,389.004,365,400z"
                 />
                 <path
-                  style={{ fill: "#FFD248" }}
+                  style={{ fill: '#FFD248' }}
                   d="M380,180c0,10.996-9.004,20-20,20h-90h-50h-90c-10.996,0-20-9.004-20-20V10h270V180z"
                 />
               </g>
@@ -139,23 +139,23 @@ const LeaderBoard = () => {
                 <rect
                   x="205"
                   y="440"
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   width="80"
                   height="20"
                 />
                 <path
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   d="M155,55h20V35h-30c-5.523,0-10,4.478-10,10v35h20V55z"
                 />
                 <rect
                   x="135"
                   y="95"
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   width="20"
                   height="20"
                 />
                 <path
-                  style={{ fill: "#231F20" }}
+                  style={{ fill: '#231F20' }}
                   d="M440,0H50c-5.522,0-10,4.477-10,10v105c0,0.474,0.033,0.945,0.101,1.414
 				c0.173,1.213,1.98,12.157,11.946,22.891c13.055,14.058,31.857,18.984,47.953,20.294V180c0,16.542,13.458,30,30,30h80v160h-65
 				c-16.542,0-30,13.458-30,30v70H90v20h310v-20h-25v-70c0-16.542-13.458-30-30-30h-65V210h80c16.542,0,30-13.458,30-30v-20.401
@@ -191,13 +191,13 @@ const LeaderBoard = () => {
             {leaderBoard.map((user, index) => {
               let colorClass;
               if (index === 0) {
-                colorClass = "bg-yellow-400 text-black"; // Or
+                colorClass = 'bg-yellow-400 text-black'; // Or
               } else if (index === 1) {
-                colorClass = "bg-gray-300 text-black"; // Argent
+                colorClass = 'bg-gray-300 text-black'; // Argent
               } else if (index === 2) {
-                colorClass = "bg-orange-500 text-white"; // Bronze
+                colorClass = 'bg-orange-500 text-white'; // Bronze
               } else {
-                colorClass = "bg-yellow-900 text-white"; // Cuivre
+                colorClass = 'bg-yellow-900 text-white'; // Cuivre
               }
 
               return (
@@ -209,7 +209,7 @@ const LeaderBoard = () => {
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {user.firstName + " " + user.lastName}
+                    {user.firstName + ' ' + user.lastName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {user.score.toFixed(2)}

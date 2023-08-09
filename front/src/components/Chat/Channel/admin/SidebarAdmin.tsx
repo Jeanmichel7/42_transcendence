@@ -111,7 +111,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('delete channel');
+    // console.log('delete channel');
     if (!room) return;
     const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
     if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)

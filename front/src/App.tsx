@@ -59,10 +59,10 @@ function App() {
   const [userId, setUserId] = useState(-1);
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
-  useEffect(() => {
-    console.log('snackbar : ' + snackbar.message);
-    console.log('snackbar : ' + snackbar.link);
-  }, [snackbar]);
+  // useEffect(() => {
+  //   console.log('snackbar : ' + snackbar.message);
+  //   console.log('snackbar : ' + snackbar.link);
+  // }, [snackbar]);
 
   const fetchData = useCallback(
     async function <
@@ -166,8 +166,8 @@ function App() {
 
   const handleClick = () => {
     if (snackbar.link) {
-      navigate(snackbar.link);
       dispatch(closeSnackbar());
+      navigate(snackbar.link);
     }
   };
 
@@ -176,9 +176,8 @@ function App() {
   };
 
   const handleClickSnackbar  = () => {
+    dispatch(closeSnackbar());
     if (snackbar.link) {
-      // dispatch()
-      dispatch(closeSnackbar());
       navigate(snackbar.link);
     }
   };

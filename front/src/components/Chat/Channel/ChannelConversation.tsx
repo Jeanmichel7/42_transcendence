@@ -202,7 +202,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           socketRef.current?.emit('leaveRoom', {
             roomId: id,
           });
-          console.log('room delete, conv : ', conv);
+          // console.log('room delete, conv : ', conv);
           dispatch(
             reduxRemoveConversationToList({
               convId: conv.id,

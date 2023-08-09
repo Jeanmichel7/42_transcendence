@@ -55,6 +55,9 @@ export const snackbarSlice = createSlice({
       state.snackbar.avatar = '';
       state.snackbar.link = '';
       state.snackbar.trophyImg = '';
+      state.snackbar.vertical = 'bottom';
+      state.snackbar.horizontal = 'right';
+
     },
     setSeveritySnackbar: (
       state,
