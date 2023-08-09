@@ -1,9 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./userSlice";
-import chatReducer from "./convListSlice";
-import snackarReducer from "./snackbarSlice";
-import notificationReducer from "./notificationSlice";
-import gameReducer from "./gameSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import userReducer from './userSlice';
+import chatReducer from './convListSlice';
+import snackarReducer from './snackbarSlice';
+import notificationReducer from './notificationSlice';
+import gameReducer from './gameSlice';
 
 const store = configureStore({
   reducer: {

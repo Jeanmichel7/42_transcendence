@@ -18,19 +18,22 @@ const addFriend = (state: UserState, user: UserInterface) => {
     state.userFriends = [...state.userFriends, user];
 };
 
-const removeFriend = (state: UserState, user: UserInterface) => {
+const removeFriend = (state: UserState, userId: number) => {
   if (!state.userFriends)
     return;
   state.userFriends = state.userFriends
-    .filter((friend: UserInterface) => friend.id !== user.id);
+    .filter((friend: UserInterface) => friend.id !== userId);
 };
 
 // User blocked management
-const addUserBlocked = (state: UserState, user: UserInterface) => {
+const addUserBlocked = (state: UserState, userId: number) => {
+  const userToBlock: UserInterface | undefined 
+    = state.userFriends?.find((u) => u.id === userId);
+  if (!userToBlock) return;
   if (!state.userBlocked)
-    state.userBlocked = [user];
+    state.userBlocked = [userToBlock];
   else
-    state.userBlocked = [...state.userBlocked, user];
+    state.userBlocked = [...state.userBlocked, userToBlock];
 };
 
 const removeUserBlocked = (state: UserState, user: UserInterface) => {
@@ -125,6 +128,7 @@ export const userSlice = createSlice({
       description: '',
       role: 'user',
       score: 1500,
+      level: 0,
       is2FAEnabled: false,
     },
   } as UserState,
@@ -161,6 +165,7 @@ export const userSlice = createSlice({
         description: '',
         is2FAEnabled: false,
         score: 1500,
+        level: 0,
       };
     },
 
@@ -182,7 +187,7 @@ export const userSlice = createSlice({
       addFriend(state, action.payload);
       removeUserBlocked(state, action.payload);
     },
-    reduxRemoveFriends: (state, action: PayloadAction<UserInterface>) => {
+    reduxRemoveFriends: (state, action: PayloadAction<number>) => {
       removeFriend(state, action.payload);
     },
 
@@ -190,7 +195,7 @@ export const userSlice = createSlice({
     reduxSetUserBlocked: (state, action: PayloadAction<UserInterface[]>) => {
       state.userBlocked = action.payload;
     },
-    reduxAddUserBlocked: (state, action: PayloadAction<UserInterface>) => {
+    reduxAddUserBlocked: (state, action: PayloadAction<number>) => {
       addUserBlocked(state, action.payload);
       removeFriend(state, action.payload);
     },

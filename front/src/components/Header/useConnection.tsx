@@ -29,11 +29,13 @@ const useConnection = () => {
 
       const snackbar: PutSnackbarInterface = {
         open: true,
-        message: message.ownerUser.login + ': ' + (message.text.length > 10 
+        loginFrom: message.ownerUser.login,
+        message: (message.text.length > 10 
           ? message.text.substring(0, 7) + '...' 
           : message.text),
         severity: 'info',
         link: '/chat/conv/x/' + message.ownerUser.id + '/' + message.ownerUser.login,
+        avatar: message.ownerUser.avatar,
       };
       dispatch(setSnackbar(snackbar));
       dispatch(reduxAddNotReadMP({ userIdFrom: message.ownerUser.id, userId: userData.id }));
@@ -85,11 +87,11 @@ const useConnection = () => {
     });
 
     socket.on('notification_friend_deleted', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveFriends(notification.sender));
+      dispatch(reduxRemoveFriends(notification.sender.id));
     });
 
     socket.on('notification_block_user', (notification: NotificationInterface) => {
-      dispatch(reduxRemoveFriends(notification.sender));
+      dispatch(reduxRemoveFriends(notification.sender.id));
     });
 
 

@@ -4,27 +4,30 @@ import {
   ButtonCreateGroup,
   ButtonInterfaceAddGroups,
   ButtonInterfaceAddFriends,
-} from "../components/Chat/ConversationList/ChannelButtons";
+} from "../components/Chat/ConversationList/outlet/ChannelButtons";
 import { Divider } from "@mui/material";
 
 function Chat() {
   return (
-    <div className="flex flex-col h-screen min-h-md relative ">
-      <div className="h-full flex justify-center bg-[#F2F2FF]">
-        <div className="flex flex-col items-center h-full w-auto min-w-fit bg-[#e5e5f2]">
-          <ButtonCreateGroup />
-          <div className="flex justify-center items-center">
+    <div className="flex h-screen w-full min-h-md relative ">
+
+        <div className="h-full w-full max-w-[200px] min-w-fit bg-[#e5e5f2]">
+          <div className="w-full justify-center items-center">
+            <p className="p-[5px] bg-gray-300 text-blue-700 text-sm ">CHANNEL </p>
+            {/* <Divider flexItem /> */}
+            <ButtonCreateGroup />
             <ButtonInterfaceAddGroups />
-            <ButtonInterfaceAddFriends />
           </div>
+
+          <ButtonInterfaceAddFriends />
           <ConversationList />
         </div>
+
         <Divider orientation="vertical" flexItem />
 
         <div className="flex-grow h-full w-full">
           <Outlet />
         </div>
-      </div>
     </div>
   );
 }

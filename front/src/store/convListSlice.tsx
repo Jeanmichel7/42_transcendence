@@ -135,7 +135,7 @@ export const chatSlice = createSlice({
       localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
     reduxRemoveConversationToList: (state, action: PayloadAction<{ convId: number, userId: number }>) => {
-      // console.log('REDUX REMOVE CONV LIST', action.payload);
+      console.log('REDUX REMOVE CONV LIST', action.payload);
       const { convId, userId } = action.payload;
       state.conversationsList = state.conversationsList
         .filter((conv: ConversationInterface) => conv.id !== convId);

@@ -43,19 +43,22 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
               angry={false}
             />
           </NavLink>
-        ) : (
-          friends.map((friend) => {
-            if (friend.login != user.login)
-              return (
-                <FriendCard
-                  key={friend.id}
-                  actualUserLogin={user.login}
-                  friend={friend}
-                  setFriends={setFriends}
-                />
-              );
-          })
-        )}
+        ) :
+          <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
+            { friends.map((friend) => {
+                if (friend.login != user.login)
+                  return (
+                    <FriendCard
+                      key={friend.id}
+                      actualUserLogin={user.login}
+                      friend={friend}
+                      setFriends={setFriends}
+                    />
+                  );
+              })
+            }
+          </div>
+        }
       </div>
     </>
   );

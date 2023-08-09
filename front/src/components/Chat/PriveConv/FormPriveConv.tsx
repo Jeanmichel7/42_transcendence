@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ApiErrorResponse, MessageInterface } from '../../../types';
-import { TextareaAutosize } from '@mui/material';
+import { Button, FormHelperText, TextareaAutosize } from '@mui/material';
 import { BiPaperPlane } from 'react-icons/bi';
 import { useParams } from 'react-router-dom';
 import { sendMessage } from '../../../api/message';
@@ -13,6 +13,7 @@ const FormPriveConv = ({
   setShouldScrollToBottom,
 }: FormChannelProps ) => {
   const id = (useParams<{ id: string }>().id || '-1');
+  const [isBlocked, setIsBlocked] = useState(false);
   const [text, setText] = useState<string>('');
   const [statusSendMsg, setStatusSendMsg] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
@@ -30,7 +31,9 @@ const FormPriveConv = ({
         = await sendMessage( message, id);
       setIsSending(false);
       if ('error' in newMessage) {
-        setStatusSendMsg(newMessage.message);
+        if (newMessage.error === 'Forbidden')
+          setIsBlocked(true);
+        setStatusSendMsg(newMessage.message); //display error
       } else {
         setShouldScrollToBottom(true);
       }
@@ -76,16 +79,18 @@ const FormPriveConv = ({
           ref={textareaRef}
           name="text"
           value={text}
+          disabled={isBlocked}
           onChange={handleChangeTextArea}
           onKeyDown={handleSubmit}
           placeholder="Enter your text here..."
           className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
         />
-        <button className='flex justify-center items-center'
+        <Button className='flex justify-center items-center'
           onClick={handleSubmit}
+          disabled={isBlocked}
         >
           <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
-        </button>
+        </Button>
 
         {/* display status send message */}
         {statusSendMsg !== '' &&
@@ -98,6 +103,7 @@ const FormPriveConv = ({
           </p>
         }
       </form>
+      <FormHelperText error >{isBlocked && 'You are blocked'}</FormHelperText>
     </>
   );
 };

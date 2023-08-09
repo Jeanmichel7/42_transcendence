@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
-import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
+import { RootState } from '../../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { reduxAddWaitingFriendsSent } from '../../../../store/userSlice';
 
-import FriendCard from '../../Profile/FriendsCard';
-import { getAllUsersCount, getAllUsersPaginate } from '../../../api/user';
-import { requestAddFriend } from '../../../api/relation';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
+import FriendCard from '../../../Profile/FriendsCard';
+import { getAllUsersCount, getAllUsersPaginate } from '../../../../api/user';
+import { requestAddFriend } from '../../../../api/relation';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../../../types';
 
 import {
   Autocomplete,
@@ -169,7 +169,7 @@ export default function FriendsSearch() {
           }}
         />
       )}
-      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
+      <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-202px)] h-full px-2">
         <div ref={topRef} />
         {users.map((user: UserInterface) => {
           if (user.id != userData.id && user.id != 0 && !isMyFriend(user.id))

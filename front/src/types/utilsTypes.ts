@@ -4,6 +4,8 @@ import { UserInterface } from './UserTypes';
 export interface SnackbarInterface {
   open: boolean;
   message: string;
+  loginFrom?: string;
+  avatar: string;
   severity: 'success' | 'info' | 'warning' | 'error';
   vertical: 'top' | 'bottom';
   horizontal: 'left' | 'center' | 'right';
@@ -13,6 +15,8 @@ export interface SnackbarInterface {
 export interface PutSnackbarInterface {
   open?: boolean;
   message?: string;
+  loginFrom?: string;
+  avatar?: string;
   severity?: 'success' | 'info' | 'warning' | 'error';
   vertical?: 'top' | 'bottom';
   horizontal?: 'left' | 'center' | 'right';

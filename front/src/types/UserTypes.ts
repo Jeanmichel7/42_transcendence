@@ -13,6 +13,7 @@ export interface UserInterface {
   status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
   avatar: string;
   score: number;
+  level: number;
   description?: string;
   role?: 'user' | 'admin';
   is2FAEnabled?: boolean;

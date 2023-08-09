@@ -5,16 +5,18 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import { apiEditMessage } from '../../api/message';
 
-import { ApiErrorResponse, UserInterface } from '../../types';
+import { ApiErrorResponse, GameInterface, UserInterface } from '../../types';
 import { ChatMsgInterface, MessageInterface } from '../../types/ChatTypes';
 import { BiPaperPlane } from 'react-icons/bi';
 import { CircularProgress, FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { getTimeSince, isChatMsgInterface, isMsgInterface } from '../../utils/utils';
 import { editChatMessage } from '../../api/chat';
 import { RootState } from '../../store';
 import { StyledLink } from './PriveConv/style';
+import { inviteGameUser } from '../../api/game';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -38,10 +40,10 @@ const MessageItem: FC<MessageItemProps> = ({
   const dispatch = useDispatch();
 
   const handleEdit = (id: number) => async (
-    e:  React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.KeyboardEvent<HTMLTextAreaElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     if (e === null) return;
-    
+
     if ('key' in e) {
       if (e.shiftKey && e.key === 'Enter') {
         setInputMessage((prev) => prev + '\n');
@@ -52,7 +54,7 @@ const MessageItem: FC<MessageItemProps> = ({
     if (inputMessage.trim() === '') return;
     e.stopPropagation();
     e.preventDefault();
-    
+
     if (inputMessage === message.text) {
       setEditMessage(false);
       return;
@@ -60,7 +62,7 @@ const MessageItem: FC<MessageItemProps> = ({
 
     setIsLoading(true);
     let res: (MessageInterface | ChatMsgInterface) | ApiErrorResponse;
-    if (isMsgInterface(message) ) {
+    if (isMsgInterface(message)) {
       res = await apiEditMessage(id, inputMessage);
     } else if (isChatMsgInterface(message)) {
       res = await editChatMessage(id, inputMessage);
@@ -72,7 +74,7 @@ const MessageItem: FC<MessageItemProps> = ({
     if ('error' in res)
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     else {
-      dispatch(setMsgSnackbar('Message edited'));
+      // dispatch(setMsgSnackbar('Message edited'));
       setEditMessage(false);
       setInputMessage(inputMessage);
     }
@@ -80,6 +82,14 @@ const MessageItem: FC<MessageItemProps> = ({
 
   const handleDelete = () => {
     handleDeleteMessage(message.id);
+  };
+
+  const handleDefi = async () => {
+    const resInvitGameUser: GameInterface | ApiErrorResponse =
+      await inviteGameUser(message.ownerUser.id);
+    if ('error' in resInvitGameUser)
+      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+    dispatch(setMsgSnackbar('Invitation sent'));
   };
 
   const handleOnChange = useCallback(
@@ -124,89 +134,106 @@ const MessageItem: FC<MessageItemProps> = ({
         {/**
         * Display message
         */}
-        { message && !message.ownerUser ? <p>t'as abuse bro</p> :
-        <>
-          <div className='flex-none w-14 mr-2'>
-            <Link to={'/profile/' + message.ownerUser.login}>
-              <img
-                className="w-10 h-10 rounded-full m-2 object-cover "
-                src={message.ownerUser.avatar}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-                }}
-                alt="avatar"
-              />
-            </Link>
-          </div>
-
-          <div className='flex-grow'>
-            <div className='font-semibold'>
+        {message && !message.ownerUser ? <p>t'as abuse bro</p> :
+          <>
+            <div className='flex-none w-14 mr-2'>
               <Link to={'/profile/' + message.ownerUser.login}>
-                {message.ownerUser.login}
+                <img
+                  className="w-10 h-10 rounded-full m-2 object-cover "
+                  src={message.ownerUser.avatar}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                  }}
+                  alt="avatar"
+                />
               </Link>
-              <span className='text-xs text-gray-500 font-normal ml-2'>
-                {messageTime}
-              </span>
             </div>
-            <div 
-              className={message.ownerUser.id == 0 ? 'text-center font-light' : ''} 
-              style={{ wordBreak: 'break-word' }}
-            >
-              { message.text.split('\n').map((line, index) => {
-                const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
-                // const urlLink = line.split(' ').find((word) => word.match(urlRegex));
-                const formatedLine = line.split(' ').map((word) => {
-                  if (word.match(urlRegex))
-                    return <StyledLink href={word} key={word}>{
-                      word.includes('game?id=') ? 'Invitation game' : word + ' '
-                    }</StyledLink>;
-                  return word + ' ';
-                });
 
-                return (
-                  <span key={index}>
-                    { formatedLine } 
-                    {index !== message.text.split('\n').length - 1 && <br />}
-                  </span>
-                );
-              })}
-              {message.updatedAt !== message.createdAt && <span className='text-gray-300 text-sm'> (edit)</span>}
+            <div className='flex-grow'>
+              <div className='font-semibold'>
+                <Link to={'/profile/' + message.ownerUser.login}>
+                  {message.ownerUser.login}
+                </Link>
+                <span className='text-xs text-gray-500 font-normal ml-2'>
+                  {messageTime}
+                </span>
+              </div>
+              <div
+                className={message.ownerUser.id == 0 ? 'text-center font-light' : ''}
+                style={{ wordBreak: 'break-word' }}
+              >
+                {message.text.split('\n').map((line, index) => {
+                  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+                  // const urlLink = line.split(' ').find((word) => word.match(urlRegex));
+                  const formatedLine = line.split(' ').map((word) => {
+                    if (word.match(urlRegex))
+                      return <StyledLink href={word} key={word}>{
+                        word.includes('game?id=') ? 'Invitation game' : word + ' '
+                      }</StyledLink>;
+                    return word + ' ';
+                  });
+
+                  return (
+                    <span key={index}>
+                      {formatedLine}
+                      {index !== message.text.split('\n').length - 1 && <br />}
+                    </span>
+                  );
+                })}
+                {message.updatedAt !== message.createdAt && <span className='text-gray-300 text-sm'> (edit)</span>}
+              </div>
             </div>
-          </div>
 
-          {/**
+            {/**
           * Display boutons edit et delete
           **/}
-          <div className='flex-none flex w-20 h-full pt-2'>
-            <Tooltip
-              title="Edit message" arrow
-              TransitionComponent={Zoom}
-              TransitionProps={{ timeout: 600 }}
-              sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
-            >
-              <IconButton onClick={() => setEditMessage(true)} color='primary'>
-                <EditOutlinedIcon />
-              </IconButton>
-            </Tooltip>
+            <div className='flex-none flex w-30 h-full pt-2'>
+              {isHovered && message.ownerUser.id === userData.id &&
+                <>
+                  <Tooltip
+                    title="Edit message" arrow
+                    TransitionComponent={Zoom}
+                    TransitionProps={{ timeout: 600 }}
+                  >
+                    <IconButton onClick={() => setEditMessage(true)} color='primary'>
+                      <EditOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
 
-            <Tooltip
-              title="Delete message" arrow
-              TransitionComponent={Zoom}
-              TransitionProps={{ timeout: 600 }}
-              sx={{ visibility: isHovered && message.ownerUser.id === userData.id ? 'visible' : 'hidden' }}
-            >
-              <IconButton 
-                onClick={handleDelete} 
-                color='warning'
-                disabled={ isLoadingDeleteMsg }
-              >
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </> }
+                  <Tooltip
+                    title="Delete message" arrow
+                    TransitionComponent={Zoom}
+                    TransitionProps={{ timeout: 600 }}
+                  >
+                    <IconButton
+                      onClick={handleDelete}
+                      color='warning'
+                      disabled={isLoadingDeleteMsg}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              }
+              {isHovered && message.ownerUser.id !== userData.id &&
+                <Tooltip
+                  title="Defi" arrow
+                  TransitionComponent={Zoom}
+                  TransitionProps={{ timeout: 600 }}
+                >
+                  <IconButton
+                    onClick={handleDefi}
+                    color='success'
+                    disabled={isLoadingDeleteMsg}
+                  >
+                    <SportsEsportsIcon />
+                  </IconButton>
+                </Tooltip>
+              }
+            </div>
+          </>}
       </div>
 
       {/**
@@ -226,12 +253,12 @@ const MessageItem: FC<MessageItemProps> = ({
             />
           </FormControl>
 
-          <IconButton 
+          <IconButton
             onClick={handleEdit(message.id)}
             color='primary'
-            disabled={ isLoading }
+            disabled={isLoading}
           >
-            { isLoading && <CircularProgress />}
+            {isLoading && <CircularProgress />}
             <BiPaperPlane />
           </IconButton>
 

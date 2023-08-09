@@ -12,9 +12,9 @@ import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
 // import Home from "../pages/Home";
 
-import CreateGroupInterface from '../components/Chat/ConversationList/ChannelCreateInterface';
-import ChannelSearch from '../components/Chat/ConversationList/ChannelSearchInterface';
-import FriendsSearch from '../components/Chat/ConversationList/FriendsSearchInterface';
+import CreateGroupInterface from '../components/Chat/ConversationList/outlet/ChannelCreateInterface';
+import ChannelSearch from '../components/Chat/ConversationList/outlet/ChannelSearchInterface';
+import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSearchInterface';
 import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 import LeaderBoard from '../pages/LeaderBoard';
@@ -29,34 +29,38 @@ const HomeChat = () => {
 };
 
 const AppRoutes: React.FC = () => (
-  <Routes>
-    <Route path="/" element={<Login />} />
-    {/* <Route path="/home" element={<Home />} /> */}
-    <Route path="/game" element={<Pong />} />
-    <Route path="/chat" element={<Chat />}>
-      <Route index element={<HomeChat />} />
-      <Route path="conv/:convId/:id/:login" element={<ConversationWrapper />} />
-      <Route
-        path="channel/:convId/:id/:name"
-        element={<ConversationWrapper />}
-      />
-      <Route
-        path="channel/invitation/:channelId/:channelName"
-        element={<InvitationWrapper />}
-      />
-      <Route path="addFriends" element={<FriendsSearch />} />
-      <Route path="createChannel" element={<CreateGroupInterface />} />
-      <Route path="addChannels" element={<ChannelSearch />} />
-      <Route path="*" element={<HomeChat />} />
-    </Route>
-    <Route path="/leaderboard" element={<LeaderBoard />} />
-    <Route path="/friends" element={<FriendsPage />} />
-    <Route path="/connection" element={<ConnectPage />} />
-    <Route path="/fakeconnection" element={<FakeConnection />} />
-    <Route path="/profile/:pseudo" element={<Profile />} />
-    <Route path="/account" element={<Account />} />
-    <Route path="*" element={<Error404 />} />
-  </Routes>
+  <>
+    <div className="mt-[56px]"/>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      {/* <Route path="/home" element={<Home />} /> */}
+      <Route path="/game" element={<Pong />} />
+      <Route path="/chat" element={<Chat />}>
+        <Route index element={<HomeChat />} />
+        <Route path="conv/:convId/:id/:login" element={<ConversationWrapper />} />
+        <Route
+          path="channel/:convId/:id/:name"
+          element={<ConversationWrapper />}
+        />
+        <Route
+          path="channel/invitation/:channelId/:channelName"
+          element={<InvitationWrapper />}
+        />
+        <Route path="addFriends" element={<FriendsSearch />} />
+        <Route path="createChannel" element={<CreateGroupInterface />} />
+        <Route path="addChannels" element={<ChannelSearch />} />
+        <Route path="*" element={<HomeChat />} />
+      </Route>
+      <Route path="/leaderboard" element={<LeaderBoard />} />
+      <Route path="/friends" element={<FriendsPage />} />
+      <Route path="/connection" element={<ConnectPage />} />
+      <Route path="/fakeconnection" element={<FakeConnection />} />
+      <Route path="/profile/:pseudo" element={<Profile />} />
+      <Route path="/account" element={<Account />} />
+      <Route path="*" element={<Error404 />} />
+    </Routes>
+    <div className="flex-grow" />
+  </>
 );
 
 export default AppRoutes;

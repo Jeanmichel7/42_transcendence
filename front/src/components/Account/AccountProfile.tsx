@@ -84,6 +84,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
         description: "",
         is2FAEnabled: false,
         score: 1500,
+        level: 0,
       }));
       dispatch(setLogged(false));
       navigate("/");

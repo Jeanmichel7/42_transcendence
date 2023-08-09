@@ -1,52 +1,52 @@
-import { apiRequest } from "./index";
-import { UserInterface, ApiErrorResponse } from "../types";
+import { apiRequest } from './index';
+import { UserInterface, ApiErrorResponse } from '../types';
 
 export async function getUserData(): Promise<UserInterface | ApiErrorResponse> {
   return apiRequest<UserInterface>(
-    "get",
-    "/users",
-    "Failed to get user data: "
+    'get',
+    '/users',
+    'Failed to get user data: ',
   );
 }
 
 export async function fetchUserAccount(): Promise<
-  UserInterface | ApiErrorResponse
+UserInterface | ApiErrorResponse
 > {
   return apiRequest<UserInterface>(
-    "get",
-    "/users/allDatas",
-    "Failed to get user data: "
+    'get',
+    '/users/allDatas',
+    'Failed to get user data: ',
   );
 }
 
 export async function getProfileByPseudo(
-  pseudo: string
+  pseudo: string,
 ): Promise<UserInterface | ApiErrorResponse> {
   return apiRequest<UserInterface>(
-    "get",
-    "/users/" + pseudo + "/profile",
-    "Failed to get profile: "
+    'get',
+    '/users/' + pseudo + '/profile',
+    'Failed to get profile: ',
   );
 }
 
 export async function getTrophiesByPseudo(
-  pseudo: string
+  pseudo: string,
 ): Promise<UserInterface | ApiErrorResponse> {
   return apiRequest<UserInterface>(
-    "get",
-    "/users/" + pseudo + "/trophies",
-    "Failed to get trophies: "
+    'get',
+    '/users/' + pseudo + '/trophies',
+    'Failed to get trophies: ',
   );
 }
 
 export async function patchUserAccount(
-  data: FormData
+  data: FormData,
 ): Promise<UserInterface | ApiErrorResponse> {
   return apiRequest<UserInterface>(
-    "patch",
-    "/users",
-    "Failed to modify user: ",
-    data
+    'patch',
+    '/users',
+    'Failed to modify user: ',
+    data,
   );
 }
 
@@ -54,30 +54,30 @@ export async function getAllUsers(
 ): Promise< UserInterface[] | ApiErrorResponse > {
   return apiRequest<UserInterface[]>(
     'get',
-    `/users/all`,
+    '/users/all',
     'Failed to get all users: ',
   );
 }
 
 export async function getAllUsersPaginate(
   page: number,
-  limit: number
+  limit: number,
 ): Promise<UserInterface[] | ApiErrorResponse> {
   return apiRequest<UserInterface[]>(
-    "get",
+    'get',
     `/users/all?page=${page}&limit=${limit}`,
-    "Failed to get all users: "
+    'Failed to get all users: ',
   );
 }
 
 export async function getAllUsersCount(): Promise<number | ApiErrorResponse> {
   return apiRequest<number>(
-    "get",
-    "/users/all/count",
-    "Failed to get all users count: "
+    'get',
+    '/users/all/count',
+    'Failed to get all users count: ',
   );
 }
 
 export async function deleteAccount(): Promise<void | ApiErrorResponse> {
-  return apiRequest<void>("delete", "/users", "Failed to delete account: ");
+  return apiRequest<void>('delete', '/users', 'Failed to delete account: ');
 }

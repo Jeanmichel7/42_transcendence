@@ -1,22 +1,22 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 import {
   ApiErrorResponse,
   GameInterface,
   UserInterface,
   UserRelation,
-} from "../../types";
-import { RootState } from "../../store";
-import { useState } from "react";
-import { apiBlockUser, deleteFriend } from "../../api/relation";
-import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { reduxAddUserBlocked, reduxRemoveFriends } from "../../store/userSlice";
-import { CircularProgress } from "@mui/material";
-import FriendItem from "./FriendItem";
-import { useNavigate } from "react-router-dom";
-import { reduxAddConversationList } from "../../store/convListSlice";
-import { getConvIdFromUserOrRoom } from "../../utils/utils";
-import { inviteGameUser } from "../../api/game";
-import { Nothing } from "./Nothing";
+} from '../../types';
+import { RootState } from '../../store';
+import { useState } from 'react';
+import { apiBlockUser, deleteFriend } from '../../api/relation';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
+import { CircularProgress } from '@mui/material';
+import FriendItem from './FriendItem';
+import { useNavigate } from 'react-router-dom';
+import { reduxAddConversationList } from '../../store/convListSlice';
+import { getConvIdFromUserOrRoom } from '../../utils/utils';
+import { inviteGameUser } from '../../api/game';
+import { Nothing } from './Nothing';
 
 interface OnLineFriendsProps {
   userDataId: number;
@@ -33,56 +33,56 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
     const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(
-      userToBlock.id
+      userToBlock.id,
     );
     setIsLoading(false);
 
-    if ("error" in resBlockRequest)
+    if ('error' in resBlockRequest)
       dispatch(
         setErrorSnackbar(
           resBlockRequest.error + resBlockRequest.message
-            ? ": " + resBlockRequest.message
-            : ""
-        )
+            ? ': ' + resBlockRequest.message
+            : '',
+        ),
       );
     else {
-      dispatch(reduxAddUserBlocked(userToBlock));
-      dispatch(setMsgSnackbar("User blocked"));
+      dispatch(reduxAddUserBlocked(userToBlock.id));
+      dispatch(setMsgSnackbar('User blocked'));
     }
   };
 
   const handleDefi = async (userToDefie: UserInterface) => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(userToDefie.id);
-    if ("error" in resInvitGameUser)
+    if ('error' in resInvitGameUser)
       return dispatch(
         setErrorSnackbar(
           resInvitGameUser.error + resInvitGameUser.message
-            ? ": " + resInvitGameUser.message
-            : ""
-        )
+            ? ': ' + resInvitGameUser.message
+            : '',
+        ),
       );
-    dispatch(setMsgSnackbar("Invitation sent"));
+    dispatch(setMsgSnackbar('Invitation sent'));
   };
 
   const handleDeleteFriend = async (userToDelete: UserInterface) => {
     setIsLoading(true);
     const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(
-      userToDelete.id
+      userToDelete.id,
     );
     setIsLoading(false);
 
-    if (typeof resDeleteRequest === "object" && "error" in resDeleteRequest)
+    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
       dispatch(
         setErrorSnackbar(
           resDeleteRequest.error + resDeleteRequest.message
-            ? ": " + resDeleteRequest.message
-            : ""
-        )
+            ? ': ' + resDeleteRequest.message
+            : '',
+        ),
       );
     else {
-      dispatch(reduxRemoveFriends(userToDelete));
-      dispatch(setMsgSnackbar("Friend deleted"));
+      dispatch(reduxRemoveFriends(userToDelete.id));
+      dispatch(setMsgSnackbar('Friend deleted'));
     }
   };
 
@@ -105,20 +105,20 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
       )}
 
       {userFriends?.length !== 0 &&
-        !userFriends?.find((u) => u.status === "online") && (
+        !userFriends?.find((u) => u.status === 'online') && (
           <Nothing text="Sorry... you're alone" />
-        )}
+      )}
       {userFriends
-        ?.filter((u) => u.status != "offline")
+        ?.filter((u) => u.status != 'offline')
         .map((user) => (
           <FriendItem
             key={user.id}
             user={user}
             actions={[
-              { name: "Defi", callback: handleDefi },
-              { name: "Chat", callback: handleNavigateToChat },
-              { name: "Block", callback: handleBlockUser },
-              { name: "Delete", callback: handleDeleteFriend },
+              { name: 'Defi', callback: handleDefi },
+              { name: 'Chat', callback: handleNavigateToChat },
+              { name: 'Block', callback: handleBlockUser },
+              { name: 'Delete', callback: handleDeleteFriend },
             ]}
             isLoading={isLoading}
           />

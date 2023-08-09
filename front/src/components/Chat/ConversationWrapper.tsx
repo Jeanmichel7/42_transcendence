@@ -49,12 +49,13 @@ const ConversationWrapper = () => {
       { login && !name && <PrivateConversation key={convId} /> }
       { !login && name && 
         <>
-          { socketRef && socketRef.current && socketRef.current.connected && location.state ?
-            <ChannelConversation
+          { socketRef && socketRef.current && socketRef.current.connected && location.state 
+            ? <ChannelConversation
               key={convId}
               conv={location.state}
               socketRef={socketRef as React.MutableRefObject<Socket>}
-            /> : <Loaderperosnalized top={50} left={50}/>
+            /> 
+            : <Loaderperosnalized />
           }
         </>
       }

@@ -7,15 +7,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { deleteFriend, apiBlockUser, requestAddFriend } from '../../api/relation';
 import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../types';
 
-import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Badge } from '@mui/material';
+import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Divider } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import SportsTennisIcon from '@mui/icons-material/SportsTennis';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import AddIcon from '@mui/icons-material/Add';
 import { red } from '@mui/material/colors';
 import { useState } from 'react';
 import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
+
 
 interface FriendCardProps {
   actualUserLogin?: string,
@@ -33,13 +34,13 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   const navigate = useNavigate();
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
   // const [ isFriendRequestSent, setIsFriendRequestSent ] = useState(false);
-  const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
-  const badgeColor = 
-    friend.status === 'online' ? 'success' :
-      friend.status === 'absent' ? 'warning' :
-        friend.status === 'inactive' ? 'secondary' :
-          friend.status === 'in game' ? 'info' :
-            'error';
+  // const descriptionParsed = friend.description ? friend.description.substring(0, 24) + '...' : 'No description';
+  // const badgeColor = 
+  //   friend.status === 'online' ? 'success' :
+  //     friend.status === 'absent' ? 'warning' :
+  //       friend.status === 'inactive' ? 'secondary' :
+  //         friend.status === 'in game' ? 'info' :
+  //           'error';
 
   const handleDefi = async () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
@@ -73,7 +74,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
     if (typeof res === 'object' && 'error' in res) {
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
-      dispatch(reduxRemoveFriends(friend));
+      dispatch(reduxRemoveFriends(friend.id));
       dispatch(setMsgSnackbar('Friend deleted'));
       if (userData.login == actualUserLogin && setFriends)
         setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
@@ -88,7 +89,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
       dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
     } else {
       dispatch(setMsgSnackbar('User blocked'));
-      dispatch(reduxAddUserBlocked(userToBlock));
+      dispatch(reduxAddUserBlocked(userToBlock.id));
       if (userData.login == actualUserLogin && setFriends)
         setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userToBlock.id));
     }
@@ -102,14 +103,20 @@ const FriendCard:  React.FC<FriendCardProps> = ({
   }
 
   return (
-    <Card key={friend.login} sx={{ maxWidth: 140, margin: '10px' }}>
+    <Card key={friend.login} sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      maxWidth: 140,
+      maxHeight: 332,
+      margin: '10px',
+    }}>
       <Link to={`/profile/${friend.login}`}>
         <CardActionArea>
-          <Badge
+          {/* <Badge
             color={badgeColor}
             overlap="circular"
-            badgeContent=" "
-          >
+            // badgeContent=""
+          > */}
             <CardMedia
               component="img"
               image={friend.avatar}
@@ -121,24 +128,35 @@ const FriendCard:  React.FC<FriendCardProps> = ({
                 target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
               }}
             />
-          </Badge>
-          <CardContent>
-            <Typography gutterBottom variant="h6" component="div" 
-              sx={{ height: 56, overflow: 'hidden', textOverflow: 'ellipsis' }}
+            <Divider/>
+          {/* </Badge> */}
+          <CardContent sx={{ padding: 1 }}>
+            <Typography gutterBottom variant="h2" component="div" 
+              sx={{ 
+                marginBottom: 2,
+                fontSize: '1.1rem',
+                overflow: 'hidden',
+                textOverflow: 'nowrap',
+                textAlign: 'center',
+              }}
               title={friend.firstName + ' ' + friend.lastName}
             >
               {friend.firstName} {friend.lastName}
             </Typography>
             <Typography variant="body2" color="text.secondary" 
               sx={{ height: 56, overflow: 'hidden', textOverflow: 'ellipsis' }}
-              title={descriptionParsed}
+              title={friend.description}
             >
-              {descriptionParsed}
+              { friend.description }
             </Typography>
           </CardContent>
         </CardActionArea>
       </Link>
 
+      <div className="flex-grow"></div>
+
+
+      <Divider/>
       {/**
        * Bouton action
        **/}
@@ -152,7 +170,7 @@ const FriendCard:  React.FC<FriendCardProps> = ({
             onClick={handleDefi}
             sx={{ margin:0, padding:0 }}
           >
-            <SportsTennisIcon color='info' />
+            <SportsEsportsIcon color='info' />
           </IconButton>
         </Tooltip>
 

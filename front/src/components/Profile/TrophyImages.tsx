@@ -3,7 +3,7 @@ import lord from "../../assets/trophies/lord.jpg";
 import emperor from "../../assets/trophies/emperor.jpg";
 import laserPointer from "../../assets/trophies/laser_pointer.jpg";
 import gammaLaser from "../../assets/trophies/gamma_laser.jpg";
-import scorificator from "../../assets/trophies/scorificator.jpg";
+import scorificator from "../../assets/trophies/Scorificator.jpg";
 import regular from "../../assets/trophies/regular.jpg";
 import addict from "../../assets/trophies/addict.jpg";
 import nolife from "../../assets/trophies/nolife.jpg";

@@ -8,20 +8,32 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';
 import { getOldMessages, apiDeleteMessage } from '../../../api/message';
-import { ApiErrorResponse, GameInterface, UserInterface } from '../../../types';
+import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../../types';
 import { MessageInterface } from '../../../types/ChatTypes';
 
-import { Button } from '@mui/material';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import BlockIcon from '@mui/icons-material/Block';
+
+import { CircularProgress, IconButton, Tooltip, Zoom } from '@mui/material';
 import { HttpStatusCode } from 'axios';
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { inviteGameUser } from '../../../api/game';
+import { reduxRemoveConversationToList, reduxResetNotReadMP } from '../../../store/convListSlice';
+import { apiBlockUser, deleteFriend, requestAddFriend } from '../../../api/relation';
+import { reduxAddUserBlocked, reduxAddWaitingFriendsSent, reduxRemoveFriends } from '../../../store/userSlice';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { getProfileByPseudo } from '../../../api/user';
 
 const PrivateConversation: React.FC = () => {
+  const convId = (useParams<{ convId: string }>().convId || '-1') ;
   const id = (useParams<{ id: string }>().id || '-1') ;
   const login = (useParams<{ login: string }>().login || 'unknown') ;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
+  const userFriend: UserInterface[] = useSelector((state: RootState) => state.user.userFriends);
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [messages, setMessages] = useState<MessageInterface[]>([]);
@@ -29,9 +41,16 @@ const PrivateConversation: React.FC = () => {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
+
+  const isFriends = userFriend?.some((friend) => friend.id === id) || false;
+
+  useEffect(() => {
+    console.log('userFriend : ', userFriend);
+  }, [userFriend]);
 
   const fetchOldMessages = useCallback(async () => {
     if (id == '-1' || userData.id == -1 ) return;
@@ -41,6 +60,9 @@ const PrivateConversation: React.FC = () => {
     if ('error' in allMessages)
       dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
     else {
+      dispatch(
+        reduxResetNotReadMP({ userIdFrom: id, userId: userData.id }),
+      );
       if (allMessages.length === 0) return;
       //save pos scrool
       const scrollContainer = document.querySelector('.overflow-y-auto');
@@ -146,7 +168,71 @@ const PrivateConversation: React.FC = () => {
     }
   };
 
-  // delete message
+  const handleBlockUser = async () => {
+    setIsLoading(true);
+    const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(
+      +id,
+    );
+    setIsLoading(false);
+
+    if ('error' in resBlockRequest)
+      dispatch(
+        setErrorSnackbar(
+          resBlockRequest.error + resBlockRequest.message
+            ? ': ' + resBlockRequest.message
+            : '',
+        ),
+      );
+    else {
+      dispatch(reduxAddUserBlocked(+id));
+      dispatch(setMsgSnackbar('User blocked'));
+    }
+  };
+
+  const handleDeleteFriend = async () => {
+    setIsLoading(true);
+    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(
+      +id,
+    );
+    setIsLoading(false);
+
+    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
+      dispatch(
+        setErrorSnackbar(
+          resDeleteRequest.error + resDeleteRequest.message
+            ? ': ' + resDeleteRequest.message
+            : '',
+        ),
+      );
+    else {
+      dispatch(reduxRemoveFriends(+id));
+      dispatch(reduxRemoveConversationToList({
+        convId: +convId,
+        userId: userData.id,
+      }));
+      // dispatch(setMsgSnackbar('Friend deleted'));
+      navigate('/chat');
+    }
+  };
+
+  const handleAddFriend = async () => {
+
+    const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
+    if ('error' in getUser)
+      return dispatch(setErrorSnackbar(getUser.error + getUser.message ? ': ' + getUser.message : ''));
+    const res: UserRelation | ApiErrorResponse = await requestAddFriend(
+      +id,
+    );
+    if ('error' in res) {
+      dispatch(
+        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
+      );
+    } else {
+      dispatch(setMsgSnackbar('Request sent'));
+      dispatch(reduxAddWaitingFriendsSent(getUser));
+    }
+  };
+
   const handleDeleteMessage = async (msgId: number) => {
     setIsLoadingDeleteMsg(true);
     const res: HttpStatusCode | ApiErrorResponse = await apiDeleteMessage(msgId);
@@ -175,14 +261,80 @@ const PrivateConversation: React.FC = () => {
        <CircularProgress className='mx-auto' />
         : */}
       <div className="flex flex-col h-full justify-between">
-        <div className="w-full text-lg text-blue text-center">
+        <div className="flex w-full justify-between items-center text-lg text-blue text-center">
+          <div className='mr-6'>
+          <Tooltip
+              title="Defi"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+              sx={{ p:0, paddingX:1, m:0 }}
+            >
+              <IconButton
+                onClick={handleDefi}
+                color="success"
+              >
+                <SportsEsportsIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+
           <p className='font-bold text-lg py-1'>
-            {login.toUpperCase()}
-            <Button sx={{ p:0, m:0 }} onClick={handleDefi}>Defi</Button>
+            <Link to={`/profile/${login}`} >
+              {login.toUpperCase()}
+            </Link>
           </p>
+
+          <div>
+            {isFriends
+              ? <Tooltip
+                  title="Remove friend"
+                  arrow
+                  TransitionComponent={Zoom}
+                  TransitionProps={{ timeout: 600 }}
+                  sx={{ p: 0, paddingX: 1, m: 0 }}
+                >
+                  <IconButton
+                    onClick={handleDeleteFriend}
+                    color="warning"
+                  >
+                    <PersonRemoveIcon />
+                  </IconButton>
+                </Tooltip>
+              : <Tooltip
+                  title="Add friend"
+                  arrow
+                  TransitionComponent={Zoom}
+                  TransitionProps={{ timeout: 600 }}
+                  sx={{ p: 0, paddingX: 1, m: 0 }}
+                >
+                  <IconButton
+                    onClick={handleAddFriend}
+                    color="success"
+                  >
+                    <PersonAddIcon />
+                  </IconButton>
+                </Tooltip>
+            }
+            <Tooltip
+              title="Block friend"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+              sx={{ p:0, paddingX:1, m:0 }}
+            >
+              <IconButton
+                onClick={handleBlockUser}
+                color="error"
+              >
+                <BlockIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+          {isLoading && <CircularProgress />}
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-275px)] bg-[#efeff8]" onScroll={handleScroll}>
+        <div className="overflow-y-auto max-h-[calc(100vh-108px)] bg-[#efeff8]" onScroll={handleScroll}>
           {/* display messages */}
           {messages &&
             <div className='text-lg m-1 p-2 '>
@@ -200,37 +352,6 @@ const PrivateConversation: React.FC = () => {
               <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
                 <FormPriveConv setShouldScrollToBottom={setShouldScrollToBottom} />
               </div>
-              {/* <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
-                <TextareaAutosize
-                  ref={textareaRef}
-                  name="text"
-                  value={text}
-                  onChange={handleChangeTextArea(setText)}
-                  onKeyDown={handleSubmit()}
-                  placeholder="Enter your text here..."
-                  className="w-full p-2 rounded-sm m-1 pb-1 shadow-sm font-sans resize-none"
-                />
-                <button className='flex justify-center items-center'
-                  onClick={handleSubmit()}
-                >
-                  <BiPaperPlane className=' text-2xl mx-2 text-cyan' />
-                </button>
-
-                {statusSendMsg !== '' &&
-                  <span className={`
-                  ${statusSendMsg == 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                  bottom-16 
-                  text-white
-                  p-2
-                  rounded-xl
-                  shadow-lg`}
-                    onClick={() => setStatusSendMsg('')}
-                  >
-                    {statusSendMsg}
-                  </span>
-                }
-              </form> */}
-
             </div>
           }
           <div ref={bottomRef}></div>

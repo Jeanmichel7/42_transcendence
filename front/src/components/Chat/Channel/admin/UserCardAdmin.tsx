@@ -33,7 +33,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isBanned, setIsBanned] = useState<boolean>(true);
   const { userData } = useSelector((state: RootState) => state.user);
-  
+
 
   useEffect(() => {
     if (!user || !room) return;
@@ -48,12 +48,12 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   }, [userData.id, room.ownerUser]);
 
   const handleMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
     if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t mute an admin or owner'));
     if (isMuted) return dispatch(setErrorSnackbar('User already muted'));
-    
+
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await muteUser(room.id, user.id, 20); //20sec
     if ('error' in result) {
@@ -66,7 +66,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleUnMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string>> => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
     if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t unmute an admin or owner'));
@@ -84,7 +84,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleKickuser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
     if (isOwner) return dispatch(setErrorSnackbar('You can\'t kick the owner'));
@@ -101,7 +101,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleBanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
@@ -121,7 +121,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleUnbanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
@@ -133,7 +133,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     const result: RoomInterface | ApiErrorResponse = await unBanUser(room.id, user.id);
     if ('error' in result) {
       dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
-    }  else {
+    } else {
       setIsBanned(false);
       dispatch(setMsgSnackbar('User unbanned'));
     }
@@ -141,7 +141,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleAddAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
@@ -161,7 +161,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleRemoveAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-  : Promise< void | PayloadAction<string> > => {
+    : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
@@ -189,12 +189,12 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
         <Link to={'/profile/' + user.login}
           className="flex flex-grow text-black p-1 pl-2 items-center ">
           <Badge
-            color={ 
+            color={
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
                   user.status === 'inactive' ? 'secondary' :
                     user.status === 'in game' ? 'info' :
-                      'error' 
+                      'error'
             }
             overlap="circular"
             badgeContent=" "
@@ -205,17 +205,31 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
             }}
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
-            <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
-              src={user.avatar}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+            <Badge
+              overlap="circular"
+              variant="dot"
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
               }}
-              alt="avatar"
-            />
-          </Badge>
+              sx={{
+                '.MuiBadge-badge': {
+                  transform: 'scale(1.6) translate(-5%, 32%)',
+                  backgroundColor: 'white',
+                },
+              }}
+            >
+              <img
+                className="w-10 h-10 rounded-full object-cover mr-2 "
+                src={user.avatar}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                }}
+                alt="avatar"
+              />
+            </Badge></Badge>
           <Typography component="span"
             sx={{
               overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
@@ -229,7 +243,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
 
 
         {/* Add admin */}
-        { ImIOwner && !isOwner && !isAdmin &&
+        {ImIOwner && !isOwner && !isAdmin &&
           <Tooltip
             title="Add admin" arrow
             TransitionComponent={Zoom}
@@ -246,7 +260,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
         }
 
         {/* Remove admin */}
-        { ImIOwner && !isOwner && isAdmin &&
+        {ImIOwner && !isOwner && isAdmin &&
           <Tooltip
             title="Remove admin" arrow
             TransitionComponent={Zoom}
@@ -274,7 +288,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
               disabled={isLoading}
             >
-              <VolumeOffSharpIcon color='primary'/>
+              <VolumeOffSharpIcon color='primary' />
             </IconButton>
           </Tooltip>
           :

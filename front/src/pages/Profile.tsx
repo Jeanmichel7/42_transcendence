@@ -29,6 +29,7 @@ function Profile() {
     is2FAEnabled: false,
     avatar: "",
     score: 1500,
+    level: 0,
     status: "offline",
     trophies: [],
   });

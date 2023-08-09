@@ -9,12 +9,12 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
         {user.login}
       </div>
       <Badge
-        color={ 
+        color={
           user.status === 'online' ? 'success' :
             user.status === 'absent' ? 'warning' :
               user.status === 'inactive' ? 'secondary' :
                 user.status === 'in game' ? 'info' :
-                  'error' 
+                  'error'
         }
         overlap="circular"
         badgeContent=" "
@@ -25,16 +25,31 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
         }}
         sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
       >
-        <img
-          className="w-10 h-10 rounded-full object-cover mr-2 "
-          src={user.avatar}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+        <Badge
+          overlap="circular"
+          variant="dot"
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
           }}
-          alt="avatar"
-        />
+          sx={{
+            '.MuiBadge-badge': {
+              transform: 'scale(1.6) translate(-5%, 32%)',
+              backgroundColor: 'white',
+            },
+          }}
+        >
+          <img
+            className="w-10 h-10 rounded-full object-cover mr-2 "
+            src={user.avatar}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+            }}
+            alt="avatar"
+          />
+        </Badge>
       </Badge>
     </div>
 

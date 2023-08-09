@@ -1,13 +1,13 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import "../utils/CircleBakcground.scss";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import '../utils/CircleBakcground.scss';
 
 export function CircleBackground() {
   const isEffectActivated = useSelector(
-    (state) => state.game.isEffectActivated
+    (state) => state.game.isEffectActivated,
   );
-  const colorBackground = isEffectActivated ? "black" : "";
-  const colorCircle = isEffectActivated ? "#330207" : "";
+  const colorBackground = isEffectActivated ? 'black' : '';
+  const colorCircle = isEffectActivated ? '#330207' : '';
 
   return (
     <div
@@ -19,7 +19,7 @@ export function CircleBackground() {
           .fill(0)
           .map((_, i) => (
             <span
-              className="circle   blinking-effect"
+              className="circle blinking-effect"
               style={{ backgroundColor: colorCircle }}
               key={i}
             ></span>

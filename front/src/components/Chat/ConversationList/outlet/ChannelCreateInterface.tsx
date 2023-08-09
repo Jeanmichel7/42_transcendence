@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store";
+import { RootState } from "../../../../store";
 
-import { ApiErrorResponse, RoomInterface, UserInterface } from "../../../types";
+import { ApiErrorResponse, RoomInterface, UserInterface } from "../../../../types";
 
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -25,10 +25,10 @@ import {
   FormGroup,
   MenuItem,
 } from "@mui/material";
-import { setErrorSnackbar, setMsgSnackbar } from "../../../store/snackbarSlice";
-import { createChannel } from "../../../api/chat";
-import { reduxAddConversationList } from "../../../store/convListSlice";
-import RowOfFriendToInvit from "../Channel/admin/RowInvitation";
+import { setErrorSnackbar, setMsgSnackbar } from "../../../../store/snackbarSlice";
+import { createChannel } from "../../../../api/chat";
+import { reduxAddConversationList } from "../../../../store/convListSlice";
+import RowOfFriendToInvit from "../../Channel/admin/RowInvitation";
 
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);

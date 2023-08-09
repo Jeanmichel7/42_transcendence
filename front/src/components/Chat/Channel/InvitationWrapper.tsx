@@ -6,7 +6,7 @@ import { setErrorSnackbar } from '../../../store/snackbarSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 // import { reduxAddConversationList } from '../../../store/chatSlicer';
-import RoomCard from '../ConversationList/ChannelRoomCard';
+import RoomCard from '../ConversationList/outlet/ChannelRoomCard';
 
 const InvitationWrapper = () => {
   const { channelId, channelName } = useParams();

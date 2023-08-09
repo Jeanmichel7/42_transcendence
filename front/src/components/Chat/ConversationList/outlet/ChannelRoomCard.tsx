@@ -1,16 +1,18 @@
-import { Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
+import { Button, Card, CardContent, CircularProgress, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
-import { RoomInterface, ApiErrorResponse } from '../../../types';
-import { joinRoom } from '../../../api/chat';
-import { reduxAddConversationList } from '../../../store/convListSlice';
-import { isConvAlreadyExist } from '../../../utils/utils';
-import { RootState } from '../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { RoomInterface, ApiErrorResponse } from '../../../../types';
+import { joinRoom } from '../../../../api/chat';
+import { reduxAddConversationList } from '../../../../store/convListSlice';
+import { isConvAlreadyExist } from '../../../../utils/utils';
+import { RootState } from '../../../../store';
 
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import KeyIcon from '@mui/icons-material/Key';
+
 // import { useNavigate } from 'react-router-dom';
 export interface RoomCardProps {
   room: RoomInterface;
@@ -22,6 +24,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [displayInputPwd, setDisplayInputPwd] = useState(false);
   const [alreadyInRoom, setAlreadyInRoom] = useState(false);
+  const [wrongPwd, setWrongPwd] = useState(false);
 
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
@@ -53,8 +56,10 @@ const RoomCard = ({ room }: RoomCardProps) => {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         dispatch(setMsgSnackbar('Add room to conversation list'));
         setAlreadyInRoom(true);
-      } else
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      } else {
+        // dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+        setWrongPwd(true);
+      }
     } else {
       // const newConvId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
       dispatch(setMsgSnackbar('Room joined'));
@@ -62,38 +67,62 @@ const RoomCard = ({ room }: RoomCardProps) => {
       setDisplayInputPwd(false);
       setInputPwd(null);
       setAlreadyInRoom(true);
+      setWrongPwd(false);
       //navigate ?
     }
     setIsLoading(false);
-
   };
 
   useEffect(() => {
+    // console.log(room)
     setAlreadyInRoom(isConvAlreadyExist(room, conversationsList));
   }, [conversationsList, room]);
 
-
+  const handleClosePwdForm = () => {
+    setDisplayInputPwd(false);
+    setWrongPwd(false);
+  };
 
   return (
-    <div className="min-w-[200px] min-h-[200px] m-2 border rounded-lg flex flex-col justify-between" >
-      <div className="flex flex-col justify-center items-center h-[150px]">
-        <p className="text-2xl">{room.name}</p>
-        <p className="text-2xl">{room.type}</p>
-        <p className="text-2xl">{room.isProtected ? 'protected' : ''}</p>
-      </div>
+    <Card elevation={10} className="m-2 w-[220px]">
+      <CardContent>
+        <Grid container alignItems="center" spacing={2} className="mb-2">
+          <Grid item xs={9}>
+            <Typography variant="h5" component="div" noWrap>
+              {room.name.toUpperCase()}
+            </Typography>
+          </Grid>
+          <Grid item xs={3}>
+            {room.isProtected && <KeyIcon />}
+          </Grid>
+        </Grid>
+
+        <Typography color="textSecondary" variant="body2" noWrap>
+          Owner: {room.ownerUser?.login}
+        </Typography>
+        <Typography color="textSecondary" variant="body2">
+          {room.users?.length} member{room.users?.length as number > 1 ? 's' : ''}
+        </Typography>
+      </CardContent>
+
+
+
+
+
+      {/* Protected */}
       {!displayInputPwd &&
-        <div className="flex justify-center items-center min-h-[50px]">
+        <div className="flex justify-center items-center min-h-[50px] w-auto">
           <Button
             onClick={() => handleJoinRoom()}
             variant="contained"
-            color={ alreadyInRoom ? 'secondary' : 'primary'}
-          > 
-            { alreadyInRoom ? 'In room' : 'Join'}
+            color={alreadyInRoom ? 'secondary' : 'primary'}
+          >
+            {alreadyInRoom ? 'In room' : 'Join'}
           </Button>
         </div>}
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
-          <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+          <FormControl sx={{ m: 1, width: '20ch' }} variant="outlined">
             <InputLabel htmlFor="outlined-adornment-password-room">Password</InputLabel>
             <OutlinedInput
               autoFocus
@@ -103,6 +132,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
               value={inputPwd ? inputPwd : ''}
               onChange={(e) => setInputPwd(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom()}
+              label="Password"
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -115,11 +145,11 @@ const RoomCard = ({ room }: RoomCardProps) => {
                   </IconButton>
                 </InputAdornment>
               }
-              label="Password"
             />
+            {wrongPwd && <FormHelperText error >Invalid password</FormHelperText>}
           </FormControl>
-
-          <div className=''>
+          {isLoading && <CircularProgress />}
+          <div>
             <IconButton
               onClick={handleJoinRoom}
               color="primary"
@@ -129,16 +159,15 @@ const RoomCard = ({ room }: RoomCardProps) => {
             </IconButton>
 
             <IconButton
-              onClick={() => setDisplayInputPwd(false)}
+              onClick={handleClosePwdForm}
               color="secondary"
             >
               <CloseIcon />
             </IconButton>
           </div>
-          {isLoading && <CircularProgress />}
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

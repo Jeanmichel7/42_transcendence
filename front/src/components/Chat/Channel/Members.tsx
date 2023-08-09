@@ -4,7 +4,7 @@ import { RoomInterface, UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
-  
+
   return (
     <>
       {!user ? null :
@@ -14,12 +14,12 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
           <Badge
-            color={ 
+            color={
               user.status === 'online' ? 'success' :
                 user.status === 'absent' ? 'warning' :
                   user.status === 'inactive' ? 'secondary' :
                     user.status === 'in game' ? 'info' :
-                      'error' 
+                      'error'
             }
             overlap="circular"
             badgeContent=" "
@@ -30,16 +30,31 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
             }}
             sx={{ '.MuiBadge-badge': { transform: 'scale(1.2) translate(-25%, 25%)' } }}
           >
-            <img
-              className="w-10 h-10 rounded-full object-cover mr-2 "
-              src={user.avatar}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+            <Badge
+              overlap="circular"
+              variant="dot"
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
               }}
-              alt="avatar"
-            />
+              sx={{
+                '.MuiBadge-badge': {
+                  transform: 'scale(1.6) translate(-5%, 32%)',
+                  backgroundColor: 'white',
+                },
+              }}
+            >
+              <img
+                className="w-10 h-10 rounded-full object-cover mr-2 "
+                src={user.avatar}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                }}
+                alt="avatar"
+              />
+            </Badge>
           </Badge>
           <Typography component="span"
             sx={{
@@ -47,7 +62,7 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
             }}
             title={user.login}
           >
-            { user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
+            {user.login.length > 15 ? user.login.slice(0, 12) + '...' : user.login}
           </Typography>
         </Link>
       }
@@ -84,7 +99,7 @@ const ChatMembers = ({
   }, [room.acceptedUsers]);
 
   return (
-    <>
+    <div className="hidden md:block mx-2">
       {room.admins &&
         <>
           <h3> ADMINS - {room.admins.length} </h3>
@@ -112,7 +127,7 @@ const ChatMembers = ({
           })}
         </>
       }
-    </>
+    </div>
   );
 };
 

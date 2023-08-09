@@ -1,40 +1,40 @@
-import { useState, useEffect, useRef, useCallback, memo } from "react";
-import { Socket } from "socket.io-client";
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { Socket } from 'socket.io-client';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 import {
   setErrorSnackbar,
   setMsgSnackbar,
   setWarningSnackbar,
-} from "../../../store/snackbarSlice";
+} from '../../../store/snackbarSlice';
 
-import MessageItem from "../MessageItem";
+import MessageItem from '../MessageItem';
 
 import {
   chatOldMessages,
   deleteChatMessage,
   getRoomData,
-} from "../../../api/chat";
+} from '../../../api/chat';
 
-import { ApiErrorResponse } from "../../../types";
+import { ApiErrorResponse } from '../../../types';
 import {
   ChatMsgInterface,
   ConversationInterface,
   RoomInterface,
-} from "../../../types/ChatTypes";
+} from '../../../types/ChatTypes';
 
-import { HttpStatusCode } from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { RootState } from "../../../store";
-import SideBarAdmin from "./admin/SidebarAdmin";
+import { HttpStatusCode } from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import { RootState } from '../../../store';
+import SideBarAdmin from './admin/SidebarAdmin';
 import {
   reduxRemoveConversationToList,
   reduxUpdateRoomConvList,
-} from "../../../store/convListSlice";
-import ChatMembers from "./Members";
-import InvitationRoom from "./admin/InvitationRoom";
-import { useConnectionSocketChannel } from "./useSocketChannel";
-import FormChannel from "./FormChannel";
+} from '../../../store/convListSlice';
+import ChatMembers from './Members';
+import InvitationRoom from './admin/InvitationRoom';
+import { useConnectionSocketChannel } from './useSocketChannel';
+import FormChannel from './FormChannel';
 // import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
 // import ErrorBoundary from './errorBoundaries';
 
@@ -45,14 +45,14 @@ interface ChannelConversationProps {
 
 const ChannelConversation: React.FC<ChannelConversationProps> = memo(
   ({ conv, socketRef }) => {
-    const id = useParams<{ id: string }>().id || "-1";
-    const name = useParams<{ name: string }>().name || "unknown";
+    const id = useParams<{ id: string }>().id || '-1';
+    const name = useParams<{ name: string }>().name || 'unknown';
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { room } = useSelector(
       (state: RootState) =>
         state.chat.conversationsList.find((c) => c.id === conv.id) ||
-        ({} as ConversationInterface)
+        ({} as ConversationInterface),
     );
     const { userData } = useSelector((state: RootState) => state.user);
     const { userBlocked } = useSelector((state: RootState) => state.user);
@@ -77,12 +77,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       userData.id,
       conv.id,
       setMessages,
-      setOffsetPagniation
+      setOffsetPagniation,
     );
 
     // get messages
     const fetchOldMessages = useCallback(async () => {
-      if (id === "-1" || !conv) return;
+      if (id === '-1' || !conv) return;
       if (allMessagesDisplayed) return;
       setShouldScrollToBottom(false);
       // console.log('fetch old messages');
@@ -91,20 +91,20 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       const allMessages: ChatMsgInterface[] | ApiErrorResponse =
         await chatOldMessages(id, pageDisplay, offsetPagniation);
 
-      if ("error" in allMessages)
+      if ('error' in allMessages)
         dispatch(
           setErrorSnackbar(
             allMessages.error + allMessages.message
-              ? ": " + allMessages.message
-              : ""
-          )
+              ? ': ' + allMessages.message
+              : '',
+          ),
         );
       else {
         if (allMessages.length === 0) return;
         if (allMessages.length < 20) setAllMessagesDisplayed(true);
 
         //save pos scrool
-        const scrollContainer = document.querySelector(".overflow-y-auto");
+        const scrollContainer = document.querySelector('.overflow-y-auto');
         if (!scrollContainer) {
           setIsLoadingPagination(false);
           return;
@@ -129,48 +129,48 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     }, [pageDisplay]);
 
     useEffect(() => {
-      if (!room || !userData.id || userData.id === -1 || id === "-1") return;
+      if (!room || !userData.id || userData.id === -1 || id === '-1') return;
       fetchOldMessages();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchOldMessages, room?.id]);
 
     const fetchRoomData = useCallback(async () => {
       if (conv == null) {
-        dispatch(setErrorSnackbar("Nop"));
-        navigate("/chat/channel");
+        dispatch(setErrorSnackbar('Nop'));
+        navigate('/chat/channel');
         return;
       }
       if (!conv.room.id || conv.room.id === -1 || userData.id === -1) return;
       const roomData: RoomInterface | ApiErrorResponse = await getRoomData(
-        conv.room.id.toString()
+        conv.room.id.toString(),
       );
       // console.log('roomData : ', roomData);
-      if (roomData && "statusCode" in roomData && roomData.statusCode === 403) {
+      if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
         dispatch(
           setErrorSnackbar(
-            "You are not allowed to access this room or just be kicked from it"
-          )
+            'You are not allowed to access this room or just be kicked from it',
+          ),
         );
-        socketRef.current?.emit("leaveRoom", {
+        socketRef.current?.emit('leaveRoom', {
           roomId: id,
         });
         dispatch(
           reduxRemoveConversationToList({
             convId: conv.id,
             userId: userData.id,
-          })
+          }),
         );
-        navigate("/chat/channel");
-      } else if (roomData && "error" in roomData)
+        navigate('/chat/channel');
+      } else if (roomData && 'error' in roomData)
         dispatch(
           setErrorSnackbar(
-            roomData.error + roomData.message ? ": " + roomData.message : ""
-          )
+            roomData.error + roomData.message ? ': ' + roomData.message : '',
+          ),
         );
       else {
         // setRoom(roomData);
         dispatch(
-          reduxUpdateRoomConvList({ item: roomData, userId: userData.id })
+          reduxUpdateRoomConvList({ item: roomData, userId: userData.id }),
         );
 
         //check if user is accepted in room
@@ -180,41 +180,41 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
             roomData.acceptedUsers.some((u) => u.id === userData.id);
           // || roomData.;
           if (!isUserInRoom) {
-            socketRef.current?.emit("leaveRoom", {
+            socketRef.current?.emit('leaveRoom', {
               roomId: id,
             });
             dispatch(
               reduxRemoveConversationToList({
                 convId: conv.id,
                 userId: userData.id,
-              })
+              }),
             );
             dispatch(
-              setWarningSnackbar("You are not in the room " + conv.room.name)
+              setWarningSnackbar('You are not in the room ' + conv.room.name),
             );
-            navigate("/chat/channel");
+            navigate('/chat/channel');
           } else {
             // console.log('user already in room');
           }
 
           // check if channel removed
         } else if (!roomData.users) {
-          socketRef.current?.emit("leaveRoom", {
+          socketRef.current?.emit('leaveRoom', {
             roomId: id,
           });
-          console.log("room delete, conv : ", conv);
+          console.log('room delete, conv : ', conv);
           dispatch(
             reduxRemoveConversationToList({
               convId: conv.id,
               userId: userData.id,
-            })
+            }),
           );
           dispatch(
-            setWarningSnackbar("Room " + conv.room.name + " was deleted")
+            setWarningSnackbar('Room ' + conv.room.name + ' was deleted'),
           );
-          navigate("/chat/channel");
+          navigate('/chat/channel');
         } else {
-          console.error("WTF ?");
+          console.error('WTF ?');
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -235,9 +235,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     useEffect(() => {
       if (shouldScrollToBottom && bottomRef.current) {
         bottomRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-          inline: "nearest",
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest',
         });
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -247,17 +247,17 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     const handleDeleteMessage = async (msgId: number) => {
       setIsLoadingDeleteMsg(true);
       const res: HttpStatusCode | ApiErrorResponse = await deleteChatMessage(
-        msgId
+        msgId,
       );
       setIsLoadingDeleteMsg(false);
 
-      if (typeof res === "object" && "error" in res)
+      if (typeof res === 'object' && 'error' in res)
         dispatch(
-          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
         );
       else {
         setMessages((prev) => prev.filter((message) => message.id !== msgId));
-        dispatch(setMsgSnackbar("Message deleted"));
+        dispatch(setMsgSnackbar('Message deleted'));
       }
     };
 
@@ -281,20 +281,19 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         ) : (
           <div className="flex h-full">
             <div className="flex flex-grow flex-col h-full justify-between">
-              <div className="w-full flex text-lg text-blue justify-between">
-                {isAdmin && room && <InvitationRoom room={room} />}
+
+              <div className="w-full flex text-lg justify-between">
+                { room && isAdmin ?
+                  <InvitationRoom room={room} /> : <span></span>
+                }
                 <p className="font-bold text-lg py-1">{name.toUpperCase()}</p>
-                {isAdmin && room && (
-                  <SideBarAdmin
-                    room={room}
-                    convId={conv.id}
-                    // setIsAdminMenuOpen={setIsAdminMenuOpen}
-                  />
-                )}
+                { room && isAdmin ? 
+                  <SideBarAdmin room={room} convId={conv.id} /> : <span></span>
+                }
               </div>
 
               <div
-                className="overflow-y-auto max-h-[calc(100vh-125px)] h-full bg-[#efeff8] 
+                className="overflow-y-auto max-h-[calc(100vh-110px)] h-full bg-[#efeff8] 
                 flex flex-col"
                 onScroll={handleScroll}
               >
@@ -304,7 +303,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                     {messages.map(
                       (message: ChatMsgInterface) =>
                         userBlocked.some(
-                          (u) => u.id === message.ownerUser.id
+                          (u) => u.id === message.ownerUser.id,
                         ) ? null : (
                           // <ErrorBoundary>
                           <MessageItem
@@ -314,7 +313,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                             handleDeleteMessage={handleDeleteMessage}
                             // isAdminMenuOpen={isAdminMenuOpen}
                           />
-                        )
+                          ),
                       // </ErrorBoundary>
                     )}
                   </div>
@@ -328,10 +327,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
               </div>
             </div>
 
-            {/* display members */}
-            <div className="w-[150px]">
-              <ChatMembers room={room} />
-            </div>
+            <ChatMembers room={room} />
           </div>
         )}
       </>
@@ -343,7 +339,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     // if (prevProps.conv.room.name !== nextProps.conv.room.name) return false;
     // if (prevProps.conv.room.users !== nextProps.conv.room.users) return false;
     return true;
-  }
+  },
 );
 
 export default ChannelConversation;
