@@ -18,9 +18,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
       user.id,
     );
     if ('error' in res) {
-      dispatch(
-        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-      );
+      dispatch(setErrorSnackbar(res));
     } else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(user));

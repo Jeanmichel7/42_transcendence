@@ -25,13 +25,7 @@ const AddFriendsRaw = () => {
     setIsLoading(false);
 
     if ('error' in allUsersFetched)
-      dispatch(
-        setErrorSnackbar(
-          allUsersFetched.error + allUsersFetched.message
-            ? ': ' + allUsersFetched.message
-            : '',
-        ),
-      );
+      dispatch(setErrorSnackbar(allUsersFetched));
     else {
       const resFiltered = allUsersFetched.filter(
         (u: UserInterface) =>
@@ -80,9 +74,7 @@ const AddFriendsRaw = () => {
     setIsLoading(false);
 
     if ('error' in res)
-      dispatch(
-        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-      );
+      dispatch(setErrorSnackbar(res));
     else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(user));

@@ -12,7 +12,7 @@ import RemoveCircleSharpIcon from '@mui/icons-material/RemoveCircleSharp';
 import AddCircleOutlineSharpIcon from '@mui/icons-material/AddCircleOutlineSharp';
 import RemoveCircleOutlineSharpIcon from '@mui/icons-material/RemoveCircleOutlineSharp';
 
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 
 import { addAdminToRoom, banUser, kickUser, muteUser, removeAdminFromRoom, unBanUser, unMuteUser } from '../../../../api/chat';
 import { PayloadAction } from '@reduxjs/toolkit';
@@ -48,16 +48,16 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   }, [userData.id, room.ownerUser]);
 
   const handleMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
-    if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t mute an admin or owner'));
-    if (isMuted) return dispatch(setErrorSnackbar('User already muted'));
+    if (isOwner || isAdmin) return dispatch(setPersonalizedErrorSnackbar('You can\'t mute an admin or owner'));
+    if (isMuted) return dispatch(setPersonalizedErrorSnackbar('User already muted'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await muteUser(room.id, user.id, 20); //20sec
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsMuted(true);
       dispatch(setMsgSnackbar('User muted'));
@@ -66,16 +66,16 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleUnMuteUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
-    if (isOwner || isAdmin) return dispatch(setErrorSnackbar('You can\'t unmute an admin or owner'));
-    if (!isMuted) return dispatch(setErrorSnackbar('User not muted'));
+    if (isOwner || isAdmin) return dispatch(setPersonalizedErrorSnackbar('You can\'t unmute an admin or owner'));
+    if (!isMuted) return dispatch(setPersonalizedErrorSnackbar('User not muted'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await unMuteUser(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsMuted(false);
       dispatch(setMsgSnackbar('User unmuted'));
@@ -84,16 +84,16 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleKickuser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
-    if (isOwner) return dispatch(setErrorSnackbar('You can\'t kick the owner'));
-    if (isAdmin) return dispatch(setErrorSnackbar('You can\'t kick an admin'));
+    if (isOwner) return dispatch(setPersonalizedErrorSnackbar('You can\'t kick the owner'));
+    if (isAdmin) return dispatch(setPersonalizedErrorSnackbar('You can\'t kick an admin'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await kickUser(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       dispatch(setMsgSnackbar('User kicked'));
     }
@@ -101,18 +101,18 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleBanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
-    if (isOwner) return dispatch(setErrorSnackbar('You can\'t ban the owner'));
-    if (isAdmin) return dispatch(setErrorSnackbar('You can\'t ban an admin'));
-    if (isBanned) return dispatch(setErrorSnackbar('User already banned'));
+    if (isOwner) return dispatch(setPersonalizedErrorSnackbar('You can\'t ban the owner'));
+    if (isAdmin) return dispatch(setPersonalizedErrorSnackbar('You can\'t ban an admin'));
+    if (isBanned) return dispatch(setPersonalizedErrorSnackbar('User already banned'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await banUser(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsBanned(true);
       dispatch(setMsgSnackbar('User banned'));
@@ -121,18 +121,18 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleUnbanUser = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
-    if (isOwner) return dispatch(setErrorSnackbar('You can\'t unban the owner'));
-    if (isAdmin) return dispatch(setErrorSnackbar('You can\'t unban an admin'));
-    if (!isBanned) return dispatch(setErrorSnackbar('User not banned'));
+    if (isOwner) return dispatch(setPersonalizedErrorSnackbar('You can\'t unban the owner'));
+    if (isAdmin) return dispatch(setPersonalizedErrorSnackbar('You can\'t unban an admin'));
+    if (!isBanned) return dispatch(setPersonalizedErrorSnackbar('User not banned'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await unBanUser(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsBanned(false);
       dispatch(setMsgSnackbar('User unbanned'));
@@ -141,18 +141,18 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleAddAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
-    if (isBanned) return dispatch(setErrorSnackbar('You can\'t add admin to a banned user'));
-    if (isOwner) return dispatch(setErrorSnackbar('You can\'t add admin to the owner'));
-    if (isAdmin) return dispatch(setErrorSnackbar('User already admin'));
+    if (isBanned) return dispatch(setPersonalizedErrorSnackbar('You can\'t add admin to a banned user'));
+    if (isOwner) return dispatch(setPersonalizedErrorSnackbar('You can\'t add admin to the owner'));
+    if (isAdmin) return dispatch(setPersonalizedErrorSnackbar('User already admin'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await addAdminToRoom(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsAdmin(true);
       dispatch(setMsgSnackbar('User admin added'));
@@ -161,17 +161,17 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
   };
 
   const handleRemoveAdmin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)
-    : Promise<void | PayloadAction<string>> => {
+  : Promise<void | PayloadAction<string>> => {
     e.stopPropagation();
     e.preventDefault();
 
-    if (isOwner) return dispatch(setErrorSnackbar('You can\'t remove admin to the owner'));
-    if (!isAdmin) return dispatch(setErrorSnackbar('User not admin'));
+    if (isOwner) return dispatch(setPersonalizedErrorSnackbar('You can\'t remove admin to the owner'));
+    if (!isAdmin) return dispatch(setPersonalizedErrorSnackbar('User not admin'));
 
     setIsLoading(true);
     const result: RoomInterface | ApiErrorResponse = await removeAdminFromRoom(room.id, user.id);
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       setIsAdmin(false);
       dispatch(setMsgSnackbar('User admin removed'));

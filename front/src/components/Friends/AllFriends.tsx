@@ -38,13 +38,7 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
     setIsLoading(false);
 
     if ('error' in resBlockRequest)
-      dispatch(
-        setErrorSnackbar(
-          resBlockRequest.error + resBlockRequest.message
-            ? ': ' + resBlockRequest.message
-            : '',
-        ),
-      );
+      dispatch(setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(userToBlock.id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -59,13 +53,7 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(
-        setErrorSnackbar(
-          resDeleteRequest.error + resDeleteRequest.message
-            ? ': ' + resDeleteRequest.message
-            : '',
-        ),
-      );
+      dispatch(setErrorSnackbar(resDeleteRequest));
     else {
       dispatch(reduxRemoveFriends(userToDelete.id));
       dispatch(setMsgSnackbar('Friend deleted'));

@@ -72,7 +72,7 @@ const MessageItem: FC<MessageItemProps> = ({
     setIsLoading(false);
 
     if ('error' in res)
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      dispatch(setErrorSnackbar(res));
     else {
       // dispatch(setMsgSnackbar('Message edited'));
       setEditMessage(false);
@@ -88,7 +88,7 @@ const MessageItem: FC<MessageItemProps> = ({
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(message.ownerUser.id);
     if ('error' in resInvitGameUser)
-      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+      return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 

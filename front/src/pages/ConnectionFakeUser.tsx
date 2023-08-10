@@ -1,18 +1,13 @@
 import { Box, Button, CircularProgress, FormControl, FormHelperText, InputLabel, OutlinedInput, TextField } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { check2FACode, check2FACookie, loginFakeUser, registerFakeUser } from '../api/auth';
 import { useDispatch } from 'react-redux';
-import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, AuthInterface, ConversationInterface, NotificationInterface, UserActionInterface, UserInterface } from '../types';
+import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode, AuthInterface, UserInterface } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
-import { getUserData } from '../api/user';
-import { reduxSetFriends, reduxSetUserBlocked, setLogged, setUser } from '../store/userSlice';
-import { getBlockedUsers, getFriends } from '../api/relation';
 import SendIcon from '@mui/icons-material/Send';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
-import { reduxSetNotifications } from '../store/notificationSlice';
-import { reduxSetConversationList } from '../store/convListSlice';
 import { Link } from 'react-router-dom';
 
 export default function FakeConnection() {
@@ -29,36 +24,6 @@ export default function FakeConnection() {
 
   const dispatch = useDispatch();
 
-  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
-    apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => UserActionInterface),
-  ): Promise<void> {
-    const result: T | ApiErrorResponse = await apiFunction();
-    if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
-    } else {
-      dispatch(action(result));
-    }
-  }, [dispatch]);
-
-  //save user data in redux
-  const saveUserData = useCallback(async function (id: number) {
-    dispatch(setLogged(true));
-    await fetchData(getUserData, setUser);
-    await fetchData(getFriends, reduxSetFriends);
-    await fetchData(getBlockedUsers, reduxSetUserBlocked);
-    dispatch(reduxSetNotifications(
-      localStorage.getItem('notifications' + id)
-        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
-        : [] as NotificationInterface[],
-    ));
-    dispatch(reduxSetConversationList(
-      localStorage.getItem('conversationsList' + id)
-        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string) 
-        : [] as ConversationInterface[],
-    ));
-  }, [dispatch, fetchData]);
-
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLogin(e.target.value);
   };
@@ -70,15 +35,14 @@ export default function FakeConnection() {
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading(true);
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-    // console.log('res : ', res);
     if ('error' in res) {
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      dispatch(setErrorSnackbar(res));
     } else {
       if (res.is2FAactived) {
         setIs2FAactiv(res.is2FAactived);
         setUserId(res.user.id);
       } else {
-        window.opener.postMessage({msg:'user connected', id: res.user.id}, 'http://localhost:3006')
+        window.opener.postMessage({ msg:'user connected', id: res.user.id }, 'http://localhost:3006');
       }
     }
     setIsLoading(false);
@@ -92,17 +56,10 @@ export default function FakeConnection() {
     e.preventDefault();
 
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(login, password);
-    // console.log('res connection : ', res);
-    if ('error' in res) {
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
-    } else {
-      
-      //check 2FA
+    if ('error' in res)
+      dispatch(setErrorSnackbar(res));
+    else
       await fetchAndSetIs2FAactived();
-      // await saveUserData(res.user.id);
-      // setUserIsConnected(true);
-      // navigate('/home');
-    }
   };
 
   async function handleSendCode() {
@@ -116,10 +73,10 @@ export default function FakeConnection() {
 
     if ('error' in res) {
       setError(true);
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      dispatch(setErrorSnackbar(res));
     } else {
       setError(false);
-      window.opener.postMessage({msg:'user connected', id: userId}, 'http://localhost:3006')
+      window.opener.postMessage({ msg:'user connected', id: userId }, 'http://localhost:3006');
     }
     setIsLoading(false);
   }
@@ -139,7 +96,7 @@ export default function FakeConnection() {
 
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
     if ('error' in res) {
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      dispatch(setErrorSnackbar(res));
       return null;
     } else
       return res;

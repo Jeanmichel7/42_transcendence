@@ -1,7 +1,7 @@
 import { Button, Card, CardContent, CircularProgress, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 import { RoomInterface, ApiErrorResponse } from '../../../../types';
 import { joinRoom } from '../../../../api/chat';
 import { reduxAddConversationList } from '../../../../store/convListSlice';
@@ -38,12 +38,12 @@ const RoomCard = ({ room }: RoomCardProps) => {
     if (!room)
       return;
     if (isConvAlreadyExist(room, conversationsList)) {
-      return dispatch(setErrorSnackbar('Room already in conversation list'));
+      return dispatch(setPersonalizedErrorSnackbar('Room already in conversation list'));
     }
     if (room.isProtected && !displayInputPwd)
       return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
-      return dispatch(setErrorSnackbar('Password required'));
+      return dispatch(setPersonalizedErrorSnackbar('Password required'));
 
     setIsLoading(true);
     const res: RoomInterface | ApiErrorResponse = await joinRoom({
@@ -57,7 +57,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
         dispatch(setMsgSnackbar('Add room to conversation list'));
         setAlreadyInRoom(true);
       } else {
-        // dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
         setWrongPwd(true);
       }
     } else {

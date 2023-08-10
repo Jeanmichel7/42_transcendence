@@ -11,8 +11,6 @@ import { patchUserAccount } from '../../api/user';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Input from '@mui/material/Input';
 import CloseIcon from '@mui/icons-material/Close';
-import { LoadingButton } from '@mui/lab';
-import SendIcon from '@mui/icons-material/Send';
 import {
   Button,
   Dialog,
@@ -101,13 +99,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     // console.log('res : ', updatedUser);
     if ('error' in updatedUser) {
       setError(updatedUser.message);
-      dispatch(
-        setErrorSnackbar(
-          updatedUser.error + updatedUser.message
-            ? ': ' + updatedUser.message
-            : '',
-        ),
-      );
+      dispatch(setErrorSnackbar(updatedUser));
       setInputValue(value);
     } else {
       dispatch(setUser({ ...userData, [keyName]: inputValue }));
@@ -145,9 +137,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setInputValue(false);
       const res: UserInterface | ApiErrorResponse = await Desactive2FA();
       if ('error' in res) {
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch(setErrorSnackbar(res));
       } else {
         setInputValue(false);
         setQRCode('');
@@ -156,9 +146,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       // enable 2FA
       const res: string | ApiErrorResponse = await Active2FA();
       if (typeof res === 'object' && 'error' in res) {
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch(setErrorSnackbar(res));
       } else {
         localStorage.setItem('2FA', res);
         setQRCode(res);

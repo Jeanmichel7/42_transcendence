@@ -4,7 +4,8 @@
 // }
 
 export interface ApiErrorResponse {
-  status: number;
+  // status: number;
   error: string;
   message: string;
+  statusCode: number;
 }

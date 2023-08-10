@@ -4,7 +4,7 @@ import { Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup } 
 import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 import { inviteUser } from '../../../../api/chat';
 import RowOfFriendToInvit from './RowInvitation';
 import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
@@ -65,7 +65,7 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
   const handleValidateForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.acceptedUsers || form.acceptedUsers.length === 0)
-      return dispatch(setErrorSnackbar('You must select at least one user'));
+      return dispatch(setPersonalizedErrorSnackbar('You must select at least one user'));
 
     const data = { acceptedUsers: form.acceptedUsers.map(u => u.id) };
     setIsLoading(true);
@@ -73,7 +73,7 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     for (let i = 0; i < data.acceptedUsers.length; i++) {
       const res: RoomInterface | ApiErrorResponse = await inviteUser(room.id, data.acceptedUsers[i]);
       if ('error' in res) {
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+        dispatch(setErrorSnackbar(res));
       } else {
         dispatch(reduxUpdateRoomConvList({ item: res, userId: userData.id }));
       }

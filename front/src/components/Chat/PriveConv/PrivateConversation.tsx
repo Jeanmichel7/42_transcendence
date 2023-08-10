@@ -3,7 +3,7 @@ import { Socket, io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../store/snackbarSlice';
 
 import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';
@@ -33,7 +33,7 @@ const PrivateConversation: React.FC = () => {
   const navigate = useNavigate();
 
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const userFriend: UserInterface[] = useSelector((state: RootState) => state.user.userFriends);
+  const userFriend: UserInterface[] | null = useSelector((state: RootState) => state.user.userFriends);
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [messages, setMessages] = useState<MessageInterface[]>([]);
@@ -58,7 +58,7 @@ const PrivateConversation: React.FC = () => {
 
     const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
     if ('error' in allMessages)
-      dispatch(setErrorSnackbar(allMessages.error + allMessages.message ? ': ' + allMessages.message : ''));
+      dispatch(setErrorSnackbar(allMessages));
     else {
       dispatch(
         reduxResetNotReadMP({ userIdFrom: id, userId: userData.id }),
@@ -177,12 +177,7 @@ const PrivateConversation: React.FC = () => {
 
     if ('error' in resBlockRequest)
       dispatch(
-        setErrorSnackbar(
-          resBlockRequest.error + resBlockRequest.message
-            ? ': ' + resBlockRequest.message
-            : '',
-        ),
-      );
+        setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(+id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -198,12 +193,7 @@ const PrivateConversation: React.FC = () => {
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
       dispatch(
-        setErrorSnackbar(
-          resDeleteRequest.error + resDeleteRequest.message
-            ? ': ' + resDeleteRequest.message
-            : '',
-        ),
-      );
+        setErrorSnackbar(resDeleteRequest));
     else {
       dispatch(reduxRemoveFriends(+id));
       dispatch(reduxRemoveConversationToList({
@@ -219,14 +209,12 @@ const PrivateConversation: React.FC = () => {
 
     const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
     if ('error' in getUser)
-      return dispatch(setErrorSnackbar(getUser.error + getUser.message ? ': ' + getUser.message : ''));
+      return dispatch(setErrorSnackbar(getUser));
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(
       +id,
     );
     if ('error' in res) {
-      dispatch(
-        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-      );
+      dispatch(setErrorSnackbar(res));
     } else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(getUser));
@@ -239,10 +227,10 @@ const PrivateConversation: React.FC = () => {
     setIsLoadingDeleteMsg(false);
 
     if (typeof res === 'object' && 'error' in res)
-      dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+      dispatch(setErrorSnackbar(res));
     else {
       setMessages((prev) => prev.filter((message) => message.id !== msgId));
-      dispatch(setMsgSnackbar('Message deleted'));
+      dispatch(setPersonalizedErrorSnackbar('Message deleted'));
     }
   };
 
@@ -250,7 +238,7 @@ const PrivateConversation: React.FC = () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
        await inviteGameUser(parseInt(id));
     if ('error' in resInvitGameUser)
-      return dispatch(setErrorSnackbar(resInvitGameUser.error + resInvitGameUser.message ? ': ' + resInvitGameUser.message : ''));
+      return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 

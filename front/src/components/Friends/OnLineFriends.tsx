@@ -38,13 +38,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
     setIsLoading(false);
 
     if ('error' in resBlockRequest)
-      dispatch(
-        setErrorSnackbar(
-          resBlockRequest.error + resBlockRequest.message
-            ? ': ' + resBlockRequest.message
-            : '',
-        ),
-      );
+      dispatch(setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(userToBlock.id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -55,13 +49,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(userToDefie.id);
     if ('error' in resInvitGameUser)
-      return dispatch(
-        setErrorSnackbar(
-          resInvitGameUser.error + resInvitGameUser.message
-            ? ': ' + resInvitGameUser.message
-            : '',
-        ),
-      );
+      return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 
@@ -74,12 +62,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
       dispatch(
-        setErrorSnackbar(
-          resDeleteRequest.error + resDeleteRequest.message
-            ? ': ' + resDeleteRequest.message
-            : '',
-        ),
-      );
+        setErrorSnackbar(resDeleteRequest));
     else {
       dispatch(reduxRemoveFriends(userToDelete.id));
       dispatch(setMsgSnackbar('Friend deleted'));

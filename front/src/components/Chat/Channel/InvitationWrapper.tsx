@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ApiErrorResponse, RoomInterface } from '../../../types';
 import { getRoomData } from '../../../api/chat';
-import { setErrorSnackbar } from '../../../store/snackbarSlice';
+import { setErrorSnackbar, setPersonalizedErrorSnackbar } from '../../../store/snackbarSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 // import { reduxAddConversationList } from '../../../store/chatSlicer';
@@ -20,16 +20,16 @@ const InvitationWrapper = () => {
     if (!channelId || userData.id === -1) return;
     const result: RoomInterface | ApiErrorResponse = await getRoomData(channelId);
     if ('statusCode' in result && result.statusCode === 403) {
-      dispatch(setErrorSnackbar('You are not allowed to access this room'));
+      dispatch(setPersonalizedErrorSnackbar('You are not allowed to access this room'));
       navigate('/chat');
     } else if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
       navigate('/chat');
     } else {
       setRoom(result);
 
       if (!result.acceptedUsers?.some(u => u.id === userData.id)) {
-        dispatch(setErrorSnackbar('You are not allowed to access this room'));
+        dispatch(setPersonalizedErrorSnackbar('You are not allowed to access this room'));
         navigate('/chat');
       } else {
         // check private and password

@@ -40,7 +40,7 @@ const NotificationItem = ({
     setIsLoading(false);
     
     if ('error' in resAcceptRequest)
-      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
+      dispatch(setErrorSnackbar(resAcceptRequest));
     else {
       dispatch(reduxRemoveWaitingFriends(userToAccept));
       dispatch(reduxAddFriends(userToAccept));
@@ -56,7 +56,7 @@ const NotificationItem = ({
     
     if (notifications.length == 1) setAnchorElNotification(null);
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+      dispatch(setErrorSnackbar(resDeclineRequest));
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
       dispatch(setMsgSnackbar('Friend request declined'));
@@ -70,7 +70,7 @@ const NotificationItem = ({
     setIsLoading(false);
 
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-      dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+      dispatch(setErrorSnackbar(resDeclineRequest));
     else {
       dispatch(reduxRemoveWaitingUserInRoom({ roomId: extractRoomId, userId: userData.id }));
       dispatch(setMsgSnackbar('Room invitation declined'));
@@ -86,7 +86,7 @@ const NotificationItem = ({
     setIsLoading(true);
     const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(extractGameId);
     if ('error' in resAcceptRequest)
-      dispatch(setErrorSnackbar(resAcceptRequest.error + resAcceptRequest.message ? ': ' + resAcceptRequest.message : ''));
+      dispatch(setErrorSnackbar(resAcceptRequest));
     else {
       // dispatch(setMsgSnackbar('Game invitation accepted'));
       navigate(notif.invitationLink ? notif.invitationLink : '/chat');
@@ -158,7 +158,7 @@ const NotificationItem = ({
   const handleMouseEnter = async () => {
     const resReadNotif: void | ApiErrorResponse = await readNotification(notification.id);
     if (typeof resReadNotif === 'object' && 'error' in resReadNotif)
-      dispatch(setErrorSnackbar(resReadNotif.error + resReadNotif.message ? ': ' + resReadNotif.message : ''));
+      dispatch(setErrorSnackbar(resReadNotif));
     else 
       dispatch(reduxReadNotification(notification));
   };

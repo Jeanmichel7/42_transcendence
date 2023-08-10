@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PutSnackbarInterface, SnackbarInterface } from '../types/utilsTypes';
+import { ApiErrorResponse, PutSnackbarInterface, SnackbarInterface } from '../types';
 
 export interface SnackbarState {
   snackbar: SnackbarInterface;
@@ -18,16 +18,45 @@ export const snackbarSlice = createSlice({
       horizontal: 'right',
       link: '',
       trophyImg: '',
+      error : {
+        error: '',
+        message: '',
+        statusCode: 0,
+      },
     } as SnackbarInterface,
   },
   reducers: {
     setSnackbar: (state, action: PayloadAction<PutSnackbarInterface>) => {
       state.snackbar = { ...state.snackbar, ...action.payload, open: true };
     },
-    setErrorSnackbar: (state, action: PayloadAction<string>) => {
+    // setErrorSnackbar: (state, action: PayloadAction<string>) => {
+    //   state.snackbar = {
+    //     ...state.snackbar,
+    //     message: action.payload,
+    //     severity: 'error',
+    //     open: true,
+    //   };
+    // },
+    setErrorSnackbar: (state, action: PayloadAction<ApiErrorResponse>) => {
       state.snackbar = {
         ...state.snackbar,
-        message: action.payload,
+        error: {
+          error: action.payload.error,
+          message: action.payload.message,
+          statusCode: action.payload.statusCode,
+        },
+        severity: 'error',
+        open: true,
+      };
+    },
+    setPersonalizedErrorSnackbar: (state, action: PayloadAction<string>) => {
+      state.snackbar = {
+        ...state.snackbar,
+        error: {
+          error: 'Error : ',
+          message: action.payload,
+          statusCode: -1,
+        },
         severity: 'error',
         open: true,
       };
@@ -55,9 +84,14 @@ export const snackbarSlice = createSlice({
       state.snackbar.avatar = '';
       state.snackbar.link = '';
       state.snackbar.trophyImg = '';
+      // state.snackbar.severity = 'success';
       state.snackbar.vertical = 'bottom';
       state.snackbar.horizontal = 'right';
-
+      state.snackbar.error = {
+        error: '',
+        message: '',
+        statusCode: -1,
+      };
     },
     setSeveritySnackbar: (
       state,
@@ -75,6 +109,7 @@ export const {
   setSeveritySnackbar,
   closeSnackbar,
   setWarningSnackbar,
+  setPersonalizedErrorSnackbar,
 } = snackbarSlice.actions;
 
 export default snackbarSlice.reducer;

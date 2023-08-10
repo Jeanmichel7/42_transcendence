@@ -75,7 +75,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
   const handleValidateForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (form.password && form.password.length < 3)
-      return dispatch(setErrorSnackbar('Password must be at least 3 characters'));
+      return dispatch(setPersonalizedErrorSnackbar('Password must be at least 3 characters'));
     if (form.isProtected && !form.password && room.isProtected != form.isProtected)
       return setErrorForm('Password is required');
 
@@ -115,7 +115,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
     if (!room) return;
     const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
     if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)
-      dispatch(setErrorSnackbar(resDeleteChannel.error + resDeleteChannel.message ? ': ' + resDeleteChannel.message : ''));
+      dispatch(setErrorSnackbar(resDeleteChannel));
     else {
       dispatch(setMsgSnackbar('Channel deleted'));
       dispatch(reduxRemoveConversationToList({ convId: convId, userId: userData.id }));

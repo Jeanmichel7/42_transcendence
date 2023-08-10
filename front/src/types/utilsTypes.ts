@@ -11,6 +11,11 @@ export interface SnackbarInterface {
   horizontal: 'left' | 'center' | 'right';
   link: string;
   trophyImg?: string;
+  error : {
+    error: string,
+    message: string,
+    statusCode: number,
+  },
 }
 
 export interface PutSnackbarInterface {

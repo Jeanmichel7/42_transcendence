@@ -1,58 +1,39 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar } from '../store/snackbarSlice';
 
-import { useDispatch } from "react-redux";
-import { setErrorSnackbar } from "../store/snackbarSlice";
+import ProfileFriends from '../components/Profile/ProfileFriends';
+import HistoryGame from '../components/Profile/HistoryGame';
 
-import ProfileFriends from "../components/Profile/ProfileFriends";
-import HistoryGame from "../components/Profile/HistoryGame";
+import { getProfileByPseudo } from '../api/user';
+import { ApiErrorResponse, UserInterface } from '../types';
 
-import { getProfileByPseudo } from "../api/user";
-
-import { ApiErrorResponse, UserInterface } from "../types";
-
-import Box from "@mui/material/Box";
-import ErrorBoundary from "../utils/errorBoundaries";
-import ProfileInfo from "../components/Profile/ProfileInfo";
-import { Sticker } from "../utils/StyledTitle";
-import ProfileTrophies from "../components/Profile/ProfileTrophies";
+import Box from '@mui/material/Box';
+import ErrorBoundary from '../utils/errorBoundaries';
+import ProfileInfo from '../components/Profile/ProfileInfo';
+import ProfileTrophies from '../components/Profile/ProfileTrophies';
 
 function Profile() {
   const { pseudo } = useParams();
-  const [userProfile, setUserProfile] = useState<UserInterface>({
-    id: -1,
-    login: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    description: "",
-    is2FAEnabled: false,
-    avatar: "",
-    score: 1500,
-    level: 0,
-    status: "offline",
-    trophies: [],
-  });
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<UserInterface | null>(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     async function fetchAndSetUserProfile() {
-      if (typeof pseudo === "undefined") return;
+      if (typeof pseudo === 'undefined') return;
       const profilesFetched: UserInterface | ApiErrorResponse =
         await getProfileByPseudo(pseudo);
-      if ("error" in profilesFetched)
-        dispatch(
-          setErrorSnackbar(
-            profilesFetched.error + profilesFetched.message
-              ? ": " + profilesFetched.message
-              : ""
-          )
-        );
-      else setUserProfile(profilesFetched);
+      if ('error' in profilesFetched) {
+        if (profilesFetched.statusCode === 404) return navigate('/404');
+        dispatch(setErrorSnackbar(profilesFetched));
+      } else setUserProfile(profilesFetched);
     }
     fetchAndSetUserProfile();
   }, [pseudo, dispatch]);
 
+  if (!userProfile) return <div>loading...</div>;
   return (
     <div className="bg-[var(--background-color)] relative z-10 ">
       <ProfileInfo user={userProfile} />

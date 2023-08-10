@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   setErrorSnackbar,
   setMsgSnackbar,
+  setPersonalizedErrorSnackbar,
   setWarningSnackbar,
 } from '../../../store/snackbarSlice';
 
@@ -92,13 +93,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         await chatOldMessages(id, pageDisplay, offsetPagniation);
 
       if ('error' in allMessages)
-        dispatch(
-          setErrorSnackbar(
-            allMessages.error + allMessages.message
-              ? ': ' + allMessages.message
-              : '',
-          ),
-        );
+        dispatch(setErrorSnackbar(allMessages));
       else {
         if (allMessages.length === 0) return;
         if (allMessages.length < 20) setAllMessagesDisplayed(true);
@@ -136,7 +131,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
 
     const fetchRoomData = useCallback(async () => {
       if (conv == null) {
-        dispatch(setErrorSnackbar('Nop'));
+        dispatch(setPersonalizedErrorSnackbar('Not allow...'));
         navigate('/chat/channel');
         return;
       }
@@ -147,7 +142,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       // console.log('roomData : ', roomData);
       if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
         dispatch(
-          setErrorSnackbar(
+          setPersonalizedErrorSnackbar(
             'You are not allowed to access this room or just be kicked from it',
           ),
         );
@@ -161,13 +156,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           }),
         );
         navigate('/chat/channel');
-      } else if (roomData && 'error' in roomData)
-        dispatch(
-          setErrorSnackbar(
-            roomData.error + roomData.message ? ': ' + roomData.message : '',
-          ),
-        );
-      else {
+      } else if (roomData && 'error' in roomData) {
+        dispatch(setErrorSnackbar(roomData));
+      } else {
         // setRoom(roomData);
         dispatch(
           reduxUpdateRoomConvList({ item: roomData, userId: userData.id }),
@@ -252,9 +243,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       setIsLoadingDeleteMsg(false);
 
       if (typeof res === 'object' && 'error' in res)
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch(setErrorSnackbar(res));
       else {
         setMessages((prev) => prev.filter((message) => message.id !== msgId));
         dispatch(setMsgSnackbar('Message deleted'));

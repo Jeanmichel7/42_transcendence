@@ -1,39 +1,33 @@
-import { CircularProgress } from "@mui/material";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { cancelFriendRequest } from "../../api/relation";
-import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { UserInterface, ApiErrorResponse } from "../../types";
-import { RootState } from "../../store";
-import { reduxRemoveWaitingFriendsSent } from "../../store/userSlice";
-import FriendItem from "./FriendItem";
-import { Nothing } from "./Nothing";
+import { CircularProgress } from '@mui/material';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { cancelFriendRequest } from '../../api/relation';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { UserInterface, ApiErrorResponse } from '../../types';
+import { RootState } from '../../store';
+import { reduxRemoveWaitingFriendsSent } from '../../store/userSlice';
+import FriendItem from './FriendItem';
+import { Nothing } from './Nothing';
 
 const WaitingRequestSent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { waitingFriendsRequestSent } = useSelector(
-    (state: RootState) => state.user
+    (state: RootState) => state.user,
   );
   const dispatch = useDispatch();
 
   const handleCancelFriendRequest = async (userToCancel: UserInterface) => {
     setIsLoading(true);
     const resCancelRequest: void | ApiErrorResponse = await cancelFriendRequest(
-      userToCancel.id
+      userToCancel.id,
     );
     setIsLoading(false);
 
-    if (typeof resCancelRequest === "object" && "error" in resCancelRequest)
-      dispatch(
-        setErrorSnackbar(
-          resCancelRequest.error + resCancelRequest.message
-            ? ": " + resCancelRequest.message
-            : ""
-        )
-      );
+    if (typeof resCancelRequest === 'object' && 'error' in resCancelRequest)
+      dispatch(setErrorSnackbar(resCancelRequest));
     else {
       dispatch(reduxRemoveWaitingFriendsSent(userToCancel));
-      dispatch(setMsgSnackbar("Friend request canceled"));
+      dispatch(setMsgSnackbar('Friend request canceled'));
     }
   };
 
@@ -47,7 +41,7 @@ const WaitingRequestSent = () => {
         <FriendItem
           key={user.id}
           user={user}
-          actions={[{ name: "Cancel", callback: handleCancelFriendRequest }]}
+          actions={[{ name: 'Cancel', callback: handleCancelFriendRequest }]}
           isLoading={isLoading}
         />
       ))}

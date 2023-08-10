@@ -44,7 +44,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
     setIsLoading(false);
 
     if ('error' in resLeaveRoom)
-      dispatch(setErrorSnackbar(resLeaveRoom.error + resLeaveRoom.message ? ': ' + resLeaveRoom.message : ''));
+      dispatch(setErrorSnackbar(resLeaveRoom));
     else {
       dispatch(setMsgSnackbar('Leaved room'));
       dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));

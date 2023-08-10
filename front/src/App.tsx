@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import './App.css';
@@ -33,8 +33,7 @@ import {
   UserActionInterface,
   UserStatusInterface,
 } from './types/utilsTypes';
-import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
-import { RootState } from './store';
+import { setErrorSnackbar } from './store/snackbarSlice';
 import {
   reduxAddManyNotifications,
   reduxSetNotifications,
@@ -44,12 +43,9 @@ import {
   reduxUpdateStatusUserConvList,
 } from './store/convListSlice';
 import { getNotifsNotRead } from './api/notification';
-
-import { Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import { CircleBackground } from './utils/CircleBackground';
+import SnackBarApp from './components/SnackBarApp';
 
-import trophyImages from './components/Profile/TrophyImages';
 
 function App() {
   const dispatch = useDispatch();
@@ -57,7 +53,6 @@ function App() {
   const location = useLocation();
 
   const [userId, setUserId] = useState(-1);
-  const { snackbar } = useSelector((state: RootState) => state.snackbar);
 
   // useEffect(() => {
   //   console.log('snackbar : ' + snackbar.message);
@@ -74,11 +69,7 @@ function App() {
       const result: T | ApiErrorResponse = await apiFunction();
 
       if ('error' in result) {
-        dispatch(
-          setErrorSnackbar(
-            result.error + result.message ? ': ' + result.message : '',
-          ),
-        );
+        dispatch(setErrorSnackbar(result));
       } else {
         if (!Array.isArray(result) && apiFunction === getUserData)
           setUserId(result.id);
@@ -164,23 +155,7 @@ function App() {
     }
   }, [dispatch, navigate, fetchData, checkAuth]);
 
-  const handleClick = () => {
-    if (snackbar.link) {
-      dispatch(closeSnackbar());
-      navigate(snackbar.link);
-    }
-  };
 
-  const handleClose = () => {
-    dispatch(closeSnackbar());
-  };
-
-  const handleClickSnackbar  = () => {
-    dispatch(closeSnackbar());
-    if (snackbar.link) {
-      navigate(snackbar.link);
-    }
-  };
 
   return (
       <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
@@ -199,97 +174,7 @@ function App() {
             <Footer />
         }
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: snackbar.vertical,
-            horizontal: snackbar.horizontal,
-          }}
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleClose}
-          onClick={handleClick}
-        >
-          {snackbar.link ? (
-            <SnackbarContent
-              message={
-                // <Link to={snackbar.link} className="text-white">
-                <div className='flex' onClick={handleClickSnackbar}>
-                  <img
-                    className="w-10 h-10 rounded-full object-cover mr-2 "
-                    src={snackbar.avatar}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.onerror = null;
-                      target.src =
-                        'http://localhost:3000/avatars/defaultAvatar.png';
-                    }}
-                    alt="avatar"
-                  />
-                  <div>
-                    <p>{snackbar.loginFrom}</p>
-                    {' ' + snackbar.message}
-                  </div>
-                </div>
-              // </Link>
-            }
-            action={
-              <IconButton
-                size="small"
-                  aria-label="close"
-                  color="inherit"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClose();
-                  }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              }
-            />
-          ) : snackbar.trophyImg ? (
-            <SnackbarContent
-              message={
-                // <Link to={snackbar.link} className="text-white">
-                <div className='flex items-center' onClick={handleClickSnackbar}>
-                  <img
-                    className="w-10 h-10 rounded-full object-cover mr-2 "
-                    src={trophyImages[snackbar.trophyImg]}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.onerror = null;
-                      target.src =
-                        'http://localhost:3000/avatars/defaultAvatar.png';
-                    }}
-                    alt="avatar"
-                  />
-                  <p>{snackbar.message}</p>
-                </div>
-              // </Link>
-            }
-            action={
-              <IconButton
-                size="small"
-                  aria-label="close"
-                  color="inherit"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClose();
-                  }}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              }
-            />
-          ) : (
-            <Alert
-              onClose={handleClose}
-              severity={snackbar.severity}
-              sx={{ width: '100%' }}
-            >
-              {snackbar.message}
-            </Alert>
-          )}
-        </Snackbar>
+        <SnackBarApp/>
     </div>
   );
 }

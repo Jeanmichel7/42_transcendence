@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 
 import { ApiErrorResponse, RoomInterface } from '../../../../types';
 
@@ -57,10 +57,10 @@ export default function ChannelSearch() {
   const handleJoinRoom = async (room: RoomInterface | null) => {
     if (!room) return;
     if (isConvAlreadyExist(room, conversationsList))
-      return dispatch(setErrorSnackbar('Room already in conversation list'));
+      return dispatch(setPersonalizedErrorSnackbar('Room already in conversation list'));
     if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
-      return dispatch(setErrorSnackbar('Password required'));
+      return dispatch(setPersonalizedErrorSnackbar('Password required'));
 
     setIsLoading(true);
     const res: RoomInterface | ApiErrorResponse = await joinRoom({
@@ -71,15 +71,10 @@ export default function ChannelSearch() {
     if ('error' in res) {
       if (res.error === 'Conflict' && res.message.includes('already in room')) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
-        if (isConvAlreadyExist(room, conversationsList))
-          dispatch(
-            setErrorSnackbar('Room already in conversation list jtevois toi ?'),
-          );
-        else dispatch(setMsgSnackbar('Add room to conversation list'));
+        if (!isConvAlreadyExist(room, conversationsList))
+          dispatch(setMsgSnackbar('Add room to conversation list'));
       } else
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch( setErrorSnackbar(res) );
     } else {
       dispatch(setMsgSnackbar('Room joint'));
       dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
@@ -93,9 +88,7 @@ export default function ChannelSearch() {
     async function fetchTotalRooms() {
       const res: number | ApiErrorResponse = await getAllPublicRoomsCount();
       if (typeof res != 'number' && 'error' in res)
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch(setErrorSnackbar(res));
       else setTotalPages(Math.ceil(res / userPerPage));
     }
     async function fetchRooms() {
@@ -105,11 +98,7 @@ export default function ChannelSearch() {
       setIsLoading(false);
 
       if ('error' in allRooms)
-        dispatch(
-          setErrorSnackbar(
-            allRooms.error + allRooms.message ? ': ' + allRooms.message : '',
-          ),
-        );
+        dispatch(setErrorSnackbar(allRooms));
       else {
         setRooms(allRooms);
         topRef.current?.scrollIntoView({ behavior: 'smooth' });

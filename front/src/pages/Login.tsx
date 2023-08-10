@@ -168,7 +168,7 @@ export default function Login() {
   ): Promise<void> {
     const result: T | ApiErrorResponse = await apiFunction();
     if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(setErrorSnackbar(result));
     } else {
       dispatch(action(result));
     }

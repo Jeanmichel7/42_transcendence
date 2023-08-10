@@ -17,13 +17,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
       const friendsFetched: UserInterface[] | ApiErrorResponse =
         await getFriendProfile(user.login);
       if ('error' in friendsFetched) {
-        dispatch(
-          setErrorSnackbar(
-            friendsFetched.error + friendsFetched.message
-              ? ': ' + friendsFetched.message
-              : '',
-          ),
-        );
+        dispatch(setErrorSnackbar(friendsFetched));
       } else {
         setFriends(friendsFetched);
       }
@@ -46,16 +40,16 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
         ) :
           <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
             { friends.map((friend) => {
-                if (friend.login != user.login)
-                  return (
+              if (friend.login != user.login)
+                return (
                     <FriendCard
                       key={friend.id}
                       actualUserLogin={user.login}
                       friend={friend}
                       setFriends={setFriends}
                     />
-                  );
-              })
+                );
+            })
             }
           </div>
         }

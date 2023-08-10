@@ -38,9 +38,7 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
     async function fetchTotalUsers() {
       const res: number | ApiErrorResponse = await getAllUsersCount();
       if (typeof res != 'number' && 'error' in res)
-        dispatch(
-          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-        );
+        dispatch(setErrorSnackbar(res));
       else setTotalPages(Math.ceil(res / userPerPage));
     }
     async function fetchUsers() {
@@ -59,11 +57,7 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
       setIsLoading(false);
 
       if ('error' in allUsers)
-        dispatch(
-          setErrorSnackbar(
-            allUsers.error + allUsers.message ? ': ' + allUsers.message : '',
-          ),
-        );
+        dispatch(setErrorSnackbar(allUsers));
       else {
         const resFiltered = allUsers.filter(
           (u: UserInterface) =>
@@ -92,9 +86,7 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
       user.id,
     );
     if ('error' in res)
-      dispatch(
-        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
-      );
+      dispatch(setErrorSnackbar(res));
     else {
       dispatch(reduxAddWaitingFriendsSent(user));
       dispatch(setMsgSnackbar('Request sent'));
