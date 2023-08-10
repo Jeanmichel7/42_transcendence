@@ -108,7 +108,7 @@ export class GameEvents {
       this.gameService.checkAlreadyInGame(client.data.userId)
     )
       return 'error when joining/creating private lobby';
-    let data = {
+    const data = {
       username: client.data.userId,
       socketId: client.id,
       gameId: update.gameId,
@@ -129,7 +129,7 @@ export class GameEvents {
       console.log('game started');
       return;
     }
-    let { socketId, ...newData } = data;
+    const { socketId, ...newData } = data;
     if (socket) this.server.to(socket).emit('privateLobby', newData);
   }
 

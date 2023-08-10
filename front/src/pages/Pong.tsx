@@ -62,6 +62,7 @@ function Pong() {
         retFetchGame.player2.id != userData.id
       )
         return dispatch(setErrorSnackbar('You are not in this game'));
+      console.log('retFetchGame : ', retFetchGame);
 
       setIsPlayer1(retFetchGame.player1.id == userData.id);
       setCurrentPage('privateLobby');
@@ -179,6 +180,7 @@ function Pong() {
     );
   }
   return (
+    
     <GameWrapper>
       {showOverlay && <Overlay />}
       {statusComponent}
