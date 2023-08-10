@@ -1,13 +1,13 @@
-import { apiRequest } from './index';
-import { ApiErrorResponse, UserInterface } from '../types';
+import { apiRequest } from "./index";
+import { ApiErrorResponse, UserInterface } from "../types";
 
 export async function getLeaderboard(
   page: number,
-  offset: number,
-): Promise< UserInterface[] | ApiErrorResponse > {
+  offset: number
+): Promise<UserInterface[] | ApiErrorResponse> {
   return apiRequest<UserInterface[]>(
-    'get',
-    '/users/leaderboard?page=' + page + '&offset=' + offset,
-    'Failed to get leaderboard: ',
+    "get",
+    "/users/leaderboard?page=" + page + "&offset=" + offset,
+    "Failed to get leaderboard: "
   );
 }

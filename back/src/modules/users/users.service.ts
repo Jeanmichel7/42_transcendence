@@ -88,7 +88,7 @@ export class UsersService {
         'role',
         'is2FAEnabled',
         'score',
-        'password'
+        'password',
       ],
     });
 
@@ -96,7 +96,6 @@ export class UsersService {
     const result: UserInterface = { ...user };
     return result;
   }
-
 
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
@@ -112,7 +111,9 @@ export class UsersService {
         'avatar',
         'status',
         'score',
+        'experience',
         'level',
+        'rank',
       ],
     });
     if (!user) throw new NotFoundException(`User ${login} not found`);
@@ -265,7 +266,7 @@ export class UsersService {
     if (updateUser.password) {
       const isMatch = await bcrypt.compare(
         updateUser.oldPassword,
-        userToUpdate.password
+        userToUpdate.password,
       );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
@@ -484,6 +485,8 @@ export class UsersService {
         'users.status',
         'users.avatar',
         'users.score',
+        'users.level',
+        'users.rank',
       ])
       .orderBy('users.score', 'DESC')
       .skip(skip)

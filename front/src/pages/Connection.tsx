@@ -12,6 +12,8 @@ import {
   OutlinedInput,
   Button,
   CircularProgress,
+  Typography,
+  Paper,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from "../types";
@@ -124,23 +126,37 @@ function ConnectPage() {
         alignItems="center"
         justifyContent="center"
         padding={3}
+        height="100vh" // Prend toute la hauteur de la vue
+        bgcolor="background.default" // Couleur de fond par défaut
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleOAuthConnection}
-          sx={{ marginBottom: 2 }}
-        >
-          Login as a 42 student
-        </Button>
+        <Paper elevation={3} style={{ padding: "20px", borderRadius: "15px" }}>
+          <Typography
+            variant="h4"
+            align="center"
+            style={{ marginBottom: "20px" }}
+          >
+            Choose your account
+          </Typography>
 
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleFakeConnection}
-        >
-          Login as fake user
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOAuthConnection}
+            fullWidth
+            style={{ marginBottom: "15px" }}
+          >
+            Login as a 42 student
+          </Button>
+
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleFakeConnection}
+            fullWidth
+          >
+            Login as fake user
+          </Button>
+        </Paper>
       </Box>
 
       {/* <Link to="/fakeconnection">

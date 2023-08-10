@@ -21,6 +21,9 @@ export interface UserInterface {
   waitingFriendsRequestReceived?: UserInterface[];
   waitingFriendsRequestSent?: UserInterface[];
   trophies?: TrophyInterface[];
+  level?: number;
+  experience?: number;
+  rank?: string;
 }
 
 export interface UserRelation {

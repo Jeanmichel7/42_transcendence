@@ -568,6 +568,20 @@ export class GameService {
     return game;
   }
 
+  determineRank(scoreElo: number): string {
+    if (scoreElo < 1600) return 'cooper_3';
+    if (scoreElo < 1700) return 'cooper_2';
+    if (scoreElo < 1800) return 'cooper_1';
+    if (scoreElo < 1900) return 'silver_3';
+    if (scoreElo < 2000) return 'silver_2';
+    if (scoreElo < 2100) return 'silver_1';
+    if (scoreElo < 2200) return 'gold_3';
+    if (scoreElo < 2300) return 'gold_2';
+    if (scoreElo < 2400) return 'gold_1';
+    if (scoreElo < 2500) return 'master_3';
+    if (scoreElo < 2600) return 'master_2';
+    return 'master_1'; // pour les scores de 2500 et plus
+  }
   async updatePlayerStats(
     player: UserEntity,
     winnerId: string,

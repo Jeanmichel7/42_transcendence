@@ -6,6 +6,8 @@ import { Button, Typography } from "@mui/material";
 import { RootState } from "../../store";
 import { reduxAddWaitingFriendsSent } from "../../store/userSlice";
 import cuteBallsClimbingVines from "../../assets/cuteBallsClimbingVines.png";
+import ExperienceBar from "./ExperienceBar";
+import { Sticker } from "../../utils/StyledTitle";
 
 export default function ProfileInfo({ user }: { user: UserInterface }) {
   const { userData, userFriends } = useSelector(
@@ -33,7 +35,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
         {user.avatar && (
           <img
             src={user.avatar}
-            className="w-full rounded-[16px] shadow-lg h-2/3  "
+            className="w-full rounded-[16px] shadow-lg h-2/3 max-h-72	 object-cover "
             alt="avatar"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -49,12 +51,6 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
       </div>
 
       <div className="md:w-3/4 mt-5  md:ml-5  box-border self-stretch z-0 relative rounded bg-white shadow-custom	 text-black p-5 ">
-        <h2
-          className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
-        before:top-0 z-10  text-white text-center mb-5 font-bold"
-        >
-          {user.firstName + " " + user.lastName}
-        </h2>
         {userData.id &&
           userFriends &&
           !userFriends.find((u) => u.id === user.id) &&
@@ -63,11 +59,18 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               variant="contained"
               color="primary"
               onClick={() => handleAddFriend()}
-              sx={{ display: "block", margin: "auto" }}
+              sx={{ display: "block", margin: "auto", position: "absolute" }}
             >
               Add friend
             </Button>
           )}
+        <h2
+          className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
+        before:top-0 z-10  text-white text-center mb-5 font-bold"
+        >
+          {user.firstName + " " + user.lastName}
+        </h2>
+
         <div className="flex justify-between items-stretch h-3/4">
           <div className="w-1/4 space-y-2 flex flex-col justify-between">
             <p className="md:text-xl opacity-60">Pseudo</p>
@@ -81,7 +84,10 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
             <p className="md:text-xl">{user.email}</p>
             <p className="md:text-xl">{user.status}</p>
             <p className="md:text-xl">{Math.floor(user.score)}</p>
-            <p className="md:text-xl">{Math.floor(user.level)}</p>
+            <ExperienceBar
+              currentExp={user.experience}
+              currentLevel={user.level}
+            />
           </div>
           <img
             src={cuteBallsClimbingVines}
