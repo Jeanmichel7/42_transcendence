@@ -36,11 +36,14 @@ const addUserBlocked = (state: UserState, userId: number) => {
     state.userBlocked = [...state.userBlocked, userToBlock];
 };
 
-const removeUserBlocked = (state: UserState, user: UserInterface) => {
+const removeUserBlocked = (state: UserState, userId: number) => {
+  const userToUnBlock: UserInterface | undefined 
+    = state.userFriends?.find((u) => u.id === userId);
+  if (!userToUnBlock) return;
   if (!state.userBlocked)
     return;
   state.userBlocked = state.userBlocked
-    .filter((userBlocked: UserInterface) => userBlocked.id !== user.id);
+    .filter((userBlocked: UserInterface) => userBlocked.id !== userId);
 };
 
 // Waiting friends request management
@@ -185,7 +188,7 @@ export const userSlice = createSlice({
     },
     reduxAddFriends: (state, action: PayloadAction<UserInterface>) => {
       addFriend(state, action.payload);
-      removeUserBlocked(state, action.payload);
+      removeUserBlocked(state, action.payload.id);
     },
     reduxRemoveFriends: (state, action: PayloadAction<number>) => {
       removeFriend(state, action.payload);
@@ -199,7 +202,7 @@ export const userSlice = createSlice({
       addUserBlocked(state, action.payload);
       removeFriend(state, action.payload);
     },
-    reduxRemoveUserBlocked: (state, action: PayloadAction<UserInterface>) => {
+    reduxRemoveUserBlocked: (state, action: PayloadAction<number>) => {
       removeUserBlocked(state, action.payload);
     },
 

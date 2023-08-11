@@ -8,7 +8,7 @@ import { apiEditMessage } from '../../api/message';
 import { ApiErrorResponse, GameInterface, UserInterface } from '../../types';
 import { ChatMsgInterface, MessageInterface } from '../../types/ChatTypes';
 import { BiPaperPlane } from 'react-icons/bi';
-import { CircularProgress, FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
+import { Button, CircularProgress, FormControl, IconButton, TextareaAutosize, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -36,6 +36,7 @@ const MessageItem: FC<MessageItemProps> = ({
   const [inputMessage, setInputMessage] = useState<string>(message.text);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDefi, setIsDefi] = useState<boolean>(false);
   const [messageTime, setMessageTime] = useState<string>(getTimeSince(message.createdAt));
   const dispatch = useDispatch();
 
@@ -123,6 +124,32 @@ const MessageItem: FC<MessageItemProps> = ({
     };
   }, [message.createdAt, message.text, message.updatedAt]);
 
+  const formatingLine = (line: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+
+    const formatedLine = line.split(' ').map((word) => {
+      if (word.match(urlRegex)) {
+        if (!isDefi) setIsDefi(true);
+        return (
+          word.includes('game?id=')
+            ? <div className='flex flex-col justify-center items-center' key={word}>
+              <p className=''>
+                Game Invitation
+              </p>
+              <Button href={word} variant='contained'>
+                Join
+              </Button>
+            </div>
+            : <StyledLink href={word} key={word}>
+              { word + ' '}
+            </StyledLink>
+        );
+      }
+      return word + ' ';
+    });
+    return formatedLine;
+  };
+
   return (
     <>
       <div
@@ -165,15 +192,8 @@ const MessageItem: FC<MessageItemProps> = ({
                 style={{ wordBreak: 'break-word' }}
               >
                 {message.text.split('\n').map((line, index) => {
-                  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
                   // const urlLink = line.split(' ').find((word) => word.match(urlRegex));
-                  const formatedLine = line.split(' ').map((word) => {
-                    if (word.match(urlRegex))
-                      return <StyledLink href={word} key={word}>{
-                        word.includes('game?id=') ? 'Invitation game' : word + ' '
-                      }</StyledLink>;
-                    return word + ' ';
-                  });
+                  const formatedLine = formatingLine(line);
 
                   return (
                     <span key={index}>
@@ -190,7 +210,7 @@ const MessageItem: FC<MessageItemProps> = ({
           * Display boutons edit et delete
           **/}
             <div className='flex-none flex w-30 h-full pt-2'>
-              {isHovered && message.ownerUser.id === userData.id &&
+              {isHovered && message.ownerUser.id === userData.id && !isDefi &&
                 <>
                   <Tooltip
                     title="Edit message" arrow
@@ -217,7 +237,7 @@ const MessageItem: FC<MessageItemProps> = ({
                   </Tooltip>
                 </>
               }
-              {isHovered && message.ownerUser.id !== userData.id &&
+              {isHovered && message.ownerUser.id !== userData.id && !isDefi &&
                 <Tooltip
                   title="Defi" arrow
                   TransitionComponent={Zoom}

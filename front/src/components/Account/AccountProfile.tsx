@@ -114,7 +114,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 src={
                   previewAvatar && openInputAvatar ? previewAvatar : user.avatar
                 }
-                className="mb-2 w-auto rounded-full max-h-[200px] border-4 border-blue-500"
+                className="mb-2 w-auto rounded-lg max-h-[200px] border-2 border-blue-500"
                 alt="avatar"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -133,22 +133,26 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                       className="mb-3"
                       onChange={handleFileChange}
                     />
+                    <div>
+
                     <Button
                       variant="contained"
                       color="primary"
                       onClick={handleFileUpload}
                       disabled={isLoading}
+                      sx={{mr: 1}}
                     >
-                      Upload File
+                      Validate
                     </Button>
                     <Button
                       variant="contained"
-                      color="secondary"
+                      color="error"
                       className="mt-2"
                       onClick={() => setOpenInputAvatar(!openInputAvatar)}
                     >
-                      Annuler
+                      Cancel
                     </Button>
+                    </div>
                   </>
                 ) : (
                   <Button
@@ -156,7 +160,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                     color="primary"
                     onClick={() => setOpenInputAvatar(!openInputAvatar)}
                   >
-                    Change avatar
+                    Modify
                   </Button>
                 )}
               </div>

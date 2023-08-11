@@ -25,7 +25,7 @@ const BlockedUser = () => {
     if (typeof resUnblockRequest === 'object' && 'error' in resUnblockRequest)
       dispatch(setErrorSnackbar(resUnblockRequest));
     else {
-      dispatch(reduxRemoveUserBlocked(userToUnblock));
+      dispatch(reduxRemoveUserBlocked(userToUnblock.id));
       dispatch(setMsgSnackbar('User unblocked'));
     }
   };

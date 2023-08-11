@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // import { ImBlocked } from 'react-icons/im';
-import { ConversationInterface } from '../../../types';
+import { ApiErrorResponse, ConversationInterface, UserInterface } from '../../../types';
 import {
-  reduxRemoveConversationToList,
-  // reduxResetNotReadMP,
+  reduxRemoveConversationToList, reduxUpdatePrivateConvList,
 } from '../../../store/convListSlice';
 
 import { Badge, Chip, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RootState } from '../../../store';
+import { getProfileByPseudo } from '../../../api/user';
+import { setErrorSnackbar } from '../../../store/snackbarSlice';
 
 interface ConvProps {
   conv: ConversationInterface;
@@ -33,10 +34,19 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
     );
   }
 
-  // const handleClickConv = () => {
-  //   dispatch(
-  //     reduxResetNotReadMP({ userIdFrom: conv.user.id, userId: userData.id }),
-  //   );
+  // const handleClickConv = async () => {
+  //   // console.log('click conv', conv);
+  //   //fetch user
+  //   const userFetch: UserInterface | ApiErrorResponse = await getProfileByPseudo(conv.user.login);
+  //   console.log('user : ', userFetch);
+  //   if ('error' in userFetch)
+  //     dispatch(setErrorSnackbar(userFetch));
+  //   else {
+  //     dispatch(reduxUpdatePrivateConvList({
+  //       item: userFetch,
+  //       userId: userData.id,
+  //     }));
+  //   }
   // };
 
   return (
@@ -46,7 +56,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
         cursor-pointer flex flex-row items-center text-left"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-      // onClick={handleClickRaw}
+        // onClick={handleClickConv}
       >
         <Link
           to={'conv/' + conv.id + '/' + conv.user.id + '/' + conv.user.login}

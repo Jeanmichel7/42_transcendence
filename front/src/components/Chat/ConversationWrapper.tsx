@@ -49,7 +49,7 @@ const ConversationWrapper = () => {
       { login && !name && <PrivateConversation key={convId} /> }
       { !login && name && 
         <>
-          { socketRef && socketRef.current && socketRef.current.connected && location.state 
+          { (socketRef && socketRef.current && socketRef.current.connected && location.state )
             ? <ChannelConversation
               key={convId}
               conv={location.state}

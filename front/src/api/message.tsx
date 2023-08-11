@@ -16,7 +16,7 @@ export async function sendMessage(
 }
 
 export async function getOldMessages(
-  userId: string,
+  userId: number,
   page: number,
   offset: number,
 ): Promise< MessageInterface[] | ApiErrorResponse > {

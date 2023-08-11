@@ -9,7 +9,7 @@ import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';
 import { getOldMessages, apiDeleteMessage } from '../../../api/message';
 import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../../types';
-import { MessageInterface } from '../../../types/ChatTypes';
+import { ConversationInterface, MessageInterface } from '../../../types/ChatTypes';
 
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -19,41 +19,38 @@ import { CircularProgress, IconButton, Tooltip, Zoom } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { inviteGameUser } from '../../../api/game';
-import { reduxRemoveConversationToList, reduxResetNotReadMP } from '../../../store/convListSlice';
-import { apiBlockUser, deleteFriend, requestAddFriend } from '../../../api/relation';
-import { reduxAddUserBlocked, reduxAddWaitingFriendsSent, reduxRemoveFriends } from '../../../store/userSlice';
+import { reduxAddConversationList, reduxRemoveConversationToList, reduxResetNotReadMP, reduxUpdatePrivateConvList } from '../../../store/convListSlice';
+import { apiBlockUser, apiUnblockUser, deleteFriend, requestAddFriend } from '../../../api/relation';
+import { reduxAddUserBlocked, reduxAddWaitingFriendsSent, reduxRemoveFriends, reduxRemoveUserBlocked } from '../../../store/userSlice';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
 
 const PrivateConversation: React.FC = () => {
-  const convId = (useParams<{ convId: string }>().convId || '-1') ;
-  const id = (useParams<{ id: string }>().id || '-1') ;
+  const convId = +(useParams<{ convId: string }>().convId || '-1') ;
+  const id = +(useParams<{ id: string }>().id || '-1') ;
   const login = (useParams<{ login: string }>().login || 'unknown') ;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const userFriend: UserInterface[] | null = useSelector((state: RootState) => state.user.userFriends);
+  const userBlocked: UserInterface[] | null = useSelector((state: RootState) => state.user.userBlocked);
+  const ConversationList: ConversationInterface[] | null = useSelector((state: RootState) => state.chat.conversationsList);
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [messages, setMessages] = useState<MessageInterface[]>([]);
   const [pageDisplay, setPageDisplay] = useState<number>(1);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-  // const [isLoadingPagination, setIsLoadingPagination] = useState<boolean>(false);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
-
-  const isFriends = userFriend?.some((friend) => friend.id === id) || false;
-
-  // useEffect(() => {
-  //   console.log('userFriend : ', userFriend);
-  // }, [userFriend]);
+  const [isFriend, setIsFriend] = useState<boolean>(true);
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
   const fetchOldMessages = useCallback(async () => {
-    if (id == '-1' || userData.id == -1 ) return;
+    if (id == -1 || userData.id == -1 ) return;
     setShouldScrollToBottom(false);
 
     const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
@@ -87,7 +84,7 @@ const PrivateConversation: React.FC = () => {
   }, [id, userData.id, pageDisplay]);
 
   const connectSocket = useCallback(() => {
-    if (id == '-1' || userData.id == -1 ) return;
+    if (id == -1 || userData.id == -1 ) return;
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
@@ -127,8 +124,34 @@ const PrivateConversation: React.FC = () => {
     socketRef.current = socket;
   }, [userData.id, id]);
 
+
+
+  const checkUpdateUser = useCallback(async () => {
+    if (id == -1 || userData.id == -1 || !login) return;
+
+    const userFetch: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
+    console.log('user fetch : ', userFetch);
+    if ('error' in userFetch)
+      dispatch(setErrorSnackbar(userFetch));
+    else {
+      // check diff before update
+      dispatch(reduxUpdatePrivateConvList({
+        item: userFetch,
+        userId: userData.id,
+      }));
+
+      if (ConversationList === null) return;
+      if (ConversationList.some((conv) => conv.id == convId)) return;
+      dispatch(reduxAddConversationList({
+        item: userFetch, userId: userData.id,
+      }));
+    }
+  }, [id, userData.id, login, dispatch]);
+
+
   useEffect(() => {
     connectSocket();
+    checkUpdateUser();
 
     return () => {
       if (socketRef.current === null) return;
@@ -157,7 +180,15 @@ const PrivateConversation: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
+  useEffect(() => {
+    if (id == -1 || !userFriend ) return;
+    setIsFriend(userFriend.some((f) => f.id == id));
+  }, [id, userFriend]);
 
+  useEffect(() => {
+    if (id == -1 || !userBlocked ) return;
+    setIsBlocked(userBlocked.some((f) => f.id == id));
+  }, [id, userBlocked]);
 
   //scrool top = fetch new page messages
   const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
@@ -171,33 +202,31 @@ const PrivateConversation: React.FC = () => {
   const handleBlockUser = async () => {
     setIsLoading(true);
     const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(
-      +id,
+      id,
     );
-    setIsLoading(false);
 
     if ('error' in resBlockRequest)
-      dispatch(
-        setErrorSnackbar(resBlockRequest));
+      dispatch(setErrorSnackbar(resBlockRequest));
     else {
-      dispatch(reduxAddUserBlocked(+id));
+      dispatch(reduxAddUserBlocked(id));
       dispatch(setMsgSnackbar('User blocked'));
     }
+    setIsLoading(false);
   };
 
   const handleDeleteFriend = async () => {
     setIsLoading(true);
     const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(
-      +id,
+      id,
     );
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(
-        setErrorSnackbar(resDeleteRequest));
+      dispatch(setErrorSnackbar(resDeleteRequest));
     else {
-      dispatch(reduxRemoveFriends(+id));
+      dispatch(reduxRemoveFriends(id));
       dispatch(reduxRemoveConversationToList({
-        convId: +convId,
+        convId: convId,
         userId: userData.id,
       }));
       // dispatch(setMsgSnackbar('Friend deleted'));
@@ -205,13 +234,27 @@ const PrivateConversation: React.FC = () => {
     }
   };
 
-  const handleAddFriend = async () => {
+  const handleUnblockUser = async () => {
+    setIsLoading(true);
+    const resUnblockRequest: void | ApiErrorResponse = await apiUnblockUser(
+      id,
+    );
+    setIsLoading(false);
 
+    if (typeof resUnblockRequest === 'object' && 'error' in resUnblockRequest)
+      dispatch(setErrorSnackbar(resUnblockRequest));
+    else {
+      dispatch(reduxRemoveUserBlocked(id));
+      dispatch(setMsgSnackbar('User unblocked'));
+    }
+  };
+
+  const handleAddFriend = async () => {
     const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
     if ('error' in getUser)
       return dispatch(setErrorSnackbar(getUser));
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(
-      +id,
+      id,
     );
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
@@ -236,7 +279,7 @@ const PrivateConversation: React.FC = () => {
 
   const handleDefi = async () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
-       await inviteGameUser(parseInt(id));
+       await inviteGameUser(id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
@@ -274,7 +317,7 @@ const PrivateConversation: React.FC = () => {
           </p>
 
           <div>
-            {isFriends
+            {isFriend
               ? <Tooltip
                   title="Remove friend"
                   arrow
@@ -289,6 +332,7 @@ const PrivateConversation: React.FC = () => {
                     <PersonRemoveIcon />
                   </IconButton>
                 </Tooltip>
+
               : <Tooltip
                   title="Add friend"
                   arrow
@@ -296,28 +340,45 @@ const PrivateConversation: React.FC = () => {
                   TransitionProps={{ timeout: 600 }}
                   sx={{ p: 0, paddingX: 1, m: 0 }}
                 >
-                  <IconButton
-                    onClick={handleAddFriend}
-                    color="success"
-                  >
-                    <PersonAddIcon />
-                  </IconButton>
-                </Tooltip>
+                <IconButton
+                  onClick={handleAddFriend}
+                  color="success"
+                >
+                  <PersonAddIcon />
+                </IconButton>
+              </Tooltip>
             }
-            <Tooltip
-              title="Block friend"
-              arrow
-              TransitionComponent={Zoom}
-              TransitionProps={{ timeout: 600 }}
-              sx={{ p:0, paddingX:1, m:0 }}
-            >
-              <IconButton
-                onClick={handleBlockUser}
-                color="error"
+            {isBlocked ?
+              <Tooltip
+                title="Unblock friend"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+                sx={{ p: 0, paddingX: 1, m: 0 }}
               >
-                <BlockIcon />
-              </IconButton>
-            </Tooltip>
+                <IconButton
+                  onClick={handleUnblockUser}
+                  color="warning"
+                >
+                  <BlockIcon />
+                </IconButton>
+              </Tooltip>
+
+              : <Tooltip
+                title="Block friend"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+                sx={{ p: 0, paddingX: 1, m: 0 }}
+              >
+                <IconButton
+                  onClick={handleBlockUser}
+                  color="error"
+                >
+                  <BlockIcon />
+                </IconButton>
+              </Tooltip>
+            }
           </div>
           {isLoading && <CircularProgress />}
         </div>

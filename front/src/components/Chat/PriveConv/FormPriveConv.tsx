@@ -103,7 +103,7 @@ const FormPriveConv = ({
           </p>
         }
       </form>
-      <FormHelperText error >{isBlocked && 'You are blocked'}</FormHelperText>
+      <FormHelperText error >{isBlocked && 'Blocked relation'}</FormHelperText>
     </>
   );
 };

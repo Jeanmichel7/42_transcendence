@@ -110,7 +110,15 @@ const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => 
   return false;
 };
 
-//check si ID est unique sinon random...
+const helperUpdatePrivateConversationList = (state: ChatState, item: UserInterface) => {
+  //edit conversation
+  const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id === item.id);
+  if (indexConvToUpdate !== -1) {
+    state.conversationsList[indexConvToUpdate].user = item;
+    return true;
+  }
+  return false;
+};
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -147,6 +155,12 @@ export const chatSlice = createSlice({
       if (helperUpdateConversationList(state, item))
         localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
     },
+    reduxUpdatePrivateConvList: (state, action: PayloadAction<{ item: UserInterface, userId: number }>) => {
+      // console.log('REDUX UPDATE PRIVATE CONV LIST', action.payload);
+      const { item, userId } = action.payload;
+      if (helperUpdatePrivateConversationList(state, item))
+        localStorage.setItem('conversationsList' + userId, JSON.stringify(state.conversationsList));
+    },
     reduxUpdateStatusUserConvList: (state, action: PayloadAction<{ item: UserStatusInterface[], userId: number }>) => {
       // console.log('REDUX UPDATE STATUS USER CONV LIST', action.payload);
       const { item, userId } = action.payload;
@@ -177,7 +191,7 @@ export const chatSlice = createSlice({
     },
     reduxResetNotReadMP: (state, action: PayloadAction<{ userIdFrom: number, userId: number }>) => {
       const { userIdFrom, userId } = action.payload;
-      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id === userIdFrom);
+      const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id == userIdFrom);
       if (indexConvToUpdate !== -1) {
         state.conversationsList[indexConvToUpdate].msgNotRead = 0;
         state.conversationsList.sort((a, b) => b.msgNotRead - a.msgNotRead);
@@ -197,6 +211,7 @@ export const {
   reduxRemoveWaitingUserInRoom,
   reduxAddNotReadMP,
   reduxResetNotReadMP,
+  reduxUpdatePrivateConvList,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
