@@ -140,7 +140,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                       color="primary"
                       onClick={handleFileUpload}
                       disabled={isLoading}
-                      sx={{mr: 1}}
+                      sx={{ mr: 1 }}
                     >
                       Validate
                     </Button>

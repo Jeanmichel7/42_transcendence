@@ -13,7 +13,7 @@ import AddFriendsRaw from '../components/Friends/AddFriends';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 
-import { AppBar, Box, Tab, Tabs, Theme, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Button, Tab, Tabs, Theme, useMediaQuery } from '@mui/material';
 import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSearchInterface';
 
 interface TabPanelProps {
@@ -64,7 +64,7 @@ export default function FriendsPage() {
   const [blockedCount, setBlockedCount] = useState<number>(0);
   const [waitingRequestCount, setWaitingRequestCount] = useState<number>(0);
   const [waitingSentCount, setWaitingSentCount] = useState<number>(0);
-  const [viewType, setViewType] = useState<string>('grid');
+  const [viewType, setViewType] = useState<string>('list');
 
   const matchesSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
@@ -120,7 +120,6 @@ export default function FriendsPage() {
     navigate(`?tab=${tabMapReverse[newValue]}`, { replace: true });
   };
 
-
   if (!userData) {
     return <p>Loading...</p>;
   }
@@ -137,17 +136,30 @@ export default function FriendsPage() {
             variant={matchesSmallScreen ? 'fullWidth' : 'scrollable'}
             scrollButtons={true}
             aria-label="nav friends"
+            sx={{ width: '100%' }}
           >
             <Tab label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')} />
             <Tab label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')} />
             <Tab label={'Invit received' + (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')} />
             <Tab label={'Invit sent' + (waitingSentCount ? ' (' + waitingSentCount + ')' : '')} />
             <Tab label={'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')} />
+            <Tab sx={{ p: 0, m: 0, padding: 0, margin: 0, width: 0 }} disabled />
           </Tabs>
-          <div className="flex-grow"></div>
+
+          <Button
+            sx={{ pr: 2, m: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            onClick={() => setViewType(viewType === 'grid' ? 'list' : 'grid')}
+          > {viewType === 'grid' ? <ViewHeadlineIcon /> : <GridViewIcon />}
+          </Button>
+
           <Tab
             label="Add Friend"
-            sx={{ color: 'rgb(129 178 216 / 1)', fontWeight: 'bold' }}
+            sx={{
+              color: '#00CB36',
+              fontWeight: 'bold',
+              border: '1px solid #00CB36',
+              borderRadius: '8px',
+            }}
             onClick={() => {
               setValue(5);
               navigate(`?tab=${tabMapReverse[5]}`, { replace: true });
@@ -159,41 +171,25 @@ export default function FriendsPage() {
       <TabPanel value={value} index={0}>
         <OnLineFriends userDataId={userData.id} />
       </TabPanel>
+
       <TabPanel value={value} index={1}>
-        
         <AllFriends userDataId={userData.id} />
       </TabPanel>
+
       <TabPanel value={value} index={2}>
-        
         <WaitingAcceptRequest />
       </TabPanel>
+
       <TabPanel value={value} index={3}>
-        
         <WaitingRequestSent />
       </TabPanel>
+
       <TabPanel value={value} index={4}>
-        
         <BlockedUser />
       </TabPanel>
+
       <TabPanel value={value} index={5}>
-        <div className="flex justify-end mb-4">
-          <p className='mr-2'>Display </p>
-          { viewType === 'list' 
-            ? (
-            <GridViewIcon
-              onClick={() => setViewType('grid')}
-              className="cursor-pointer"
-            />
-            ) : (
-            <ViewHeadlineIcon
-              onClick={() => setViewType('list')}
-              className="cursor-pointer"
-            />
-            )}
-        </div>
-        {
-          viewType === 'grid' ? <FriendsSearch setHeight={false}/> : <AddFriendsRaw/> 
-        }
+        {viewType === 'grid' ? <FriendsSearch setHeight={false} /> : <AddFriendsRaw />}
       </TabPanel>
     </>
   );
