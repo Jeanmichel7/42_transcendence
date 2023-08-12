@@ -171,7 +171,13 @@ CREATE TABLE public.games (
     "player1Id" bigint,
     "player2Id" bigint,
     "winnerId" bigint,
-    "updatedAt" timestamp without time zone DEFAULT now()
+    "updatedAt" timestamp without time zone DEFAULT now(),
+    "eloScorePlayer1" integer DEFAULT 1500 NOT NULL,
+    "eloScorePlayer2" integer DEFAULT 1500 NOT NULL,
+    "levelPlayer1" integer DEFAULT 1 NOT NULL,
+    "levelPlayer2" integer DEFAULT 1 NOT NULL,
+    "expPlayer1" integer DEFAULT 0 NOT NULL,
+    "expPlayer2" integer DEFAULT 0 NOT NULL
 );
 
 
@@ -276,6 +282,80 @@ ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 
 
 --
+-- Name: trophies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trophies (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    description text NOT NULL,
+    "imagePath" text NOT NULL,
+    total integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.trophies OWNER TO postgres;
+
+--
+-- Name: trophies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trophies_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trophies_id_seq OWNER TO postgres;
+
+--
+-- Name: trophies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trophies_id_seq OWNED BY public.trophies.id;
+
+
+--
+-- Name: trophies_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trophies_progress (
+    id integer NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    total integer NOT NULL,
+    "userId" bigint,
+    "trophyId" integer
+);
+
+
+ALTER TABLE public.trophies_progress OWNER TO postgres;
+
+--
+-- Name: trophies_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trophies_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trophies_progress_id_seq OWNER TO postgres;
+
+--
+-- Name: trophies_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trophies_progress_id_seq OWNED BY public.trophies_progress.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -294,17 +374,28 @@ CREATE TABLE public.users (
     "secret2FA" text,
     "createdAt" timestamp without time zone DEFAULT now(),
     "updatedAt" timestamp without time zone DEFAULT now(),
-    "lastActivity" timestamp without time zone DEFAULT now()
+    "lastActivity" timestamp without time zone DEFAULT now(),
+    score double precision DEFAULT '1500'::double precision NOT NULL,
+    level integer DEFAULT 1 NOT NULL,
+    experience integer DEFAULT 0 NOT NULL,
+    "gamesPlayed" integer DEFAULT 0 NOT NULL,
+    "consecutiveWin" integer DEFAULT 0 NOT NULL,
+    "laserKill" integer DEFAULT 0 NOT NULL,
+    "bonusUsed" integer DEFAULT 0 NOT NULL,
+    "numberOfConsecutiveWins" integer DEFAULT 0 NOT NULL,
+    "numberOfEnemiesKilledWithLaser" integer DEFAULT 0 NOT NULL,
+    "numberOfGamesPlayed" integer DEFAULT 0 NOT NULL,
+    "numberOfGamesWonWithoutMissingBall" integer DEFAULT 0 NOT NULL
 );
 
 
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- Name: users-relation; Type: TABLE; Schema: public; Owner: postgres
+-- Name: users_relation; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."users-relation" (
+CREATE TABLE public."users_relation" (
     id integer NOT NULL,
     "relationType" text DEFAULT 'pending'::text NOT NULL,
     "createdAt" timestamp without time zone DEFAULT now(),
@@ -315,13 +406,13 @@ CREATE TABLE public."users-relation" (
 );
 
 
-ALTER TABLE public."users-relation" OWNER TO postgres;
+ALTER TABLE public."users_relation" OWNER TO postgres;
 
 --
--- Name: users-relation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: users_relation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public."users-relation_id_seq"
+CREATE SEQUENCE public."users_relation_id_seq"
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -330,13 +421,13 @@ CREATE SEQUENCE public."users-relation_id_seq"
     CACHE 1;
 
 
-ALTER TABLE public."users-relation_id_seq" OWNER TO postgres;
+ALTER TABLE public."users_relation_id_seq" OWNER TO postgres;
 
 --
--- Name: users-relation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: users_relation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public."users-relation_id_seq" OWNED BY public."users-relation".id;
+ALTER SEQUENCE public."users_relation_id_seq" OWNED BY public."users_relation".id;
 
 
 --
@@ -359,6 +450,18 @@ ALTER TABLE public.users_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
+
+--
+-- Name: users_trophies_trophies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_trophies_trophies (
+    "usersId" bigint NOT NULL,
+    "trophiesId" integer NOT NULL
+);
+
+
+ALTER TABLE public.users_trophies_trophies OWNER TO postgres;
 
 --
 -- Name: chat_messages id; Type: DEFAULT; Schema: public; Owner: postgres
@@ -396,6 +499,20 @@ ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: trophies id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trophies ALTER COLUMN id SET DEFAULT nextval('public.trophies_id_seq'::regclass);
+
+
+--
+-- Name: trophies_progress id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trophies_progress ALTER COLUMN id SET DEFAULT nextval('public.trophies_progress_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -403,10 +520,10 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Name: users-relation id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: users_relation id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."users-relation" ALTER COLUMN id SET DEFAULT nextval('public."users-relation_id_seq"'::regclass);
+ALTER TABLE ONLY public."users_relation" ALTER COLUMN id SET DEFAULT nextval('public."users_relation_id_seq"'::regclass);
 
 
 --
@@ -591,6 +708,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 394	jrasser has join the room	2023-06-20 17:35:52.354396	2023-06-20 17:35:52.354396	0	68
 395	jrasser has join the room	2023-06-20 17:35:54.137012	2023-06-20 17:35:54.137012	0	69
 432	Grayce_Dach has left the room	2023-06-20 18:57:35.566295	2023-06-20 18:57:35.566295	0	78
+1548	1	2023-06-22 01:19:04.761	2023-06-22 01:19:04.761	\N	89
 396	jrasser has left the room	2023-06-20 17:36:23.561755	2023-06-20 17:36:23.561755	0	69
 397	jrasser has join the room	2023-06-20 17:36:25.366039	2023-06-20 17:36:25.366039	0	69
 398	Invitation link http://localhost:3006/chat/channel/invitation/70/PPPPPPPPPPPPPPPPPPPPPPP	2023-06-20 17:36:49.061022	2023-06-20 17:36:49.061022	0	70
@@ -678,6 +796,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 433	Grayce_Dach has join the room	2023-06-20 19:06:32.85378	2023-06-20 19:06:32.85378	0	78
 405	Invitation link http://localhost:3006/chat/channel/invitation/72/DDDDDDDDDD	2023-06-20 17:52:38.383449	2023-06-20 17:52:38.383449	0	72
 406	jrasser has join the room	2023-06-20 17:52:46.992809	2023-06-20 17:52:46.992809	0	72
+2244	7	2023-06-22 02:27:10.8602	2023-06-22 02:27:10.8602	\N	\N
 407	Invitation link http://localhost:3006/chat/channel/invitation/73/QWERTYUIO	2023-06-20 17:57:07.430458	2023-06-20 17:57:07.430458	0	73
 440	Laron76 has left the room	2023-06-20 19:16:28.923586	2023-06-20 19:16:28.923586	0	78
 408	jrasser has join the room	2023-06-20 17:57:12.479326	2023-06-20 17:57:12.479326	0	73
@@ -1606,6 +1725,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 1215	24	2023-06-21 19:29:55.52928	2023-06-21 19:29:55.52928	35	85
 1220	ththt h fh fth fth	2023-06-21 19:42:32.882946	2023-06-21 19:42:32.882946	35	85
 1216	fffff	2023-06-21 19:30:40.739374	2023-06-21 19:30:40.739374	35	85
+1309	2	2023-06-22 00:15:31.704338	2023-06-22 00:15:31.704338	35	68
 1217	aaaaaaaaaaaaaasdfghjkghkckygv ouy luv lh 	2023-06-21 19:31:11.799272	2023-06-21 19:31:11.799272	35	85
 1218	fgb f b  dfb dfb fbdf bfdb fdbf dbdf bdbfdb fdbdfbdf bdfb dfbd fbdf bfd bdfb dbfd bfdb f bdfb dfb fb dfb dfbd	2023-06-21 19:33:19.250048	2023-06-21 19:33:19.250048	35	85
 1221	d fsd sfsdfsd sdfs fs f sdf sdfsffsd f\n	2023-06-21 19:42:40.390589	2023-06-21 19:42:40.390589	35	85
@@ -1698,7 +1818,6 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 1304	6	2023-06-22 00:15:25.918846	2023-06-22 00:15:25.918846	35	68
 1305	7	2023-06-22 00:15:26.062146	2023-06-22 00:15:26.062146	35	68
 1312	5	2023-06-22 00:15:32.218025	2023-06-22 00:15:32.218025	35	68
-1309	2	2023-06-22 00:15:31.704338	2023-06-22 00:15:31.704338	35	68
 1310	3	2023-06-22 00:15:31.854281	2023-06-22 00:15:31.854281	35	68
 1315	89	2023-06-22 00:15:32.856945	2023-06-22 00:15:32.856945	35	68
 1313	6	2023-06-22 00:15:32.377404	2023-06-22 00:15:32.377404	35	68
@@ -1806,6 +1925,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 1368	2	2023-06-22 00:16:24.908305	2023-06-22 00:16:24.908305	35	68
 1369	\n\n\n\nok\n\n\n\n	2023-06-22 00:17:00.56487	2023-06-22 00:17:00.56487	35	68
 1424	123	2023-06-22 01:14:10.005	2023-06-22 01:14:10.005	35	89
+2707	4	2023-06-22 03:55:04.491255	2023-06-22 03:55:04.491255	\N	91
 1370	Invitation link http://localhost:3006/chat/channel/invitation/89/ddddd	2023-06-22 00:17:22.031677	2023-06-22 00:17:22.031677	0	89
 1388	d	2023-06-22 00:40:51.87519	2023-06-22 00:40:51.87519	35	89
 1371	sdfsdsddsf	2023-06-22 00:17:25.986733	2023-06-22 00:17:25.986733	35	89
@@ -1912,7 +2032,6 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 2704	1	2023-06-22 03:55:03.584911	2023-06-22 03:55:03.584911	29	91
 2705	2	2023-06-22 03:55:03.880176	2023-06-22 03:55:03.880176	29	91
 2706	3	2023-06-22 03:55:04.1873	2023-06-22 03:55:04.1873	29	91
-2707	4	2023-06-22 03:55:04.491255	2023-06-22 03:55:04.491255	\N	91
 2709	6	2023-06-22 03:55:04.991035	2023-06-22 03:55:04.991035	29	91
 2712	99	2023-06-22 03:55:05.752951	2023-06-22 03:55:05.752951	29	91
 2713	1	2023-06-22 03:55:07.964698	2023-06-22 03:55:07.964698	35	91
@@ -2023,7 +2142,6 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 1563	1	2023-06-22 01:19:06.872242	2023-06-22 01:19:06.872242	\N	\N
 1556	1	2023-06-22 01:19:05.861032	2023-06-22 01:19:05.861032	35	89
 1571	1	2023-06-22 01:19:09.513	2023-06-22 01:19:09.513	\N	\N
-1548	1	2023-06-22 01:19:04.761	2023-06-22 01:19:04.761	\N	89
 1573	0	2023-06-22 01:19:24.700312	2023-06-22 01:19:24.700312	35	89
 1575	0	2023-06-22 01:19:25.057109	2023-06-22 01:19:25.057109	35	89
 1541	1	2023-06-22 01:19:02.47544	2023-06-22 01:19:02.47544	\N	89
@@ -2133,7 +2251,6 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 2382	7	2023-06-22 02:58:31.625504	2023-06-22 02:58:31.625504	35	90
 2425	2	2023-06-22 03:20:18.961054	2023-06-22 03:20:18.961054	\N	90
 2242	4	2023-06-22 02:27:06.195419	2023-06-22 02:27:06.195419	35	85
-2244	7	2023-06-22 02:27:10.8602	2023-06-22 02:27:10.8602	\N	\N
 2428	2	2023-06-22 03:20:28.493507	2023-06-22 03:20:28.493507	35	90
 2305	6	2023-06-22 02:29:23.450294	2023-06-22 02:29:23.450294	\N	\N
 2434	8	2023-06-22 03:20:39.338243	2023-06-22 03:20:39.338243	35	\N
@@ -2853,6 +2970,11 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 2326	9	2023-06-22 02:30:46.309412	2023-06-22 02:30:46.309412	35	\N
 2626	5	2023-06-22 03:46:13.081821	2023-06-22 03:46:13.081821	\N	91
 2783	1	2023-06-22 13:02:26.363026	2023-06-22 13:02:26.363026	29	93
+2802	jrasser has left the room	2023-08-10 21:06:12.151682	2023-08-10 21:06:12.151682	0	92
+2803	jrasser has left the room	2023-08-10 21:07:46.452695	2023-08-10 21:07:46.452695	0	68
+2804	Coralie84 has join the room	2023-08-10 21:09:25.11741	2023-08-10 21:09:25.11741	0	92
+2805	jrasser has join the room	2023-08-10 21:09:29.092875	2023-08-10 21:09:29.092875	0	92
+2806	cc	2023-08-10 21:09:33.774913	2023-08-10 21:09:33.774913	41	92
 \.
 
 
@@ -3075,7 +3197,6 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 81	32
 82	35
 82	29
-68	35
 82	32
 82	27
 83	35
@@ -3092,9 +3213,10 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 91	35
 91	29
 92	29
-92	35
 93	29
 93	35
+92	41
+92	35
 \.
 
 
@@ -3102,19 +3224,19 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 -- Data for Name: games; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "player1Id", "player2Id", "winnerId", "updatedAt") FROM stdin;
-56	finished	2023-06-23 02:12:00.982	2023-06-23 02:12:25.087	2023-06-23 02:12:00.98354	1	0	35	39	35	2023-06-23 02:12:19.568
-57	waiting	2023-06-23 02:19:01.547	2023-06-23 02:19:01.548225	2023-06-23 02:19:01.548225	0	0	35	27	\N	2023-06-23 02:19:01.548225
-58	waiting_start	2023-06-23 02:19:09.936	2023-06-23 02:19:09.937169	2023-06-23 02:19:09.937169	0	0	35	32	\N	2023-06-23 02:19:11.869
-59	finished	2023-06-23 02:19:27.717	2023-06-23 02:19:36.981	2023-06-23 02:19:27.718896	0	1	35	32	32	2023-06-23 02:19:28.671
-45	playing	2023-06-23 01:48:32.615	2023-06-23 01:48:32.616922	2023-06-23 01:48:32.616922	0	0	39	35	\N	2023-06-23 01:48:33.387
-48	playing	2023-06-23 01:52:18.997	2023-06-23 01:52:18.998872	2023-06-23 01:52:18.998872	0	0	35	39	\N	2023-06-23 01:52:19.666
-50	finished	2023-06-23 02:06:26.626	2023-06-23 02:06:51.805	2023-06-23 02:06:26.629256	1	0	39	32	39	2023-06-23 02:06:46.162
-51	finished	2023-06-23 02:08:17.022	2023-06-23 02:08:23.538	2023-06-23 02:08:17.023815	1	0	32	39	32	2023-06-23 02:08:17.945
-52	finished	2023-06-23 02:09:28.566	2023-06-23 02:09:35.342	2023-06-23 02:09:28.568229	1	0	35	27	35	2023-06-23 02:09:29.809
-53	finished	2023-06-23 02:09:44.966	2023-06-23 02:09:53.983	2023-06-23 02:09:44.967378	0	1	39	35	35	2023-06-23 02:09:45.585
-54	finished	2023-06-23 02:09:46.616	2023-06-23 02:09:56.135	2023-06-23 02:09:46.618016	0	1	32	27	27	2023-06-23 02:09:47.776
-55	waiting_start	2023-06-23 02:11:51.457	2023-06-23 02:11:51.458196	2023-06-23 02:11:51.458196	0	0	35	32	\N	2023-06-23 02:11:54.804
+COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "player1Id", "player2Id", "winnerId", "updatedAt", "eloScorePlayer1", "eloScorePlayer2", "levelPlayer1", "levelPlayer2", "expPlayer1", "expPlayer2") FROM stdin;
+150	finished	2023-08-12 16:36:11.647	2023-08-12 16:36:23.417	2023-08-12 16:36:11.648823	2	0	35	29	35	2023-08-12 16:36:12.557	1565	1472	4	2	150	30
+151	finished	2023-08-12 16:40:54.712	2023-08-12 16:41:07.844	2023-08-12 16:40:54.714668	2	0	35	29	35	2023-08-12 16:40:56.942	1576	1460	4	2	160	30
+140	finished	2023-08-12 14:35:47.728	2023-08-12 14:36:24.512	2023-08-12 14:35:47.734497	0	2	29	35	35	2023-08-12 14:35:50.057	1486	1561	1	3	0	80
+141	finished	2023-08-12 14:36:35.788	2023-08-12 14:36:52.357	2023-08-12 14:36:35.790365	0	2	29	35	35	2023-08-12 14:36:38.632	1473	1573	1	3	0	90
+142	finished	2023-08-12 15:36:02.082	2023-08-12 15:36:45.799	2023-08-12 15:36:02.090751	2	0	35	29	35	2023-08-12 15:36:29.583	1584	1461	3	1	100	0
+143	finished	2023-08-12 16:18:12.352	2023-08-12 16:18:37.388	2023-08-12 16:18:12.354671	1	3	29	35	35	2023-08-12 16:18:13.061	1450	1594	1	3	0	110
+144	finished	2023-08-12 16:28:15.035	2023-08-12 16:28:30.591	2023-08-12 16:28:15.037952	0	2	29	35	35	2023-08-12 16:28:16.856	1440	1603	1	4	0	120
+145	finished	2023-08-12 16:32:18.964	2023-08-12 16:32:33.465	2023-08-12 16:32:18.969728	0	2	29	35	35	2023-08-12 16:32:19.687	1431	1611	1	4	0	130
+146	finished	2023-08-12 16:34:07.877	2023-08-12 16:34:20.76	2023-08-12 16:34:07.879022	2	0	29	35	29	2023-08-12 16:34:09.885	1454	1587	1	4	10	130
+147	finished	2023-08-12 16:34:58.349	2023-08-12 16:35:16.157	2023-08-12 16:34:58.351572	0	2	29	35	35	2023-08-12 16:35:02.453	1443	1597	1	4	10	140
+148	finished	2023-08-12 16:35:26.543	2023-08-12 16:35:38.22	2023-08-12 16:35:26.545218	2	0	29	35	29	2023-08-12 16:35:27.341	1465	1574	2	4	20	140
+149	finished	2023-08-12 16:35:46.782	2023-08-12 16:35:59.406	2023-08-12 16:35:46.783764	2	0	29	35	29	2023-08-12 16:35:48.515	1485	1553	2	4	30	140
 \.
 
 
@@ -3231,6 +3353,137 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 125	,jhv,jgv,jghcv	2023-06-23 02:13:57.647837	2023-06-23 02:13:57.647837	35	32
 126	Invitation Game http://localhost:3006/game?id=57	2023-06-23 02:19:01.556724	2023-06-23 02:19:01.556724	35	27
 127	Invitation Game http://localhost:3006/game?id=58	2023-06-23 02:19:09.943183	2023-06-23 02:19:09.943183	35	32
+156	ddd	2023-08-10 21:10:10.64967	2023-08-10 21:10:10.64967	41	35
+128	cc	2023-08-10 20:50:18.963253	2023-08-10 20:50:18.963253	41	35
+129	hi	2023-08-10 20:50:25.122622	2023-08-10 20:50:25.122622	35	41
+247	ok	2023-08-11 23:42:19.815912	2023-08-11 23:42:19.815912	35	41
+130	bli	2023-08-10 20:50:28.542999	2023-08-10 20:50:28.542999	35	41
+157	cc	2023-08-10 21:31:05.272888	2023-08-10 21:31:05.272888	35	37
+131	bla	2023-08-10 20:50:31.538583	2023-08-10 20:50:31.538583	41	35
+132	bli	2023-08-10 20:51:39.824916	2023-08-10 20:51:39.824916	41	35
+133	sadsad	2023-08-10 20:51:50.160405	2023-08-10 20:51:50.160405	41	35
+158	zdxfcghvjkl;	2023-08-10 21:38:59.484383	2023-08-10 21:38:59.484383	41	35
+134	wtf	2023-08-10 20:51:58.407363	2023-08-10 20:51:58.407363	35	41
+135	hgc	2023-08-10 20:54:56.738397	2023-08-10 20:54:56.738397	41	35
+136	dd	2023-08-10 21:08:25.692729	2023-08-10 21:08:25.692729	41	35
+159	et bah	2023-08-10 21:40:21.694681	2023-08-10 21:40:21.694681	35	41
+137	a	2023-08-10 21:08:30.489724	2023-08-10 21:08:30.489724	35	41
+138	b	2023-08-10 21:08:30.763449	2023-08-10 21:08:30.763449	35	41
+248	blabla	2023-08-11 23:42:24.409213	2023-08-11 23:42:24.409213	35	41
+139	c	2023-08-10 21:08:30.995411	2023-08-10 21:08:30.995411	35	41
+160	quoi?	2023-08-10 21:40:24.746668	2023-08-10 21:40:24.746668	41	35
+140	d	2023-08-10 21:08:31.211962	2023-08-10 21:08:31.211962	35	41
+141	e	2023-08-10 21:08:31.443731	2023-08-10 21:08:31.443731	35	41
+142	r	2023-08-10 21:08:31.659729	2023-08-10 21:08:31.659729	35	41
+161	rien	2023-08-10 21:40:29.738469	2023-08-10 21:40:29.738469	41	35
+143	sf	2023-08-10 21:08:31.914574	2023-08-10 21:08:31.914574	35	41
+144	dfds	2023-08-10 21:08:32.107333	2023-08-10 21:08:32.107333	35	41
+145	fsd	2023-08-10 21:08:32.251098	2023-08-10 21:08:32.251098	35	41
+249	1	2023-08-11 23:42:27.613037	2023-08-11 23:42:27.613037	35	41
+146	fsdfsd	2023-08-10 21:08:32.478975	2023-08-10 21:08:32.478975	35	41
+147	dsf	2023-08-10 21:08:32.713401	2023-08-10 21:08:32.713401	35	41
+148	fsdf	2023-08-10 21:08:32.908005	2023-08-10 21:08:32.908005	35	41
+250	2	2023-08-11 23:42:29.681147	2023-08-11 23:42:29.681147	35	41
+149	sdfsddf	2023-08-10 21:08:36.729964	2023-08-10 21:08:36.729964	41	35
+150	sdf	2023-08-10 21:09:49.932104	2023-08-10 21:09:49.932104	41	35
+151	ddddddd	2023-08-10 21:09:52.550789	2023-08-10 21:09:52.550789	41	35
+251	3	2023-08-11 23:42:31.722412	2023-08-11 23:42:31.722412	35	41
+152	sssssss	2023-08-10 21:09:54.4796	2023-08-10 21:09:54.4796	41	35
+153	dasdasdadads	2023-08-10 21:09:58.328851	2023-08-10 21:09:58.328851	35	41
+154	dddd	2023-08-10 21:09:59.883995	2023-08-10 21:09:59.883995	35	41
+252	4	2023-08-11 23:42:33.765999	2023-08-11 23:42:33.765999	35	41
+155	ssss	2023-08-10 21:10:06.95442	2023-08-10 21:10:06.95442	41	35
+253	5	2023-08-11 23:42:35.831153	2023-08-11 23:42:35.831153	35	41
+254	6	2023-08-11 23:42:37.870508	2023-08-11 23:42:37.870508	35	41
+255	7	2023-08-11 23:42:39.931105	2023-08-11 23:42:39.931105	35	41
+256	8	2023-08-11 23:42:41.98565	2023-08-11 23:42:41.98565	35	41
+257	9	2023-08-11 23:42:44.025814	2023-08-11 23:42:44.025814	35	41
+258	10	2023-08-11 23:42:46.060409	2023-08-11 23:42:46.060409	35	41
+259	http://localhost:3006/game?id=140	2023-08-12 14:35:47.73998	2023-08-12 14:35:47.73998	29	35
+162	sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd sdsad sdasd sad adsa dasda ds d da da sdsad ad asdsd daddasd 	2023-08-10 21:40:36.45621	2023-08-10 21:40:36.45621	41	35
+163	hi	2023-08-10 21:41:12.593777	2023-08-10 21:41:12.593777	37	35
+164	http://localhost:3006/game?id=61	2023-08-10 21:43:16.611579	2023-08-10 21:43:16.611579	41	35
+165	check ca www.google.fr	2023-08-10 21:44:16.741122	2023-08-10 21:44:16.741122	41	35
+194	dfghjkl;'	2023-08-10 23:41:32.041667	2023-08-10 23:41:32.041667	35	42
+166	http://google.fr	2023-08-10 21:44:25.373554	2023-08-10 21:44:25.373554	41	35
+167	http://google.fr	2023-08-10 21:46:26.4501	2023-08-10 21:46:26.4501	35	41
+168	https://google.fr	2023-08-10 21:46:32.636908	2023-08-10 21:46:32.636908	35	41
+195	fghjk	2023-08-10 23:41:35.771468	2023-08-10 23:41:35.771468	42	35
+169	:test	2023-08-10 21:46:52.650902	2023-08-10 21:46:52.650902	35	41
+170	://test	2023-08-10 21:47:06.678944	2023-08-10 21:47:06.678944	35	41
+211	lll	2023-08-11 00:12:33.379882	2023-08-11 00:12:33.379882	42	35
+171	://test.fr	2023-08-10 21:47:17.410611	2023-08-10 21:47:17.410611	35	41
+172	http://localhost:3006/game?id=62	2023-08-10 21:50:20.622925	2023-08-10 21:50:20.622925	41	35
+196	cc	2023-08-10 23:41:58.391702	2023-08-10 23:41:58.391702	42	35
+173	sdfdsf	2023-08-10 22:01:24.48325	2023-08-10 22:01:24.48325	41	35
+174	http://localhost:3006/game?id=63	2023-08-10 22:01:30.456138	2023-08-10 22:01:30.456138	35	41
+175	http://localhost:3006/game?id=64	2023-08-10 22:01:34.096655	2023-08-10 22:01:34.096655	41	35
+176	sdasd	2023-08-10 22:40:50.404716	2023-08-10 22:40:50.404716	35	29
+177	sadsad	2023-08-10 22:42:53.900659	2023-08-10 22:42:53.900659	35	41
+197	sdfghjkl;'	2023-08-10 23:57:32.175752	2023-08-10 23:57:32.175752	42	35
+178	beuh	2023-08-10 22:44:16.670712	2023-08-10 22:44:16.670712	41	35
+179	ytre	2023-08-10 22:51:32.439772	2023-08-10 22:51:32.439772	42	35
+221	f	2023-08-11 00:28:58.686781	2023-08-11 00:28:58.686781	42	35
+180	cc	2023-08-10 22:51:38.133185	2023-08-10 22:51:38.133185	35	42
+198	l;'	2023-08-10 23:57:36.715671	2023-08-10 23:57:36.715671	42	35
+181	ca v ?	2023-08-10 22:51:41.920443	2023-08-10 22:51:41.920443	42	35
+182	et toi ?	2023-08-10 22:52:03.611132	2023-08-10 22:52:03.611132	35	42
+212	cc	2023-08-11 00:12:52.781739	2023-08-11 00:12:52.781739	35	42
+183	bien	2023-08-10 22:52:07.889326	2023-08-10 22:52:07.889326	42	35
+199	1	2023-08-10 23:57:47.611486	2023-08-10 23:57:47.611486	42	35
+184	cc	2023-08-10 22:53:03.502801	2023-08-10 22:53:03.502801	35	42
+185	dd	2023-08-10 22:53:05.702176	2023-08-10 22:53:05.702176	42	35
+186	sdfsdf	2023-08-10 22:53:09.200758	2023-08-10 22:53:09.200758	42	35
+200	2	2023-08-10 23:57:47.861597	2023-08-10 23:57:47.861597	42	35
+187	asdfghj	2023-08-10 22:53:37.217576	2023-08-10 22:53:37.217576	35	42
+188	zxcvbnm,.'	2023-08-10 22:53:40.07642	2023-08-10 22:53:40.07642	35	37
+189	ggghh	2023-08-10 22:53:43.404222	2023-08-10 22:53:43.404222	42	35
+201	3	2023-08-10 23:57:48.082952	2023-08-10 23:57:48.082952	42	35
+190	fgdg	2023-08-10 22:53:49.417756	2023-08-10 22:53:49.417756	35	42
+191	adsfdnhjk	2023-08-10 22:53:52.262154	2023-08-10 22:53:52.262154	42	35
+213	ok	2023-08-11 00:12:56.339123	2023-08-11 00:12:56.339123	42	35
+192	dfghjkl	2023-08-10 23:32:11.913757	2023-08-10 23:32:11.913757	42	35
+202	4	2023-08-10 23:57:48.364442	2023-08-10 23:57:48.364442	42	35
+193	fghjkl;'	2023-08-10 23:32:50.797287	2023-08-10 23:32:50.797287	42	35
+203	5	2023-08-10 23:57:48.599115	2023-08-10 23:57:48.599115	42	35
+227	gggg	2023-08-11 00:29:02.666671	2023-08-11 00:29:02.666671	35	42
+204	6	2023-08-10 23:57:48.840804	2023-08-10 23:57:48.840804	42	35
+214	mouahaaha	2023-08-11 00:13:05.811478	2023-08-11 00:13:05.811478	35	42
+205	7	2023-08-10 23:57:49.106598	2023-08-10 23:57:49.106598	42	35
+206	8	2023-08-10 23:57:49.435574	2023-08-10 23:57:49.435574	42	35
+222	ff	2023-08-11 00:28:58.916429	2023-08-11 00:28:58.916429	42	35
+207	9	2023-08-10 23:57:49.73151	2023-08-10 23:57:49.73151	42	35
+215	nice	2023-08-11 00:13:18.517317	2023-08-11 00:13:18.517317	42	35
+208	kjhgfds	2023-08-10 23:59:54.928814	2023-08-10 23:59:54.928814	35	42
+209	ghjhgjgj	2023-08-11 00:00:00.843578	2023-08-11 00:00:00.843578	42	35
+210	jjjjjj	2023-08-11 00:00:03.946507	2023-08-11 00:00:03.946507	42	35
+216	djk	2023-08-11 00:28:33.988793	2023-08-11 00:28:33.988793	35	42
+217	ert	2023-08-11 00:28:51.919431	2023-08-11 00:28:51.919431	35	42
+223	f	2023-08-11 00:28:59.158176	2023-08-11 00:28:59.158176	42	35
+218	dgdfggfg	2023-08-11 00:28:57.166476	2023-08-11 00:28:57.166476	42	35
+219	fff	2023-08-11 00:28:58.11078	2023-08-11 00:28:58.11078	42	35
+234	f	2023-08-11 00:34:36.434338	2023-08-11 00:34:36.434338	42	35
+220	ff	2023-08-11 00:28:58.446425	2023-08-11 00:28:58.446425	42	35
+224	f	2023-08-11 00:28:59.39732	2023-08-11 00:28:59.39732	42	35
+228	ffff	2023-08-11 00:29:03.672108	2023-08-11 00:29:03.672108	35	42
+225	f	2023-08-11 00:28:59.682644	2023-08-11 00:28:59.682644	42	35
+226	ff	2023-08-11 00:28:59.955574	2023-08-11 00:28:59.955574	42	35
+231	fghjkl;'	2023-08-11 00:34:28.277823	2023-08-11 00:34:28.277823	35	42
+229	cc	2023-08-11 00:33:10.956108	2023-08-11 00:33:10.956108	35	37
+230	sfsdf	2023-08-11 00:33:13.350893	2023-08-11 00:33:13.350893	42	35
+233	f	2023-08-11 00:34:36.172046	2023-08-11 00:34:36.172046	42	35
+232	ghjkl;'	2023-08-11 00:34:32.335212	2023-08-11 00:34:32.335212	42	35
+235	f	2023-08-11 00:34:36.715371	2023-08-11 00:34:36.715371	42	35
+236	f	2023-08-11 00:34:36.985236	2023-08-11 00:34:36.985236	42	35
+237	f	2023-08-11 00:34:37.249713	2023-08-11 00:34:37.249713	42	35
+238	f	2023-08-11 00:34:37.512116	2023-08-11 00:34:37.512116	42	35
+239	f	2023-08-11 00:34:37.785117	2023-08-11 00:34:37.785117	42	35
+240	f	2023-08-11 00:34:38.05839	2023-08-11 00:34:38.05839	42	35
+241	dfghjkl;'	2023-08-11 00:34:58.155026	2023-08-11 00:34:58.155026	42	35
+243	wtf	2023-08-11 21:39:43.812139	2023-08-11 21:39:43.812139	41	35
+244	slt	2023-08-11 22:09:48.469693	2023-08-11 22:09:48.469693	37	35
+245	hi	2023-08-11 23:42:07.989701	2023-08-11 23:42:07.989701	35	41
+246	hey	2023-08-11 23:42:16.245317	2023-08-11 23:42:16.245317	35	41
 \.
 
 
@@ -3521,6 +3774,701 @@ COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "s
 490	gameInvite	jrasser challenges you}	f	2023-06-23 02:19:01.560577	2023-06-23 02:19:01.560577	35	27	/game?id=57
 491	gameInvite	jrasser challenges you}	t	2023-06-23 02:19:09.945756	2023-06-23 02:19:09.945756	35	32	/game?id=58
 492	gameInviteAccepted	Grayce_Dach accept challenge, let's play	t	2023-06-23 02:19:11.877924	2023-06-23 02:19:11.877924	32	35	/game?id=58
+493	friendRequest	send you a friend request	t	2023-08-10 20:49:58.050738	2023-08-10 20:49:58.050738	35	41	\N
+494	friendRequestAccepted	accepted your friend request	t	2023-08-10 20:50:10.775472	2023-08-10 20:50:10.775472	41	35	\N
+495	friendDeleted	deleted you from his friend list	t	2023-08-10 20:51:32.34033	2023-08-10 20:51:32.34033	41	35	\N
+496	friendRequest	send you a friend request	t	2023-08-10 20:51:53.326835	2023-08-10 20:51:53.326835	35	41	\N
+497	friendRequestAccepted	accepted your friend request	t	2023-08-10 20:51:55.197038	2023-08-10 20:51:55.197038	41	35	\N
+498	blockUser	blocked you	t	2023-08-10 20:52:09.619595	2023-08-10 20:52:09.619595	35	41	\N
+499	unblockUser	unblocked you	t	2023-08-10 20:52:11.687646	2023-08-10 20:52:11.687646	35	41	\N
+500	friendRequest	send you a friend request	t	2023-08-10 20:52:34.914928	2023-08-10 20:52:34.914928	35	41	\N
+501	friendRequestAccepted	accepted your friend request	t	2023-08-10 20:52:37.385131	2023-08-10 20:52:37.385131	41	35	\N
+502	friendDeleted	deleted you from his friend list	t	2023-08-10 20:53:00.159716	2023-08-10 20:53:00.159716	35	41	\N
+503	friendRequest	send you a friend request	t	2023-08-10 20:53:06.999047	2023-08-10 20:53:06.999047	35	41	\N
+504	friendRequestAccepted	accepted your friend request	t	2023-08-10 20:53:09.097196	2023-08-10 20:53:09.097196	41	35	\N
+505	blockUser	blocked you	t	2023-08-10 20:55:02.261245	2023-08-10 20:55:02.261245	35	41	\N
+506	friendDeleted	deleted you from his friend list	t	2023-08-10 20:57:29.476523	2023-08-10 20:57:29.476523	35	41	\N
+507	friendRequest	send you a friend request	t	2023-08-10 20:57:41.732771	2023-08-10 20:57:41.732771	41	35	\N
+508	friendRequestAccepted	accepted your friend request	t	2023-08-10 20:58:44.822891	2023-08-10 20:58:44.822891	35	41	\N
+509	friendDeleted	deleted you from his friend list	t	2023-08-10 21:07:57.967949	2023-08-10 21:07:57.967949	41	35	\N
+510	friendRequest	send you a friend request	t	2023-08-10 21:08:02.144342	2023-08-10 21:08:02.144342	41	35	\N
+511	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:08:04.312094	2023-08-10 21:08:04.312094	35	41	\N
+512	blockUser	blocked you	t	2023-08-10 21:08:43.519435	2023-08-10 21:08:43.519435	35	41	\N
+513	unblockUser	unblocked you	t	2023-08-10 21:09:44.887957	2023-08-10 21:09:44.887957	35	41	\N
+514	friendRequest	send you a friend request	t	2023-08-10 21:10:15.397402	2023-08-10 21:10:15.397402	35	41	\N
+515	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:10:19.20235	2023-08-10 21:10:19.20235	41	35	\N
+516	friendDeleted	deleted you from his friend list	t	2023-08-10 21:10:26.303484	2023-08-10 21:10:26.303484	41	35	\N
+517	friendRequest	send you a friend request	t	2023-08-10 21:16:24.202981	2023-08-10 21:16:24.202981	41	35	\N
+518	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:16:26.355118	2023-08-10 21:16:26.355118	35	41	\N
+519	friendRequest	send you a friend request	f	2023-08-10 21:19:48.144019	2023-08-10 21:19:48.144019	35	36	\N
+521	friendRequest	send you a friend request	f	2023-08-10 21:19:48.475474	2023-08-10 21:19:48.475474	35	38	\N
+522	friendRequest	send you a friend request	f	2023-08-10 21:19:48.639864	2023-08-10 21:19:48.639864	35	40	\N
+523	friendRequest	send you a friend request	f	2023-08-10 21:19:48.798875	2023-08-10 21:19:48.798875	35	39	\N
+520	friendRequest	send you a friend request	t	2023-08-10 21:19:48.311875	2023-08-10 21:19:48.311875	35	37	\N
+524	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:20:15.006473	2023-08-10 21:20:15.006473	37	35	\N
+525	friendRequest	send you a friend request	f	2023-08-10 21:20:28.279498	2023-08-10 21:20:28.279498	37	26	\N
+526	friendRequest	send you a friend request	f	2023-08-10 21:20:28.406098	2023-08-10 21:20:28.406098	37	28	\N
+527	friendRequest	send you a friend request	f	2023-08-10 21:20:28.557595	2023-08-10 21:20:28.557595	37	30	\N
+528	friendRequest	send you a friend request	f	2023-08-10 21:20:28.71837	2023-08-10 21:20:28.71837	37	31	\N
+529	friendRequest	send you a friend request	f	2023-08-10 21:20:28.965596	2023-08-10 21:20:28.965596	37	33	\N
+530	friendRequest	send you a friend request	f	2023-08-10 21:20:29.109571	2023-08-10 21:20:29.109571	37	34	\N
+531	friendRequest	send you a friend request	f	2023-08-10 21:20:29.244474	2023-08-10 21:20:29.244474	37	25	\N
+532	friendRequest	send you a friend request	f	2023-08-10 21:20:29.388656	2023-08-10 21:20:29.388656	37	36	\N
+533	friendRequest	send you a friend request	f	2023-08-10 21:20:29.532444	2023-08-10 21:20:29.532444	37	38	\N
+534	friendRequest	send you a friend request	f	2023-08-10 21:20:29.685921	2023-08-10 21:20:29.685921	37	40	\N
+535	friendRequest	send you a friend request	f	2023-08-10 21:20:29.829062	2023-08-10 21:20:29.829062	37	39	\N
+537	friendRequest	send you a friend request	f	2023-08-10 21:20:30.116945	2023-08-10 21:20:30.116945	37	27	\N
+538	friendRequest	send you a friend request	f	2023-08-10 21:20:30.269277	2023-08-10 21:20:30.269277	37	32	\N
+539	friendRequest	send you a friend request	t	2023-08-10 21:20:30.509331	2023-08-10 21:20:30.509331	37	41	\N
+540	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:20:32.292869	2023-08-10 21:20:32.292869	41	37	\N
+541	friendDeleted	deleted you from his friend list	t	2023-08-10 21:21:24.903061	2023-08-10 21:21:24.903061	41	37	\N
+542	friendRequest	send you a friend request	t	2023-08-10 21:21:51.557664	2023-08-10 21:21:51.557664	37	41	\N
+543	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:21:52.949165	2023-08-10 21:21:52.949165	41	37	\N
+544	friendDeleted	deleted you from his friend list	t	2023-08-10 21:22:08.733508	2023-08-10 21:22:08.733508	37	35	\N
+545	friendRequest	send you a friend request	t	2023-08-10 21:23:12.958534	2023-08-10 21:23:12.958534	35	37	\N
+546	friendRequestAccepted	accepted your friend request	t	2023-08-10 21:23:15.756018	2023-08-10 21:23:15.756018	37	35	\N
+547	trophy	You win a trophy : Blitz Pong	t	2023-08-10 21:36:58.111614	2023-08-10 21:36:58.111614	\N	41	\N
+548	trophy	You win a trophy : Blitz Pong	t	2023-08-10 21:36:58.125017	2023-08-10 21:36:58.125017	\N	35	\N
+550	gameInvite	challenges you	t	2023-08-10 21:50:20.6254	2023-08-10 21:50:20.6254	41	35	/game?id=62
+549	gameInvite	challenges you	t	2023-08-10 21:43:16.614766	2023-08-10 21:43:16.614766	41	35	/game?id=61
+552	gameInvite	challenges you	t	2023-08-10 22:01:34.100736	2023-08-10 22:01:34.100736	41	35	/game?id=64
+554	blockUser	blocked you	t	2023-08-10 22:18:33.577572	2023-08-10 22:18:33.577572	35	41	\N
+555	unblockUser	unblocked you	t	2023-08-10 22:42:50.947261	2023-08-10 22:42:50.947261	35	41	\N
+553	gameInviteAccepted	's challenge accepted, let's play	t	2023-08-10 22:17:52.935814	2023-08-10 22:17:52.935814	35	41	/game?id=64
+551	gameInvite	challenges you	t	2023-08-10 22:01:30.459784	2023-08-10 22:01:30.459784	35	41	/game?id=63
+556	friendRequest	send you a friend request	t	2023-08-10 22:43:47.34734	2023-08-10 22:43:47.34734	35	41	\N
+557	friendRequestAccepted	accepted your friend request	t	2023-08-10 22:43:56.350596	2023-08-10 22:43:56.350596	41	35	\N
+558	blockUser	blocked you	t	2023-08-10 22:48:04.750126	2023-08-10 22:48:04.750126	35	41	\N
+559	unblockUser	unblocked you	t	2023-08-10 22:48:26.178486	2023-08-10 22:48:26.178486	35	41	\N
+560	friendRequest	send you a friend request	t	2023-08-10 22:50:57.405737	2023-08-10 22:50:57.405737	42	35	\N
+561	friendRequestAccepted	accepted your friend request	t	2023-08-10 22:51:00.64638	2023-08-10 22:51:00.64638	35	42	\N
+562	blockUser	blocked you	t	2023-08-10 22:54:17.471458	2023-08-10 22:54:17.471458	35	42	\N
+563	unblockUser	unblocked you	t	2023-08-10 22:57:42.226657	2023-08-10 22:57:42.226657	35	42	\N
+564	friendRequest	send you a friend request	t	2023-08-10 22:58:18.247773	2023-08-10 22:58:18.247773	35	42	\N
+565	friendRequestAccepted	accepted your friend request	t	2023-08-10 22:58:23.305813	2023-08-10 22:58:23.305813	42	35	\N
+566	blockUser	blocked you	t	2023-08-10 22:58:29.132325	2023-08-10 22:58:29.132325	35	42	\N
+567	unblockUser	unblocked you	t	2023-08-10 23:00:34.710341	2023-08-10 23:00:34.710341	35	42	\N
+568	friendRequest	send you a friend request	t	2023-08-10 23:00:39.075952	2023-08-10 23:00:39.075952	35	42	\N
+569	friendRequestAccepted	accepted your friend request	t	2023-08-10 23:00:42.557057	2023-08-10 23:00:42.557057	42	35	\N
+570	blockUser	blocked you	t	2023-08-10 23:07:22.011808	2023-08-10 23:07:22.011808	35	42	\N
+571	unblockUser	unblocked you	t	2023-08-10 23:07:30.00664	2023-08-10 23:07:30.00664	35	42	\N
+572	friendRequest	send you a friend request	t	2023-08-10 23:32:17.448229	2023-08-10 23:32:17.448229	35	42	\N
+573	friendRequestAccepted	accepted your friend request	t	2023-08-10 23:32:21.273236	2023-08-10 23:32:21.273236	42	35	\N
+574	friendDeleted	deleted you from his friend list	t	2023-08-10 23:32:27.354184	2023-08-10 23:32:27.354184	35	42	\N
+575	friendRequest	send you a friend request	t	2023-08-10 23:32:36.913919	2023-08-10 23:32:36.913919	35	42	\N
+576	friendRequestAccepted	accepted your friend request	t	2023-08-10 23:32:38.3898	2023-08-10 23:32:38.3898	42	35	\N
+577	friendDeleted	deleted you from his friend list	t	2023-08-10 23:32:43.038262	2023-08-10 23:32:43.038262	35	42	\N
+578	unblockUser	unblocked you	t	2023-08-10 23:33:22.573174	2023-08-10 23:33:22.573174	35	42	\N
+579	friendRequest	send you a friend request	t	2023-08-10 23:33:24.996455	2023-08-10 23:33:24.996455	35	42	\N
+580	friendRequestAccepted	accepted your friend request	t	2023-08-10 23:33:27.407672	2023-08-10 23:33:27.407672	42	35	\N
+581	friendDeleted	deleted you from his friend list	t	2023-08-10 23:33:29.589593	2023-08-10 23:33:29.589593	35	42	\N
+582	friendRequest	send you a friend request	t	2023-08-10 23:41:47.060409	2023-08-10 23:41:47.060409	42	35	\N
+583	friendRequestAccepted	accepted your friend request	t	2023-08-10 23:41:54.117667	2023-08-10 23:41:54.117667	35	42	\N
+584	friendDeleted	deleted you from his friend list	t	2023-08-11 00:34:52.040203	2023-08-11 00:34:52.040203	35	42	\N
+585	friendRequest	send you a friend request	t	2023-08-11 00:35:12.374986	2023-08-11 00:35:12.374986	35	42	\N
+586	friendRequestAccepted	accepted your friend request	t	2023-08-11 00:35:16.058728	2023-08-11 00:35:16.058728	42	35	\N
+587	blockUser	blocked you	t	2023-08-11 00:35:57.879659	2023-08-11 00:35:57.879659	42	35	\N
+588	trophy	You win a trophy : Blitz Pong	t	2023-08-11 13:49:34.305414	2023-08-11 13:49:34.305414	\N	42	\N
+589	trophy	You win a trophy : Warrior	t	2023-08-11 13:50:03.498949	2023-08-11 13:50:03.498949	\N	35	\N
+590	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 13:50:03.514236	2023-08-11 13:50:03.514236	\N	42	\N
+591	trophy	You win a trophy : Blitz Pong	t	2023-08-11 14:22:37.151648	2023-08-11 14:22:37.151648	\N	41	\N
+592	trophy	You win a trophy : Warrior	t	2023-08-11 14:22:37.187337	2023-08-11 14:22:37.187337	\N	35	\N
+593	trophy	You win a trophy : Why Not	t	2023-08-11 14:36:14.736935	2023-08-11 14:36:14.736935	\N	41	\N
+594	trophy	You win a trophy : Why Not	t	2023-08-11 14:36:14.768991	2023-08-11 14:36:14.768991	\N	35	\N
+595	trophy	You win a trophy : Warrior	t	2023-08-11 14:51:08.023669	2023-08-11 14:51:08.023669	\N	35	\N
+596	trophy	You win a trophy : Lord	t	2023-08-11 14:51:08.027635	2023-08-11 14:51:08.027635	\N	35	\N
+597	trophy	You win a trophy : Blitz Pong	t	2023-08-11 14:51:08.033638	2023-08-11 14:51:08.033638	\N	35	\N
+598	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 14:51:08.038662	2023-08-11 14:51:08.038662	\N	35	\N
+599	trophy	You win a trophy : Blitz Pong	t	2023-08-11 14:51:08.059571	2023-08-11 14:51:08.059571	\N	41	\N
+600	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 14:51:08.069167	2023-08-11 14:51:08.069167	\N	41	\N
+601	trophy	You win a trophy : Why Not	t	2023-08-11 14:54:00.675463	2023-08-11 14:54:00.675463	\N	41	\N
+602	trophy	You win a trophy : Why Not	t	2023-08-11 14:54:00.711616	2023-08-11 14:54:00.711616	\N	35	\N
+603	friendRequest	send you a friend request	t	2023-08-11 15:00:14.922947	2023-08-11 15:00:14.922947	41	35	\N
+604	friendRequestAccepted	accepted your friend request	t	2023-08-11 15:00:16.963998	2023-08-11 15:00:16.963998	35	41	\N
+605	trophy	You win a trophy : Blitz Pong	t	2023-08-11 15:02:10.30995	2023-08-11 15:02:10.30995	\N	37	\N
+606	trophy	You win a trophy : Warrior	t	2023-08-11 15:02:32.069804	2023-08-11 15:02:32.069804	\N	37	\N
+607	trophy	You win a trophy : Warrior	t	2023-08-11 15:29:39.396272	2023-08-11 15:29:39.396272	\N	35	\N
+608	trophy	You win a trophy : Blitz Pong	t	2023-08-11 15:29:39.403738	2023-08-11 15:29:39.403738	\N	35	\N
+609	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 15:29:39.407645	2023-08-11 15:29:39.407645	\N	35	\N
+610	trophy	You win a trophy : Blitz Pong	t	2023-08-11 15:29:39.42589	2023-08-11 15:29:39.42589	\N	41	\N
+611	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 15:29:39.428683	2023-08-11 15:29:39.428683	\N	41	\N
+612	trophy	You win a trophy : Blitz Pong	t	2023-08-11 15:34:24.911298	2023-08-11 15:34:24.911298	\N	35	\N
+613	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 15:34:25.156125	2023-08-11 15:34:25.156125	\N	35	\N
+614	trophy	You win a trophy : Blitz Pong	t	2023-08-11 15:34:25.586961	2023-08-11 15:34:25.586961	\N	41	\N
+615	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 15:34:25.811981	2023-08-11 15:34:25.811981	\N	41	\N
+616	trophy	You win a trophy : Warrior	t	2023-08-11 15:34:57.200562	2023-08-11 15:34:57.200562	\N	35	\N
+617	trophy	You win a trophy : Lord	t	2023-08-11 15:35:27.689692	2023-08-11 15:35:27.689692	\N	35	\N
+618	trophy	You win a trophy : Why Not	t	2023-08-11 15:38:44.017207	2023-08-11 15:38:44.017207	\N	41	\N
+619	trophy	You win a trophy : Why Not	t	2023-08-11 15:38:44.02918	2023-08-11 15:38:44.02918	\N	35	\N
+620	trophy	You win a trophy : Warrior	t	2023-08-11 16:31:46.378453	2023-08-11 16:31:46.378453	\N	35	\N
+621	trophy	You win a trophy : Blitz Pong	t	2023-08-11 16:31:46.382249	2023-08-11 16:31:46.382249	\N	35	\N
+622	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 16:31:46.385636	2023-08-11 16:31:46.385636	\N	35	\N
+623	trophy	You win a trophy : Blitz Pong	t	2023-08-11 16:31:46.398184	2023-08-11 16:31:46.398184	\N	41	\N
+624	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 16:31:46.401649	2023-08-11 16:31:46.401649	\N	41	\N
+625	trophy	You win a trophy : Blitz Pong	t	2023-08-11 18:21:10.23527	2023-08-11 18:21:10.23527	\N	37	\N
+626	trophy	You win a trophy : Why Not	t	2023-08-11 18:43:42.644118	2023-08-11 18:43:42.644118	\N	35	\N
+627	trophy	You win a trophy : Why Not	t	2023-08-11 18:43:42.667163	2023-08-11 18:43:42.667163	\N	41	\N
+628	trophy	You win a trophy : Warrior	t	2023-08-11 18:43:42.67193	2023-08-11 18:43:42.67193	\N	41	\N
+630	friendRequest	send you a friend request	f	2023-08-11 21:38:37.948419	2023-08-11 21:38:37.948419	43	25	\N
+631	friendRequest	send you a friend request	f	2023-08-11 21:38:38.247015	2023-08-11 21:38:38.247015	43	26	\N
+632	friendRequest	send you a friend request	f	2023-08-11 21:38:38.5493	2023-08-11 21:38:38.5493	43	27	\N
+633	friendRequest	send you a friend request	f	2023-08-11 21:38:38.683594	2023-08-11 21:38:38.683594	43	28	\N
+635	friendRequest	send you a friend request	f	2023-08-11 21:38:38.98725	2023-08-11 21:38:38.98725	43	30	\N
+636	friendRequest	send you a friend request	f	2023-08-11 21:38:39.165235	2023-08-11 21:38:39.165235	43	31	\N
+637	friendRequest	send you a friend request	f	2023-08-11 21:38:39.324874	2023-08-11 21:38:39.324874	43	32	\N
+638	friendRequest	send you a friend request	f	2023-08-11 21:38:39.493556	2023-08-11 21:38:39.493556	43	33	\N
+639	friendRequest	send you a friend request	f	2023-08-11 21:38:39.643894	2023-08-11 21:38:39.643894	43	42	\N
+642	friendRequest	send you a friend request	f	2023-08-11 21:38:40.141826	2023-08-11 21:38:40.141826	43	34	\N
+643	friendRequest	send you a friend request	f	2023-08-11 21:38:40.308768	2023-08-11 21:38:40.308768	43	36	\N
+644	friendRequest	send you a friend request	f	2023-08-11 21:38:40.451878	2023-08-11 21:38:40.451878	43	38	\N
+645	friendRequest	send you a friend request	f	2023-08-11 21:38:40.632507	2023-08-11 21:38:40.632507	43	39	\N
+646	friendRequest	send you a friend request	f	2023-08-11 21:38:40.799168	2023-08-11 21:38:40.799168	43	40	\N
+641	friendRequest	send you a friend request	t	2023-08-11 21:38:39.981127	2023-08-11 21:38:39.981127	43	37	\N
+647	friendRequestAccepted	accepted your friend request	t	2023-08-11 21:38:43.331693	2023-08-11 21:38:43.331693	37	43	\N
+629	friendRequest	send you a friend request	t	2023-08-11 21:38:37.197167	2023-08-11 21:38:37.197167	43	35	\N
+648	friendRequestAccepted	accepted your friend request	t	2023-08-11 21:38:45.497053	2023-08-11 21:38:45.497053	35	43	\N
+640	friendRequest	send you a friend request	t	2023-08-11 21:38:39.826549	2023-08-11 21:38:39.826549	43	41	\N
+649	friendRequestAccepted	accepted your friend request	t	2023-08-11 21:38:49.771331	2023-08-11 21:38:49.771331	41	43	\N
+650	trophy	You win a trophy : Blitz Pong	t	2023-08-11 22:16:49.10573	2023-08-11 22:16:49.10573	\N	41	\N
+651	trophy	You win a trophy : Blitz Pong	t	2023-08-11 22:16:49.123291	2023-08-11 22:16:49.123291	\N	35	\N
+652	trophy	You win a trophy : Warrior	t	2023-08-11 22:17:46.253235	2023-08-11 22:17:46.253235	\N	35	\N
+653	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 22:28:04.120327	2023-08-11 22:28:04.120327	\N	35	\N
+654	trophy	You win a trophy : Invincible Resistant	t	2023-08-11 22:28:04.134661	2023-08-11 22:28:04.134661	\N	41	\N
+655	trophy	You win a trophy : Lord	t	2023-08-11 22:29:23.37169	2023-08-11 22:29:23.37169	\N	35	\N
+656	trophy	You win a trophy : Blitz Pong	t	2023-08-12 00:42:41.321918	2023-08-12 00:42:41.321918	\N	37	\N
+657	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 00:42:41.33157	2023-08-12 00:42:41.33157	\N	37	\N
+634	friendRequest	send you a friend request	t	2023-08-11 21:38:38.845115	2023-08-11 21:38:38.845115	43	29	\N
+658	friendRequestAccepted	accepted your friend request	t	2023-08-12 14:35:40.059982	2023-08-12 14:35:40.059982	29	43	\N
+536	friendRequest	send you a friend request	t	2023-08-10 21:20:29.965923	2023-08-10 21:20:29.965923	37	29	\N
+659	friendRequestAccepted	accepted your friend request	t	2023-08-12 14:35:41.523822	2023-08-12 14:35:41.523822	29	37	\N
+660	gameInvite	challenges you	t	2023-08-12 14:35:47.744392	2023-08-12 14:35:47.744392	29	35	/game?id=140
+661	gameInviteAccepted	's challenge accepted, let's play	t	2023-08-12 14:35:50.063497	2023-08-12 14:35:50.063497	35	29	/game?id=140
+662	trophy	You win a trophy : Blitz Pong	t	2023-08-12 14:36:24.553809	2023-08-12 14:36:24.553809	\N	29	\N
+663	trophy	You win a trophy : Warrior	t	2023-08-12 14:36:24.562458	2023-08-12 14:36:24.562458	\N	35	\N
+664	trophy	You win a trophy : Blitz Pong	t	2023-08-12 14:36:24.565416	2023-08-12 14:36:24.565416	\N	35	\N
+665	trophy	You win a trophy : Lord	t	2023-08-12 14:36:52.548888	2023-08-12 14:36:52.548888	\N	35	\N
+666	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.867476	2023-08-12 15:36:45.867476	\N	35	\N
+667	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.889494	2023-08-12 15:36:45.889494	\N	35	\N
+668	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.904827	2023-08-12 15:36:45.904827	\N	35	\N
+669	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.92553	2023-08-12 15:36:45.92553	\N	35	\N
+670	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.95583	2023-08-12 15:36:45.95583	\N	35	\N
+671	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:45.979721	2023-08-12 15:36:45.979721	\N	35	\N
+672	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.008055	2023-08-12 15:36:46.008055	\N	35	\N
+673	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.030226	2023-08-12 15:36:46.030226	\N	35	\N
+674	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.049503	2023-08-12 15:36:46.049503	\N	35	\N
+675	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.063809	2023-08-12 15:36:46.063809	\N	35	\N
+676	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.082673	2023-08-12 15:36:46.082673	\N	35	\N
+677	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.128101	2023-08-12 15:36:46.128101	\N	35	\N
+678	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.165627	2023-08-12 15:36:46.165627	\N	29	\N
+679	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.211302	2023-08-12 15:36:46.211302	\N	29	\N
+680	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.253875	2023-08-12 15:36:46.253875	\N	29	\N
+681	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.276754	2023-08-12 15:36:46.276754	\N	29	\N
+682	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.291769	2023-08-12 15:36:46.291769	\N	29	\N
+683	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.304556	2023-08-12 15:36:46.304556	\N	29	\N
+684	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.318219	2023-08-12 15:36:46.318219	\N	29	\N
+685	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.334425	2023-08-12 15:36:46.334425	\N	29	\N
+686	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.351907	2023-08-12 15:36:46.351907	\N	29	\N
+687	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.371717	2023-08-12 15:36:46.371717	\N	29	\N
+688	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.381948	2023-08-12 15:36:46.381948	\N	29	\N
+689	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.398801	2023-08-12 15:36:46.398801	\N	29	\N
+690	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.413484	2023-08-12 15:36:46.413484	\N	29	\N
+691	trophy	You win a trophy : Invincible Resistant	t	2023-08-12 15:36:46.438528	2023-08-12 15:36:46.438528	\N	29	\N
+692	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.725612	2023-08-12 16:28:30.725612	\N	35	\N
+693	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.743232	2023-08-12 16:28:30.743232	\N	35	\N
+694	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.761069	2023-08-12 16:28:30.761069	\N	35	\N
+695	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.783078	2023-08-12 16:28:30.783078	\N	35	\N
+696	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.803137	2023-08-12 16:28:30.803137	\N	35	\N
+697	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.837547	2023-08-12 16:28:30.837547	\N	35	\N
+698	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.851825	2023-08-12 16:28:30.851825	\N	35	\N
+699	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.864483	2023-08-12 16:28:30.864483	\N	35	\N
+700	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.879513	2023-08-12 16:28:30.879513	\N	35	\N
+701	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.894616	2023-08-12 16:28:30.894616	\N	35	\N
+702	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.907975	2023-08-12 16:28:30.907975	\N	35	\N
+703	trophy	You win a trophy : Emperor	t	2023-08-12 16:28:30.924367	2023-08-12 16:28:30.924367	\N	35	\N
+704	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.478774	2023-08-12 16:35:59.478774	\N	29	\N
+705	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.500183	2023-08-12 16:35:59.500183	\N	29	\N
+706	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.516557	2023-08-12 16:35:59.516557	\N	29	\N
+707	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.530499	2023-08-12 16:35:59.530499	\N	29	\N
+708	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.544269	2023-08-12 16:35:59.544269	\N	29	\N
+709	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.552746	2023-08-12 16:35:59.552746	\N	29	\N
+710	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.562596	2023-08-12 16:35:59.562596	\N	29	\N
+711	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.571277	2023-08-12 16:35:59.571277	\N	29	\N
+712	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.581974	2023-08-12 16:35:59.581974	\N	29	\N
+713	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.595805	2023-08-12 16:35:59.595805	\N	29	\N
+714	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.606535	2023-08-12 16:35:59.606535	\N	29	\N
+715	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.618327	2023-08-12 16:35:59.618327	\N	29	\N
+716	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.630938	2023-08-12 16:35:59.630938	\N	29	\N
+717	trophy	You win a trophy : Warrior	t	2023-08-12 16:35:59.644406	2023-08-12 16:35:59.644406	\N	29	\N
+718	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.478676	2023-08-12 16:36:23.478676	\N	35	\N
+719	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.499152	2023-08-12 16:36:23.499152	\N	35	\N
+720	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.51773	2023-08-12 16:36:23.51773	\N	35	\N
+721	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.537372	2023-08-12 16:36:23.537372	\N	35	\N
+722	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.558534	2023-08-12 16:36:23.558534	\N	35	\N
+723	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.57155	2023-08-12 16:36:23.57155	\N	35	\N
+724	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.589788	2023-08-12 16:36:23.589788	\N	35	\N
+725	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.609382	2023-08-12 16:36:23.609382	\N	35	\N
+726	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.620495	2023-08-12 16:36:23.620495	\N	35	\N
+727	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.638197	2023-08-12 16:36:23.638197	\N	35	\N
+728	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.663094	2023-08-12 16:36:23.663094	\N	35	\N
+729	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.692277	2023-08-12 16:36:23.692277	\N	29	\N
+730	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.707153	2023-08-12 16:36:23.707153	\N	29	\N
+731	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.73197	2023-08-12 16:36:23.73197	\N	29	\N
+732	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.746977	2023-08-12 16:36:23.746977	\N	29	\N
+733	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.762216	2023-08-12 16:36:23.762216	\N	29	\N
+734	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.774285	2023-08-12 16:36:23.774285	\N	29	\N
+735	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.793255	2023-08-12 16:36:23.793255	\N	29	\N
+736	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.811154	2023-08-12 16:36:23.811154	\N	29	\N
+737	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.823552	2023-08-12 16:36:23.823552	\N	29	\N
+738	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.841274	2023-08-12 16:36:23.841274	\N	29	\N
+739	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.861381	2023-08-12 16:36:23.861381	\N	29	\N
+740	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.880882	2023-08-12 16:36:23.880882	\N	29	\N
+741	trophy	You win a trophy : Why Not	t	2023-08-12 16:36:23.915525	2023-08-12 16:36:23.915525	\N	29	\N
+742	trophy	You win a trophy : Regular	t	2023-08-12 16:41:07.944151	2023-08-12 16:41:07.944151	\N	35	\N
+743	trophy	You win a trophy : Regular	t	2023-08-12 16:41:07.978092	2023-08-12 16:41:07.978092	\N	35	\N
+744	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.008717	2023-08-12 16:41:08.008717	\N	35	\N
+745	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.053492	2023-08-12 16:41:08.053492	\N	35	\N
+746	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.084802	2023-08-12 16:41:08.084802	\N	35	\N
+747	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.107037	2023-08-12 16:41:08.107037	\N	35	\N
+748	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.1662	2023-08-12 16:41:08.1662	\N	35	\N
+749	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.20134	2023-08-12 16:41:08.20134	\N	35	\N
+750	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.229907	2023-08-12 16:41:08.229907	\N	35	\N
+751	trophy	You win a trophy : Regular	t	2023-08-12 16:41:08.256694	2023-08-12 16:41:08.256694	\N	35	\N
+\.
+
+
+--
+-- Data for Name: trophies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trophies (id, name, description, "imagePath", total) FROM stdin;
+420	Lord	Win 5 games in a row	lord.jpeg	5
+421	Emperor	Win 10 games in a row	emperor.jpeg	10
+422	Laser Pointer	Kill an opponent with a Laser	laser_pointer.jpeg	0
+423	Gamma Laser	Kill 5 opponents with a laser	gamma_laser.jpeg	5
+424	Scorificator	Kill 10 opponents with a laser	scorificator.jpeg	10
+425	Regular	Play 20 games	regular.jpeg	20
+426	Addict	Play 50 games	addict.jpeg	50
+427	NoLife	Play 100 games	nolife.jpeg	100
+428	Bonus Master	Use 3 bonuses in one game	bonus_master.jpeg	3
+429	Bonus Pro	Use 5 bonuses in one game	bonus_pro.jpeg	5
+430	Bonus Cheater	Use 10 bonuses in one game	bonus_cheater.jpeg	10
+431	Pong-tastic	Win 5 games without missing a single ball	pong_tastic.jpeg	5
+432	Tireless Returner	Return the ball 10 times in a row without it touching the sides	tireless_returner.jpeg	10
+433	Why Not	Win a bonus game without using any bonuses	why_not.jpeg	0
+434	Ping King	Score a point when the ball is at high speed	ping_king.jpeg	0
+435	Faster Than Light	Score a point when the ball is at maximum speed	faster_than_light.jpeg	0
+436	Blitz Pong	Win a game in less than 2 minutes	blitz_pong.jpeg	0
+437	Invincible Resistant	Win a game without losing a single point	invincible_resistant.jpeg	0
+438	Point Prospector	Win a game with a minimum of 30 points scored	point_prospector.jpeg	30
+419	Warrior	Win 3 games in a row	warrior.jpeg	3
+\.
+
+
+--
+-- Data for Name: trophies_progress; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trophies_progress (id, progress, total, "userId", "trophyId") FROM stdin;
+3057	0	0	0	419
+3058	0	5	0	420
+3059	0	10	0	421
+3060	0	0	0	422
+3061	0	5	0	423
+3062	0	10	0	424
+3063	0	20	0	425
+3064	0	50	0	426
+3065	0	100	0	427
+3066	0	3	0	428
+3067	0	5	0	429
+3068	0	10	0	430
+3069	0	5	0	431
+3070	0	10	0	432
+3071	0	0	0	433
+3072	0	0	0	434
+3073	0	0	0	435
+3074	0	0	0	436
+3075	0	0	0	437
+3076	0	30	0	438
+3077	0	0	25	419
+3078	0	5	25	420
+3079	0	10	25	421
+3080	0	0	25	422
+3081	0	5	25	423
+3082	0	10	25	424
+3083	0	20	25	425
+3084	0	50	25	426
+3085	0	100	25	427
+3086	0	3	25	428
+3087	0	5	25	429
+3088	0	10	25	430
+3089	0	5	25	431
+3090	0	10	25	432
+3091	0	0	25	433
+3092	0	0	25	434
+3093	0	0	25	435
+3094	0	0	25	436
+3095	0	0	25	437
+3096	0	30	25	438
+3097	0	0	26	419
+3098	0	5	26	420
+3099	0	10	26	421
+3100	0	0	26	422
+3101	0	5	26	423
+3102	0	10	26	424
+3103	0	20	26	425
+3104	0	50	26	426
+3105	0	100	26	427
+3106	0	3	26	428
+3107	0	5	26	429
+3108	0	10	26	430
+3109	0	5	26	431
+3110	0	10	26	432
+3111	0	0	26	433
+3112	0	0	26	434
+3113	0	0	26	435
+3114	0	0	26	436
+3115	0	0	26	437
+3116	0	30	26	438
+3117	0	0	27	419
+3118	0	5	27	420
+3119	0	10	27	421
+3120	0	0	27	422
+3121	0	5	27	423
+3122	0	10	27	424
+3123	0	20	27	425
+3124	0	50	27	426
+3125	0	100	27	427
+3126	0	3	27	428
+3127	0	5	27	429
+3128	0	10	27	430
+3129	0	5	27	431
+3130	0	10	27	432
+3131	0	0	27	433
+3132	0	0	27	434
+3133	0	0	27	435
+3134	0	0	27	436
+3135	0	0	27	437
+3136	0	30	27	438
+3137	0	0	28	419
+3138	0	5	28	420
+3139	0	10	28	421
+3140	0	0	28	422
+3141	0	5	28	423
+3142	0	10	28	424
+3143	0	20	28	425
+3144	0	50	28	426
+3145	0	100	28	427
+3146	0	3	28	428
+3147	0	5	28	429
+3148	0	10	28	430
+3149	0	5	28	431
+3150	0	10	28	432
+3151	0	0	28	433
+3152	0	0	28	434
+3153	0	0	28	435
+3154	0	0	28	436
+3155	0	0	28	437
+3156	0	30	28	438
+3160	0	0	29	422
+3161	0	5	29	423
+3162	0	10	29	424
+3166	0	3	29	428
+3167	0	5	29	429
+3168	0	10	29	430
+3169	0	5	29	431
+3170	0	10	29	432
+3171	0	0	29	433
+3172	0	0	29	434
+3173	0	0	29	435
+3174	0	0	29	436
+3175	0	0	29	437
+3177	0	0	30	419
+3178	0	5	30	420
+3179	0	10	30	421
+3180	0	0	30	422
+3181	0	5	30	423
+3182	0	10	30	424
+3183	0	20	30	425
+3184	0	50	30	426
+3185	0	100	30	427
+3186	0	3	30	428
+3187	0	5	30	429
+3188	0	10	30	430
+3189	0	5	30	431
+3190	0	10	30	432
+3191	0	0	30	433
+3192	0	0	30	434
+3158	4	5	29	420
+3163	12	20	29	425
+3157	4	0	29	419
+3164	12	50	29	426
+3165	12	100	29	427
+3193	0	0	30	435
+3194	0	0	30	436
+3195	0	0	30	437
+3196	0	30	30	438
+3197	0	0	31	419
+3198	0	5	31	420
+3199	0	10	31	421
+3200	0	0	31	422
+3201	0	5	31	423
+3202	0	10	31	424
+3203	0	20	31	425
+3204	0	50	31	426
+3205	0	100	31	427
+3206	0	3	31	428
+3207	0	5	31	429
+3208	0	10	31	430
+3209	0	5	31	431
+3210	0	10	31	432
+3211	0	0	31	433
+3212	0	0	31	434
+3213	0	0	31	435
+3214	0	0	31	436
+3215	0	0	31	437
+3216	0	30	31	438
+3217	0	0	32	419
+3218	0	5	32	420
+3219	0	10	32	421
+3220	0	0	32	422
+3221	0	5	32	423
+3222	0	10	32	424
+3223	0	20	32	425
+3224	0	50	32	426
+3225	0	100	32	427
+3226	0	3	32	428
+3227	0	5	32	429
+3228	0	10	32	430
+3229	0	5	32	431
+3230	0	10	32	432
+3231	0	0	32	433
+3232	0	0	32	434
+3233	0	0	32	435
+3234	0	0	32	436
+3235	0	0	32	437
+3236	0	30	32	438
+3237	0	0	33	419
+3238	0	5	33	420
+3239	0	10	33	421
+3240	0	0	33	422
+3241	0	5	33	423
+3242	0	10	33	424
+3243	0	20	33	425
+3244	0	50	33	426
+3245	0	100	33	427
+3246	0	3	33	428
+3247	0	5	33	429
+3248	0	10	33	430
+3249	0	5	33	431
+3250	0	10	33	432
+3251	0	0	33	433
+3252	0	0	33	434
+3253	0	0	33	435
+3254	0	0	33	436
+3255	0	0	33	437
+3256	0	30	33	438
+3257	0	0	42	419
+3258	0	5	42	420
+3259	0	10	42	421
+3260	0	0	42	422
+3261	0	5	42	423
+3262	0	10	42	424
+3263	0	20	42	425
+3264	0	50	42	426
+3265	0	100	42	427
+3266	0	3	42	428
+3267	0	5	42	429
+3268	0	10	42	430
+3269	0	5	42	431
+3270	0	10	42	432
+3271	0	0	42	433
+3272	0	0	42	434
+3273	0	0	42	435
+3274	0	0	42	436
+3275	0	0	42	437
+3276	0	30	42	438
+3277	0	0	34	419
+3278	0	5	34	420
+3279	0	10	34	421
+3280	0	0	34	422
+3281	0	5	34	423
+3282	0	10	34	424
+3283	0	20	34	425
+3284	0	50	34	426
+3285	0	100	34	427
+3286	0	3	34	428
+3287	0	5	34	429
+3288	0	10	34	430
+3289	0	5	34	431
+3290	0	10	34	432
+3291	0	0	34	433
+3292	0	0	34	434
+3293	0	0	34	435
+3294	0	0	34	436
+3295	0	0	34	437
+3296	0	30	34	438
+3297	0	0	36	419
+3298	0	5	36	420
+3299	0	10	36	421
+3300	0	0	36	422
+3301	0	5	36	423
+3302	0	10	36	424
+3303	0	20	36	425
+3304	0	50	36	426
+3305	0	100	36	427
+3306	0	3	36	428
+3307	0	5	36	429
+3308	0	10	36	430
+3309	0	5	36	431
+3310	0	10	36	432
+3311	0	0	36	433
+3312	0	0	36	434
+3313	0	0	36	435
+3314	0	0	36	436
+3315	0	0	36	437
+3316	0	30	36	438
+3317	0	0	38	419
+3318	0	5	38	420
+3319	0	10	38	421
+3320	0	0	38	422
+3321	0	5	38	423
+3322	0	10	38	424
+3323	0	20	38	425
+3324	0	50	38	426
+3325	0	100	38	427
+3326	0	3	38	428
+3327	0	5	38	429
+3328	0	10	38	430
+3329	0	5	38	431
+3330	0	10	38	432
+3331	0	0	38	433
+3332	0	0	38	434
+3333	0	0	38	435
+3334	0	0	38	436
+3335	0	0	38	437
+3336	0	30	38	438
+3337	0	0	39	419
+3338	0	5	39	420
+3339	0	10	39	421
+3340	0	0	39	422
+3341	0	5	39	423
+3342	0	10	39	424
+3343	0	20	39	425
+3344	0	50	39	426
+3345	0	100	39	427
+3346	0	3	39	428
+3347	0	5	39	429
+3348	0	10	39	430
+3349	0	5	39	431
+3350	0	10	39	432
+3351	0	0	39	433
+3352	0	0	39	434
+3353	0	0	39	435
+3354	0	0	39	436
+3355	0	0	39	437
+3356	0	30	39	438
+3357	0	0	40	419
+3358	0	5	40	420
+3359	0	10	40	421
+3360	0	0	40	422
+3361	0	5	40	423
+3362	0	10	40	424
+3363	0	20	40	425
+3364	0	50	40	426
+3365	0	100	40	427
+3366	0	3	40	428
+3367	0	5	40	429
+3368	0	10	40	430
+3369	0	5	40	431
+3370	0	10	40	432
+3371	0	0	40	433
+3372	0	0	40	434
+3373	0	0	40	435
+3374	0	0	40	436
+3375	0	0	40	437
+3376	0	30	40	438
+3377	0	0	43	419
+3378	0	5	43	420
+3379	0	10	43	421
+3380	0	0	43	422
+3381	0	5	43	423
+3382	0	10	43	424
+3383	0	20	43	425
+3384	0	50	43	426
+3385	0	100	43	427
+3386	0	3	43	428
+3387	0	5	43	429
+3388	0	10	43	430
+3389	0	5	43	431
+3390	0	10	43	432
+3391	0	0	43	433
+3392	0	0	43	434
+3393	0	0	43	435
+3394	0	0	43	436
+3395	0	0	43	437
+3396	0	30	43	438
+3397	0	0	41	419
+3398	0	5	41	420
+3399	0	10	41	421
+3400	0	0	41	422
+3401	0	5	41	423
+3402	0	10	41	424
+3403	0	20	41	425
+3404	0	50	41	426
+3405	0	100	41	427
+3406	0	3	41	428
+3407	0	5	41	429
+3408	0	10	41	430
+3409	0	5	41	431
+3410	0	10	41	432
+3411	0	0	41	433
+3412	0	0	41	434
+3413	0	0	41	435
+3414	0	0	41	436
+3415	0	0	41	437
+3416	0	30	41	438
+3417	0	0	35	419
+3418	0	5	35	420
+3420	0	0	35	422
+3421	0	5	35	423
+3422	0	10	35	424
+3423	0	20	35	425
+3426	0	3	35	428
+3427	0	5	35	429
+3428	0	10	35	430
+3429	0	5	35	431
+3430	0	10	35	432
+3431	0	0	35	433
+3432	0	0	35	434
+3433	0	0	35	435
+3434	0	0	35	436
+3435	0	0	35	437
+3437	0	0	37	419
+3438	0	5	37	420
+3439	0	10	37	421
+3440	0	0	37	422
+3441	0	5	37	423
+3442	0	10	37	424
+3443	0	20	37	425
+3444	0	50	37	426
+3445	0	100	37	427
+3446	0	3	37	428
+3447	0	5	37	429
+3448	0	10	37	430
+3449	0	5	37	431
+3450	0	10	37	432
+3451	0	0	37	433
+3452	0	0	37	434
+3453	0	0	37	435
+3454	0	0	37	436
+3455	0	0	37	437
+3456	0	30	37	438
+3419	11	10	35	421
+3436	2	30	35	438
+3424	21	50	35	426
+3425	21	100	35	427
+3176	2	30	29	438
+3159	4	10	29	421
 \.
 
 
@@ -3528,32 +4476,36 @@ COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "s
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity") FROM stdin;
-0	Bot	Bot	Bot	bla@gmail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	\N	t	offline	\N	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889
-26	Violette	Beahan	Angelina93	Cali.Halvorson71@hotmail.com	$2b$10$c7fuqdKwSmloYW70MiVILe7LCQc2U56P18n7Q3fjUtr9rk3Po11FW	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/33.jpg	Neque eveniet ullam quia vitae esse facere.	f	offline	\N	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241
-28	Christopher	Huels-Anderson	Jordane_Flatley54	Mabelle.Kshlerin-OKon@yahoo.com	$2b$10$pUcwY5cToAxvZ69ynmL8p.X3t/Vqi6..bdLY10px5m6Osp2/G8Fvm	user	https://avatars.githubusercontent.com/u/72724821	Occaecati quia sunt eligendi illo maxime minima debitis.	f	offline	\N	2023-06-19 18:24:15.244542	2023-06-19 18:24:15.244542	2023-06-19 18:24:15.244542
-30	Johnny	Bayer	Eula_Weber	Ashleigh.Gulgowski@yahoo.com	$2b$10$X8N/Xjc.uQ0y1t2eeMZyYeDkQ/5bDIJb.BG6d/r4fS1f93SLzBNsS	user	https://avatars.githubusercontent.com/u/83549509	Aperiam pariatur repudiandae rem culpa.	f	offline	\N	2023-06-19 18:24:15.38792	2023-06-19 18:24:15.38792	2023-06-19 18:24:15.38792
-31	Eula	Kutch	Libbie36	Jerod_Kutch@hotmail.com	$2b$10$eoTi/n5NDntYwtnuGhDSbeqtML6cYeaAa3RzizGIf6.Zv0yROS0Wu	user	https://avatars.githubusercontent.com/u/11865065	Quas dolor sequi harum numquam.	f	offline	\N	2023-06-19 18:24:15.468936	2023-06-19 18:24:15.468936	2023-06-19 18:24:15.468936
-33	Edwin	Wolf	Johanna73	Tressa_Beier@yahoo.com	$2b$10$ZW4WtRV4610xn/YF7u1Kvu6aX3tNJsbx/pwlmWC8pWk55XA8rtn4S	user	https://avatars.githubusercontent.com/u/48188922	Reiciendis quod asperiores odit earum magni itaque.	f	offline	\N	2023-06-19 18:24:15.60468	2023-06-19 18:24:15.60468	2023-06-19 18:24:15.60468
-34	Shaina	Bergnaum	Ivy_Heller	Shawna_Schmitt@gmail.com	$2b$10$OOc2nVoZ67Acj3oxHKEDrecPIXbzLmEzSxFONgPjiOGuIPj6yW8MO	user	https://avatars.githubusercontent.com/u/87908182	Perferendis inventore culpa impedit.	f	offline	\N	2023-06-19 18:24:15.668621	2023-06-19 18:24:15.668621	2023-06-19 18:24:15.668621
-25	Leila	Kessler	Lynn6	Cynthia4@yahoo.com	$2b$10$i3n6ue9OCkjOq5fezKOClunOOY7EhllA65vdYe0o9/zP9EEw9Nxyu	user	https://avatars.githubusercontent.com/u/41298539	Placeat aliquam iure eum.	f	offline	\N	2023-06-19 18:24:15.049995	2023-06-20 16:16:46.52	2023-06-19 19:47:29.461
-36	Chaim	Shields	Jazmin.Barrows	Eleanora_Leffler@yahoo.com	$2b$10$iDVCtJRwtxPtr7syvR52R.LM6OeLGD9DopNnZHO7TLx2gDGLAJuw6	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/581.jpg	Atque inventore iusto.	f	offline	\N	2023-06-23 01:48:13.337563	2023-06-23 01:48:13.337563	2023-06-23 01:48:13.337563
-37	Rosa	Howe	Elsie.Hirthe74	Lowell20@hotmail.com	$2b$10$regtloEiaCuv11GAg//I5uEco6anmsPYjPCahN7ARW5tkkI/Lrk7e	user	https://avatars.githubusercontent.com/u/9337675	Culpa delectus fugiat.	f	offline	\N	2023-06-23 01:48:13.405836	2023-06-23 01:48:13.405836	2023-06-23 01:48:13.405836
-38	Uriah	VonRueden	Kaelyn.Heathcote	Effie17@hotmail.com	$2b$10$mgKAY9GHrGKl/fE1gebv1ObP8u5EhFpLo8EmWIpHP5K3kKZl3ciGu	user	https://avatars.githubusercontent.com/u/39319990	Laudantium non quam provident laborum doloremque maiores quis.	f	offline	\N	2023-06-23 01:48:13.469143	2023-06-23 01:48:13.469143	2023-06-23 01:48:13.469143
-27	Rhianna	Hoppe	Randi.Bruen-Lakin	Katarina50@hotmail.com	$2b$10$sVfIx5EnyQslMSrSohv6Gei0BQkHqOlPOJ6wwO24Ig8i/ULVDmxpm	user	https://avatars.githubusercontent.com/u/58112789	Tenetur fugiat eveniet exercitationem repellendus fuga temporibus numquam accusamus.	f	online	\N	2023-06-19 18:24:15.1809	2023-06-23 01:24:37.649	2023-06-23 02:22:02.005
-40	Krystina	Hilpert	Darlene75	Buddy24@hotmail.com	$2b$10$HFfxMguBAFAUAg0Wimv7y.V98/ZiZcSZto/8GkowfHBc3ghlusr1e	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/568.jpg	Perferendis velit cupiditate dolor tempore dolores doloremque distinctio illum.	f	offline	\N	2023-06-23 01:48:13.59588	2023-06-23 01:48:13.59588	2023-06-23 01:48:13.59588
-39	Rebekah	Sipes	Julian.Nienow69	Ed_Hamill97@gmail.com	$2b$10$/0yQUcg84GQldgZiYVrHr.CmSJgHgF1WknBSl8acL72UiiT3zBVXa	user	https://avatars.githubusercontent.com/u/93676085	At dolores deleniti totam.	f	offline	\N	2023-06-23 01:48:13.534414	2023-06-23 02:17:06.056	2023-06-23 02:17:06.05
-35	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1687278288385-749758.jpg	\N	f	online	\N	2023-06-20 16:24:48.481926	2023-06-23 02:17:11.32	2023-06-23 02:22:24.28
-29	Darrin	Kirlin	Laron76	Furman_Buckridge-Gusikowski@gmail.com	$2b$10$c1j721RAxyGoIukxRC5suu2ALUFfYV2XoH51h8rryg7U1k40YmC/2	user	https://avatars.githubusercontent.com/u/82350039	Quis blanditiis vel aut repellendus atque itaque.	f	offline	\N	2023-06-19 18:24:15.304727	2023-06-23 01:36:49.119	2023-06-23 01:36:49.11
-32	Naomi	Runolfsson	Grayce_Dach	Margarita.Mosciski3@hotmail.com	$2b$10$iSNxAAh5CQWmpCLa7IaUM.Ykl2rRdFhEPtKNJ0V2mpC.nbvwgV6aq	user	https://avatars.githubusercontent.com/u/72204078	Iure laborum perspiciatis tenetur totam.	f	online	\N	2023-06-19 18:24:15.542461	2023-06-23 01:24:37.654	2023-06-23 02:22:01.732
+COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity", score, level, experience, "gamesPlayed", "consecutiveWin", "laserKill", "bonusUsed", "numberOfConsecutiveWins", "numberOfEnemiesKilledWithLaser", "numberOfGamesPlayed", "numberOfGamesWonWithoutMissingBall") FROM stdin;
+29	Darrin	Kirlin	Laron76	Furman_Buckridge-Gusikowski@gmail.com	$2b$10$c1j721RAxyGoIukxRC5suu2ALUFfYV2XoH51h8rryg7U1k40YmC/2	user	https://avatars.githubusercontent.com/u/82350039	Quis blanditiis vel aut repellendus atque itaque.	f	offline	\N	2023-06-19 18:24:15.304727	2023-08-12 19:09:50.518	2023-08-12 17:08:51.45	1460	2	30	0	0	0	0	0	0	12	0
+44	Bot	Bot	bot	nomail@bot.bot	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	I am a bot	f	online	\N	2023-08-12 21:09:13.093063	2023-08-12 21:09:13.093063	2023-08-12 21:09:13.093063	1500	1	0	0	0	0	0	0	0	0	0
+0	Bot	Bot	Bot	bla@gmail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	\N	t	offline	\N	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889	2023-06-18 23:09:10.083889	1500	1	0	0	0	0	0	0	0	0	0
+25	Leila	Kessler	Lynn6	Cynthia4@yahoo.com	$2b$10$i3n6ue9OCkjOq5fezKOClunOOY7EhllA65vdYe0o9/zP9EEw9Nxyu	user	https://avatars.githubusercontent.com/u/41298539	Placeat aliquam iure eum.	f	offline	\N	2023-06-19 18:24:15.049995	2023-06-20 16:16:46.52	2023-06-19 19:47:29.461	1500	1	0	0	0	0	0	0	0	0	0
+26	Violette	Beahan	Angelina93	Cali.Halvorson71@hotmail.com	$2b$10$c7fuqdKwSmloYW70MiVILe7LCQc2U56P18n7Q3fjUtr9rk3Po11FW	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/33.jpg	Neque eveniet ullam quia vitae esse facere.	f	offline	\N	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241	2023-06-19 18:24:15.117241	1500	1	0	0	0	0	0	0	0	0	0
+27	Rhianna	Hoppe	Randi.Bruen-Lakin	Katarina50@hotmail.com	$2b$10$sVfIx5EnyQslMSrSohv6Gei0BQkHqOlPOJ6wwO24Ig8i/ULVDmxpm	user	https://avatars.githubusercontent.com/u/58112789	Tenetur fugiat eveniet exercitationem repellendus fuga temporibus numquam accusamus.	f	offline	\N	2023-06-19 18:24:15.1809	2023-08-10 18:30:13.873	2023-06-23 02:22:02.005	1500	1	0	0	0	0	0	0	0	0	0
+28	Christopher	Huels-Anderson	Jordane_Flatley54	Mabelle.Kshlerin-OKon@yahoo.com	$2b$10$pUcwY5cToAxvZ69ynmL8p.X3t/Vqi6..bdLY10px5m6Osp2/G8Fvm	user	https://avatars.githubusercontent.com/u/72724821	Occaecati quia sunt eligendi illo maxime minima debitis.	f	offline	\N	2023-06-19 18:24:15.244542	2023-06-19 18:24:15.244542	2023-06-19 18:24:15.244542	1500	1	0	0	0	0	0	0	0	0	0
+30	Johnny	Bayer	Eula_Weber	Ashleigh.Gulgowski@yahoo.com	$2b$10$X8N/Xjc.uQ0y1t2eeMZyYeDkQ/5bDIJb.BG6d/r4fS1f93SLzBNsS	user	https://avatars.githubusercontent.com/u/83549509	Aperiam pariatur repudiandae rem culpa.	f	offline	\N	2023-06-19 18:24:15.38792	2023-06-19 18:24:15.38792	2023-06-19 18:24:15.38792	1500	1	0	0	0	0	0	0	0	0	0
+31	Eula	Kutch	Libbie36	Jerod_Kutch@hotmail.com	$2b$10$eoTi/n5NDntYwtnuGhDSbeqtML6cYeaAa3RzizGIf6.Zv0yROS0Wu	user	https://avatars.githubusercontent.com/u/11865065	Quas dolor sequi harum numquam.	f	offline	\N	2023-06-19 18:24:15.468936	2023-06-19 18:24:15.468936	2023-06-19 18:24:15.468936	1500	1	0	0	0	0	0	0	0	0	0
+32	Naomi	Runolfsson	Grayce_Dach	Margarita.Mosciski3@hotmail.com	$2b$10$iSNxAAh5CQWmpCLa7IaUM.Ykl2rRdFhEPtKNJ0V2mpC.nbvwgV6aq	user	https://avatars.githubusercontent.com/u/72204078	Iure laborum perspiciatis tenetur totam.	f	offline	\N	2023-06-19 18:24:15.542461	2023-08-10 18:30:14.107	2023-06-23 02:22:01.732	1500	1	0	0	0	0	0	0	0	0	0
+33	Edwin	Wolf	Johanna73	Tressa_Beier@yahoo.com	$2b$10$ZW4WtRV4610xn/YF7u1Kvu6aX3tNJsbx/pwlmWC8pWk55XA8rtn4S	user	https://avatars.githubusercontent.com/u/48188922	Reiciendis quod asperiores odit earum magni itaque.	f	offline	\N	2023-06-19 18:24:15.60468	2023-06-19 18:24:15.60468	2023-06-19 18:24:15.60468	1500	1	0	0	0	0	0	0	0	0	0
+42	Dianna	Dach	Johanna_Ledner71	Karen_Keebler26@yahoo.com	$2b$10$sdYbWik.ww/at6TzLXktZu3whblgAeCVwqbjwYU5Mpw3D3GUwhFzS	user	http://localhost:3000/avatars/avatar-1691714062004-781316.jpg	Ipsam enim a nesciunt autem necessitatibus quos quod.	f	offline	\N	2023-08-10 22:50:48.386448	2023-08-11 16:11:34.08	2023-08-11 14:10:38.233	1500	1	0	0	0	0	0	0	0	0	0
+34	Shaina	Bergnaum	Ivy_Heller	Shawna_Schmitt@gmail.com	$2b$10$OOc2nVoZ67Acj3oxHKEDrecPIXbzLmEzSxFONgPjiOGuIPj6yW8MO	user	https://avatars.githubusercontent.com/u/87908182	Perferendis inventore culpa impedit.	f	offline	\N	2023-06-19 18:24:15.668621	2023-06-19 18:24:15.668621	2023-06-19 18:24:15.668621	1500	1	0	0	0	0	0	0	0	0	0
+36	Chaim	Shields	Jazmin.Barrows	Eleanora_Leffler@yahoo.com	$2b$10$iDVCtJRwtxPtr7syvR52R.LM6OeLGD9DopNnZHO7TLx2gDGLAJuw6	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/581.jpg	Atque inventore iusto.	f	offline	\N	2023-06-23 01:48:13.337563	2023-06-23 01:48:13.337563	2023-06-23 01:48:13.337563	1500	1	0	0	0	0	0	0	0	0	0
+38	Uriah	VonRueden	Kaelyn.Heathcote	Effie17@hotmail.com	$2b$10$mgKAY9GHrGKl/fE1gebv1ObP8u5EhFpLo8EmWIpHP5K3kKZl3ciGu	user	https://avatars.githubusercontent.com/u/39319990	Laudantium non quam provident laborum doloremque maiores quis.	f	offline	\N	2023-06-23 01:48:13.469143	2023-06-23 01:48:13.469143	2023-06-23 01:48:13.469143	1500	1	0	0	0	0	0	0	0	0	0
+39	Rebekah	Sipes	Julian.Nienow69	Ed_Hamill97@gmail.com	$2b$10$/0yQUcg84GQldgZiYVrHr.CmSJgHgF1WknBSl8acL72UiiT3zBVXa	user	https://avatars.githubusercontent.com/u/93676085	At dolores deleniti totam.	f	offline	\N	2023-06-23 01:48:13.534414	2023-06-23 02:17:06.056	2023-06-23 02:17:06.05	1500	1	0	0	0	0	0	0	0	0	0
+40	Krystina	Hilpert	Darlene75	Buddy24@hotmail.com	$2b$10$HFfxMguBAFAUAg0Wimv7y.V98/ZiZcSZto/8GkowfHBc3ghlusr1e	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/568.jpg	Perferendis velit cupiditate dolor tempore dolores doloremque distinctio illum.	f	offline	\N	2023-06-23 01:48:13.59588	2023-06-23 01:48:13.59588	2023-06-23 01:48:13.59588	1500	1	0	0	0	0	0	0	0	0	0
+43	Breanne	Zulauf	Audra.Greenfelder	Bennie_Rolfson@yahoo.com	$2b$10$q.2UJcsaT9Kn0o2u2/RGk.BeUdcD4W/cqNyxsrmzIWLG2VthEZN8.	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/545.jpg	Facere reprehenderit iusto ullam.	f	offline	\N	2023-08-11 21:38:00.699852	2023-08-12 01:05:53.201	2023-08-12 01:05:53.153	1500	1	0	0	0	0	0	0	0	0	0
+41	Boris	Franey	Coralie84	Margie95@gmail.com	$2b$10$wsNdsI6f.COrlnx.CYk1cu4.T.KA1xVK3vtwBINek0Tc9jt273k9W	user	http://localhost:3000/avatars/avatar-1691703574808-325166.jpg	Nam ipsa velit adipisci cum alias mollitia.	f	offline	\N	2023-08-10 20:49:38.666801	2023-08-12 02:29:55.698	2023-08-12 00:29:08.424	1426	1	10	0	0	0	0	0	0	8	0
+35	Jean-michel	Rasser	jrasser	jrasser@student.42mulhouse.fr	\N	user	http://localhost:3000/avatars/avatar-1687278288385-749758.jpg	\N	f	offline	\N	2023-06-20 16:24:48.481926	2023-08-12 20:59:50.521	2023-08-12 18:59:16.742	1576	4	160	0	0	0	0	4	0	21	0
+37	Rosa	Howe	Elsie.Hirthe74	Lowell20@hotmail.com	$2b$10$regtloEiaCuv11GAg//I5uEco6anmsPYjPCahN7ARW5tkkI/Lrk7e	user	https://avatars.githubusercontent.com/u/9337675	Culpa delectus fugiat.	f	offline	\N	2023-06-23 01:48:13.405836	2023-08-12 02:53:03.718	2023-08-12 00:52:23.244	1518	1	10	0	0	0	0	2	0	1	0
 \.
 
 
 --
--- Data for Name: users-relation; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: users_relation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."users-relation" (id, "relationType", "createdAt", "updatedAt", "userRelationId", "mutuelBlocked", "userInitiateurId") FROM stdin;
+COPY public."users_relation" (id, "relationType", "createdAt", "updatedAt", "userRelationId", "mutuelBlocked", "userInitiateurId") FROM stdin;
 155	friend	2023-06-21 12:39:49.181625	2023-06-21 12:46:25.84	32	f	35
 157	friend	2023-06-22 20:47:19.805364	2023-06-22 20:47:24.461	35	f	29
 154	friend	2023-06-21 12:39:48.486107	2023-06-23 00:54:14.158	27	f	35
@@ -3564,6 +4516,65 @@ COPY public."users-relation" (id, "relationType", "createdAt", "updatedAt", "use
 151	pending	2023-06-21 12:39:47.033559	2023-06-21 12:39:47.033559	33	f	35
 152	pending	2023-06-21 12:39:47.574196	2023-06-21 12:39:47.574196	34	f	35
 153	pending	2023-06-21 12:39:47.885413	2023-06-21 12:39:47.885413	25	f	35
+205	pending	2023-08-11 21:38:38.984453	2023-08-11 21:38:38.984453	30	f	43
+206	pending	2023-08-11 21:38:39.162695	2023-08-11 21:38:39.162695	31	f	43
+207	pending	2023-08-11 21:38:39.321048	2023-08-11 21:38:39.321048	32	f	43
+208	pending	2023-08-11 21:38:39.489341	2023-08-11 21:38:39.489341	33	f	43
+209	pending	2023-08-11 21:38:39.640974	2023-08-11 21:38:39.640974	42	f	43
+212	pending	2023-08-11 21:38:40.137366	2023-08-11 21:38:40.137366	34	f	43
+213	pending	2023-08-11 21:38:40.303573	2023-08-11 21:38:40.303573	36	f	43
+214	pending	2023-08-11 21:38:40.449831	2023-08-11 21:38:40.449831	38	f	43
+215	pending	2023-08-11 21:38:40.62913	2023-08-11 21:38:40.62913	39	f	43
+166	pending	2023-08-10 21:19:48.140986	2023-08-10 21:19:48.140986	36	f	35
+168	pending	2023-08-10 21:19:48.473435	2023-08-10 21:19:48.473435	38	f	35
+169	pending	2023-08-10 21:19:48.636798	2023-08-10 21:19:48.636798	40	f	35
+170	pending	2023-08-10 21:19:48.796267	2023-08-10 21:19:48.796267	39	f	35
+216	pending	2023-08-11 21:38:40.796222	2023-08-11 21:38:40.796222	40	f	43
+171	pending	2023-08-10 21:20:28.276465	2023-08-10 21:20:28.276465	26	f	37
+172	pending	2023-08-10 21:20:28.402763	2023-08-10 21:20:28.402763	28	f	37
+173	pending	2023-08-10 21:20:28.554531	2023-08-10 21:20:28.554531	30	f	37
+174	pending	2023-08-10 21:20:28.715532	2023-08-10 21:20:28.715532	31	f	37
+175	pending	2023-08-10 21:20:28.962612	2023-08-10 21:20:28.962612	33	f	37
+176	pending	2023-08-10 21:20:29.106776	2023-08-10 21:20:29.106776	34	f	37
+177	pending	2023-08-10 21:20:29.24179	2023-08-10 21:20:29.24179	25	f	37
+178	pending	2023-08-10 21:20:29.385616	2023-08-10 21:20:29.385616	36	f	37
+179	pending	2023-08-10 21:20:29.529664	2023-08-10 21:20:29.529664	38	f	37
+180	pending	2023-08-10 21:20:29.683413	2023-08-10 21:20:29.683413	40	f	37
+181	pending	2023-08-10 21:20:29.826338	2023-08-10 21:20:29.826338	39	f	37
+183	pending	2023-08-10 21:20:30.114666	2023-08-10 21:20:30.114666	27	f	37
+184	pending	2023-08-10 21:20:30.266666	2023-08-10 21:20:30.266666	32	f	37
+211	friend	2023-08-11 21:38:39.978453	2023-08-11 21:38:43.325	37	f	43
+186	friend	2023-08-10 21:21:51.554569	2023-08-10 21:21:52.945	41	f	37
+187	friend	2023-08-10 21:23:12.954653	2023-08-10 21:23:15.752	37	f	35
+199	friend	2023-08-11 21:38:37.188791	2023-08-11 21:38:45.492	35	f	43
+210	friend	2023-08-11 21:38:39.813224	2023-08-11 21:38:49.767	41	f	43
+204	friend	2023-08-11 21:38:38.842016	2023-08-12 14:35:40.056	29	f	43
+182	friend	2023-08-10 21:20:29.963108	2023-08-12 14:35:41.52	29	f	37
+197	blocked	2023-08-11 00:35:12.371076	2023-08-11 00:35:57.874	35	f	42
+198	friend	2023-08-11 15:00:14.917845	2023-08-11 15:00:16.957	35	f	41
+200	pending	2023-08-11 21:38:37.940391	2023-08-11 21:38:37.940391	25	f	43
+201	pending	2023-08-11 21:38:38.238914	2023-08-11 21:38:38.238914	26	f	43
+202	pending	2023-08-11 21:38:38.546241	2023-08-11 21:38:38.546241	27	f	43
+203	pending	2023-08-11 21:38:38.680863	2023-08-11 21:38:38.680863	28	f	43
+\.
+
+
+--
+-- Data for Name: users_trophies_trophies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users_trophies_trophies ("usersId", "trophiesId") FROM stdin;
+29	436
+35	419
+35	436
+35	420
+35	437
+29	437
+35	421
+29	419
+35	433
+29	433
+35	425
 \.
 
 
@@ -3571,7 +4582,7 @@ COPY public."users-relation" (id, "relationType", "createdAt", "updatedAt", "use
 -- Name: chat_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_messages_id_seq', 2801, true);
+SELECT pg_catalog.setval('public.chat_messages_id_seq', 2806, true);
 
 
 --
@@ -3585,35 +4596,49 @@ SELECT pg_catalog.setval('public.chat_rooms_id_seq', 93, true);
 -- Name: games_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.games_id_seq', 59, true);
+SELECT pg_catalog.setval('public.games_id_seq', 151, true);
 
 
 --
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_id_seq', 127, true);
+SELECT pg_catalog.setval('public.messages_id_seq', 259, true);
 
 
 --
 -- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notifications_id_seq', 492, true);
+SELECT pg_catalog.setval('public.notifications_id_seq', 751, true);
 
 
 --
--- Name: users-relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: trophies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."users-relation_id_seq"', 157, true);
+SELECT pg_catalog.setval('public.trophies_id_seq', 438, true);
+
+
+--
+-- Name: trophies_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trophies_progress_id_seq', 3456, true);
+
+
+--
+-- Name: users_relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."users_relation_id_seq"', 216, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 40, true);
+SELECT pg_catalog.setval('public.users_id_seq', 53, true);
 
 
 --
@@ -3657,10 +4682,18 @@ ALTER TABLE ONLY public.chat_messages
 
 
 --
--- Name: users-relation PK_6973ffe5e4128326da10a9527d1; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: trophies PK_637daf936e7ee2633533bebd31f; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."users-relation"
+ALTER TABLE ONLY public.trophies
+    ADD CONSTRAINT "PK_637daf936e7ee2633533bebd31f" PRIMARY KEY (id);
+
+
+--
+-- Name: users_relation PK_6973ffe5e4128326da10a9527d1; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."users_relation"
     ADD CONSTRAINT "PK_6973ffe5e4128326da10a9527d1" PRIMARY KEY (id);
 
 
@@ -3713,6 +4746,22 @@ ALTER TABLE ONLY public.games
 
 
 --
+-- Name: trophies_progress PK_c9e42f7242172d838e09acfab94; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trophies_progress
+    ADD CONSTRAINT "PK_c9e42f7242172d838e09acfab94" PRIMARY KEY (id);
+
+
+--
+-- Name: users_trophies_trophies PK_dc465c6183cc813bf2c13986937; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_trophies_trophies
+    ADD CONSTRAINT "PK_dc465c6183cc813bf2c13986937" PRIMARY KEY ("usersId", "trophiesId");
+
+
+--
 -- Name: users UQ_2d443082eccd5198f95f2a36e2c; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3747,6 +4796,20 @@ CREATE INDEX "IDX_3eb1543ae1d1b81c09a4b151e8" ON public.chat_rooms_banned_users_
 --
 
 CREATE INDEX "IDX_444df0df5e3ecd89efb686169b" ON public.chat_rooms_users_users USING btree ("usersId");
+
+
+--
+-- Name: IDX_44c3e4a7e33f71d52c2cb0a785; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IDX_44c3e4a7e33f71d52c2cb0a785" ON public.users_trophies_trophies USING btree ("usersId");
+
+
+--
+-- Name: IDX_45f7673d36bd1985debccd7a2e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IDX_45f7673d36bd1985debccd7a2e" ON public.users_trophies_trophies USING btree ("trophiesId");
 
 
 --
@@ -3799,10 +4862,10 @@ CREATE INDEX "IDX_97c390e700263fb405a48f8a18" ON public.chat_rooms_accepted_user
 
 
 --
--- Name: users-relation FK_0402056c5d34c9eb988252444d9; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users_relation FK_0402056c5d34c9eb988252444d9; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."users-relation"
+ALTER TABLE ONLY public."users_relation"
     ADD CONSTRAINT "FK_0402056c5d34c9eb988252444d9" FOREIGN KEY ("userInitiateurId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -3811,7 +4874,7 @@ ALTER TABLE ONLY public."users-relation"
 --
 
 ALTER TABLE ONLY public.games
-    ADD CONSTRAINT "FK_090ead4cf0688537043f35b569e" FOREIGN KEY ("player2Id") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_090ead4cf0688537043f35b569e" FOREIGN KEY ("player2Id") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -3828,6 +4891,14 @@ ALTER TABLE ONLY public.messages
 
 ALTER TABLE ONLY public.chat_messages
     ADD CONSTRAINT "FK_1c522cb7567a307ebcc15cf773b" FOREIGN KEY ("ownerUserId") REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: trophies_progress FK_2af5d79644dd29af544eb57e323; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trophies_progress
+    ADD CONSTRAINT "FK_2af5d79644dd29af544eb57e323" FOREIGN KEY ("trophyId") REFERENCES public.trophies(id) ON DELETE CASCADE;
 
 
 --
@@ -3855,6 +4926,22 @@ ALTER TABLE ONLY public.chat_rooms_users_users
 
 
 --
+-- Name: users_trophies_trophies FK_44c3e4a7e33f71d52c2cb0a7857; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_trophies_trophies
+    ADD CONSTRAINT "FK_44c3e4a7e33f71d52c2cb0a7857" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: users_trophies_trophies FK_45f7673d36bd1985debccd7a2e9; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_trophies_trophies
+    ADD CONSTRAINT "FK_45f7673d36bd1985debccd7a2e9" FOREIGN KEY ("trophiesId") REFERENCES public.trophies(id) ON DELETE CASCADE;
+
+
+--
 -- Name: chat_rooms_admins_users FK_47e2c338a75bf1326bb5e4c21a1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3871,10 +4958,10 @@ ALTER TABLE ONLY public.chat_rooms_muted_users_users
 
 
 --
--- Name: users-relation FK_718040c5303bad75d9908ee7fc0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users_relation FK_718040c5303bad75d9908ee7fc0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public."users-relation"
+ALTER TABLE ONLY public."users_relation"
     ADD CONSTRAINT "FK_718040c5303bad75d9908ee7fc0" FOREIGN KEY ("userRelationId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -3883,7 +4970,7 @@ ALTER TABLE ONLY public."users-relation"
 --
 
 ALTER TABLE ONLY public.games
-    ADD CONSTRAINT "FK_75fbf4e5d917a20839c96ccda03" FOREIGN KEY ("player1Id") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_75fbf4e5d917a20839c96ccda03" FOREIGN KEY ("player1Id") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -3923,7 +5010,7 @@ ALTER TABLE ONLY public.chat_rooms_banned_users_users
 --
 
 ALTER TABLE ONLY public.chat_rooms_accepted_users_users
-    ADD CONSTRAINT "FK_97c390e700263fb405a48f8a185" FOREIGN KEY ("usersId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_97c390e700263fb405a48f8a185" FOREIGN KEY ("usersId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -3951,6 +5038,14 @@ ALTER TABLE ONLY public.chat_rooms
 
 
 --
+-- Name: trophies_progress FK_d1cb4d572cc245d1c754b4afaa7; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trophies_progress
+    ADD CONSTRAINT "FK_d1cb4d572cc245d1c754b4afaa7" FOREIGN KEY ("userId") REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: notifications FK_d1e9b2452666de3b9b4d271cca0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3971,7 +5066,7 @@ ALTER TABLE ONLY public.notifications
 --
 
 ALTER TABLE ONLY public.games
-    ADD CONSTRAINT "FK_e528275f53e8f4a97f1b2e7dfb8" FOREIGN KEY ("winnerId") REFERENCES public.users(id);
+    ADD CONSTRAINT "FK_e528275f53e8f4a97f1b2e7dfb8" FOREIGN KEY ("winnerId") REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

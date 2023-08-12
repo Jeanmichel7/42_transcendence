@@ -35,9 +35,6 @@ export const notificationSlice = createSlice({
         });
     },
     reduxAddManyNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
-      // check localStorage
-      // const notifsInLoc
-      
       state.notifications = [...state.notifications, ...action.payload];
     },
   },

@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import './App.css';
-// import SideBar from './components/Sidebar/Sidebar';
 
 import AppRoutes from './routes/indexRoutes';
 import { isAuthenticated } from './api/auth';
@@ -51,13 +50,7 @@ function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
   const [userId, setUserId] = useState(-1);
-
-  // useEffect(() => {
-  //   console.log('snackbar : ' + snackbar.message);
-  //   console.log('snackbar : ' + snackbar.link);
-  // }, [snackbar]);
 
   const fetchData = useCallback(
     async function <

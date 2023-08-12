@@ -34,7 +34,6 @@ const SnackBarApp = () => {
   const InvitationSnackbar = (
     <SnackbarContent
       message={
-        // <Link to={snackbar.link} className="text-white">
         <div className='flex' onClick={handleClickSnackbar}>
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
@@ -52,7 +51,6 @@ const SnackBarApp = () => {
             {' ' + snackbar.message}
           </div>
         </div>
-        // </Link>
       }
       action={
         <IconButton
@@ -76,7 +74,7 @@ const SnackBarApp = () => {
         <div className='flex items-center' onClick={handleClickSnackbar}>
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
-            src={trophyImages[snackbar.trophyImg]}
+            src={trophyImages[snackbar.trophyImg as keyof typeof trophyImages]}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;

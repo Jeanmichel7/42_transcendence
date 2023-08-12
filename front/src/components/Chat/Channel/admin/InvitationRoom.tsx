@@ -9,7 +9,6 @@ import { inviteUser } from '../../../../api/chat';
 import RowOfFriendToInvit from './RowInvitation';
 import { reduxUpdateRoomConvList } from '../../../../store/convListSlice';
 
-
 interface InvitationRoomProps {
   room: RoomInterface;
 }
@@ -47,7 +46,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     const ClickOutside = (event: any) => {
       if (!ref.current.contains(event.target)) {
         setOpenEdit(false);
-        // setIsAdminMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', ClickOutside);
@@ -96,7 +94,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
     setOpenEdit(!openEdit);
   };
 
-
   return (
     <div className="left-120 top-[64px]">
       <div ref={ref} className={'border-stone-300 shadow-gray-300 text-left'} >
@@ -108,10 +105,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
           <ArrowBackIosNewOutlinedIcon className={`${openEdit ? 'rotate-0' : 'rotate-180'}`} />
         </Button>
 
-        {/* <div className={`rounded-md transition-all duration-1000 ease-in-out transform overflow-hidden origin-top-left ${openEdit
-          ? 'scale-100 visible opacity-100 z-50 bg-slate-400 border-stone-300 shadow-gray-300'
-          : 'scale-0 invisible opacity-0 z-0 border-stone-300 shadow-gray-300'
-        }`}> */}
         {openEdit &&
           <div className="min-w-[50vw] rounded-md overflow-hidden origin-top-right bg-slate-400 border-stone-300 shadow-gray-300">
             <div className='bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center'>
@@ -154,4 +147,3 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({
 };
 
 export default InvitationRoom;
-

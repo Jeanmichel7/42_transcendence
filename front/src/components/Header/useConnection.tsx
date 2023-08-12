@@ -102,7 +102,6 @@ const useConnection = () => {
 
     /* user update status */
     socket.on('update_user_status', (userStatus: UserStatusInterface) => {
-      // console.log('recu du socket update user status : ', userStatus);
       dispatch(reduxUpdateUserStatus(userStatus)); // modif userData.[].status
       dispatch(reduxUpdateStatusUserConvList({ item: [userStatus], userId: userData.id }));
     });
@@ -124,9 +123,6 @@ const useConnection = () => {
 
     /* TROPHY */
     socket.on('notification_trophee', (notif: NotificationInterface) => {
-      // console.log('notif trophy : ', notif);
-      // dispatch(reduxAddNotification(notification));
-
       const trophyName = notif.content.split(' : ')[1];
       const snackbar: PutSnackbarInterface = {
         open: true,
@@ -146,7 +142,6 @@ const useConnection = () => {
 
     return () => {
       if (userIsLogged) return; 
-      // console.log('disconnect socket');
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');
       socket.off('notification_friend_request_declined');

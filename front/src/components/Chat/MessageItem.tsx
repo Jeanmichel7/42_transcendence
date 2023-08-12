@@ -141,7 +141,7 @@ const MessageItem: FC<MessageItemProps> = ({
               </Button>
             </div>
             : <StyledLink href={word} key={word}>
-              { word + ' '}
+              {word + ' '}
             </StyledLink>
         );
       }
@@ -153,7 +153,6 @@ const MessageItem: FC<MessageItemProps> = ({
   return (
     <>
       <div
-        // ref={index === messages.length - 1 ? bottomRef : null}
         className={`w-full flex ${isHovered && 'bg-[#e7e7f7] rounded-lg'}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -192,7 +191,6 @@ const MessageItem: FC<MessageItemProps> = ({
                 style={{ wordBreak: 'break-word' }}
               >
                 {message.text.split('\n').map((line, index) => {
-                  // const urlLink = line.split(' ').find((word) => word.match(urlRegex));
                   const formatedLine = formatingLine(line);
 
                   return (

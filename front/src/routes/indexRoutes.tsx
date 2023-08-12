@@ -10,7 +10,6 @@ import FakeConnection from '../pages/ConnectionFakeUser';
 import Profile from '../pages/Profile';
 import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
-// import Home from "../pages/Home";
 
 import CreateGroupInterface from '../components/Chat/ConversationList/outlet/ChannelCreateInterface';
 import ChannelSearch from '../components/Chat/ConversationList/outlet/ChannelSearchInterface';
@@ -19,7 +18,6 @@ import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 import LeaderBoard from '../pages/LeaderBoard';
 import Achievement from '../pages/Achievement';
-// import { CircleBackground } from '../utils/CircleBackground';
 
 const HomeChat = () => {
   return (
@@ -34,7 +32,6 @@ const AppRoutes: React.FC = () => (
     <div className="mt-[56px]"/>
     <Routes>
       <Route path="/" element={<Login />} />
-      {/* <Route path="/home" element={<Home />} /> */}
       <Route path="/game" element={<Pong />} />
       <Route path="/chat" element={<Chat />}>
         <Route index element={<HomeChat />} />

@@ -31,14 +31,12 @@ const NotificationItem = ({
   const { userData } = useSelector((state: RootState) => state.user);
   const { notifications } = useSelector((state: RootState) => state.notification);
 
-
-
   /* helper action FriendShip action */
   const handleAcceptFriendRequest = async (userToAccept: UserInterface) => {
     setIsLoading(true);
     const resAcceptRequest: UserRelation | ApiErrorResponse = await acceptFriend(userToAccept.id);
     setIsLoading(false);
-    
+
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest));
     else {
@@ -53,7 +51,7 @@ const NotificationItem = ({
     setIsLoading(true);
     const resDeclineRequest: void | ApiErrorResponse = await declineFriend(userToDecline.id);
     setIsLoading(false);
-    
+
     if (notifications.length == 1) setAnchorElNotification(null);
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
       dispatch(setErrorSnackbar(resDeclineRequest));
@@ -107,8 +105,6 @@ const NotificationItem = ({
 
 
 
-
-
   /* action notif */
   const handleClickNotification = (notif: NotificationInterface) => {
     setAnchorElNotification(null);
@@ -144,12 +140,10 @@ const NotificationItem = ({
   const handleDenyActionNotification = async (notif: NotificationInterface) => {
     if (notif.type === 'friendRequest')
       await handleDeclineFriendRequest(notif.sender);
-    if (notif.type === 'roomInvite') 
+    if (notif.type === 'roomInvite')
       await handleDeclineJoinRoom(notif);
     if (notif.type === 'gameInvite')
       await handleDeclineGameInvitation(notif);
-    // if (notif.type === 'gameInviteAccepted')
-
     handleDeleteNotification(notif);
   };
 
@@ -159,18 +153,13 @@ const NotificationItem = ({
     const resReadNotif: void | ApiErrorResponse = await readNotification(notification.id);
     if (typeof resReadNotif === 'object' && 'error' in resReadNotif)
       dispatch(setErrorSnackbar(resReadNotif));
-    else 
+    else
       dispatch(reduxReadNotification(notification));
   };
 
   const handleMouseLeave = () => {
   };
 
-
-  if (isLoading) {
-    return <CircularProgress />;
-  }
-  
   return (
     <MenuItem
       sx={{
@@ -180,12 +169,13 @@ const NotificationItem = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Typography component="span"> 
-        <span 
+      {isLoading ? <CircularProgress /> : null}
+      <Typography component="span">
+        <span
           className='font-bold mx-1'
           onClick={() => handleClickNotificationUser(notification)}
-        > 
-          {notification.sender.login} 
+        >
+          {notification.sender.login}
         </span>
         <span
           className='mr-12'

@@ -269,7 +269,6 @@ function Header() {
       </Box>
 
       <Box
-        // className='bg-red-500'
         sx={{
           flexGrow: 1,
           display: { xs: 'none', md: userIsLogged ? 'flex' : 'none' },
@@ -480,13 +479,9 @@ function Header() {
               </MenuItem>
             </div>
           </Menu>
-          {/* {renderMobileNotification} */}
-
-          {/** Menu notifications */}
           {notificationMenu}
         </Box>
       )}
-      {/* <div className="h-[1px] bg-white"></div> */}
     </Box>
   );
 }

@@ -1,10 +1,9 @@
 import React, { useState, createRef } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { setLogged, setUser } from '../../store/userSlice';
-// import { RootState } from '../../store';
 import { Sticker } from '../../utils/StyledTitle';
-
 import AccountItem from './AccountItem';
 
 import { deleteAccount, patchUserAccount } from '../../api/user';
@@ -12,14 +11,12 @@ import { UserInterface, ApiErrorResponse } from '../../types';
 
 import Box from '@mui/material/Box';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 interface AccountProfileProps {
   user: UserInterface;
 }
 
 const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
-  // const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
   const [isLoading, setIsLoading] = useState(false);
   const [openInputAvatar, setOpenInputAvatar] = useState<boolean>(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);

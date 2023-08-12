@@ -32,14 +32,14 @@ export class UsersRelationsService {
   async getAllRelations(userId: bigint): Promise<UserRelationInterface[]> {
     const userRelations: UserRelationEntity[] =
       await this.userRelationRepository
-        .createQueryBuilder('user-relation')
+        .createQueryBuilder('user_relation')
         .select([
-          'user-relation.id',
-          'user-relation.relationType',
-          'user-relation.createdAt',
-          'user-relation.updatedAt',
+          'user_relation.id',
+          'user_relation.relationType',
+          'user_relation.createdAt',
+          'user_relation.updatedAt',
         ])
-        .leftJoin('user-relation.userInitiateur', 'user')
+        .leftJoin('user_relation.userInitiateur', 'user')
         .addSelect([
           'user.id',
           'user.login',
@@ -50,7 +50,7 @@ export class UsersRelationsService {
           'user.avatar',
           'user.status',
         ])
-        .leftJoin('user-relation.userRelation', 'userRelation')
+        .leftJoin('user_relation.userRelation', 'userRelation')
         .addSelect([
           'userRelation.id',
           'userRelation.login',
@@ -70,9 +70,9 @@ export class UsersRelationsService {
   async getAllFriendsofUserByLogin(login: string): Promise<UserInterface[]> {
     const userRelations: UserRelationEntity[] =
       await this.userRelationRepository
-        .createQueryBuilder('user-relation')
-        .select('user-relation')
-        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .createQueryBuilder('user_relation')
+        .select('user_relation')
+        .leftJoin('user_relation.userInitiateur', 'userInitiateur')
         .addSelect([
           'userInitiateur.id',
           'userInitiateur.login',
@@ -83,7 +83,7 @@ export class UsersRelationsService {
           'userInitiateur.avatar',
           'userInitiateur.status',
         ])
-        .leftJoin('user-relation.userRelation', 'userRelation')
+        .leftJoin('user_relation.userRelation', 'userRelation')
         .addSelect([
           'userRelation.id',
           'userRelation.login',
@@ -94,7 +94,7 @@ export class UsersRelationsService {
           'userRelation.avatar',
           'userRelation.status',
         ])
-        .where('user-relation.relationType = :relationType', {
+        .where('user_relation.relationType = :relationType', {
           relationType: 'friend',
         })
         .andWhere(
@@ -136,14 +136,14 @@ export class UsersRelationsService {
 
     const allRelationFriends: UserRelationEntity[] =
       await this.userRelationRepository
-        .createQueryBuilder('user-relation')
+        .createQueryBuilder('user_relation')
         .select([
-          'user-relation.id',
-          'user-relation.relationType',
-          'user-relation.createdAt',
-          'user-relation.updatedAt',
+          'user_relation.id',
+          'user_relation.relationType',
+          'user_relation.createdAt',
+          'user_relation.updatedAt',
         ])
-        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .leftJoin('user_relation.userInitiateur', 'userInitiateur')
         .addSelect([
           'userInitiateur.id',
           'userInitiateur.login',
@@ -154,7 +154,7 @@ export class UsersRelationsService {
           'userInitiateur.avatar',
           'userInitiateur.status',
         ])
-        .leftJoin('user-relation.userRelation', 'userRelation')
+        .leftJoin('user_relation.userRelation', 'userRelation')
         .addSelect([
           'userRelation.id',
           'userRelation.login',
@@ -165,7 +165,7 @@ export class UsersRelationsService {
           'userRelation.avatar',
           'userRelation.status',
         ])
-        .where('user-relation.relationType = :relationType', {
+        .where('user_relation.relationType = :relationType', {
           relationType: 'friend',
         })
         .andWhere(
@@ -207,14 +207,14 @@ export class UsersRelationsService {
 
     const allRelationBlocked: UserRelationEntity[] =
       await this.userRelationRepository
-        .createQueryBuilder('user-relation')
+        .createQueryBuilder('user_relation')
         .select([
-          'user-relation.id',
-          'user-relation.relationType',
-          'user-relation.createdAt',
-          'user-relation.updatedAt',
+          'user_relation.id',
+          'user_relation.relationType',
+          'user_relation.createdAt',
+          'user_relation.updatedAt',
         ])
-        .leftJoin('user-relation.userInitiateur', 'userInitiateur')
+        .leftJoin('user_relation.userInitiateur', 'userInitiateur')
         .addSelect([
           'userInitiateur.id',
           'userInitiateur.login',
@@ -225,7 +225,7 @@ export class UsersRelationsService {
           'userInitiateur.avatar',
           'userInitiateur.status',
         ])
-        .leftJoin('user-relation.userRelation', 'userRelation')
+        .leftJoin('user_relation.userRelation', 'userRelation')
         .addSelect([
           'userRelation.id',
           'userRelation.login',
@@ -236,7 +236,7 @@ export class UsersRelationsService {
           'userRelation.avatar',
           'userRelation.status',
         ])
-        .where('user-relation.relationType = :relationType', {
+        .where('user_relation.relationType = :relationType', {
           relationType: 'blocked',
         })
         .andWhere('userInitiateur.id = :userId', { userId })

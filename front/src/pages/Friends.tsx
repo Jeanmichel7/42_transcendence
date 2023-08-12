@@ -57,7 +57,6 @@ const tabMap = {
 };
 
 export default function FriendsPage() {
-  // const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState<number>(0);
   const [onlineCount, setOnlineCount] = useState<number>(0);
   const [friendsCount, setFriendsCount] = useState<number>(0);
@@ -85,14 +84,9 @@ export default function FriendsPage() {
     if (!tabType) return;
 
     if (tabType in tabMap) {
-      // console.log('params : ', serviceParam, userIdParam);
       setValue(tabMap[tabType as keyof typeof tabMap]);
     }
   }, [location.search]);
-
-  // useEffect(() => {
-  //   console.log('value : ', value);
-  // }, [value]);
 
   useEffect(() => {
     if (userFriends) {

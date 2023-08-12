@@ -31,14 +31,6 @@ const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsPr
     return users[rand];
   }, [room]);
 
-  // useEffect(() => {
-  // console.log('usersToDisplay : ', usersToDisplay);
-  // }, [usersToDisplay]);
-
-  // useEffect(() => {
-  //   console.log('        room : ', room);
-  // }, [room]);
-
   useEffect(() => {
     if (room && room.ownerUser && (usersToDisplay == null || usersToDisplay.length < 2)) {
       const adminSelected: UserInterface | undefined = getRandAdmin();
@@ -58,13 +50,13 @@ const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsPr
         }
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room, room.ownerUser, room.admins, room.users]);
 
   return (
     <>
       <div className="flex">
-        { room.ownerUser &&
+        {room.ownerUser &&
           <img
             className="w-10 h-10 rounded-full object-cover z-0 border border-[#5f616f]"
             src={room.ownerUser.avatar}
@@ -76,7 +68,7 @@ const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsPr
             alt="avatar"
           />
         }
-        { usersToDisplay && usersToDisplay.map((user, index) => (
+        {usersToDisplay && usersToDisplay.map((user, index) => (
           <div className='relative' key={user.id}>
             <div style={{ left: `${-32 + (8 * index)}px` }} className='absolute w-10 h-10'>
               <img
@@ -96,15 +88,16 @@ const ConversationListRoomItemIcons = ({ conv }: ConversationListRoomItemIconsPr
       <div className="flex flex-grow text-black p-1 pl-2 items-center ">
         <Typography
           component="span"
-          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
-            marginLeft: usersToDisplay?.length ?  '1rem' : '0rem',
+          sx={{
+            overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', whiteSpace: 'nowrap',
+            marginLeft: usersToDisplay?.length ? '1rem' : '0rem',
           }}
           title={room.name}
         >
           <div className='flex flex-col'>
-            <p> 
+            <p>
               {room.type === 'private' ? <LockIcon sx={{ fontSize: 16, marginRight: 0.5 }} /> : ''}
-              {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name} 
+              {room.name.length > 10 ? room.name.slice(0, 7) + '...' : room.name}
             </p>
             <span className='m-0 p-0 text-xs text-gray-400'>
               {room.users?.length ? room.users.length != 1 ? room.users.length + ' Members' : '1 Member' : 'No Member'} </span>

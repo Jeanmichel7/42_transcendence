@@ -16,8 +16,6 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
-// import { StyledLink } from '../components/Chat/PriveConv/style';
-// import styled from 'styled-components';
 
 function ConnectPage() {
   const [is2FAactiv, setIs2FAactiv] = useState(false);
@@ -138,12 +136,6 @@ function ConnectPage() {
           Login as fake user
         </Button>
       </Box>
-
-      {/* <Link to="/fakeconnection">
-          <Button sx={{ my: 2, color: 'white', display: 'block' }}>
-            Login Fake
-          </Button>
-        </Link> */}
 
       {is2FAactiv && (
         <section className="w-full flex flex-col">

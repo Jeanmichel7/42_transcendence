@@ -7,6 +7,7 @@ import { setErrorSnackbar } from '../../store/snackbarSlice';
 import { Sticker } from '../../utils/StyledTitle';
 import { Nothing } from '../Friends/Nothing';
 import { NavLink } from 'react-router-dom';
+
 export default function ProfileFriends({ user }: { user: UserInterface }) {
   const [friends, setFriends] = useState<UserInterface[]>([]);
   const dispatch = useDispatch();
@@ -39,21 +40,20 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
               angry={false}
             />
           </NavLink>
-        ) :
-          <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
-            {friends.map((friend) => {
-              if (friend.login != user.login)
-                return (
-                  <FriendCard
-                    key={friend.id}
-                    actualUserLogin={user.login}
-                    friend={friend}
-                    setFriends={setFriends}
-                  />
-                );
-            })}
-          </div>
-        }
+        ) : (
+        <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
+          {friends.map((friend) => {
+            if (friend.login != user.login)
+              return (
+                <FriendCard
+                  key={friend.id}
+                  actualUserLogin={user.login}
+                  friend={friend}
+                  setFriends={setFriends}
+                />
+              );
+          })}
+        </div> )}
       </div>
     </>
   );

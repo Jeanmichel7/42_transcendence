@@ -27,7 +27,6 @@ export const GameWrapper = styled.div`
 
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
-  // const socketRef = useRef<Socket | null>(null);
   const [connectStatus, setConnectStatus] = useState('disconnected');
   const [currentPage, setCurrentPage] = useState<string>('lobby');
   const { userData } = useSelector((state: RootState) => state.user);

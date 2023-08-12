@@ -16,7 +16,6 @@ import { useEffect, useState } from 'react';
 import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
 
-
 interface FriendCardProps {
   actualUserLogin?: string,
   friend: UserInterface,
@@ -53,7 +52,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
   }
 
   const handleRequestAddFriend = async (userIdToAdd: number) => {
-    // const res: UserRelation | ApiErrorResponse = await addFriend(userIdToAdd);
     if (isRequestFriendSent()) return;
     setIsLoading(true);
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(userIdToAdd);
@@ -103,8 +101,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
     }
     isMyFriend();
   }, [userData, userFriends, friend]);
-
-
 
   return (
     <Card key={friend.login} sx={{
@@ -173,13 +169,11 @@ const FriendCard: React.FC<FriendCardProps> = ({
 
       <div className="flex-grow"></div>
 
-
       <Divider />
       {/**
        * Bouton action
        **/}
       <CardActions className='flex flex-wrap items-center justify-between w-full'>
-        {/* { userData.id != friend.id ? */}
         <Tooltip
           title="Defier" arrow
           TransitionComponent={Zoom}
@@ -196,8 +190,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
             <SportsEsportsIcon color='success' />
           </IconButton>
         </Tooltip> 
-          {/* : <div className=''></div>
-        } */}
 
         {!isFriendOrRequestSent ?
           <Tooltip

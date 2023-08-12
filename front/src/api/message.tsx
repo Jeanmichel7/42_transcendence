@@ -27,18 +27,6 @@ export async function getOldMessages(
   );
 }
 
-// export async function imgExist(url: string) {
-//   try {
-//     const response = await apiAvatar(url);
-//     // console.log('respons eimage exist : ', response);
-//     if (response.status === 200) {
-//       return true;
-//     }
-//   } catch (e: any) {
-//     return false;
-//   }
-// }
-
 export async function apiDeleteMessage(
   messageId: number,
 ): Promise< HttpStatusCode | ApiErrorResponse> {

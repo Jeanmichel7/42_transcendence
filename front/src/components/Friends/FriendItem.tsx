@@ -101,12 +101,6 @@ const FriendItem: React.FC<FriendItemProps> = ({
         </div>
         <div>
           {actions.map((action, index) => (
-            // <Tooltip
-            //   key={index}
-            //   title={action.name} arrow
-            //   TransitionComponent={Zoom}
-            //   TransitionProps={{ timeout: 600 }}
-            // >
             <Button
               key={index}
               variant="outlined"
@@ -129,7 +123,6 @@ const FriendItem: React.FC<FriendItemProps> = ({
             >
               {action.name}
             </Button>
-            // </Tooltip>
           ))}
         </div>
       </div>

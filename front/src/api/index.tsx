@@ -16,7 +16,7 @@ const api = axios.create({
 // });
 
 export const networkErrorResponse: ApiErrorResponse = {
-  status: 500,
+  statusCode: 500,
   error: 'Network Error',
   message: 'Failed to connect. Please check your internet connection.',
 };

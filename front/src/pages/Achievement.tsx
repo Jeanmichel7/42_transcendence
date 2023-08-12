@@ -56,13 +56,6 @@ const Achievement = () => {
     fetchData();
   }, [dispatch, login]);
 
-  useEffect(() => {
-    // console.log('user : ', userTrophies);
-    console.log('all : ', allTrophies);
-    // console.log('userId : ');
-  }, [allTrophies]);
-
-
   return (
     <>
       <p className='mt-2'>
@@ -82,7 +75,5 @@ const Achievement = () => {
     </>
   );
 };
-
-
 
 export default Achievement;

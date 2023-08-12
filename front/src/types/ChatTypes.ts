@@ -35,15 +35,6 @@ export interface RoomInterface {
   acceptedUsers?: UserInterface[];
 }
 
-// export interface ChatBotInterface {
-//   id: number;
-//   roomId: number;
-//   userId: number;
-//   userLogin: string;
-//   text: string;
-//   createdAt?: Date;
-// }
-
 export interface ConversationInterface {
   id: number;
   user: UserInterface

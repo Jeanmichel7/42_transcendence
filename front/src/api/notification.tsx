@@ -1,8 +1,6 @@
 import { ApiErrorResponse, NotificationInterface } from '../types';
 import { apiRequest } from './index';
 
-
-
 /* ****************************
  *             ROOM           *
  ******************************/

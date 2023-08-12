@@ -15,7 +15,6 @@ interface PropsGames {
 
 export default function StatsGame({ user, games }: PropsGames) {
   const [gamesFinished, setGamesFinished] = useState<GameInterface[]>([]);
-  // const gamesFinished = games.filter(g => g.status === 'finished');
   const [scorePlayer, setScorePlayer] = useState<number[]>([]);
   const [gamesWin, setGamesWin] = useState<number>(0);
   const ratio = (gamesWin / gamesFinished.length * 100).toFixed(1);
@@ -45,17 +44,16 @@ export default function StatsGame({ user, games }: PropsGames) {
     datasets: [{
       data: [gamesWin, games.filter(g => g.status === 'finished').length - gamesWin],
       backgroundColor: [
-        'rgba(75, 192, 192, 0.2)',  // color for wins
-        'rgba(255, 99, 132, 0.2)',   // color for losses
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(255, 99, 132, 0.2)',
       ],
       borderColor: [
-        'rgba(75, 192, 192, 1)',    // border color for wins
-        'rgba(255, 99, 132, 1)',     // border color for losses
+        'rgba(75, 192, 192, 1)',
+        'rgba(255, 99, 132, 1)',
       ],
       borderWidth: 1,
     }],
   };
-
 
   return (
     <>
@@ -72,8 +70,8 @@ export default function StatsGame({ user, games }: PropsGames) {
                   {
                     data: scorePlayer,
                     label: 'Elo score',
-                    borderColor: 'rgba(75, 192, 192, 1)', // Specify the line color
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Specify the fill color
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderWidth: 1,
                   },
                 ],
@@ -104,8 +102,6 @@ export default function StatsGame({ user, games }: PropsGames) {
             />
           </div>
 
-
-          {/* //graphe level / time */}
           <div className="relative w-full md:w-[35vw] px-16 py-8 md:p-2">
             <p className="text-center">Level - Experience</p>
             <Line

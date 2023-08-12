@@ -45,10 +45,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
       setIsOwner(true);
   }, [room, userData]);
 
-
-
-
-
   const handleOpenEdit = (event: any) => {
     event.stopPropagation();
     setOpenEdit(!openEdit);
@@ -90,7 +86,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
 
     if ('error' in resCreateChannel) {
       setErrorForm(resCreateChannel.error + resCreateChannel.message);
-      // dispatch(setErrorSnackbar(resCreateChannel.error + resCreateChannel.message ? ': ' + resCreateChannel.message : ''));
     } else {
       dispatch(setMsgSnackbar('Channel updated'));
       dispatch(reduxUpdateRoomConvList({ item: resCreateChannel, userId: userData.id }));
@@ -111,7 +106,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    // console.log('delete channel');
     if (!room) return;
     const resDeleteChannel: RoomInterface | ApiErrorResponse = await deleteChannel(room.id);
     if (typeof resDeleteChannel === 'object' && 'error' in resDeleteChannel)

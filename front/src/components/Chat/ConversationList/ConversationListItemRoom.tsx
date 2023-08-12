@@ -53,11 +53,6 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
     }
   };
 
-  // useEffect(() => {
-  //   console.log('   convlistitemconv', conv);
-  // }, [conv]);
-
-
   return (
     <div>
       <div className="border hover:bg-gray-100 transition-all 
@@ -65,8 +60,8 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link 
-          to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name} 
+        <Link
+          to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name}
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
@@ -78,7 +73,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton 
+          <IconButton
             onClick={(e) => handleLeaveRoom(e)} color='error'
             sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '0' }}
           >
@@ -91,7 +86,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton 
+          <IconButton
             onClick={(e) => handleCloseConv(e)} color='warning'
             sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '1' }}
           >
@@ -99,7 +94,7 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
           </IconButton>
         </Tooltip>
 
-        { isLoading && <CircularProgress />}
+        {isLoading && <CircularProgress />}
       </div>
     </div>
   );

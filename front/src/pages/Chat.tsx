@@ -1,11 +1,11 @@
-import ConversationList from "../components/Chat/ConversationList/ConversationList";
-import { Outlet } from "react-router-dom";
+import ConversationList from '../components/Chat/ConversationList/ConversationList';
+import { Outlet } from 'react-router-dom';
 import {
   ButtonCreateGroup,
   ButtonInterfaceAddGroups,
   ButtonInterfaceAddFriends,
-} from "../components/Chat/ConversationList/outlet/ChannelButtons";
-import { Divider } from "@mui/material";
+} from '../components/Chat/ConversationList/outlet/ChannelButtons';
+import { Divider } from '@mui/material';
 
 function Chat() {
   return (
@@ -14,7 +14,6 @@ function Chat() {
         <div className="h-full w-full max-w-[200px] min-w-fit bg-[#e5e5f2]">
           <div className="w-full justify-center items-center">
             <p className="p-[5px] bg-gray-300 text-blue-700 text-sm ">CHANNEL </p>
-            {/* <Divider flexItem /> */}
             <ButtonCreateGroup />
             <ButtonInterfaceAddGroups />
           </div>

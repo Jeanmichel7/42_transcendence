@@ -36,8 +36,6 @@ import ChatMembers from './Members';
 import InvitationRoom from './admin/InvitationRoom';
 import { useConnectionSocketChannel } from './useSocketChannel';
 import FormChannel from './FormChannel';
-// import Loaderperosnalized from '../../../utils/LoaderPerosnalized ';
-// import ErrorBoundary from './errorBoundaries';
 
 interface ChannelConversationProps {
   conv: ConversationInterface;
@@ -59,7 +57,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     const { userBlocked } = useSelector((state: RootState) => state.user);
 
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    // const [isAdminMenuOpen, setIsAdminMenuOpen] = useState<boolean>(false);
     const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
     const [pageDisplay, setPageDisplay] = useState<number>(1);
     const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
@@ -81,12 +78,10 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       setOffsetPagniation,
     );
 
-    // get messages
     const fetchOldMessages = useCallback(async () => {
       if (id === '-1' || !conv) return;
       if (allMessagesDisplayed) return;
       setShouldScrollToBottom(false);
-      // console.log('fetch old messages');
 
       setIsLoadingPagination(true);
       const allMessages: ChatMsgInterface[] | ApiErrorResponse =
@@ -120,13 +115,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         });
       }
       setIsLoadingPagination(false);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageDisplay]);
 
     useEffect(() => {
       if (!room || !userData.id || userData.id === -1 || id === '-1') return;
       fetchOldMessages();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchOldMessages, room?.id]);
 
     const fetchRoomData = useCallback(async () => {
@@ -139,7 +132,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       const roomData: RoomInterface | ApiErrorResponse = await getRoomData(
         conv.room.id.toString(),
       );
-      // console.log('roomData : ', roomData);
       if (roomData && 'statusCode' in roomData && roomData.statusCode === 403) {
         dispatch(
           setPersonalizedErrorSnackbar(
@@ -159,7 +151,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       } else if (roomData && 'error' in roomData) {
         dispatch(setErrorSnackbar(roomData));
       } else {
-        // setRoom(roomData);
         dispatch(
           reduxUpdateRoomConvList({ item: roomData, userId: userData.id }),
         );
@@ -169,7 +160,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           const isUserInRoom =
             roomData.users.some((u) => u.id === userData.id) ||
             roomData.acceptedUsers.some((u) => u.id === userData.id);
-          // || roomData.;
+
           if (!isUserInRoom) {
             socketRef.current?.emit('leaveRoom', {
               roomId: id,
@@ -185,7 +176,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
             );
             navigate('/chat/channel');
           } else {
-            // console.log('user already in room');
           }
 
           // check if channel removed
@@ -193,7 +183,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           socketRef.current?.emit('leaveRoom', {
             roomId: id,
           });
-          // console.log('room delete, conv : ', conv);
           dispatch(
             reduxRemoveConversationToList({
               convId: conv.id,
@@ -208,7 +197,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           console.error('WTF ?');
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, id, navigate, userData.id]);
 
     useEffect(() => {
@@ -231,10 +219,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           inline: 'nearest',
         });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages]);
 
-    // delete message
     const handleDeleteMessage = async (msgId: number) => {
       setIsLoadingDeleteMsg(true);
       const res: HttpStatusCode | ApiErrorResponse = await deleteChatMessage(

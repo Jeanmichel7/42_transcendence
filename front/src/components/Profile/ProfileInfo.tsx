@@ -89,7 +89,6 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

@@ -111,11 +111,6 @@ export default function FakeConnection() {
     }
   }
 
-  // useEffect(() => {
-  //   if (userIsConnected)
-  //     window.opener.postMessage({msg:'user connected', id: -1}, 'http://localhost:3006');
-  // }, [userIsConnected]);
-
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       {/* link prev page */}

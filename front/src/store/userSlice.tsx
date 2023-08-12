@@ -77,7 +77,6 @@ const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
 };
 
 const helperUpdateUserStatus = (state: UserState, userStatus: UserStatusInterface) => {
-  // console.log('redux update userStatus : ', userStatus);
   // userFriends
   if (state.userFriends) {
     const userFriend = state.userFriends.find((u) => u.id === userStatus.id);
@@ -236,9 +235,7 @@ export const userSlice = createSlice({
     reduxDeclinedRequest: (state, action: PayloadAction<NotificationInterface>) => {
       removeWaitingFriendsSent(state, action.payload.sender);
     },
-
   },
-
 });
 
 export const {
@@ -250,7 +247,5 @@ export const {
   reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
   reduxAcceptedRequest, reduxDeclinedRequest,
 } = userSlice.actions;
-
-
 
 export default userSlice.reducer;

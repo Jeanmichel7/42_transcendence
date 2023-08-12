@@ -38,12 +38,6 @@ const ConversationWrapper = () => {
     parseInt(convId as string),
   );
 
-  // useEffect(() => {
-  //   console.log('location state : ', location.state);
-  //   console.log('name : ', name);
-  // }, [location.state, name]);
-
-  
   return (
     <>
       { login && !name && <PrivateConversation key={convId} /> }

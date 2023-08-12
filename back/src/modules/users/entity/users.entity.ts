@@ -186,11 +186,6 @@ export class UserEntity extends BaseEntity {
   chatMessages: ChatMessageEntity[];
 
   //chat room
-  // @ManyToMany(() => ChatRoomEntity, (room) => room.users, {
-  //     cascade: true
-  // })
-  // rooms: ChatRoomEntity[];
-
   @OneToMany(() => ChatRoomEntity, (room) => room.ownerUser, {
     onDelete: 'CASCADE',
     cascade: true,

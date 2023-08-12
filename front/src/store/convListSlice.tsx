@@ -26,8 +26,6 @@ function isConversationExists(list: ConversationInterface[], newConv: Conversati
 }
 
 const helperAddConversationList = (state: ChatState, item: UserInterface | RoomInterface) => {
-  //create new conversation
-  // console.log('redux add conv list : ', item);
   const newConversation: ConversationInterface = {
     id: state.conversationsList.length === 0 ? 0 : state.conversationsList[state.conversationsList.length - 1].id + 1,
     room: {} as RoomInterface,
@@ -55,7 +53,6 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
     throw new Error("item n'est ni de type RoomInterface, ni de type UserInterface");
   }
   if (isConversationExists(state.conversationsList, newConversation)) {
-    // console.log('redux conv already exist');
     return;
   } else {
     if (state.conversationsList == undefined) {
@@ -67,7 +64,6 @@ const helperAddConversationList = (state: ChatState, item: UserInterface | RoomI
 };
 
 const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterface[]) => {
-  // console.log('redux update status conv list : ', item);
   item.forEach((userStatus) => {
     state.conversationsList.forEach((conv: ConversationInterface) => {
       if (isUserInterface(conv.user) && conv.user.id === userStatus.id)
@@ -101,7 +97,6 @@ const helperUpdateStatusUserConvList = (state: ChatState, item: UserStatusInterf
 };
 
 const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => {
-  //edit conversation
   const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.room.id === item.id);
   if (indexConvToUpdate !== -1) {
     state.conversationsList[indexConvToUpdate].room = item;
@@ -111,7 +106,6 @@ const helperUpdateConversationList = (state: ChatState, item: RoomInterface) => 
 };
 
 const helperUpdatePrivateConversationList = (state: ChatState, item: UserInterface) => {
-  //edit conversation
   const indexConvToUpdate = state.conversationsList.findIndex((conv) => conv.user.id === item.id);
   if (indexConvToUpdate !== -1) {
     state.conversationsList[indexConvToUpdate].user = item;
@@ -123,16 +117,10 @@ const helperUpdatePrivateConversationList = (state: ChatState, item: UserInterfa
 export const chatSlice = createSlice({
   name: 'chat',
   initialState: {
-    // conversationIdSelected: -1,
     conversationsList: [] as ConversationInterface[],
   } as ChatState,
 
   reducers: {
-    // manage conversation
-    // reduxSetCurrentConversationList: (state, action: PayloadAction<number>) => {
-    //   state.conversationIdSelected = action.payload;
-    // },
-
     reduxSetConversationList: (state, action: PayloadAction<ConversationInterface[]>) => {
       state.conversationsList = action.payload;
     },

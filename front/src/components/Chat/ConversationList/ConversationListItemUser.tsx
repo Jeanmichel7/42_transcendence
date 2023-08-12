@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-// import { ImBlocked } from 'react-icons/im';
-import { ConversationInterface } from '../../../types';
-import {
-  reduxRemoveConversationToList,
-} from '../../../store/convListSlice';
-
-import { Badge, Chip, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ConversationInterface } from '../../../types';
+import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import { RootState } from '../../../store';
+import { Badge, Chip, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
+
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ConvProps {
   conv: ConversationInterface;
@@ -23,7 +19,6 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // const { conversationsList } = useSelector((state: RootState) => state.chat);
   async function handleCloseConv(e: React.MouseEvent<HTMLButtonElement>) {
     if (conv.id === parseInt(convId as string)) navigate('/chat');
     e.stopPropagation();
@@ -39,12 +34,10 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
         cursor-pointer flex flex-row items-center text-left"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        // onClick={handleClickConv}
       >
         <Link
           to={'conv/' + conv.id + '/' + conv.user.id + '/' + conv.user.login}
           className="flex flex-grow text-black p-1 pl-2 items-center "
-        // onClick={handleClickConv}
         >
           <Badge
             color={

@@ -32,7 +32,6 @@ function Profile() {
 
       setIsLoadingFriends(true);
       const gamesFetched = await getHistoryGames(userProfile.id);
-      // console.log(gamesFetched);
   
       if ('error' in gamesFetched)
         dispatch(setErrorSnackbar(gamesFetched));

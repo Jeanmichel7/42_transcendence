@@ -31,7 +31,6 @@ import DoneIcon from '@mui/icons-material/Done';
 interface ItemProps {
   keyName: string;
   value: string | number | boolean;
-  // setUserProfile: (user: any) => any;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -90,13 +89,11 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     if (keyName === 'password')
       formData.append('oldPassword', inputOldPwd);
 
-    // console.log('formData', formData);
-
     setLoading(true);
     const updatedUser: UserInterface | ApiErrorResponse =
       await patchUserAccount(formData);
     setLoading(false);
-    // console.log('res : ', updatedUser);
+
     if ('error' in updatedUser) {
       setError(updatedUser.message);
       dispatch(setErrorSnackbar(updatedUser));

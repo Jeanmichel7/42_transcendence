@@ -13,7 +13,6 @@ export const TrophyCard = ({ trophy }: TrophyProps) => {
   useEffect(() => {
     if (!trophy) return;
 
-    console.log('trophy : ', trophy);
     const ratio = trophy.progress / trophy.total * 100;
     if (ratio > 100) setProgress(100);
     else if (trophy.isHeld) setProgress(100);

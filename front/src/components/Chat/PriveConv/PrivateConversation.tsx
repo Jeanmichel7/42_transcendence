@@ -26,9 +26,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
 
 const PrivateConversation: React.FC = () => {
-  const convId = +(useParams<{ convId: string }>().convId || '-1') ;
-  const id = +(useParams<{ id: string }>().id || '-1') ;
-  const login = (useParams<{ login: string }>().login || 'unknown') ;
+  const convId = +(useParams<{ convId: string }>().convId || '-1');
+  const id = +(useParams<{ id: string }>().id || '-1');
+  const login = (useParams<{ login: string }>().login || 'unknown');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ const PrivateConversation: React.FC = () => {
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
   const fetchOldMessages = useCallback(async () => {
-    if (id == -1 || userData.id == -1 ) return;
+    if (id == -1 || userData.id == -1) return;
     setShouldScrollToBottom(false);
 
     const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
@@ -84,13 +84,12 @@ const PrivateConversation: React.FC = () => {
   }, [id, userData.id, pageDisplay]);
 
   const connectSocket = useCallback(() => {
-    if (id == -1 || userData.id == -1 ) return;
+    if (id == -1 || userData.id == -1) return;
     const socket = io('http://localhost:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
 
-    //listen on /message
     socket.on('message', (message) => {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -130,7 +129,6 @@ const PrivateConversation: React.FC = () => {
     if (id == -1 || userData.id == -1 || !login) return;
 
     const userFetch: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
-    console.log('user fetch : ', userFetch);
     if ('error' in userFetch)
       dispatch(setErrorSnackbar(userFetch));
     else {
@@ -176,17 +174,15 @@ const PrivateConversation: React.FC = () => {
     if (shouldScrollToBottom && bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
     }
-    // console.log('messages : ', messages);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   useEffect(() => {
-    if (id == -1 || !userFriend ) return;
+    if (id == -1 || !userFriend) return;
     setIsFriend(userFriend.some((f) => f.id == id));
   }, [id, userFriend]);
 
   useEffect(() => {
-    if (id == -1 || !userBlocked ) return;
+    if (id == -1 || !userBlocked) return;
     setIsBlocked(userBlocked.some((f) => f.id == id));
   }, [id, userBlocked]);
 
@@ -279,7 +275,7 @@ const PrivateConversation: React.FC = () => {
 
   const handleDefi = async () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
-       await inviteGameUser(id);
+      await inviteGameUser(id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
@@ -288,18 +284,15 @@ const PrivateConversation: React.FC = () => {
 
   return (
     <>
-      {/* { (id == '-1' || login == 'unknown' || userData.id == -1 ) ?
-       <CircularProgress className='mx-auto' />
-        : */}
       <div className="flex flex-col h-full justify-between">
         <div className="flex w-full justify-between items-center text-lg text-blue text-center">
           <div className='mr-6'>
-          <Tooltip
+            <Tooltip
               title="Defi"
               arrow
               TransitionComponent={Zoom}
               TransitionProps={{ timeout: 600 }}
-              sx={{ p:0, paddingX:1, m:0 }}
+              sx={{ p: 0, paddingX: 1, m: 0 }}
             >
               <IconButton
                 onClick={handleDefi}
@@ -319,27 +312,27 @@ const PrivateConversation: React.FC = () => {
           <div>
             {isFriend
               ? <Tooltip
-                  title="Remove friend"
-                  arrow
-                  TransitionComponent={Zoom}
-                  TransitionProps={{ timeout: 600 }}
-                  sx={{ p: 0, paddingX: 1, m: 0 }}
+                title="Remove friend"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+                sx={{ p: 0, paddingX: 1, m: 0 }}
+              >
+                <IconButton
+                  onClick={handleDeleteFriend}
+                  color="warning"
                 >
-                  <IconButton
-                    onClick={handleDeleteFriend}
-                    color="warning"
-                  >
-                    <PersonRemoveIcon />
-                  </IconButton>
-                </Tooltip>
+                  <PersonRemoveIcon />
+                </IconButton>
+              </Tooltip>
 
               : <Tooltip
-                  title="Add friend"
-                  arrow
-                  TransitionComponent={Zoom}
-                  TransitionProps={{ timeout: 600 }}
-                  sx={{ p: 0, paddingX: 1, m: 0 }}
-                >
+                title="Add friend"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+                sx={{ p: 0, paddingX: 1, m: 0 }}
+              >
                 <IconButton
                   onClick={handleAddFriend}
                   color="success"
@@ -413,6 +406,3 @@ const PrivateConversation: React.FC = () => {
 };
 
 export default PrivateConversation;
-
-
-

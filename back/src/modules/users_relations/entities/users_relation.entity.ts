@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
 
-@Entity('users-relation')
+@Entity('users_relation')
 export class UserRelationEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: bigint;

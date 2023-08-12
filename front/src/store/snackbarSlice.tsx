@@ -29,14 +29,6 @@ export const snackbarSlice = createSlice({
     setSnackbar: (state, action: PayloadAction<PutSnackbarInterface>) => {
       state.snackbar = { ...state.snackbar, ...action.payload, open: true };
     },
-    // setErrorSnackbar: (state, action: PayloadAction<string>) => {
-    //   state.snackbar = {
-    //     ...state.snackbar,
-    //     message: action.payload,
-    //     severity: 'error',
-    //     open: true,
-    //   };
-    // },
     setErrorSnackbar: (state, action: PayloadAction<ApiErrorResponse>) => {
       state.snackbar = {
         ...state.snackbar,

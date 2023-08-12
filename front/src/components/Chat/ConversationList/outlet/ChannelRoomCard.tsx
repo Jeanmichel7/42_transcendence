@@ -1,7 +1,7 @@
 import { Button, Card, CardContent, CircularProgress, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
+import { setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 import { RoomInterface, ApiErrorResponse } from '../../../../types';
 import { joinRoom } from '../../../../api/chat';
 import { reduxAddConversationList } from '../../../../store/convListSlice';
@@ -13,7 +13,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
 
-// import { useNavigate } from 'react-router-dom';
 export interface RoomCardProps {
   room: RoomInterface;
 }
@@ -60,20 +59,17 @@ const RoomCard = ({ room }: RoomCardProps) => {
         setWrongPwd(true);
       }
     } else {
-      // const newConvId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
       dispatch(setMsgSnackbar('Room joined'));
       dispatch(reduxAddConversationList({ item: res, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
       setAlreadyInRoom(true);
       setWrongPwd(false);
-      //navigate ?
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    // console.log(room)
     setAlreadyInRoom(isConvAlreadyExist(room, conversationsList));
   }, [conversationsList, room]);
 

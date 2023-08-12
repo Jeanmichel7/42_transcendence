@@ -27,7 +27,6 @@ import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserUpdateEvent } from '../notification/events/notification.event';
-import { TrophiesEntity } from '../trophies/entity/trophies.entity';
 
 @Injectable()
 export class UsersService {
@@ -88,7 +87,7 @@ export class UsersService {
         'role',
         'is2FAEnabled',
         'score',
-        'password'
+        'password',
       ],
     });
 
@@ -177,7 +176,10 @@ export class UsersService {
     return result;
   }
 
-  async findAllUsersPaginate(page: number, limit: number): Promise<UserInterface[]> {
+  async findAllUsersPaginate(
+    page: number,
+    limit: number,
+  ): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
         'id',
@@ -301,7 +303,7 @@ export class UsersService {
     if (updateUser.password) {
       const isMatch = await bcrypt.compare(
         updateUser.oldPassword,
-        userToUpdate.password
+        userToUpdate.password,
       );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {

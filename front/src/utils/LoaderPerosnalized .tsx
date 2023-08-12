@@ -1,8 +1,3 @@
-// interface LoaderperosnalizedProps {
-//   top: number,
-//   left: number,
-// }
-
 const Loaderperosnalized = () => {
   return (
     <div className="relative h-full w-full">

@@ -56,8 +56,8 @@ const GameCard = ({ game, user }: GameCardProps) => {
 
       <div className="flex-grow text-center">
         <p className='text-[1.3rem] font-bold'>
-          {p1IsWinner ? game.scorePlayer1 : game.scorePlayer2} 
-          {' - '} 
+          {p1IsWinner ? game.scorePlayer1 : game.scorePlayer2}
+          {' - '}
           {!p1IsWinner ? game.scorePlayer1 : game.scorePlayer2}
         </p>
         <p> Duration: {duration} </p>

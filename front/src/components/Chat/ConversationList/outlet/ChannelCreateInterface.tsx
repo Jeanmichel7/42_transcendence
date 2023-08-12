@@ -6,8 +6,6 @@ import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../type
 
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-// import Input from '@mui/material/Input';
-// import FilledInput from '@mui/material/FilledInput';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -100,7 +98,6 @@ const CreateGroupInterface = () => {
     } else {
       dispatch(setPersonalizedErrorSnackbar('Channel created'));
 
-      // console.log('room res : ', resCreateChannel);
       dispatch(
         reduxAddConversationList({
           item: resCreateChannel,
@@ -130,8 +127,6 @@ const CreateGroupInterface = () => {
           sx={{
             '& .MuiTextField-root': { m: 1, width: '25ch' },
           }}
-          // noValidate
-          // autoComplete="off"
         >
           <div>
             <TextField

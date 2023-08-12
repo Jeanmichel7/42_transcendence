@@ -19,16 +19,12 @@ interface AllFriendsProps {
 }
 
 const AllFriends = ({ userDataId }: AllFriendsProps) => {
-  // const { userData } = useSelector((state: RootState) => state.user);
   const { userFriends } = useSelector((state: RootState) => state.user);
-
   const [isLoading, setIsLoading] = useState(false);
   const { conversationsList } = useSelector((state: RootState) => state.chat);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  console.log('userFriends', userFriends);
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
