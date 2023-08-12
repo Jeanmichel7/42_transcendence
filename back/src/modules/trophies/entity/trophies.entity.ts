@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  OneToMany,
+} from 'typeorm';
 import { UserEntity } from 'config';
+import { UserTrophiesEntity } from './userTrophiesProgress.entity';
+
 @Entity('trophies')
 export class TrophiesEntity {
   @PrimaryGeneratedColumn()
@@ -13,6 +21,14 @@ export class TrophiesEntity {
 
   @Column('text')
   imagePath: string;
+
+  @Column({ default: 0 })
+  total: number;
+
+  @OneToMany(() => UserTrophiesEntity, (userTrophy) => userTrophy.trophy, {
+    onDelete: 'CASCADE',
+  })
+  trophiesProgress: UserTrophiesEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.trophies, {
     onDelete: 'CASCADE',

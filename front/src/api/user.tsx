@@ -29,12 +29,12 @@ export async function getProfileByPseudo(
   );
 }
 
-export async function getTrophiesByPseudo(
+export async function getTrophiesProgressByPseudo(
   pseudo: string,
 ): Promise<UserInterface | ApiErrorResponse> {
   return apiRequest<UserInterface>(
     'get',
-    '/users/' + pseudo + '/trophies',
+    '/users/' + pseudo + '/profile/trophiesProgress',
     'Failed to get trophies: ',
   );
 }

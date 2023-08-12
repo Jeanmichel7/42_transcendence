@@ -1,4 +1,5 @@
 import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
+import { UserTrophiesEntity } from 'src/modules/trophies/entity/userTrophiesProgress.entity';
 
 export interface ProfilInterface {
   id: bigint;
@@ -12,4 +13,5 @@ export interface ProfilInterface {
   createdAt?: Date;
   updatedAt?: Date;
   trophies?: TrophiesEntity[];
+  trophiesProgress?: UserTrophiesEntity[];
 }

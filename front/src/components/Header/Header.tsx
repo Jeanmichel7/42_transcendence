@@ -38,6 +38,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -462,6 +463,14 @@ function Header() {
                 Account
               </MenuItem>
             </NavLink>
+
+            <NavLink to={`/achievement/${userData.login}`}>
+              <MenuItem onClick={handleCloseUserMenu}>
+                <EmojiEventsIcon className="mr-2" />
+                Achievement
+              </MenuItem>
+            </NavLink>
+
             <Divider />
 
             <div>

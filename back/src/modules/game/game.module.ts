@@ -6,14 +6,14 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameEntity } from './entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
-// import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MessageService } from '../messagerie/messages.service';
 import { MessageEntity } from '../messagerie/entity/messages.entity';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
-import { TrophiesService } from '../trophies/trophies.service';
 import { TrophiesEntity } from '../trophies/entity/trophies.entity';
+import { UserTrophiesEntity } from '../trophies/entity/userTrophiesProgress.entity';
+import { TrophieModule } from '../trophies/trophies.module';
 
 @Module({
   imports: [
@@ -23,7 +23,9 @@ import { TrophiesEntity } from '../trophies/entity/trophies.entity';
       MessageEntity,
       NotificationEntity,
       TrophiesEntity,
+      UserTrophiesEntity,
     ]),
+    TrophieModule,
   ],
   controllers: [GameController],
   providers: [
@@ -33,7 +35,6 @@ import { TrophiesEntity } from '../trophies/entity/trophies.entity';
     JwtService,
     MessageService,
     NotificationService,
-    TrophiesService,
   ],
 })
 export class GameModule {}

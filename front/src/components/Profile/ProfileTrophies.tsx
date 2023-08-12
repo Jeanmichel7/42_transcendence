@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { UserInterface } from '../../types';
 import { Sticker } from '../../utils/StyledTitle';
 import { Nothing } from '../Friends/Nothing';
@@ -12,11 +13,15 @@ export default function ProfileTrophies({ user }: { user: UserInterface }) {
       {user.trophies?.length === 0 && (
         <Nothing text={'No Trophy won'} angry={false} />
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 justify-center">
-        {user.trophies?.map((trophy, index) => (
-          <TrophyCard key={index} trophy={trophy} />
-        ))}
+      <div className="flex flex-wrap justify-center">
+        {user.trophies?.map((trophy) => {
+          trophy.isHeld = true;
+          return <TrophyCard key={trophy.id} trophy={trophy} />;
+        })}
       </div>
+      <p className='text-center text-blue-600 '>
+        <Link to={`/achievement/${user.login}`} >See all achievements</Link>
+      </p>
     </>
   );
 }

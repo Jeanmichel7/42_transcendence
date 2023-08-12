@@ -27,8 +27,6 @@ export default function StatsGame({ user, games }: PropsGames) {
   }, [games]);
 
   useEffect(() => {
-    console.log('lvl : ', niveau);
-    console.log('exp : ', exp);
     setScorePlayer(
       [1500, ...gamesFinished
         .map(game => game.player1.id === user.id

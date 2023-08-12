@@ -18,6 +18,7 @@ import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSea
 import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 import LeaderBoard from '../pages/LeaderBoard';
+import Achievement from '../pages/Achievement';
 // import { CircleBackground } from '../utils/CircleBackground';
 
 const HomeChat = () => {
@@ -57,6 +58,8 @@ const AppRoutes: React.FC = () => (
       <Route path="/fakeconnection" element={<FakeConnection />} />
       <Route path="/profile/:pseudo" element={<Profile />} />
       <Route path="/account" element={<Account />} />
+      <Route path="/achievement" element={<Achievement />} />
+      <Route path="/achievement/:login" element={<Achievement />} />
       <Route path="*" element={<Error404 />} />
     </Routes>
     <div className="flex-grow" />

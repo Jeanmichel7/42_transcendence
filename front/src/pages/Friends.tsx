@@ -125,7 +125,7 @@ export default function FriendsPage() {
   }
 
   return (
-    <>
+    <div className='bg-inherit'>
       <AppBar position="static">
         <div className="flex bg-gray-800">
           <Tabs
@@ -191,6 +191,6 @@ export default function FriendsPage() {
       <TabPanel value={value} index={5}>
         {viewType === 'grid' ? <FriendsSearch setHeight={false} /> : <AddFriendsRaw />}
       </TabPanel>
-    </>
+    </div>
   );
 }

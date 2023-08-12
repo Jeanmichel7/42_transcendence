@@ -100,7 +100,7 @@ export class UsersService {
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { login: login },
-      relations: ['trophies'],
+      relations: ['trophies', 'trophiesProgress'],
       select: [
         'id',
         'firstName',
@@ -108,6 +108,26 @@ export class UsersService {
         'login',
         'email',
         'description',
+        'avatar',
+        'status',
+        'score',
+        'level',
+      ],
+    });
+    if (!user) throw new NotFoundException(`User ${login} not found`);
+    const result: ProfilInterface = { ...user };
+    return result;
+  }
+
+  async findTrophiesProgress(login: string): Promise<ProfilInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { login: login },
+      relations: ['trophies', 'trophiesProgress', 'trophiesProgress.trophy'],
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
         'avatar',
         'status',
         'score',

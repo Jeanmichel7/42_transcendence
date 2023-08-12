@@ -54,10 +54,9 @@ export class UsersController {
     @Query('limit') limit: number,
   ): Promise<UserInterface[]> {
     let result: UserInterface[];
-    if(page)
+    if (page)
       result = await this.usersService.findAllUsersPaginate(page, limit);
-    else
-      result = await this.usersService.findAllUsers();
+    else result = await this.usersService.findAllUsers();
     return result;
   }
 
@@ -73,6 +72,15 @@ export class UsersController {
     @Param('userlogin') params: string,
   ): Promise<ProfilInterface> {
     const result: ProfilInterface = await this.usersService.findProfile(params);
+    return result;
+  }
+
+  @Get(':userlogin/profile/trophiesProgress')
+  async findTrophiesProgress(
+    @Param('userlogin') params: string,
+  ): Promise<ProfilInterface> {
+    const result: ProfilInterface =
+      await this.usersService.findTrophiesProgress(params);
     return result;
   }
 

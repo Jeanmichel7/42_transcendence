@@ -17,6 +17,7 @@ import { ChatRoomEntity } from 'src/modules/chat/entity/chat.room.entity';
 import { GameEntity } from 'src/modules/game/entity/game.entity';
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
+import { UserTrophiesEntity } from 'src/modules/trophies/entity/userTrophiesProgress.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -271,9 +272,13 @@ export class UserEntity extends BaseEntity {
   })
   notificationsReceived: NotificationEntity[];
 
+  /* trophie */
   @ManyToMany(() => TrophiesEntity, (trophie) => trophie.users)
   @JoinTable()
   trophies: TrophiesEntity[];
+
+  @OneToMany(() => UserTrophiesEntity, (userTrophy) => userTrophy.user)
+  trophiesProgress: UserTrophiesEntity[];
 
   /* helper */
   get relations(): UserRelationEntity[] {

@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
-import { TrophiesService } from './modules/trophies/trophies.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,8 +11,6 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept',
     credentials: true,
   });
-  const trophyService = app.get(TrophiesService);
-  await trophyService.initializeTrophies();
   await app.listen(3000);
 }
 bootstrap();

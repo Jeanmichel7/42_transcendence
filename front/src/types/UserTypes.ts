@@ -1,9 +1,5 @@
-export interface TrophyInterface {
-  id: number;
-  name: string;
-  description: string;
-  imagePath: string;
-}
+import { TrophyInterface, TrophyProgressInterface } from './TrophiesTypes';
+
 export interface UserInterface {
   id: number;
   login: string;
@@ -22,6 +18,7 @@ export interface UserInterface {
   waitingFriendsRequestReceived?: UserInterface[];
   waitingFriendsRequestSent?: UserInterface[];
   trophies?: TrophyInterface[];
+  trophiesProgress?: TrophyProgressInterface[];
 }
 
 export interface UserRelation {

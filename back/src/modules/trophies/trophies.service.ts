@@ -9,22 +9,28 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
+import { UserTrophiesEntity } from './entity/userTrophiesProgress.entity';
 
 const trophies = [
   {
     name: 'Warrior',
     description: 'Win 3 games in a row',
     imagePath: 'warrior.jpeg',
+    total: 3,
   },
   {
     name: 'Lord',
     description: 'Win 5 games in a row',
     imagePath: 'lord.jpeg',
+    progress: 0,
+    total: 5,
   },
   {
     name: 'Emperor',
     description: 'Win 10 games in a row',
     imagePath: 'emperor.jpeg',
+    progress: 0,
+    total: 10,
   },
   {
     name: 'Laser Pointer',
@@ -35,52 +41,72 @@ const trophies = [
     name: 'Gamma Laser',
     description: 'Kill 5 opponents with a laser',
     imagePath: 'gamma_laser.jpeg',
+    progress: 0,
+    total: 5,
   },
   {
     name: 'Scorificator',
     description: 'Kill 10 opponents with a laser',
     imagePath: 'scorificator.jpeg',
+    progress: 0,
+    total: 10,
   },
   {
     name: 'Regular',
     description: 'Play 20 games',
     imagePath: 'regular.jpeg',
+    progress: 0,
+    total: 20,
   },
   {
     name: 'Addict',
     description: 'Play 50 games',
     imagePath: 'addict.jpeg',
+    progress: 0,
+    total: 50,
   },
   {
     name: 'NoLife',
     description: 'Play 100 games',
     imagePath: 'nolife.jpeg',
+    progress: 0,
+    total: 100,
   },
   {
     name: 'Bonus Master',
     description: 'Use 3 bonuses in one game',
     imagePath: 'bonus_master.jpeg',
+    progress: 0,
+    total: 3,
   },
   {
     name: 'Bonus Pro',
     description: 'Use 5 bonuses in one game',
     imagePath: 'bonus_pro.jpeg',
+    progress: 0,
+    total: 5,
   },
   {
     name: 'Bonus Cheater',
     description: 'Use 10 bonuses in one game',
     imagePath: 'bonus_cheater.jpeg',
+    progress: 0,
+    total: 10,
   },
   {
     name: 'Pong-tastic',
     description: 'Win 5 games without missing a single ball',
     imagePath: 'pong_tastic.jpeg',
+    progress: 0,
+    total: 5,
   },
   {
     name: 'Tireless Returner',
     description:
       'Return the ball 10 times in a row without it touching the sides',
     imagePath: 'tireless_returner.jpeg',
+    progress: 0,
+    total: 10,
   },
   {
     name: 'Why Not',
@@ -111,6 +137,8 @@ const trophies = [
     name: 'Point Prospector',
     description: 'Win a game with a minimum of 30 points scored',
     imagePath: 'point_prospector.jpeg',
+    progress: 0,
+    total: 30,
   },
 ];
 
@@ -119,24 +147,29 @@ export class TrophiesService {
   constructor(
     @InjectRepository(TrophiesEntity)
     private readonly trophyRepository: Repository<TrophiesEntity>,
-    @InjectRepository(GameEntity)
-    private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(UserTrophiesEntity)
+    private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
+    // @InjectRepository(GameEntity)
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly eventEmitter: EventEmitter2,
+    // private readonly eventEmitter: EventEmitter2,
     private readonly notificationService: NotificationService,
-  ) {}
+  ) {
+    this.initializeTrophies();
+    this.initializeTrophiesProgress();
+  }
 
   async createTrophy(
     name: string,
     description: string,
     path: string,
+    total: number,
   ): Promise<TrophiesEntity> {
     const newTrophy = new TrophiesEntity();
     newTrophy.name = name;
     newTrophy.description = description;
     newTrophy.imagePath = path;
-
+    newTrophy.total = total;
     return await this.trophyRepository.save(newTrophy);
   }
 
@@ -152,18 +185,40 @@ export class TrophiesService {
           trophy.name,
           trophy.description,
           trophy.imagePath,
+          trophy.total,
         );
       }
     }
   }
 
-  async assignTrophyToPlayer(
-    player: UserEntity,
-    trophy: TrophiesEntity,
-  ): Promise<void> {
-    player.trophies = [...(player.trophies || []), trophy];
-    await this.userRepository.save(player);
+  async initializeTrophiesProgress(): Promise<void> {
+    const count = await this.userTrophiesProgressRepository.count();
+
+    if (count === 0) {
+      console.log(
+        "UserTrophiesProgress table doesn't exist... Creating table in dataBase/",
+      );
+      const users = await this.userRepository.find();
+      for (const user of users) {
+        for (const trophy of trophies) {
+          const newTrophy = new UserTrophiesEntity();
+          newTrophy.trophy = await this.getTrophyByName(trophy.name);
+          newTrophy.user = user;
+          newTrophy.progress = trophy.progress || 0;
+          newTrophy.total = trophy.total || 0;
+          await this.userTrophiesProgressRepository.save(newTrophy);
+        }
+      }
+    }
   }
+
+  // async assignTrophyToPlayer(
+  //   player: UserEntity,
+  //   trophy: TrophiesEntity,
+  // ): Promise<void> {
+  //   player.trophies = [...(player.trophies || []), trophy];
+  //   await this.userRepository.save(player);
+  // }
 
   async getTrophyByName(name: string): Promise<TrophiesEntity | null> {
     return await this.trophyRepository.findOne({ where: { name } });
@@ -225,13 +280,13 @@ export class TrophiesService {
     if (consecutiveExchangesWithoutBounce >= 10) {
       trophyNamesToAssign.push('Tireless Returner');
     }
-    if (player.gamesPlayed >= 20) {
+    if (player.numberOfGamesPlayed >= 20) {
       trophyNamesToAssign.push('Regular');
     }
-    if (player.gamesPlayed >= 50) {
+    if (player.numberOfGamesPlayed >= 50) {
       trophyNamesToAssign.push('Addict');
     }
-    if (player.gamesPlayed >= 100) {
+    if (player.numberOfGamesPlayed >= 100) {
       trophyNamesToAssign.push('NoLife');
     }
     if (this.calculDuration(game.createdAt, game.finishAt) <= 120) {
@@ -246,7 +301,7 @@ export class TrophiesService {
     if (player.numberOfGamesWonWithoutMissingBall >= 5) {
       trophyNamesToAssign.push('Pong-tastic');
     }
-    console.log('trophyNamesToAssign', trophyNamesToAssign);
+    // console.log('trophyNamesToAssign', trophyNamesToAssign);
     // Récupérez les trophées par leurs noms
     let trophiesToAssign: TrophiesEntity[] = await Promise.all(
       trophyNamesToAssign.map(async (name) => {
@@ -256,58 +311,178 @@ export class TrophiesService {
     );
 
     // Filtrer les trophées que le joueur possède déjà
-    console.log('trophiesToAssign', trophiesToAssign);
+    // console.log('trophiesToAssign', trophiesToAssign);
     trophiesToAssign = trophiesToAssign.filter((trophy) => trophy !== null);
     const trophiesToAdd = trophiesToAssign?.filter((trophy) => {
       return !player.trophies?.some(
         (playerTrophy) => playerTrophy.id === trophy.id,
       );
     });
-    console.log('trophiesToAdd', trophiesToAdd);
-    console.log('trophiesPlayer', player.trophies);
-    console.log('playerId', player.id);
+    // console.log('trophiesToAdd', trophiesToAdd);
+    // console.log('trophiesPlayer', player.trophies);
+    // console.log('playerId', player.id);
 
-    // Ajouter les trophées au joueur
-    if (trophiesToAdd && trophiesToAdd.length > 0) {
-      player.trophies = [...(player.trophies || []), ...trophiesToAdd];
-      await this.userRepository.save(player);
+    const trophyNamesToCheck: string[] = trophies.map((t) => t.name);
 
-      console.log('trophe to add', trophiesToAdd);
+    for (const trophyName of trophyNamesToCheck) {
+      const trophy = await this.getTrophyByName(trophyName);
+      if (!trophy || trophy.total == 0) continue;
 
-      const bot: UserEntity = await this.userRepository.findOne({
-        where: { login: 'bot' },
-      });
+      const userTrophyProgress =
+        await this.userTrophiesProgressRepository.findOne({
+          where: {
+            user: { id: player.id },
+            trophy: { id: trophy.id },
+          },
+        });
 
-      for (const trophy of trophiesToAdd) {
-        const newNotif: NotificationEntity =
-          await this.notificationService.sendNotification({
-            type: 'trophy',
-            content: `You win a trophy : ${trophy.name}`,
-            receiver: player,
-            sender: bot,
-          } as NotificationCreateDTO);
-
-        if (!newNotif)
-          throw new InternalServerErrorException(
-            `Can't create notification for user ${player.login}`,
-          );
+      if (!userTrophyProgress) continue;
+      if (player.trophies?.some((t) => t.id === trophy.id)) continue;
+      console.log('userTrophyProgress', userTrophyProgress);
+      console.log('trophyName', trophyName);
+      console.log('user : ', player);
+      switch (trophyName) {
+        case 'Warrior':
+          userTrophyProgress.progress =
+            player.numberOfConsecutiveWins > userTrophyProgress.progress
+              ? player.numberOfConsecutiveWins
+              : userTrophyProgress.progress;
+          break;
+        case 'Lord':
+          userTrophyProgress.progress =
+            player.numberOfConsecutiveWins > userTrophyProgress.progress
+              ? player.numberOfConsecutiveWins
+              : userTrophyProgress.progress;
+          break;
+        case 'Emperor':
+          userTrophyProgress.progress =
+            player.numberOfConsecutiveWins > userTrophyProgress.progress
+              ? player.numberOfConsecutiveWins
+              : userTrophyProgress.progress;
+          break;
+        case 'Gamma Laser':
+          userTrophyProgress.progress =
+            playerStats.numberOfLaserKills > userTrophyProgress.progress
+              ? playerStats.numberOfLaserKills
+              : userTrophyProgress.progress;
+          break;
+        case 'Scorificator':
+          userTrophyProgress.progress =
+            playerStats.numberOfLaserKills > userTrophyProgress.progress
+              ? playerStats.numberOfLaserKills
+              : userTrophyProgress.progress;
+          break;
+        case 'Regular':
+          userTrophyProgress.progress =
+            player.numberOfGamesPlayed > userTrophyProgress.progress
+              ? player.numberOfGamesPlayed
+              : userTrophyProgress.progress;
+          break;
+        case 'Addict':
+          userTrophyProgress.progress =
+            player.numberOfGamesPlayed > userTrophyProgress.progress
+              ? player.numberOfGamesPlayed
+              : userTrophyProgress.progress;
+          break;
+        case 'NoLife':
+          userTrophyProgress.progress =
+            player.numberOfGamesPlayed > userTrophyProgress.progress
+              ? player.numberOfGamesPlayed
+              : userTrophyProgress.progress;
+          break;
+        case 'Bonus Master':
+          userTrophyProgress.progress =
+            playerStats.numberOfBonusesUsed > userTrophyProgress.progress
+              ? playerStats.numberOfBonusesUsed
+              : userTrophyProgress.progress;
+          break;
+        case 'Bonus Pro':
+          userTrophyProgress.progress =
+            playerStats.numberOfBonusesUsed > userTrophyProgress.progress
+              ? playerStats.numberOfBonusesUsed
+              : userTrophyProgress.progress;
+          break;
+        case 'Bonus Cheater':
+          userTrophyProgress.progress =
+            playerStats.numberOfBonusesUsed > userTrophyProgress.progress
+              ? playerStats.numberOfBonusesUsed
+              : userTrophyProgress.progress;
+          break;
+        case 'Point Prospector':
+          userTrophyProgress.progress =
+            playerScore > userTrophyProgress.progress
+              ? playerScore
+              : userTrophyProgress.progress;
+          break;
+        case 'Tireless Returner':
+          userTrophyProgress.progress =
+            consecutiveExchangesWithoutBounce > userTrophyProgress.progress
+              ? consecutiveExchangesWithoutBounce
+              : userTrophyProgress.progress;
+          break;
+        case 'Point Prospector':
+          userTrophyProgress.progress =
+            playerScore > userTrophyProgress.progress
+              ? playerScore
+              : userTrophyProgress.progress;
+          break;
+        case 'Pong-tastic':
+          userTrophyProgress.progress =
+            player.numberOfGamesWonWithoutMissingBall >
+            userTrophyProgress.progress
+              ? player.numberOfGamesWonWithoutMissingBall
+              : userTrophyProgress.progress;
+          break;
       }
-      // await this.notificationService.sendNotification({
-      //   type: 'trophy',
-      //   content: `You win a trophy : ${trophiesToAdd[0].name}`,
-      //   receiver: player,
-      //   sender: bot,
-      // } as NotificationCreateDTO);
 
-      // //notif trophées
-      // this.eventEmitter.emit(
-      //   'message.updated',
-      //   new NotificationCreatedEvent({
-      //     ...messageToUpdate,
-      //     text: newMessage.text,
-      //     updatedAt: new Date(),
-      //   }),
-      // );
+      // Save updated trophy progress
+      await this.userTrophiesProgressRepository.save(userTrophyProgress);
+
+      // Ajouter les trophées au joueur
+      if (trophiesToAdd && trophiesToAdd.length > 0) {
+        player.trophies = [...(player.trophies || []), ...trophiesToAdd];
+        await this.userRepository.save(player);
+
+        const bot: UserEntity = await this.userRepository.findOne({
+          where: { login: 'bot' },
+        });
+
+        for (const trophy of trophiesToAdd) {
+          const newNotif: NotificationEntity =
+            await this.notificationService.sendNotification({
+              type: 'trophy',
+              content: `You win a trophy : ${trophy.name}`,
+              receiver: player,
+              sender: bot,
+            } as NotificationCreateDTO);
+
+          if (!newNotif)
+            throw new InternalServerErrorException(
+              `Can't create notification for user ${player.login}`,
+            );
+        }
+      }
     }
+  }
+
+  async getAllTrophies(): Promise<TrophiesEntity[]> {
+    const trophies = await this.trophyRepository.find({
+      order: { name: 'ASC' },
+    });
+    return trophies;
+  }
+
+  async getUserTrophies(login: string): Promise<TrophiesEntity[]> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.trophies', 'trophies')
+      .where('user.login = :login', { login })
+      .orderBy('trophies.name', 'ASC')
+      .getOne();
+
+    if (user && user.trophies) {
+      return user.trophies;
+    }
+    return [];
   }
 }
