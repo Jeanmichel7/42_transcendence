@@ -102,6 +102,10 @@ const FriendCard: React.FC<FriendCardProps> = ({
     isMyFriend();
   }, [userData, userFriends, friend]);
 
+  useEffect(() => {
+    console.log('sdfghjkl', isFriendOrRequestSent);
+  }, [isFriendOrRequestSent]);
+
   return (
     <Card key={friend.login} sx={{
       display: 'flex',
@@ -116,6 +120,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
             ? <Badge
               color={badgeColor}
               overlap="circular"
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              badgeContent={ <span className='p-1'>{friend.status}</span> }
             >
               <CardMedia
                 component="img"
