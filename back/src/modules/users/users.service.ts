@@ -97,7 +97,6 @@ export class UsersService {
     return result;
   }
 
-
   async findProfile(login: string): Promise<ProfilInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { login: login },

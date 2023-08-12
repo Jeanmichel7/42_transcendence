@@ -451,14 +451,14 @@ function Header() {
 
             <NavLink to="/about">
               <MenuItem onClick={handleCloseUserMenu}>
-                <SettingsIcon className="mr-2" />
+                <InfoIcon className="mr-2" />
                 About
               </MenuItem>
             </NavLink>
 
             <NavLink to="/account">
               <MenuItem onClick={handleCloseUserMenu}>
-                <InfoIcon className="mr-2" />
+                <SettingsIcon className="mr-2" />
                 Account
               </MenuItem>
             </NavLink>

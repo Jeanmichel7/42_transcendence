@@ -79,7 +79,7 @@ export class UserEntity extends BaseEntity {
 
   @Column({
     type: 'integer',
-    default: 0,
+    default: 1,
   })
   level: number;
 

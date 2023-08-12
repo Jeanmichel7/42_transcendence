@@ -7,17 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from './entity/game.entity';
 import { Game } from './game.class';
 
-/**
- * - *
- * - *
- * - *
- * - *
- * - *
- * - *
- * - *
- * - *
- */
-
 // import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlayerStats } from './game.class';
@@ -38,8 +27,10 @@ import { MessageService } from '../messagerie/messages.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
-import { threadId } from 'worker_threads';
+import { UserUpdateEvent } from '../notification/events/notification.event';
+import { TrophiesService } from '../trophies/trophies.service';
 
+const BASE_XP = 20;
 interface PlayerInfoPrivateLobby {
   username: string;
   socketId: string;
@@ -58,10 +49,6 @@ class PrivateLobby {
     this.creationDate = new Date();
   }
 }
-import { UserStatusInterface } from '../users/interfaces/status.interface';
-import { UserUpdateEvent } from '../notification/events/notification.event';
-import { UserInterface } from '../users/interfaces/users.interface';
-import { TrophiesService } from '../trophies/trophies.service';
 
 @Injectable()
 export class GameService {
@@ -102,7 +89,7 @@ export class GameService {
       );
     }
     if (!this.privatesLobby.has(playerInfo.gameId)) {
-      let newLob = new PrivateLobby();
+      const newLob = new PrivateLobby();
       this.privatesLobby.set(playerInfo.gameId, newLob);
     }
     if (player1 === true) {
@@ -557,6 +544,7 @@ export class GameService {
       where: { id: gameId },
       relations: ['player1', 'player2', 'player1.trophies', 'player2.trophies'],
     });
+
     game.status = 'finished';
     game.finishAt = new Date();
     game.scorePlayer1 = scorePlayer1;
@@ -564,6 +552,21 @@ export class GameService {
     game.winner = await this.userRepository.findOne({
       where: { login: winnerId },
     });
+
+    const { scoreEloP1, scoreEloP2 } = this.updateEloScore(
+      game.player1,
+      game.player2,
+      game.winner,
+    );
+    game.eloScorePlayer1 = scoreEloP1 | 0;
+    game.eloScorePlayer2 = scoreEloP2 | 0;
+    game.player1.experience += game.winner.id == game.player1.id ? 10 : 0;
+    game.player2.experience += game.winner.id == game.player2.id ? 10 : 0;
+    game.expPlayer1 = game.player1.experience;
+    game.expPlayer2 = game.player2.experience;
+    game.levelPlayer1 = this.computeLevel(game.expPlayer1);
+    game.levelPlayer2 = this.computeLevel(game.expPlayer2);
+
     await this.gameRepository.save(game);
     return game;
   }
@@ -576,14 +579,14 @@ export class GameService {
     winWihoutLoseAPoint: boolean,
   ) {
     if (player.login == winnerId) {
-      player.experience += 10;
-      player.level = Math.floor(Math.sqrt(player.experience / 5));
+      // do not update exp here
+      player.level = this.computeLevel(player.experience);
       player.numberOfConsecutiveWins += 1;
     } else {
       player.numberOfConsecutiveWins = 0;
     }
     if (winWihoutLoseAPoint) {
-      player.numberOfConsecutiveWins += 1;
+      player.numberOfConsecutiveWins += 1; // on peux ++ les 2 users
     }
     player.bonusUsed += playerStats.numberOfBonusesUsed;
     player.laserKill += playerStats.numberOfLaserKills;
@@ -610,25 +613,22 @@ export class GameService {
       scorePlayer1,
       scorePlayer2,
     );
-    const { scoreEloP1, scoreEloP2 } = this.updateEloScore(
-      game.player1,
-      game.player2,
-      game.winner,
-    );
+
     await this.updatePlayerStats(
       game.player1,
       winnerId,
-      scoreEloP1,
+      game.eloScorePlayer1 | 0,
       player1Stats,
       scorePlayer2 === 0,
     );
     await this.updatePlayerStats(
       game.player2,
       winnerId,
-      scoreEloP2,
+      game.eloScorePlayer2 | 0,
       player2Stats,
       scorePlayer1 === 0,
     );
+
     await this.trophiesService.updateTrophiesPlayer(
       scorePlayer1,
       scorePlayer2,
@@ -647,6 +647,7 @@ export class GameService {
       consecutiveExchangesWithoutBounce,
       bonusMode,
     );
+
     this.eventEmitter.emit(
       'user_status.updated',
       new UserUpdateEvent({
@@ -678,13 +679,19 @@ export class GameService {
       .select([
         'games',
         'player1.id',
+        'player1.score',
+        'player1.level',
         'player1.firstName',
         'player1.lastName',
         'player1.login',
+        'player1.avatar',
         'player2.id',
+        'player2.score',
+        'player2.level',
         'player2.firstName',
         'player2.lastName',
         'player2.login',
+        'player2.avatar',
         'winner.id',
         'winner.firstName',
         'winner.lastName',
@@ -746,5 +753,14 @@ export class GameService {
       newScoreEloP2 = scoreEloP2 + k * (1 - expectedScoreP2);
     }
     return { scoreEloP1: newScoreEloP1, scoreEloP2: newScoreEloP2 };
+  }
+
+  computeLevel(xp: number) {
+    let level = 1;
+    while (xp >= BASE_XP * level) {
+      xp -= BASE_XP * level;
+      level++;
+    }
+    return level;
   }
 }

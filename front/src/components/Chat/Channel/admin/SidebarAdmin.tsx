@@ -5,7 +5,7 @@ import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../type
 import AdminUserCard from './UserCardAdmin';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { deleteChannel, editChannel } from '../../../../api/chat';
 import { reduxRemoveConversationToList, reduxUpdateRoomConvList } from '../../../../store/convListSlice';

@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components";
+import styled from 'styled-components';
 const StickerSpan = styled.span`
   background: linear-gradient(
       var(--shine-angle),
@@ -23,7 +23,7 @@ const StickerSpan = styled.span`
   -webkit-text-stroke: 0.01em rgba(0, 0, 0, 0.6);
   grid-area: text;
   padding: 0em 0.07em;
-  font-size: 1em;
+  font-size: 3rem;
 `;
 
 const StickerWrapper = styled.span`
@@ -42,7 +42,7 @@ const StickerWrapper = styled.span`
   font-weight: 900;
   width: 100%;
   font-style: italic;
-  font-size: clamp(2rem, 8vw, 7rem);
+  font-size: clamp(3rem, 3.8vw, 7rem);
   text-transform: uppercase;
   color: var(--c5);
 
@@ -66,7 +66,7 @@ const StickerWrapper = styled.span`
 `;
 
 // Utilisation dans un composant React
-export const Sticker = ({ dataText }) => (
+export const Sticker = ({ dataText }: { dataText: string }) => (
   <StickerWrapper data-text={dataText}>
     <StickerSpan>{dataText}</StickerSpan>
   </StickerWrapper>

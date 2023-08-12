@@ -26,68 +26,70 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-between   text-white p-5 rounded-xl ">
-      <div className="mb-5 mt-5 md:w-1/4">
-        {user.avatar && (
-          <img
-            src={user.avatar}
-            className="w-full rounded-[16px] shadow-lg h-2/3  "
-            alt="avatar"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
-            }}
-          />
-        )}
-        <p className=" text-purple-600 p-3  mt-5 rounded-lg bg-white shadow-custom h-1/3	">
-          {' '}
-          {user.description ? user.description : 'No description'}{' '}
-        </p>
+    <div className='p-5'>
+      <div className="md:flex justify-center bg-blue-100 text-center py-2 font-bold rounded-t-lg box-border shadow-custom">
+        <span className='min-w-[300px]'></span>
+        <h2 className="text-3xl"> {user.firstName + ' ' + user.lastName} </h2>
       </div>
+      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white p-3 ">
+        <div className="">
+          <div className="md:absolute top-10 left-9">
+            {user.avatar && (
+              <img
+                src={user.avatar}
+                className="rounded-lg shadow-lg w-[346px] md:max-w-[256px] mx-auto"
+                alt="avatar"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                }}
+              />
+            )}
+          </div>
+          <p className=" text-center md:mt-[150px] ml-1 md:w-[256px] pt-3">
+            { user.description ? user.description : 'No description' }
+          </p>
+        </div>
 
-      <div className="md:w-3/4 mt-5  md:ml-5  box-border self-stretch z-0 relative rounded bg-white shadow-custom	 text-black p-5 ">
-        <h2
-          className="text-3xl before:bg-gray-400 before:z-[-1]  before:h-16 before:w-full before:left-0 before:absolute 
-        before:top-0 z-10  text-white text-center mb-5 font-bold"
-        >
-          {user.firstName + ' ' + user.lastName}
-        </h2>
-        {userData.id &&
-          userFriends &&
-          !userFriends.find((u) => u.id === user.id) &&
-          userData.id != user.id && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleAddFriend()}
-              sx={{ display: 'block', margin: 'auto' }}
-            >
-              Add friend
-            </Button>
-        )}
-        <div className="flex justify-between items-stretch h-3/4">
-          <div className="w-1/4 space-y-2 flex flex-col justify-between">
-            <p className="md:text-xl opacity-60">Pseudo</p>
-            <p className="md:text-xl opacity-60">Email</p>
-            <p className="md:text-xl opacity-60">Status</p>
-            <p className="md:text-xl opacity-60">Score</p>
-            <p className="md:text-xl opacity-60">Level</p>
+        <div className="relative flex-grow">
+          {userData.id &&
+            userFriends &&
+            !userFriends.find((u) => u.id === user.id) &&
+            userData.id != user.id && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleAddFriend()}
+                sx={{ display: 'block', margin: 'auto' }}
+              >
+                Add friend
+              </Button>
+          )}
+          <div className="flex justify-between items-stretch h-3/4 p-3 ml-5">
+            <div className="w-1/4 space-y-2 flex flex-col justify-between">
+              <p className="md:text-xl opacity-60">Pseudo</p>
+              <p className="md:text-xl opacity-60">Email</p>
+              <p className="md:text-xl opacity-60">Status</p>
+              <p className="md:text-xl opacity-60">Score</p>
+              <p className="md:text-xl opacity-60">Level</p>
+            </div>
+            <div className="w-3/4 space-y-2 flex flex-col justify-between">
+              <p className="md:text-xl">{user.login}</p>
+              <p className="md:text-xl">{user.email}</p>
+              <p className="md:text-xl">{user.status}</p>
+              <p className="md:text-xl">{Math.floor(user.score)}</p>
+              <p className="md:text-xl">{Math.floor(user.level)}</p>
+            </div>
+            <img
+              src={cuteBallsClimbingVines}
+              alt="illustration"
+              className="absolute right-0 h-full hidden lg:block bottom-0"
+            />
           </div>
-          <div className="w-3/4 space-y-2 flex flex-col justify-between">
-            <p className="md:text-xl">{user.login}</p>
-            <p className="md:text-xl">{user.email}</p>
-            <p className="md:text-xl">{user.status}</p>
-            <p className="md:text-xl">{Math.floor(user.score)}</p>
-            <p className="md:text-xl">{Math.floor(user.level)}</p>
-          </div>
-          <img
-            src={cuteBallsClimbingVines}
-            alt="illustration"
-            className="absolute right-0 h-full hidden md:block bottom-0"
-          />
         </div>
       </div>
+
     </div>
   );
 }

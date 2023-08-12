@@ -62,6 +62,24 @@ export class GameEntity extends BaseEntity {
   })
   scorePlayer2: number;
 
+  @Column({ type: Number, default: 1500 })
+  eloScorePlayer1: number;
+
+  @Column({ type: Number, default: 1500 })
+  eloScorePlayer2: number;
+
+  @Column({ type: Number, default: 1 })
+  levelPlayer1: number;
+
+  @Column({ type: Number, default: 1 })
+  levelPlayer2: number;
+
+  @Column({ type: Number, default: 0 })
+  expPlayer1: number;
+
+  @Column({ type: Number, default: 0 })
+  expPlayer2: number;
+
   /* users */
   @ManyToOne(() => UserEntity, (user) => user.gamesAsPlayer1, {
     onDelete: 'CASCADE',

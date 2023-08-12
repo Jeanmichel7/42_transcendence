@@ -20,10 +20,8 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 })
 export class MessagerieWebsocketService {
   @WebSocketServer() server: Server;
-
-  async handleConnection(@ConnectedSocket() client: Socket) {}
-
-  async handleDisconnect(@ConnectedSocket() client: Socket) {}
+  // async handleConnection(@ConnectedSocket() client: Socket) {}
+  // async handleDisconnect(@ConnectedSocket() client: Socket) {}
 
   @SubscribeMessage('joinPrivateRoom')
   async handleJoin(

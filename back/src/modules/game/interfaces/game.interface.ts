@@ -9,11 +9,16 @@ export interface GameInterface {
   abortedAt?: Date;
   scorePlayer1?: number;
   scorePlayer2?: number;
+  eloScorePlayer1?: number;
+  eloScorePlayer2?: number;
+  levelPlayer1?: number;
+  levelPlayer2?: number;
+  expPlayer1?: number;
+  expPlayer2?: number;
   player1?: UserInterface;
   player2?: UserInterface;
   winner?: UserInterface;
 }
-
 
 export interface clientUpdate {
   posRacket: number;

@@ -246,8 +246,9 @@ export class TrophiesService {
     if (player.numberOfGamesWonWithoutMissingBall >= 5) {
       trophyNamesToAssign.push('Pong-tastic');
     }
+    console.log('trophyNamesToAssign', trophyNamesToAssign);
     // Récupérez les trophées par leurs noms
-    const trophiesToAssign: TrophiesEntity[] = await Promise.all(
+    let trophiesToAssign: TrophiesEntity[] = await Promise.all(
       trophyNamesToAssign.map(async (name) => {
         const trophy = await this.getTrophyByName(name);
         return trophy;
@@ -256,7 +257,7 @@ export class TrophiesService {
 
     // Filtrer les trophées que le joueur possède déjà
     console.log('trophiesToAssign', trophiesToAssign);
-    trophiesToAssign.filter((trophy) => trophy !== null);
+    trophiesToAssign = trophiesToAssign.filter((trophy) => trophy !== null);
     const trophiesToAdd = trophiesToAssign?.filter((trophy) => {
       return !player.trophies?.some(
         (playerTrophy) => playerTrophy.id === trophy.id,
@@ -267,25 +268,36 @@ export class TrophiesService {
     console.log('playerId', player.id);
 
     // Ajouter les trophées au joueur
-    if (trophiesToAdd.length > 0) {
+    if (trophiesToAdd && trophiesToAdd.length > 0) {
       player.trophies = [...(player.trophies || []), ...trophiesToAdd];
       await this.userRepository.save(player);
+
+      console.log('trophe to add', trophiesToAdd);
 
       const bot: UserEntity = await this.userRepository.findOne({
         where: { login: 'bot' },
       });
 
-      const newNotif: NotificationEntity =
-        await this.notificationService.sendNotification({
-          type: 'trophy',
-          content: `You win a trophy : ${trophiesToAdd[0].name}`,
-          receiver: player,
-          sender: bot,
-        } as NotificationCreateDTO);
-      if (!newNotif)
-        throw new InternalServerErrorException(
-          `Can't create notification for user ${player.login}`,
-        );
+      for (const trophy of trophiesToAdd) {
+        const newNotif: NotificationEntity =
+          await this.notificationService.sendNotification({
+            type: 'trophy',
+            content: `You win a trophy : ${trophy.name}`,
+            receiver: player,
+            sender: bot,
+          } as NotificationCreateDTO);
+
+        if (!newNotif)
+          throw new InternalServerErrorException(
+            `Can't create notification for user ${player.login}`,
+          );
+      }
+      // await this.notificationService.sendNotification({
+      //   type: 'trophy',
+      //   content: `You win a trophy : ${trophiesToAdd[0].name}`,
+      //   receiver: player,
+      //   sender: bot,
+      // } as NotificationCreateDTO);
 
       // //notif trophées
       // this.eventEmitter.emit(

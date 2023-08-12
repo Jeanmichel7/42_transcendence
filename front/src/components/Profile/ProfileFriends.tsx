@@ -27,9 +27,11 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
 
   return (
     <>
-      <Sticker dataText={'friends'} />
+      <p className='mt-6'>
+        <Sticker dataText={'friends'} />
+      </p>
 
-      <div className="flex flex-wrap items-center justify-center w-full pb-3 p-5">
+      <div className="flex flex-wrap items-center justify-center w-full p-3 pt-0">
         {friends.length == 0 ? (
           <NavLink to="/friends?tab=add">
             <Nothing
@@ -39,18 +41,17 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
           </NavLink>
         ) :
           <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
-            { friends.map((friend) => {
+            {friends.map((friend) => {
               if (friend.login != user.login)
                 return (
-                    <FriendCard
-                      key={friend.id}
-                      actualUserLogin={user.login}
-                      friend={friend}
-                      setFriends={setFriends}
-                    />
+                  <FriendCard
+                    key={friend.id}
+                    actualUserLogin={user.login}
+                    friend={friend}
+                    setFriends={setFriends}
+                  />
                 );
-            })
-            }
+            })}
           </div>
         }
       </div>

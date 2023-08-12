@@ -14,6 +14,8 @@ export class TrophiesEntity {
   @Column('text')
   imagePath: string;
 
-  @ManyToMany(() => UserEntity, (user) => user.trophies)
+  @ManyToMany(() => UserEntity, (user) => user.trophies, {
+    onDelete: 'CASCADE',
+  })
   users: UserEntity[];
 }

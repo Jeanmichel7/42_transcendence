@@ -27,12 +27,14 @@ export class GameController {
   }
 
   @Get('allUserGames')
-  async getAllGames(@Req() req: RequestWithUser) {
+  async getAllGames(@Req() req: RequestWithUser): Promise<GameInterface[]> {
     return await this.gameService.getAllUserGames(req.user.id);
   }
 
   @Get('users/:userId/allUserGames')
-  async getAllGamesWithUser(@Param('userId', ParseIntPipe) userId: bigint) {
+  async getAllGamesWithUser(
+    @Param('userId', ParseIntPipe) userId: bigint,
+  ): Promise<GameInterface[]> {
     return await this.gameService.getAllUserGames(userId);
   }
 

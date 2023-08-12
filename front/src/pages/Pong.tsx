@@ -127,7 +127,7 @@ function Pong() {
       dispatch(desactivateEffect());
     }
   }, [currentPage, gameId, dispatch]);
-  
+
 
   let statusComponent;
   if (connectStatus === 'connecting') {
@@ -174,7 +174,6 @@ function Pong() {
     );
   }
   return (
-    
     <GameWrapper>
       {showOverlay && <Overlay />}
       {statusComponent}
