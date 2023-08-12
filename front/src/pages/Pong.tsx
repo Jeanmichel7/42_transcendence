@@ -1,19 +1,20 @@
-import Game from "../components/Game/Game";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import EndGame from "../components/Game/EndGame";
-import { Socket, io } from "socket.io-client";
-import Lobby from "../components/Game/Lobby";
-import SearchingOpponent from "../components/Game/SearchingOpponent";
-import { Overlay } from "../components/Game/Overlay";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ApiErrorResponse, GameInterface } from "../types";
-import { getGame } from "../api/game";
-import { useDispatch, useSelector } from "react-redux";
-import { setErrorSnackbar } from "../store/snackbarSlice";
-import { RootState } from "../store";
-import PrivateLobby from "../components/Game/PrivateLobby";
-import { activateEffect, desactivateEffect } from "../store/gameSlice";
+import Game from '../components/Game/Game';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
+import EndGame from '../components/Game/EndGame';
+import { Socket, io } from 'socket.io-client';
+import Lobby from '../components/Game/Lobby';
+import SearchingOpponent from '../components/Game/SearchingOpponent';
+import { Overlay } from '../components/Game/Overlay';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ApiErrorResponse, GameInterface } from '../types';
+import { getGame } from '../api/game';
+import { useDispatch, useSelector } from 'react-redux';
+import { setErrorSnackbar } from '../store/snackbarSlice';
+import { RootState } from '../store';
+import PrivateLobby from '../components/Game/PrivateLobby';
+import { activateEffect, desactivateEffect } from '../store/gameSlice';
+import GameSpectator from '../components/Game/Spectator';
 
 export const GameWrapper = styled.div`
   width: 100%;
@@ -25,11 +26,23 @@ export const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
+export interface GameCard {
+  id: bigint;
+  player1Username: string;
+  player2Username: string;
+  player1Avatar: string;
+  player2Avatar: string;
+  player1Rank: string;
+  player2Rank: string;
+  player1Score: number;
+  player2Score: number;
+}
+
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
   // const socketRef = useRef<Socket | null>(null);
-  const [connectStatus, setConnectStatus] = useState("disconnected");
-  const [currentPage, setCurrentPage] = useState<string>("lobby");
+  const [connectStatus, setConnectStatus] = useState('disconnected');
+  const [currentPage, setCurrentPage] = useState<string>('lobby');
   const { userData } = useSelector((state: RootState) => state.user);
   const lastGameInfo = useRef({} as any);
   const [isPlayer1, setIsPlayer1] = useState(true);
@@ -37,8 +50,23 @@ function Pong() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const gameId = searchParams.get("id");
+  const gameId = searchParams.get('id');
+  const [gameIdSpectate, setGameIdSpectate] = useState<undefined | bigint>();
   const [showOverlay, setShowOverlay] = useState(false);
+  const [lobbyData, setLobbyData] = useState<GameCard[]>([
+    {
+      id: '1592',
+      player1Avatar:
+        'http://localhost:3000/avatars/avatar-1691591479363-862391.jpeg',
+      player1Rank: 'master_1',
+      player1Score: 0,
+      player1Username: 'ydumaine',
+      player2Avatar: 'https://avatars.githubusercontent.com/u/58447743',
+      player2Rank: 'cooper_3',
+      player2Score: 0,
+      player2Username: 'Mathias.Auer',
+    },
+  ]);
 
   useEffect(() => {
     if (!gameId || !userData.id || userData.id == -1) return;
@@ -47,31 +75,31 @@ function Pong() {
       const retFetchGame: GameInterface | ApiErrorResponse = await getGame(
         parseInt(gameId)
       );
-      if ("error" in retFetchGame) {
+      if ('error' in retFetchGame) {
         dispatch(
           setErrorSnackbar(
             retFetchGame.error + retFetchGame.message
-              ? ": " + retFetchGame.message
-              : ""
+              ? ': ' + retFetchGame.message
+              : ''
           )
         );
-        return navigate("/game");
+        return navigate('/game');
       }
       if (
         retFetchGame.player1.id != userData.id &&
         retFetchGame.player2.id != userData.id
       )
-        return dispatch(setErrorSnackbar("You are not in this game"));
+        return dispatch(setErrorSnackbar('You are not in this game'));
 
       setIsPlayer1(retFetchGame.player1.id == userData.id);
-      setCurrentPage("privateLobby");
+      setCurrentPage('privateLobby');
     };
     fetchGame();
   }, [socket, userData.id, dispatch, navigate]);
 
   useEffect(() => {
     let timeoutId;
-    if (connectStatus === "disconnected") {
+    if (connectStatus === 'disconnected') {
       timeoutId = setTimeout(() => setShowOverlay(true), 1000); // 1s delay
     } else {
       setShowOverlay(false);
@@ -82,66 +110,80 @@ function Pong() {
   }, [connectStatus]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000/game", {
+    if (!socket.emit) return;
+    if (currentPage === 'lobby') {
+      socket.emit('joinLobbyRoom');
+    } else {
+      socket.emit('leaveLobbyRoom');
+    }
+    socket.on('lobbyRoomUpdate', (data) => {
+      setLobbyData(data);
+    });
+
+    return () => {
+      // N'oubliez pas de nettoyer l'écouteur pour éviter des écouteurs multiples
+      socket.off('lobbyRoomUpdate');
+    };
+  }, [currentPage, socket]);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3000/game', {
       withCredentials: true,
     });
-    newSocket.on("connect", () => {
-      setConnectStatus("connected");
+    newSocket.on('connect', () => {
+      setConnectStatus('connected');
     });
 
-    newSocket.on("disconnect", () => {
-      setConnectStatus("disconnected");
-      console.log("ERROR SOCKET DISCONNECTED");
+    newSocket.on('disconnect', () => {
+      setConnectStatus('disconnected');
     });
 
-    newSocket.on("userGameStatus", (message) => {
-      if (message === "foundNormal") {
-        dispatch(activateEffect());
+    newSocket.on('userGameStatus', (message) => {
+      if (message === 'foundNormal') {
         setBonus(false);
-        setCurrentPage("game");
-      }
-      if (message === "foundBonus") {
-        dispatch(activateEffect());
+        setCurrentPage('game');
+      } else if (message === 'foundBonus') {
         setBonus(true);
-        setCurrentPage("game");
+        setCurrentPage('game');
+      } else if (message === 'alreadyInGame') {
+        setCurrentPage('game');
       }
-      if (message === "alreadyInGame") {
-        console.log("bonus value", bonus);
-        setCurrentPage("game");
-      }
-      if (message === "notInGame") {
-        setCurrentPage("lobby");
+      if (message === 'notInGame') {
+        setCurrentPage('lobby');
       }
     });
 
     setSocket(newSocket);
 
     return () => {
-      newSocket.off("connect");
-      newSocket.off("disconnect");
-      newSocket.off("userGameStatus");
+      newSocket.off('connect');
+      newSocket.off('disconnect');
+      newSocket.off('userGameStatus');
       newSocket.disconnect();
       setSocket({} as Socket);
     };
   }, []);
 
   let statusComponent;
-  if (connectStatus === "connecting") {
+  if (connectStatus === 'connecting') {
     statusComponent = <p>Connecting...</p>;
   } else {
     statusComponent = undefined;
   }
   let pageContent: ReactNode;
-  if (currentPage === "lobby" && !gameId) {
+  if (currentPage === 'lobby' && !gameId) {
     dispatch(desactivateEffect());
     pageContent = (
       <Lobby
         setCurrentPage={setCurrentPage}
         socket={socket}
         setBonus={setBonus}
+        lobbyData={lobbyData}
+        setGameIdSpectate={setGameIdSpectate}
       />
     );
-  } else if (currentPage === "game") {
+  } else if (currentPage === 'game') {
+    dispatch(activateEffect());
     pageContent = (
       <Game
         socket={socket}
@@ -150,7 +192,7 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === "searchOpponent") {
+  } else if (currentPage === 'searchOpponent') {
     pageContent = (
       <SearchingOpponent
         socket={socket}
@@ -158,7 +200,7 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === "privateLobby") {
+  } else if (currentPage === 'privateLobby' && gameId) {
     dispatch(desactivateEffect());
     pageContent = (
       <PrivateLobby
@@ -168,7 +210,17 @@ function Pong() {
         isPlayer1={isPlayer1}
       />
     );
+  } else if (currentPage === 'spectate' && gameIdSpectate) {
+    console.log('spectate', gameIdSpectate);
+    pageContent = (
+      <GameSpectator
+        setCurrentPage={setCurrentPage}
+        socket={socket}
+        gameId={gameIdSpectate}
+      />
+    );
   }
+
   return (
     <GameWrapper>
       {showOverlay && <Overlay />}

@@ -1,28 +1,30 @@
 import {
+  Dispatch,
   MutableRefObject,
   ReactNode,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
-} from "react";
-import styled, { keyframes, css } from "styled-components";
-import Score from "./Score";
-import { Socket } from "socket.io-client";
-import useSocketConnection from "./useSocketConnection";
+} from 'react';
+import styled, { keyframes, css } from 'styled-components';
+import Score from './Score';
+import { Socket } from 'socket.io-client';
+import useSocketConnection from './useSocketConnection';
 import {
   ClientToServerEvents,
   GameData,
   ServerToClientEvents,
-} from "./Interface";
-import CountDown from "./CountDown";
-import BonusBox from "./BonusBox";
-import spriteBonus from "../../assets/spriteBonus.png";
-import spriteBonusExplode from "../../assets/spriteBonusExplode.png";
-import "./font.css";
-import EndGame from "./EndGame";
-import { BonusPosition } from "./Interface";
+} from './Interface';
+import CountDown from './CountDown';
+import BonusBox from './BonusBox';
+import spriteBonus from '../../assets/spriteBonus.png';
+import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
+import './font.css';
+import EndGame from './EndGame';
+import { BonusPosition } from './Interface';
 
-const Playground = styled.div`
+export const Playground = styled.div`
   width: 100%;
   top: 20%;
   height: 80%;
@@ -103,7 +105,7 @@ const BonusExplode = styled.div<{ posX: number; posY: number }>`
 
 interface BonusInterface {}
 
-function Bonus({
+export function Bonus({
   bonus,
   posX,
   posY,
@@ -121,7 +123,7 @@ function Bonus({
       setIsBonusVisible(true);
       setPosition([posX, posY]);
     } else if (position[0] !== -1) {
-      console.log("bonus not detected");
+      console.log('bonus not detected');
       setIsBonusVisible(false);
       setBonusExplode(true);
     }
@@ -165,7 +167,7 @@ const StyledRacket = styled.div.attrs<RacketProps>(
   background-color: blue;
   position: absolute;
   left: ${(props) =>
-    props.type === "left" ? RACKET_LEFT_POS_X + "%" : RACKET_RIGHT_POS_X + "%"};
+    props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
   top: 0%;
   border-radius: 10px;
   z-index: 2;
@@ -174,13 +176,13 @@ const StyledRacket = styled.div.attrs<RacketProps>(
       ? css`
           ${explodeAnimation} 1s forwards
         `
-      : "none"};
+      : 'none'};
   box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
     0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
 
 // Composant Raquette avec le Laser comme enfant
-const Racket = ({
+export const Racket = ({
   posY,
   height,
   type,
@@ -214,7 +216,7 @@ interface BallProps {
   posY: number;
 }
 
-const Ball = styled.div.attrs<BallProps>((props) => {
+export const Ball = styled.div.attrs<BallProps>((props) => {
   return {
     style: {
       transform: `translate(${props.posX - BALL_RADIUS}px, ${
@@ -250,24 +252,24 @@ const laserFlowLeft = keyframes`
 
 // Utilisez les animations dans votre composant
 
-interface LaserProps {
+export interface LaserProps {
   type: string;
 }
-const Laser = styled.div<LaserProps>`
+export const Laser = styled.div<LaserProps>`
   position: absolute;
 
   width: ${({ type }: { type: string }) =>
-    type === "left" ? "10000px" : "10000px"};
+    type === 'left' ? '10000px' : '10000px'};
   height: 10px;
   top: 50%;
   z-index: 1;
   background: ${({ type }: { type: string }) =>
-    type === "left"
-      ? "linear-gradient(to right, red, white, red)"
-      : "linear-gradient(to left, red, white, red)"};
+    type === 'left'
+      ? 'linear-gradient(to right, red, white, red)'
+      : 'linear-gradient(to left, red, white, red)'};
   background-size: 50px 100%;
   animation: ${({ type }: { type: string }) =>
-    type === "left"
+    type === 'left'
       ? css`
           ${laserFlowRight} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
         `
@@ -275,12 +277,12 @@ const Laser = styled.div<LaserProps>`
           ${laserFlowLeft} 0.1s linear infinite, ${laserGlow} 1s ease-in-out infinite
         `};
   transform: ${({ type }: { type: string }) =>
-      type === "left" ? "translateX(0%)" : "translateX(-10000px)"}
+      type === 'left' ? 'translateX(0%)' : 'translateX(-10000px)'}
     translateY(-5px);
   left: 100%;
 `;
 
-const GameWrapper = styled.div`
+export const GameWrapper = styled.div`
   animation: ${fadeIn} 2s ease;
 `;
 
@@ -292,7 +294,7 @@ function Game({
 }: {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   lastGameInfo: any;
-  setCurrentPage: any;
+  setCurrentPage: Dispatch<SetStateAction<string>>;
   bonus: boolean;
 }) {
   const posRacket = useRef({
@@ -341,18 +343,18 @@ function Game({
 
   useEffect(() => {
     const handleResize = () => {
-      const gameWrapper = document.querySelector("#playground") as HTMLElement;
+      const gameWrapper = document.querySelector('#playground') as HTMLElement;
       if (gameWrapper) {
         gameDimensions.current.width = gameWrapper.offsetWidth;
         gameDimensions.current.height = gameWrapper.offsetHeight;
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     handleResize();
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -495,7 +497,7 @@ function Game({
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-        console.log("cancelAnimationFrame");
+        console.log('cancelAnimationFrame');
       }
     };
   }, [gameStarted]);
@@ -508,12 +510,12 @@ function Game({
     function handleKeyUp(e: any) {
       keyStateRef.current[e.key] = false;
     }
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -535,9 +537,9 @@ function Game({
         <Racket
           posY={posRacket.current.left}
           height={racketHeightRef.current.left}
-          type={"left"}
+          type={'left'}
         >
-          {laser.current.left && <Laser type={"left"} />}
+          {laser.current.left && <Laser type={'left'} />}
         </Racket>
         <Ball
           posX={ball.x * (gameDimensions.current.width / 1000)}
@@ -564,9 +566,9 @@ function Game({
         <Racket
           posY={posRacket.current.right}
           height={racketHeightRef.current.right}
-          type={"right"}
+          type={'right'}
         >
-          {laser.current.right && <Laser type={"right"} />}
+          {laser.current.right && <Laser type={'right'} />}
         </Racket>
       </Playground>
       {(bonus || (gameStarted && gameData?.current!.bonusMode)) && (

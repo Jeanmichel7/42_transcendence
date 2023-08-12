@@ -1,29 +1,52 @@
-import styled, { keyframes } from "styled-components";
+import { useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+
+const shineAnimation = keyframes`
+5% {
+  background-position: 0% 50%;
+}
+20% {
+  background-position: 100% 50%;
+}
+100% {
+  background-position: 100% 50%;
+}
+`;
+
+const ShineSpan = styled.span`
+  background: linear-gradient(
+    var(--shine-angle),
+    rgba(255, 0, 0, 0) 0%,
+    rgba(255, 0, 0, 0) 45%,
+    rgba(255, 255, 255, 0.98) 49.95%,
+    rgba(255, 255, 255, 0.98) 50.15%,
+    rgba(255, 0, 0, 0) 55%,
+    rgba(255, 0, 0, 0)
+  );
+  -webkit-background-clip: text;
+  background-size: 400% 100%;
+  grid-area: text;
+  animation: ${shineAnimation} 12s ease infinite;
+  padding: 0em 0.07em;
+  font-size: 1em;
+  z-index: 10;
+`;
 const StickerSpan = styled.span`
   background: linear-gradient(
-      var(--shine-angle),
-      rgba(255, 0, 0, 0) 0%,
-      rgba(255, 0, 0, 0) 35%,
-      rgba(255, 255, 255, 0.98) 49.95%,
-      rgba(255, 255, 255, 0.98) 50.15%,
-      rgba(255, 0, 0, 0) 65%,
-      rgba(255, 0, 0, 0)
-    ),
-    linear-gradient(
-      to right,
-      var(--c1),
-      var(--c2),
-      var(--c3),
-      var(--c4),
-      var(--c5)
-    );
+    to right,
+    var(--c1),
+    var(--c2),
+    var(--c3),
+    var(--c4),
+    var(--c5)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 110%;
   -webkit-text-stroke: 0.01em rgba(0, 0, 0, 0.6);
   grid-area: text;
   padding: 0em 0.07em;
   font-size: 1em;
+  z-index: 10;
 `;
 
 const StickerWrapper = styled.span`
@@ -36,9 +59,9 @@ const StickerWrapper = styled.span`
 
   --shine-angle: 15deg;
   display: inline-grid;
-  grid-template-areas: "text";
+  grid-template-areas: 'text';
   place-items: center;
-  font-family: "Alegreya Sans SC", sans-serif;
+  font-family: 'Alegreya Sans SC', sans-serif;
   font-weight: 900;
   width: 100%;
   font-style: italic;
@@ -66,8 +89,12 @@ const StickerWrapper = styled.span`
 `;
 
 // Utilisation dans un composant React
-export const Sticker = ({ dataText }) => (
-  <StickerWrapper data-text={dataText}>
-    <StickerSpan>{dataText}</StickerSpan>
-  </StickerWrapper>
-);
+export const Sticker = ({ dataText }) => {
+  return (
+    <StickerWrapper data-text={dataText}>
+      <StickerSpan>
+        <ShineSpan>{dataText}</ShineSpan>
+      </StickerSpan>
+    </StickerWrapper>
+  );
+};

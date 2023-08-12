@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 // Définir une animation keyframes pour le fondu et le zoom.
 const fadeAndZoomIn = keyframes`
@@ -38,11 +38,11 @@ const Number = styled.span<NumberProps>`
   transition: opacity 0.3s ease-out;
 `;
 
-const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
+const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
   useEffect(() => {
-    console.log("GameStarder value : ", gameStarted);
+    console.log('GameStarder value : ', gameStarted);
     if (gameStarted) {
       setVisible(false);
     } else {
@@ -65,7 +65,7 @@ const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
   return (
     <CountdownWrapper>
       <Number visible={visible} key={count}>
-        {count > 0 ? count : "Go!"}
+        {count > 0 ? count : 'Go!'}
       </Number>
     </CountdownWrapper>
   );

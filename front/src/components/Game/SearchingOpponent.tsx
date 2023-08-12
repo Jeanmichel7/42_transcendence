@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import styled, { keyframes } from "styled-components";
-import { io, Socket } from "socket.io-client";
+import React, { useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { io, Socket } from 'socket.io-client';
 import {
   ClientToServerEvents,
   ServerToClientEvents,
   SocketInterface,
-} from "./Interface";
-import { ButtonWrapper, StyledButton } from "./Lobby";
-import { DotWaitings, dotAnimation } from "./Utils";
+} from './Interface';
+import { ButtonWrapper, StyledButton } from './Lobby';
+import { DotWaitings, dotAnimation } from './Utils';
 interface SearchingOpponentProps {
   // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   socket: any;
@@ -25,7 +25,7 @@ const StyledCircle = styled.div`
   left: ${(props) => props.position};
   transition: top 0.2s ease;
   ${(props) => {
-    return props.top === "top" ? "top: 0%;" : " top: calc(100% - 5rem);";
+    return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
   animation: ${dotAnimation} 2s infinite ease-in-out both;
 `;
@@ -96,11 +96,11 @@ export const StyledOblong = styled.button`
   visibility: visible;
   left: -50%;
   ${(props) => {
-    return props.top === "top" ? "top: 0%;" : " top: calc(100% - 5rem);";
+    return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
 
   &::before {
-    content: "";
+    content: '';
     width: 100%;
     top: 0;
     left: 0;
@@ -128,42 +128,44 @@ function SearchingOpponent({
       // Vous pouvez faire quelque chose ici à la fin de l'animation
     }
 
-    if (node) node.addEventListener("animationend", handleAnimationEnd);
+    if (node) node.addEventListener('animationend', handleAnimationEnd);
 
     // Assurez-vous de nettoyer l'écouteur d'événement lors du démontage du composant
     return () => {
-      if (node) node.removeEventListener("animationend", handleAnimationEnd);
+      if (node) node.removeEventListener('animationend', handleAnimationEnd);
     };
   }, []); // Cette dépendance vide indique que cet effet ne fonctionne qu'au montage et au démontage
   console.log(bonus);
 
   return (
-    <ButtonWrapper>
-      <StyledButtonOrder
-        order={bonus ? "0" : "1"}
-        activateEffect={loadingDot}
-        onClick={() => {
-          socket.emit("userGameStatus", "cancel");
-          setCurrentPage("lobby");
-        }}
-      >
-        Cancel
-      </StyledButtonOrder>
-      {loadingDot ? (
-        <div>
-          <StyledCircle3 top={bonus ? "bottom" : "top"} position={"-50%"} />
-          <StyledCircle2 top={bonus ? "bottom" : "top"} position={"37%"} />
-          <StyledCircle top={bonus ? "bottom" : "top"} position={"125%"} />
-        </div>
-      ) : (
-        <div>
-          <StyledOblong
-            ref={myRef}
-            top={bonus ? "bottom" : "top"}
-          ></StyledOblong>
-        </div>
-      )}
-    </ButtonWrapper>
+    <div className="flex flex-col justify-center items-center  w-full ">
+      <ButtonWrapper>
+        <StyledButtonOrder
+          order={bonus ? '0' : '1'}
+          activateEffect={loadingDot}
+          onClick={() => {
+            socket.emit('userGameStatus', 'cancel');
+            setCurrentPage('lobby');
+          }}
+        >
+          Cancel
+        </StyledButtonOrder>
+        {loadingDot ? (
+          <div>
+            <StyledCircle3 top={bonus ? 'bottom' : 'top'} position={'-50%'} />
+            <StyledCircle2 top={bonus ? 'bottom' : 'top'} position={'37%'} />
+            <StyledCircle top={bonus ? 'bottom' : 'top'} position={'125%'} />
+          </div>
+        ) : (
+          <div>
+            <StyledOblong
+              ref={myRef}
+              top={bonus ? 'bottom' : 'top'}
+            ></StyledOblong>
+          </div>
+        )}
+      </ButtonWrapper>
+    </div>
   );
 }
 export default SearchingOpponent;

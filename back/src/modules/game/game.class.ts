@@ -1,3 +1,5 @@
+import { UserEntity } from '../users/entity/users.entity';
+import { GameInfo } from './game.service';
 import { BonusPosition, clientUpdate } from './interfaces/game.interface';
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
@@ -37,6 +39,8 @@ export class Game {
   socketPlayer2Id: string;
   player1Username: string;
   player2Username: string;
+  player1Info: UserEntity;
+  player2Info: UserEntity;
   player1Score: number;
   player2Score: number;
   player1ArrowUp: boolean;
@@ -48,7 +52,6 @@ export class Game {
   gameStart: boolean;
   startTime: number;
   fail: boolean;
-
   bonus: BonusPosition;
   bonusesLastGeneration: number;
   bonusesPlayer1: any;
@@ -70,16 +73,21 @@ export class Game {
   player1Stats: PlayerStats;
   player2Stats: PlayerStats;
   consecutiveExchangesWithoutBounce: number;
+  emitEvent: (eventName: string, data?: any) => void;
   //Stats
 
   constructor(
     socketPlayer1Id: string,
     player1Username: string,
+    player1Info: UserEntity,
     socketPlayer2Id: string,
     player2Username: string,
+    player2Info: UserEntity,
     gameId: bigint,
     bonusMode = false,
+    EmitEvent: (eventName: string, data?: any) => void,
   ) {
+    this.emitEvent = EmitEvent;
     this.isOver = false;
     this.ball = {
       x: 500,
@@ -92,6 +100,8 @@ export class Game {
     this.socketPlayer2Id = socketPlayer2Id;
     this.player1Username = player1Username;
     this.player2Username = player2Username;
+    this.player1Info = player1Info;
+    this.player2Info = player2Info;
     this.winner = null;
     this.lastTime = performance.now();
     this.player1Score = 0;
@@ -323,6 +333,7 @@ export class Game {
     this.racketLeftHeight = RACKET_HEIGHT_10;
     this.racketRightHeight = RACKET_HEIGHT_10;
     this.consecutiveExchangesWithoutBounce = -1;
+    this.emitEvent('updateLobbyRoomRequire');
   }
 
   updateBallPosition() {
@@ -427,8 +438,6 @@ export class Game {
       !this.isOver
     ) {
       this.player2Score += 1;
-      console.log('player1Score', this.player1Score);
-      console.log('player2Score', this.player2Score);
       if (this.ball.speed > this.player2Stats.maxSpeedScoring) {
         this.player2Stats.maxSpeedScoring = this.ball.speed;
       }
@@ -446,8 +455,6 @@ export class Game {
       !this.isOver
     ) {
       this.player1Score += 1;
-      console.log('player1Score', this.player1Score);
-      console.log('player2Score', this.player2Score);
       if (this.ball.speed > this.player1Stats.maxSpeedScoring) {
         this.player1Stats.maxSpeedScoring = this.ball.speed;
       }
@@ -477,6 +484,7 @@ export class Game {
       isPlayerRight: false,
       player1Username: this.player1Username,
       player2Username: this.player2Username,
+      playerAvatar: this.player1Info.avatar,
       gameStart: this.gameStart,
       bonus: this.bonus,
       bonusPlayer1:
@@ -500,6 +508,20 @@ export class Game {
       player1Laser: this.player1Laser,
       player2Laser: this.player2Laser,
       bonusMode: this.bonusMode,
+    };
+  }
+
+  getInfo(): GameInfo {
+    return {
+      id: this.id,
+      player1Username: this.player1Username,
+      player2Username: this.player2Username,
+      player1Avatar: this.player1Info.avatar,
+      player2Avatar: this.player2Info.avatar,
+      player1Rank: this.player1Info.rank,
+      player2Rank: this.player2Info.rank,
+      player1Score: this.player1Score,
+      player2Score: this.player2Score,
     };
   }
 
