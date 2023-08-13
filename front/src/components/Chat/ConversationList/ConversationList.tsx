@@ -14,7 +14,7 @@ const ConversationList: React.FC = () => {
   }
   return (
     <>
-      <div className="max-h-[calc(100vh-212px)] text-center transition-all overflow-auto">
+      <div className="bg-scroll max-h-[calc(100vh-212px)] text-center transition-all overflow-auto">
         {conversationsList.length === 0 ? (
           <p className="text-center">No friends yet</p>
         ) : (

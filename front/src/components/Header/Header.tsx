@@ -287,7 +287,8 @@ function Header() {
             paddingY: 1,
             ':hover': { backgroundColor: 'rgb(59 130 246)' },
           }}>
-            <SportsEsportsIcon className="mr-2" />Game
+            <SportsEsportsIcon className="mr-2" />
+            <p className='mt-0.5'>Game</p>
           </Button>
         </NavLink>
 
@@ -301,7 +302,9 @@ function Header() {
             paddingY: 1,
             ':hover': { backgroundColor: 'rgb(59 130 246)' },
           }}>
-            <LeaderboardIcon className="mr-2" />Leaderboard
+            <LeaderboardIcon className="mr-2" />
+            <p className='mt-0.5'>Leaderboard</p>
+
           </Button>
         </NavLink>
 
@@ -315,7 +318,8 @@ function Header() {
             paddingY: 1,
             ':hover': { backgroundColor: 'rgb(59 130 246)' },
           }}>
-            <ChatIcon className="mr-2" />Chat
+            <ChatIcon className="mr-2" />
+            <p className='mt-0.5'>Chat</p>
           </Button>
         </NavLink>
 
@@ -329,7 +333,8 @@ function Header() {
             paddingY: 1,
             ':hover': { backgroundColor: 'rgb(59 130 246)' },
           }}>
-            <GroupIcon className="mr-2" />Friends
+            <GroupIcon className="mr-2" />
+            <p className='mt-0.5'>Friends</p>
           </Button>
         </NavLink>
 
@@ -343,7 +348,8 @@ function Header() {
             paddingY: 1,
             ':hover': { backgroundColor: 'rgb(59 130 246)' },
           }}>
-            <PersonSearchIcon className="mr-2" />Profile
+            <PersonSearchIcon className="mr-2" />
+            <p className='mt-0.5'>Profile</p>
           </Button>
         </NavLink>
       </Box>

@@ -26,8 +26,9 @@ export const TrophyCard = ({ trophy }: TrophyProps) => {
       <div className={`text-center rounded-t-lg rounded-b-md
       bg-white border-blue-200
       m-2 mx-[10%] md:mx-2
-      w-full md:w-[40vw] lg:w-[30vw] xl:w-[20vw] 2xl:w-[15vw]
+      w-full md:w-[40vw] lg:w-[30vw] xl:w-[18vw] 
       ${trophy.isHeld ? 'border-blue-400' : 'opacity-60'}
+      flex flex-col justify-between 
     `}>
         <h2 className="font-bold text-xl bg-blue-100 p-2 rounded-t-md">
           {trophy.name}
