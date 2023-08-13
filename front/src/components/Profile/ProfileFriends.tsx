@@ -7,7 +7,6 @@ import { setErrorSnackbar } from '../../store/snackbarSlice';
 import { Sticker } from '../../utils/StyledTitle';
 import { Nothing } from '../Friends/Nothing';
 import { NavLink } from 'react-router-dom';
-
 export default function ProfileFriends({ user }: { user: UserInterface }) {
   const [friends, setFriends] = useState<UserInterface[]>([]);
   const dispatch = useDispatch();

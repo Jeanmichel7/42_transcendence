@@ -1,12 +1,13 @@
 import {
+  Dispatch,
   MutableRefObject,
   ReactNode,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
 } from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import Score from './Score';
 import { Socket } from 'socket.io-client';
 import useSocketConnection from './useSocketConnection';
 import {
@@ -16,13 +17,13 @@ import {
   BonusPosition,
 } from './Interface';
 import CountDown from './CountDown';
-import BonusBox from './BonusBox';
 import spriteBonus from '../../assets/spriteBonus.png';
 import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
 import './font.css';
 import EndGame from './EndGame';
+import { StatutBar } from './StatutBar';
 
-const Playground = styled.div`
+export const Playground = styled.div`
   width: 100%;
   top: 20%;
   height: 80%;
@@ -53,8 +54,6 @@ const POSITION_THRESHOLD = 30;
 const SPEED_INCREASE = 0.04;
 
 // Variable constante for optimisation, don't change
-const RACKET_FACTOR = (100 / RACKET_HEIGHT) * 100;
-const RACKET_FACTOR_1000 = RACKET_FACTOR / 1000;
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
@@ -101,14 +100,12 @@ const BonusExplode = styled.div<{ posX: number; posY: number }>`
   animation-fill-mode: forwards;
 `;
 
-interface BonusInterface {}
-
-function Bonus({
+export function Bonus({
   bonus,
   posX,
   posY,
 }: {
-  bonus: BonusPosition | null;
+  bonus: BonusPosition | undefined;
   posX: number;
   posY: number;
 }) {
@@ -180,7 +177,7 @@ const StyledRacket = styled.div.attrs<RacketProps>(
 `;
 
 // Composant Raquette avec le Laser comme enfant
-const Racket = ({
+export const Racket = ({
   posY,
   height,
   type,
@@ -214,7 +211,7 @@ interface BallProps {
   posY: number;
 }
 
-const Ball = styled.div.attrs<BallProps>(props => {
+export const Ball = styled.div.attrs<BallProps>(props => {
   return {
     style: {
       transform: `translate(${props.posX - BALL_RADIUS}px, ${
@@ -250,10 +247,10 @@ const laserFlowLeft = keyframes`
 
 // Utilisez les animations dans votre composant
 
-interface LaserProps {
+export interface LaserProps {
   type: string;
 }
-const Laser = styled.div<LaserProps>`
+export const Laser = styled.div<LaserProps>`
   position: absolute;
 
   width: ${({ type }: { type: string }) =>
@@ -280,9 +277,16 @@ const Laser = styled.div<LaserProps>`
   left: 100%;
 `;
 
-const GameWrapper = styled.div`
+export const GameWrapper = styled.div`
   animation: ${fadeIn} 2s ease;
 `;
+
+export interface PlayersInfo {
+  playerLeftUsername: string;
+  playerRightUsername: string;
+  playerLeftAvatar: string;
+  playerRightAvatar: string;
+}
 
 function Game({
   socket,
@@ -292,7 +296,7 @@ function Game({
 }: {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   lastGameInfo: any;
-  setCurrentPage: any;
+  setCurrentPage: Dispatch<SetStateAction<string>>;
   bonus: boolean;
 }) {
   const posRacket = useRef({
@@ -307,15 +311,14 @@ function Game({
     vy: 0,
     speed: INITIAL_BALL_SPEED,
   });
-  const gameWidth = useRef(0);
   const scorePlayers = useRef({ left: 0, right: 0 });
   const gameDimensions = useRef({ width: 0, height: 0 });
-  const lastDateTime = useRef(0);
   const gameId = useRef(0);
   const [gameStarted, setGameStarted] = useState(false);
-  const bonusPositionRef = useRef<BonusPosition | null>(null);
+  const bonusPositionRef = useRef<BonusPosition | undefined>();
+  const [playerInfo, setPlayerInfo] = useState<PlayersInfo | undefined>();
   const bonusIsLoading = useRef(false);
-  const bonusValueRef = useRef(null);
+  const bonusValueRef = useRef();
   const racketHeightRef = useRef({
     left: RACKET_HEIGHT_10,
     right: RACKET_HEIGHT_10,
@@ -334,9 +337,10 @@ function Game({
       bonusValueRef,
       racketHeightRef,
       laser,
+      playerInfo,
+      setPlayerInfo,
     );
   const fail = useRef(false);
-  const correctionFactor = useRef(0);
   const [ShowEndGame, setShowEndGame] = useState(false);
 
   useEffect(() => {
@@ -527,9 +531,14 @@ function Game({
         />
       )}
       <CountDown gameStarted={gameStarted} />
-      <Score
+      <StatutBar
+        playersInfo={playerInfo ? playerInfo : undefined}
         scorePlayerLeft={scorePlayers.current.left}
         scorePlayerRight={scorePlayers.current.right}
+        bonusActive={bonus || (gameStarted && gameData?.current!.bonusMode)}
+        bonusIsLoading={bonusIsLoading.current}
+        bonusName={bonusValueRef.current}
+        //... passez les autres props ici
       />
       <Playground id="playground">
         <Racket
@@ -569,12 +578,6 @@ function Game({
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
       </Playground>
-      {(bonus || (gameStarted && gameData?.current!.bonusMode)) && (
-        <BonusBox
-          bonusIsLoading={bonusIsLoading.current}
-          bonusName={bonusValueRef.current}
-        />
-      )}
     </GameWrapper>
   );
 }

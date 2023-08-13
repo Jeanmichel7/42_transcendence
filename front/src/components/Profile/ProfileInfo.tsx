@@ -6,6 +6,7 @@ import { Button } from '@mui/material';
 import { RootState } from '../../store';
 import { reduxAddWaitingFriendsSent } from '../../store/userSlice';
 import cuteBallsClimbingVines from '../../assets/cuteBallsClimbingVines.png';
+import ExperienceBar from './ExperienceBar';
 
 export default function ProfileInfo({ user }: { user: UserInterface }) {
   const { userData, userFriends } = useSelector(
@@ -80,7 +81,11 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               <p className="md:text-xl">{user.email}</p>
               <p className="md:text-xl">{user.status}</p>
               <p className="md:text-xl">{Math.floor(user.score)}</p>
-              <p className="md:text-xl">{Math.floor(user.level)}</p>
+              <ExperienceBar
+                currentExp={user.experience}
+                currentLevel={user.level}
+              />
+              {/* <p className="md:text-xl">{Math.floor(user.level)}</p> */}
             </div>
             <img
               src={cuteBallsClimbingVines}

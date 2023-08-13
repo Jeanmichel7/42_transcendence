@@ -4,14 +4,13 @@ import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Game } from './game.class';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 interface clientUpdate {
   posRacket: number;
@@ -35,13 +34,21 @@ export class GameEvents {
     private gameService: GameService,
     private configService: ConfigService,
     private jwtService: JwtService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
+    eventEmitter.on('updateLobbyRoomRequire', () => {
+      this.server
+        .to('LobbyRoom')
+        .emit('lobbyRoomUpdate', this.gameService.getAllGamesInfo());
+      // Faites ce que vous devez faire quand l'événement est déclenché
+    });
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
       games.forEach(async (game) => {
         if (game.isBeingProcessed) return; // Skip si le jeu est en cours de traitement
         game.isBeingProcessed = true;
         const update = await this.gameService.updateGame(game);
+        this.server.to(`gameRoom-${game.id}`).emit('gameUpdate', update);
         this.server.to(game.socketPlayer1Id).emit('gameUpdate', update);
         update.isPlayerRight = true;
         this.server.to(game.socketPlayer2Id).emit('gameUpdate', update);
@@ -54,7 +61,6 @@ export class GameEvents {
   async handleConnection(client: Socket) {
     if (client.handshake.headers.cookie === undefined) return;
     const cookieArray = client.handshake.headers.cookie.split(';');
-    console.log(cookieArray);
     let jwtToken = '';
     cookieArray.forEach((cookie) => {
       const cookieParts = cookie.split('=');
@@ -93,8 +99,33 @@ export class GameEvents {
 
   //desconexio
   handleDisconnect(client: Socket) {
-    console.log('client disconnected: ' + client.id);
     this.gameService.removeFromQueue(client.id);
+  }
+
+  @SubscribeMessage('spectateGame')
+  handleSpectateGame(
+    @MessageBody() gameId: bigint,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('VALEUR DE GAME ID', gameId);
+    Object.keys(client.rooms).forEach((roomId) => {
+      if (roomId !== client.id) {
+        client.leave(roomId);
+      }
+    });
+    console.log(`spectating game ${gameId}`);
+    client.join(`gameRoom-${gameId}`);
+  }
+
+  @SubscribeMessage('joinLobbyRoom')
+  handleJoinLobbyRoom(client: Socket) {
+    client.join('LobbyRoom');
+    client.emit('lobbyRoomUpdate', this.gameService.getAllGamesInfo());
+  }
+
+  @SubscribeMessage('leaveLobbyRoom')
+  handleLeaveLobbyRoom(client: Socket) {
+    client.leave('LobbyRoom');
   }
 
   @SubscribeMessage('privateLobby')
@@ -129,7 +160,8 @@ export class GameEvents {
       console.log('game started');
       return;
     }
-    const { socketId, ...newData } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { socketId: _, ...newData } = data;
     if (socket) this.server.to(socket).emit('privateLobby', newData);
   }
 
@@ -182,14 +214,14 @@ export class GameEvents {
   //   @ConnectedSocket() client: Socket,
   // ) {}
 
-  @SubscribeMessage('message')
-  handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    //this.server.emit('message', client.id, data)
-    const rt_data = {
-      message: 'hello',
-      timestamp: Date.now(),
-    };
-    return rt_data;
-    // recevoir un event (s'abonner a` un message)
-  }
+  // @SubscribeMessage('message')
+  // handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
+  //   //this.server.emit('message', client.id, data)
+  //   const rt_data = {
+  //     message: 'hello',
+  //     timestamp: Date.now(),
+  //   };
+  //   return rt_data;
+  //   // recevoir un event (s'abonner a` un message)
+  // }
 }

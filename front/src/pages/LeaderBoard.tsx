@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getLeaderboard } from '../api/leaderBoard';
 import { UserInterface } from '../types';
+import { Sticker } from '../utils/StyledTitle';
+import { ranksImages } from '../utils/rankImages';
 
 const LeaderBoard = () => {
   const [leaderBoard, setLeaderBoard] = useState<UserInterface[]>([]);
@@ -18,7 +20,7 @@ const LeaderBoard = () => {
   }, []);
 
   return (
-    <div className="bg-[var(--background-color)] ">
+    <div className="bg-[var(--background-color)] -z-10">
       <div className="flex items-center justify-around z-10">
         <svg
           version="1.1"
@@ -27,7 +29,7 @@ const LeaderBoard = () => {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 490 490"
           xmlSpace="preserve"
-          className="relative w-1/12 top-0 left-0  pt-8"
+          className="relative w-1/6 top-0 left-20  pt-8"
         >
           <g>
             <g id="XMLID_47_">
@@ -91,13 +93,7 @@ const LeaderBoard = () => {
             </g>
           </g>
         </svg>
-
-        <div className="relative mb-5 mt-5">
-          <h1 className="text-8xl border-2 border-black text-center   bg-blue-500 -skew-x-12 rounded-lg relative z-10 text-white">
-            Leaderboard
-          </h1>
-          <div className="absolute top-2 left-2  w-full h-full bg-black  rounded-lg z-0 -skew-x-12"></div>
-        </div>
+        <Sticker dataText={'Leaderboard'} />
 
         <svg
           version="1.1"
@@ -106,7 +102,7 @@ const LeaderBoard = () => {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 490 490"
           xmlSpace="preserve"
-          className=" relative w-1/12 top-0 left-0  pt-8"
+          className=" relative w-1/6 top-0 -left-20  pt-8"
         >
           <g>
             <g id="XMLID_47_">
@@ -172,12 +168,12 @@ const LeaderBoard = () => {
         </svg>
       </div>
 
-      <div className="overflow-x-auto bg-gray-100 shadow-xl rounded-xl p-3 ml-10 mr-10">
-        <table className="min-w-full bg-yellow-400 divide-y divide-gray-200">
+      <div className=" bg-gray-100 shadow-xl rounded-xl p-3 ml-10 mr-10">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rank
+                Ranking
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
@@ -185,9 +181,15 @@ const LeaderBoard = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Score
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Level
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Rank
+              </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200 bg-gradient-to-b  from-white to-[var(--color-primary)] ">
             {leaderBoard.map((user, index) => {
               let colorClass;
               if (index === 0) {
@@ -202,10 +204,16 @@ const LeaderBoard = () => {
 
               return (
                 <tr
-                  key={index}
-                  className={`${colorClass} transform hover:scale-105 transition-transform duration-200`}
+                  key={user.id}
+                  className={
+                    'transform hover:scale-110 hover:bg-white transition-transform duration-200'
+                  }
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold">
+                  <td
+                    className={
+                      ' px-6 py-4 whitespace-nowrap text-2xl font-bold'
+                    }
+                  >
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -213,6 +221,15 @@ const LeaderBoard = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {user.score.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{user.level}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={ranksImages[user.rank!]}
+                      alt={user.rank}
+                      className="h-16"
+                      title={user.rank}
+                    />
                   </td>
                 </tr>
               );

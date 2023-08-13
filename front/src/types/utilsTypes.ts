@@ -55,6 +55,7 @@ export interface NotificationInterface {
     | 'gameInviteAccepted'
     | 'gameInviteDeclined'
     | 'message';
+  // title: string;
   content: string;
   read: boolean;
   createdAt: Date;

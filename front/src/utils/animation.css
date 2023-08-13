@@ -1,0 +1,21 @@
+@keyframes vibration {
+  0% {
+    transform: translateX(0);
+  }
+  5% {
+    transform: translateX(-5px);
+  }
+  10% {
+    transform: translateX(5px);
+  }
+  15% {
+    transform: translateX(-5px);
+  }
+  20% {
+    transform: translateX(0);
+  }
+}
+
+.animate-vibration {
+  animation: vibration 2s infinite;
+}

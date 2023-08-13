@@ -159,7 +159,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           const isUserInRoom =
             roomData.users.some(u => u.id === userData.id) ||
             roomData.acceptedUsers.some(u => u.id === userData.id);
-
           if (!isUserInRoom) {
             socketRef.current?.emit('leaveRoom', {
               roomId: id,

@@ -19,6 +19,20 @@ import { NotificationEntity } from 'src/modules/notification/entity/notification
 import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
 import { UserTrophiesEntity } from 'src/modules/trophies/entity/userTrophiesProgress.entity';
 
+type Rank =
+  | 'cooper_3'
+  | 'cooper_2'
+  | 'cooper_1'
+  | 'silver_3'
+  | 'silver_2'
+  | 'silver_1'
+  | 'gold_3'
+  | 'gold_2'
+  | 'gold_1'
+  | 'master_3'
+  | 'master_2'
+  | 'master_1';
+
 @Entity('users')
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn({
@@ -127,6 +141,13 @@ export class UserEntity extends BaseEntity {
     nullable: true,
   })
   status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
+
+  @Column({
+    type: 'text',
+    default: 'cooper_3',
+    nullable: true,
+  })
+  rank: Rank;
 
   @Column({
     type: 'text',

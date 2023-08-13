@@ -144,10 +144,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
     isMyFriend();
   }, [userData, userFriends, friend]);
 
-  useEffect(() => {
-    console.log('sdfghjkl', isFriendOrRequestSent);
-  }, [isFriendOrRequestSent]);
-
   return (
     <Card
       key={friend.login}

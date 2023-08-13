@@ -199,8 +199,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 color="error"
                 onClick={handleOpenDialog}
               >
-                {' '}
-                Delete Account{' '}
+                Delete Account
               </Button>
             </div>
           </div>

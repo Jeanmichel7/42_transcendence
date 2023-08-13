@@ -1,5 +1,3 @@
-import { Dispatch } from '@reduxjs/toolkit';
-import { RefObject, SetStateAction } from 'react';
 import { Socket } from 'socket.io-client';
 
 export interface ServerToClientEvents {
@@ -32,6 +30,7 @@ export interface ClientToServerEvents {
     ready: boolean;
     player1: boolean;
   }) => void;
+  spectateGame: (gameId: bigint) => void;
 }
 export interface SocketInterface {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -55,9 +54,9 @@ export interface GameData {
   player1Username: string;
   player2Username: string;
   gameStart: boolean;
-  bonus: BonusPosition | null;
-  bonusPlayer1: number | null;
-  bonusPlayer2: number | null;
+  bonus: BonusPosition | undefined;
+  bonusPlayer1: string | undefined;
+  bonusPlayer2: string | undefined;
   racketLeftHeight: number;
   racketRightHeight: number;
   bonusPlayer1Loading: boolean;
@@ -65,21 +64,6 @@ export interface GameData {
   player1Laser: boolean;
   player2Laser: boolean;
   bonusMode: boolean;
+  player1Avatar: string;
+  player2Avatar: string;
 }
-
-type GameProps = {
-  keyStateRef: RefObject<{
-    ArrowUp: boolean;
-    ArrowDown: boolean;
-    ' ': boolean;
-  }>;
-  posRacket: RefObject<{ left: number; right: number }>;
-  gameId: RefObject<bigint>;
-  scorePlayers: RefObject<{ left: number; right: number }>;
-  bonusPositionRef: RefObject<BonusPosition | null>;
-  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
-  bonusIsLoading: RefObject<boolean>;
-  bonusValueRef: RefObject<number | null>;
-  racketHeightRef: RefObject<{ left: number; right: number }>;
-  laser: RefObject<{ left: boolean; right: boolean }>;
-};

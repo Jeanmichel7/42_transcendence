@@ -1,7 +1,6 @@
 import Game from '../components/Game/Game';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-// import EndGame from '../components/Game/EndGame';
 import { Socket, io } from 'socket.io-client';
 import Lobby from '../components/Game/Lobby';
 import SearchingOpponent from '../components/Game/SearchingOpponent';
@@ -17,6 +16,7 @@ import {
 import { RootState } from '../store';
 import PrivateLobby from '../components/Game/PrivateLobby';
 import { activateEffect, desactivateEffect } from '../store/gameSlice';
+import GameSpectator from '../components/Game/Spectator';
 
 export const GameWrapper = styled.div`
   width: 100%;
@@ -28,8 +28,21 @@ export const GameWrapper = styled.div`
   overflow: hidden;
 `;
 
+export interface GameCard {
+  id: bigint;
+  player1Username: string;
+  player2Username: string;
+  player1Avatar: string;
+  player2Avatar: string;
+  player1Rank: string;
+  player2Rank: string;
+  player1Score: number;
+  player2Score: number;
+}
+
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
+  // const socketRef = useRef<Socket | null>(null);
   const [connectStatus, setConnectStatus] = useState('disconnected');
   const [currentPage, setCurrentPage] = useState<string>('lobby');
   const { userData } = useSelector((state: RootState) => state.user);
@@ -40,7 +53,9 @@ function Pong() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const gameId = searchParams.get('id');
+  const [gameIdSpectate, setGameIdSpectate] = useState<undefined | bigint>();
   const [showOverlay, setShowOverlay] = useState(false);
+  const [lobbyData, setLobbyData] = useState<GameCard[]>([{} as GameCard]);
 
   useEffect(() => {
     if (!gameId || !userData.id || userData.id == -1) return;
@@ -81,6 +96,23 @@ function Pong() {
   }, [connectStatus]);
 
   useEffect(() => {
+    if (!socket.emit) return;
+    if (currentPage === 'lobby') {
+      socket.emit('joinLobbyRoom');
+    } else {
+      socket.emit('leaveLobbyRoom');
+    }
+    socket.on('lobbyRoomUpdate', data => {
+      setLobbyData(data);
+    });
+
+    return () => {
+      // N'oubliez pas de nettoyer l'écouteur pour éviter des écouteurs multiples
+      socket.off('lobbyRoomUpdate');
+    };
+  }, [currentPage, socket]);
+
+  useEffect(() => {
     const newSocket = io('http://localhost:3000/game', {
       withCredentials: true,
     });
@@ -90,22 +122,16 @@ function Pong() {
 
     newSocket.on('disconnect', () => {
       setConnectStatus('disconnected');
-      console.log('ERROR SOCKET DISCONNECTED');
     });
 
     newSocket.on('userGameStatus', message => {
       if (message === 'foundNormal') {
-        dispatch(activateEffect());
         setBonus(false);
         setCurrentPage('game');
-      }
-      if (message === 'foundBonus') {
-        dispatch(activateEffect());
+      } else if (message === 'foundBonus') {
         setBonus(true);
         setCurrentPage('game');
-      }
-      if (message === 'alreadyInGame') {
-        console.log('bonus value', bonus);
+      } else if (message === 'alreadyInGame') {
         setCurrentPage('game');
       }
       if (message === 'notInGame') {
@@ -140,15 +166,18 @@ function Pong() {
   }
   let pageContent: ReactNode;
   if (currentPage === 'lobby' && !gameId) {
-    // dispatch(desactivateEffect());
+    dispatch(desactivateEffect());
     pageContent = (
       <Lobby
         setCurrentPage={setCurrentPage}
         socket={socket}
         setBonus={setBonus}
+        lobbyData={lobbyData}
+        setGameIdSpectate={setGameIdSpectate}
       />
     );
   } else if (currentPage === 'game') {
+    dispatch(activateEffect());
     pageContent = (
       <Game
         socket={socket}
@@ -165,8 +194,8 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === 'privateLobby') {
-    // dispatch(desactivateEffect());
+  } else if (currentPage === 'privateLobby' && gameId) {
+    dispatch(desactivateEffect());
     pageContent = (
       <PrivateLobby
         setCurrentPage={setCurrentPage}
@@ -175,7 +204,17 @@ function Pong() {
         isPlayer1={isPlayer1}
       />
     );
+  } else if (currentPage === 'spectate' && gameIdSpectate) {
+    console.log('spectate', gameIdSpectate);
+    pageContent = (
+      <GameSpectator
+        setCurrentPage={setCurrentPage}
+        socket={socket}
+        gameId={gameIdSpectate}
+      />
+    );
   }
+
   return (
     <GameWrapper>
       {showOverlay && <Overlay />}

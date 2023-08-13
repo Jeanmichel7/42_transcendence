@@ -19,7 +19,7 @@ const fadeIn = keyframes`
 }
 `;
 
-const StyledButton = styled.button`
+export const StyledButton = styled.button`
   align-items: center;
   appearance: none;
   background-clip: padding-box;
@@ -276,12 +276,12 @@ interface LooseProps {
   lastGameInfo: React.RefObject<LastGameInfo>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
-function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
+function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
   useEffect(() => {
     if (lastGameInfo.current && lastGameInfo.current.win) {
       setTimeout(() => {
         const myConfetti = confetti.create(
-          document.getElementById('myCanvas'),
+          document.getElementById('myCanvas') as HTMLCanvasElement,
           { useWorker: true, resize: true },
         );
         myConfetti({
@@ -295,16 +295,12 @@ function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
     return null;
   }
 
-  const opponent = lastGameInfo.current.win
-    ? lastGameInfo.current.looserName
-    : lastGameInfo.current.winnerName;
-
   return (
     <Smiley mood={lastGameInfo.current.win ? 'happy' : 'sad'}>
       <LooseWrapper>
         {lastGameInfo.current.win ? (
           <>
-            <StyledNeonH1 victory={true}>
+            <StyledNeonH1>
               Victory !
               <br />
               Winner: <br />
@@ -328,7 +324,6 @@ function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
           onClick={() => {
             setCurrentPage('lobby');
           }}
-          activateEffect
         >
           Return to Lobby
         </StyledButton>

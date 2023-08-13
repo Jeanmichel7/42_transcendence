@@ -1,7 +1,7 @@
 import { UserInterface } from './UserTypes';
 
 export interface AuthLogout {
-  message: string,
+  message: string;
 }
 
 export interface Api2FAResponse {

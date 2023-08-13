@@ -39,6 +39,18 @@ interface PlayerInfoPrivateLobby {
   ready: boolean;
 }
 
+export interface GameInfo {
+  id: bigint;
+  player1Username: string;
+  player2Username: string;
+  player1Avatar: string;
+  player2Avatar: string;
+  player1Rank: string;
+  player2Rank: string;
+  player1Score: number;
+  player2Score: number;
+}
+
 class PrivateLobby {
   player1: PlayerInfoPrivateLobby;
   player2: PlayerInfoPrivateLobby;
@@ -109,18 +121,13 @@ export class GameService {
       this.privatesLobby.get(playerInfo.gameId).player1?.mode ===
         this.privatesLobby.get(playerInfo.gameId).player2?.mode
     ) {
-      console.log(this.privatesLobby.get(playerInfo.gameId).player1.gameId);
-      const game = new Game(
+      this.startNewGame(
         this.privatesLobby.get(playerInfo.gameId).player1.socketId,
         this.privatesLobby.get(playerInfo.gameId).player1.username,
         this.privatesLobby.get(playerInfo.gameId).player2.socketId,
         this.privatesLobby.get(playerInfo.gameId).player2.username,
-        this.privatesLobby.get(playerInfo.gameId).player1.gameId,
         this.privatesLobby.get(playerInfo.gameId).player1.mode === 'bonus',
-      );
-      this.games.set(
         this.privatesLobby.get(playerInfo.gameId).player1.gameId,
-        game,
       );
       return true;
     }
@@ -141,7 +148,6 @@ export class GameService {
   async updateGame(game: Game) {
     game.updateBallPosition();
     if (game.isOver) {
-      console.log('game is over');
       await this.saveEndGame(
         game.id,
         game.winner,
@@ -153,6 +159,7 @@ export class GameService {
         game.bonusMode,
       );
       this.games.delete(game.id);
+      this.eventEmitter.emit('updateLobbyRoomRequire');
     }
     return game.getState();
   }
@@ -182,6 +189,82 @@ export class GameService {
     });
   }
 
+  async startNewGame(
+    socketId1: string,
+    username1: string,
+    socketId2: string,
+    username2: string,
+    bonusMode: boolean,
+    gameId?: bigint,
+  ): Promise<Game> {
+    if (!gameId) {
+      let res: GameInterface;
+      if (bonusMode) {
+        res = await this.saveStartGame(
+          username2,
+          this.createdWaitingGameBonus.id,
+        );
+      } else {
+        res = await this.saveStartGame(username2, this.createdWaitingGame.id);
+      }
+      if (!res) throw new BadRequestException('erreur save start game');
+      gameId = res.id;
+    }
+
+    const user1: UserEntity = await this.userRepository.findOne({
+      where: { login: username1 },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
+        'email',
+        'description',
+        'avatar',
+        'score',
+        'rank',
+      ],
+    });
+
+    const user2: UserEntity = await this.userRepository.findOne({
+      where: { login: username2 },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'login',
+        'email',
+        'description',
+        'avatar',
+        'score',
+        'rank',
+      ],
+    });
+
+    this.createdWaitingGameBonus = {} as GameInterface;
+
+    const game: Game = new Game(
+      socketId1,
+      username1,
+      user1,
+      socketId2,
+      username2,
+      user2,
+      gameId,
+      bonusMode,
+      (eventName, data) => this.eventEmitter.emit(eventName, data),
+    );
+    this.games.set(game.id, game);
+    this.eventEmitter.emit('updateLobbyRoomRequire');
+    return game;
+  }
+  getAllGamesInfo(): GameInfo[] {
+    const gamesInfo: GameInfo[] = [];
+    this.games.forEach((game) => {
+      gamesInfo.push(game.getInfo());
+    });
+    return gamesInfo;
+  }
   async addToQueue(socketId: string, username: string, bonusMode = false) {
     if (this.checkAlreadyInGame(username)) return;
     if (bonusMode) {
@@ -197,32 +280,18 @@ export class GameService {
         this.playerWaiting2Bonus === undefined &&
         this.playerWaiting1Bonus.username !== username
       ) {
-        console.log(
-          'player waiting Bonus username',
-          this.playerWaiting1Bonus.username,
-        );
-        console.log('username player two bonus : ', username);
         this.playerWaiting2Bonus = {
           socketId: socketId,
           username: username,
         };
-        const res = await this.saveStartGame(
-          this.playerWaiting2Bonus.username,
-          this.createdWaitingGameBonus.id,
-        );
-        if (!res) throw new BadRequestException('erreur save start game');
 
-        this.createdWaitingGameBonus = {} as GameInterface;
-
-        const game: Game = new Game(
+        const game = await this.startNewGame(
           this.playerWaiting1Bonus.socketId,
           this.playerWaiting1Bonus.username,
           this.playerWaiting2Bonus.socketId,
           this.playerWaiting2Bonus.username,
-          res.id, // conversion foireuse
           true,
         );
-        this.games.set(game.id, game);
         this.playerWaiting1Bonus = undefined;
         this.playerWaiting2Bonus = undefined;
 
@@ -243,33 +312,19 @@ export class GameService {
         this.playerWaiting2Normal === undefined &&
         this.playerWaiting1Normal.username !== username
       ) {
-        console.log(
-          'player waiting username',
-          this.playerWaiting1Normal.username,
-        );
-        console.log('username', username);
         this.playerWaiting2Normal = {
           socketId: socketId,
           username: username,
         };
 
-        const res = await this.saveStartGame(
-          this.playerWaiting2Normal.username,
-          this.createdWaitingGame.id,
-        );
-        if (!res) throw new BadRequestException('erreur save start game');
-
-        this.createdWaitingGame = {} as GameInterface;
-
-        const game = new Game(
+        const game = await this.startNewGame(
           this.playerWaiting1Normal.socketId,
           this.playerWaiting1Normal.username,
           this.playerWaiting2Normal.socketId,
           this.playerWaiting2Normal.username,
-          res.id, // conversion foireuse
           false,
         );
-        this.games.set(game.id, game);
+
         this.playerWaiting1Normal = undefined;
         this.playerWaiting2Normal = undefined;
         return game.socketPlayer1Id;
@@ -571,6 +626,20 @@ export class GameService {
     return game;
   }
 
+  determineRank(scoreElo: number): string {
+    if (scoreElo < 1600) return 'cooper_3';
+    if (scoreElo < 1700) return 'cooper_2';
+    if (scoreElo < 1800) return 'cooper_1';
+    if (scoreElo < 1900) return 'silver_3';
+    if (scoreElo < 2000) return 'silver_2';
+    if (scoreElo < 2100) return 'silver_1';
+    if (scoreElo < 2200) return 'gold_3';
+    if (scoreElo < 2300) return 'gold_2';
+    if (scoreElo < 2400) return 'gold_1';
+    if (scoreElo < 2500) return 'master_3';
+    if (scoreElo < 2600) return 'master_2';
+    return 'master_1'; // pour les scores de 2500 et plus
+  }
   async updatePlayerStats(
     player: UserEntity,
     winnerId: string,

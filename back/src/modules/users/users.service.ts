@@ -110,7 +110,9 @@ export class UsersService {
         'avatar',
         'status',
         'score',
+        'experience',
         'level',
+        'rank',
       ],
     });
     if (!user) throw new NotFoundException(`User ${login} not found`);
@@ -522,6 +524,8 @@ export class UsersService {
         'users.status',
         'users.avatar',
         'users.score',
+        'users.level',
+        'users.rank',
       ])
       .orderBy('users.score', 'DESC')
       .skip(skip)
