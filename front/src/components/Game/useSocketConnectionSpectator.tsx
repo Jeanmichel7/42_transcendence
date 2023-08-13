@@ -1,19 +1,11 @@
-import {
-  Dispatch,
-  MutableRefObject,
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import io, { Socket } from 'socket.io-client';
+import { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
 import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { GameData } from './Interface';
 
 const useSocketConnectionSpectator = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
-  gameId: bigint
+  gameId: bigint,
 ) => {
   const [data, setData] = useState<GameData | undefined>();
 

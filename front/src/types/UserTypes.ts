@@ -10,11 +10,11 @@ export interface UserInterface {
   email: string;
   firstName: string;
   lastName: string;
-  status: "online" | "offline" | "absent" | "in game" | "inactive";
+  status: 'online' | 'offline' | 'absent' | 'in game' | 'inactive';
   avatar: string;
   score: number;
   description?: string;
-  role?: "user" | "admin";
+  role?: 'user' | 'admin';
   is2FAEnabled?: boolean;
   friends?: UserInterface[];
   userBlocked?: UserInterface[];

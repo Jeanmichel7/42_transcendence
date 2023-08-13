@@ -1,28 +1,28 @@
-import { useEffect, useState } from "react";
-import { getFriendProfile } from "../../api/relation";
-import { ApiErrorResponse, UserInterface } from "../../types";
-import FriendCard from "./FriendsCard";
-import { useDispatch } from "react-redux";
-import { setErrorSnackbar } from "../../store/snackbarSlice";
-import { Sticker } from "../../utils/StyledTitle";
-import { Nothing } from "../Friends/Nothing";
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { getFriendProfile } from '../../api/relation';
+import { ApiErrorResponse, UserInterface } from '../../types';
+import FriendCard from './FriendsCard';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar } from '../../store/snackbarSlice';
+import { Sticker } from '../../utils/StyledTitle';
+import { Nothing } from '../Friends/Nothing';
+import { NavLink } from 'react-router-dom';
 export default function ProfileFriends({ user }: { user: UserInterface }) {
   const [friends, setFriends] = useState<UserInterface[]>([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (typeof user === "undefined" || !user.login) return;
+    if (typeof user === 'undefined' || !user.login) return;
     async function fetchAndSetFriendsProfile() {
       const friendsFetched: UserInterface[] | ApiErrorResponse =
         await getFriendProfile(user.login);
-      if ("error" in friendsFetched) {
+      if ('error' in friendsFetched) {
         dispatch(
           setErrorSnackbar(
             friendsFetched.error + friendsFetched.message
-              ? ": " + friendsFetched.message
-              : ""
-          )
+              ? ': ' + friendsFetched.message
+              : '',
+          ),
         );
       } else {
         setFriends(friendsFetched);
@@ -33,7 +33,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
 
   return (
     <>
-      <Sticker dataText={"friends"} />
+      <Sticker dataText={'friends'} />
 
       <div className="flex flex-wrap items-center justify-center w-full pb-3 p-5">
         {friends.length == 0 ? (
@@ -44,7 +44,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
             />
           </NavLink>
         ) : (
-          friends.map((friend) => {
+          friends.map(friend => {
             if (friend.login != user.login)
               return (
                 <FriendCard

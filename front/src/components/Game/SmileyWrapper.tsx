@@ -1,5 +1,6 @@
-import styled, { keyframes, css } from "styled-components";
-import neonBrickWall from "../../assets/neonBrickWall.jpeg";
+import styled, { keyframes, css } from 'styled-components';
+import neonBrickWall from '../../assets/neonBrickWall.jpeg';
+import { ReactNode } from 'react';
 
 const arrival = keyframes`
   0% {
@@ -69,12 +70,15 @@ const Wrapper = styled.div`
   z-index: 10;
 `;
 
-const Pacman = styled.div`
+interface PacmanProps {
+  mood: 'happy' | 'sad';
+}
+const Pacman = styled.div<PacmanProps>`
   width: 120px;
   height: 120px;
   position: absolute;
   background-color: ${({ mood }) =>
-    mood === "sad" ? "var(--color-primary)" : "var(--color-secondary)"};
+    mood === 'sad' ? 'var(--color-primary)' : 'var(--color-secondary)'};
   border-radius: 50%;
   left: 50%;
   top: -100%;
@@ -82,44 +86,47 @@ const Pacman = styled.div`
   transform: translate(-50%, -50%);
 `;
 
-const Eyebrow = styled.div`
+interface EyeBrowProps {
+  isLeft?: boolean;
+}
+const Eyebrow = styled.div<EyeBrowProps>`
   background-color: transparent;
   border-bottom: 3px solid black;
   position: absolute;
-  left: ${({ isLeft }) => (isLeft ? "25px" : "75px")};
+  left: ${({ isLeft }) => (isLeft ? '25px' : '75px')};
   top: 20px;
   width: 20px;
-  transform: ${({ isLeft }) => (isLeft ? "rotate(-30deg)" : "rotate(30deg)")};
+  transform: ${({ isLeft }) => (isLeft ? 'rotate(-30deg)' : 'rotate(30deg)')};
   height: 10px;
   border-radius: 40%;
 `;
 
 interface EyeProps {
-  mood: "happy" | "sad";
-  isLeft: boolean;
+  mood: 'happy' | 'sad';
+  isLeft?: boolean;
 }
 
 const Eye = styled.div<EyeProps>`
-  background-color: ${({ mood }) => (mood === "sad" ? "black" : "transparent")};
+  background-color: ${({ mood }) => (mood === 'sad' ? 'black' : 'transparent')};
   width: 20px;
   height: 16px;
-  left: ${({ isLeft }) => (isLeft ? "30px" : "70px")};
+  left: ${({ isLeft }) => (isLeft ? '30px' : '70px')};
   position: absolute;
   top: 35px;
   border-radius: 50%;
   border-bottom: solid black 4px;
   animation: ${({ mood }) =>
-    mood === "sad"
+    mood === 'sad'
       ? css`
           ${sadEyes} 4.5s forwards
         `
-      : "none"};
+      : 'none'};
   transform: ${({ mood }) =>
-    mood === "happy" ? "rotate(180deg)" : "rotate(0deg)"};
+    mood === 'happy' ? 'rotate(180deg)' : 'rotate(0deg)'};
 `;
 
 interface MouthProps {
-  mood: "happy" | "sad";
+  mood: 'happy' | 'sad';
 }
 
 const Mouth = styled.div<MouthProps>`
@@ -131,26 +138,30 @@ const Mouth = styled.div<MouthProps>`
   background-image: url(${neonBrickWall});
   background-size: cover; // Pour s'assurer que l'image couvre toute la zone, sans répétition
   background-repeat: no-repeat; // Pour s'assurer que l'image ne se répète pas
-  background-position: ${({ mood }) => (mood === "sad" ? "bottom" : "top")};
+  background-position: ${({ mood }) => (mood === 'sad' ? 'bottom' : 'top')};
   border-top: ${({ mood }) =>
-    mood === "sad" ? "solid transparent 8px" : "none"};
+    mood === 'sad' ? 'solid transparent 8px' : 'none'};
   border-bottom: ${({ mood }) =>
-    mood === "happy" ? "solid transparent 8px" : "none"};
+    mood === 'happy' ? 'solid transparent 8px' : 'none'};
   border-radius: 50%;
   box-sizing: content-box;
-  animation: ${(props) =>
+  animation: ${() =>
     css`
       ${eat} 6s forwards
     `};
 `;
 
-export const Smiley = ({ children, mood }) => {
+interface SmileyProps {
+  children: ReactNode;
+  mood: 'happy' | 'sad';
+}
+export const Smiley = ({ children, mood }: SmileyProps) => {
   return (
     <Wrapper>
       <Pacman mood={mood}>
-        {mood === "sad" && <Eyebrow isLeft />}
+        {mood === 'sad' && <Eyebrow isLeft />}
         <Eye mood={mood} isLeft />
-        {mood === "sad" && <Eyebrow />}
+        {mood === 'sad' && <Eyebrow />}
         <Eye mood={mood} />
         <Mouth mood={mood} />
       </Pacman>

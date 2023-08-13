@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
-import "./App.css";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import './App.css';
 // import SideBar from './components/Sidebar/Sidebar';
 
-import AppRoutes from "./routes/indexRoutes";
-import { isAuthenticated } from "./api/auth";
-import { getUserData } from "./api/user";
+import AppRoutes from './routes/indexRoutes';
+import { isAuthenticated } from './api/auth';
+import { getUserData } from './api/user';
 import {
   getBlockedUsers,
   getFriendRequests,
   getFriendRequestsSent,
   getFriends,
-} from "./api/relation";
+} from './api/relation';
 import {
   reduxSetFriends,
   reduxSetUserBlocked,
@@ -21,34 +21,34 @@ import {
   reduxSetWaitingFriendsSent,
   setLogged,
   setUser,
-} from "./store/userSlice";
+} from './store/userSlice';
 import {
   ApiErrorResponse,
   ConversationInterface,
   UserInterface,
-} from "./types";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+} from './types';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   NotificationInterface,
   UserActionInterface,
   UserStatusInterface,
-} from "./types/utilsTypes";
-import { closeSnackbar, setErrorSnackbar } from "./store/snackbarSlice";
-import { RootState } from "./store";
+} from './types/utilsTypes';
+import { closeSnackbar, setErrorSnackbar } from './store/snackbarSlice';
+import { RootState } from './store';
 import {
   reduxAddManyNotifications,
   reduxSetNotifications,
-} from "./store/notificationSlice";
+} from './store/notificationSlice';
 import {
   reduxSetConversationList,
   reduxUpdateStatusUserConvList,
-} from "./store/convListSlice";
-import { getNotifsNotRead } from "./api/notification";
+} from './store/convListSlice';
+import { getNotifsNotRead } from './api/notification';
 
-import { Alert, IconButton, Snackbar, SnackbarContent } from "@mui/material";
-import MessageIcon from "@mui/icons-material/Message";
-import CloseIcon from "@mui/icons-material/Close";
-import { CircleBackground } from "./utils/CircleBackground";
+import { Alert, IconButton, Snackbar, SnackbarContent } from '@mui/material';
+import MessageIcon from '@mui/icons-material/Message';
+import CloseIcon from '@mui/icons-material/Close';
+import { CircleBackground } from './utils/CircleBackground';
 
 function App() {
   const dispatch = useDispatch();
@@ -60,18 +60,18 @@ function App() {
 
   const fetchData = useCallback(
     async function <
-      T extends UserInterface | UserInterface[] | NotificationInterface[]
+      T extends UserInterface | UserInterface[] | NotificationInterface[],
     >(
       apiFunction: () => Promise<T | ApiErrorResponse>,
-      action: (payload: T) => UserActionInterface
+      action: (payload: T) => UserActionInterface,
     ): Promise<void> {
       const result: T | ApiErrorResponse = await apiFunction();
 
-      if ("error" in result) {
+      if ('error' in result) {
         dispatch(
           setErrorSnackbar(
-            result.error + result.message ? ": " + result.message : ""
-          )
+            result.error + result.message ? ': ' + result.message : '',
+          ),
         );
       } else {
         if (!Array.isArray(result) && apiFunction === getUserData)
@@ -88,32 +88,32 @@ function App() {
             reduxUpdateStatusUserConvList({
               item: userFriendsStatusInterface,
               userId: userId,
-            })
+            }),
           );
         }
       }
     },
-    [dispatch, userId]
+    [dispatch, userId],
   );
 
   const checkAuth = useCallback(async () => {
     const isAuth: boolean | ApiErrorResponse = await isAuthenticated();
-    if (typeof isAuth === "boolean" && isAuth === true) {
+    if (typeof isAuth === 'boolean' && isAuth === true) {
       dispatch(setLogged(true));
 
       /* GET NOTIF IN LOCALSTORAGE AND ADD NOTIF NOT READ */
       const notifInLocalStorage: NotificationInterface[] =
-        JSON.parse(localStorage.getItem("notifications" + userId) as string) ||
+        JSON.parse(localStorage.getItem('notifications' + userId) as string) ||
         ([] as NotificationInterface[]);
       dispatch(reduxSetNotifications(notifInLocalStorage));
 
       const notifsNotRead = await getNotifsNotRead();
-      if (!("error" in notifsNotRead)) {
+      if (!('error' in notifsNotRead)) {
         const notifsNotReadFiltered = notifsNotRead.filter(
           (n: NotificationInterface) =>
             !notifInLocalStorage?.find(
-              (n2: NotificationInterface) => n2.id === n.id
-            )
+              (n2: NotificationInterface) => n2.id === n.id,
+            ),
         );
         if (notifsNotReadFiltered.length > 0)
           dispatch(reduxAddManyNotifications(notifsNotReadFiltered));
@@ -122,7 +122,7 @@ function App() {
       /* GET CONVERSATION LIST IN LOCALSTORAGE AND UPDATE STATUS FRIENDS*/
       const convListInLocalStorage: ConversationInterface[] =
         JSON.parse(
-          localStorage.getItem("conversationsList" + userId) as string
+          localStorage.getItem('conversationsList' + userId) as string,
         ) || ([] as ConversationInterface[]);
       dispatch(reduxSetConversationList(convListInLocalStorage));
 
@@ -136,12 +136,12 @@ function App() {
       //disconnect user
       if (
         location &&
-        location.pathname != "/" &&
-        location.pathname != "/login" &&
-        location.pathname != "/connection" &&
-        location.pathname != "/fakeconnection"
+        location.pathname != '/' &&
+        location.pathname != '/login' &&
+        location.pathname != '/connection' &&
+        location.pathname != '/fakeconnection'
       )
-        navigate("/");
+        navigate('/');
       setUserId(-1);
     }
   }, [dispatch, fetchData, navigate, userId]);
@@ -149,10 +149,10 @@ function App() {
   useEffect(() => {
     if (
       location &&
-      location.pathname != "/" &&
-      location.pathname != "/login" &&
-      location.pathname != "/connection" &&
-      location.pathname != "/fakeconnection"
+      location.pathname != '/' &&
+      location.pathname != '/login' &&
+      location.pathname != '/connection' &&
+      location.pathname != '/fakeconnection'
     ) {
       checkAuth();
     }
@@ -172,16 +172,16 @@ function App() {
   return (
     <div className="relative z-10">
       <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] -z-10 ">
-        {location?.pathname !== "/" &&
-          location?.pathname != "/connection" &&
-          location?.pathname != "/fakeconnection" && <Header />}
-        {(location?.pathname == "/" || location?.pathname == "/game") && 
+        {location?.pathname !== '/' &&
+          location?.pathname != '/connection' &&
+          location?.pathname != '/fakeconnection' && <Header />}
+        {(location?.pathname == '/' || location?.pathname == '/game') && (
           <CircleBackground />
-        }
+        )}
         <AppRoutes />
-        {location?.pathname !== "/" &&
-          location?.pathname != "/connection" &&
-          location?.pathname != "/fakeconnection" && <Footer />}
+        {location?.pathname !== '/' &&
+          location?.pathname != '/connection' &&
+          location?.pathname != '/fakeconnection' && <Footer />}
 
         <Snackbar
           anchorOrigin={{
@@ -198,7 +198,7 @@ function App() {
               message={
                 <Link to={snackbar.link} className="text-white">
                   <MessageIcon />
-                  {" " + snackbar.message}
+                  {' ' + snackbar.message}
                 </Link>
               }
               action={
@@ -206,7 +206,7 @@ function App() {
                   size="small"
                   aria-label="close"
                   color="inherit"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleClose();
                   }}
@@ -219,7 +219,7 @@ function App() {
             <Alert
               onClose={handleClose}
               severity={snackbar.severity}
-              sx={{ width: "100%" }}
+              sx={{ width: '100%' }}
             >
               {snackbar.message}
             </Alert>

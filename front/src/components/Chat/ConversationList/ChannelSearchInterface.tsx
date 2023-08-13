@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store";
-import { setErrorSnackbar, setMsgSnackbar } from "../../../store/snackbarSlice";
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
-import { ApiErrorResponse, RoomInterface } from "../../../types";
+import { ApiErrorResponse, RoomInterface } from '../../../types';
 
 import {
   Autocomplete,
@@ -19,19 +19,19 @@ import {
   Select,
   Stack,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 import {
   getAllPublicRooms,
   getAllPublicRoomsCount,
   joinRoom,
-} from "../../../api/chat";
-import RoomCard from "./ChannelRoomCard";
-import { reduxAddConversationList } from "../../../store/convListSlice";
-import { isConvAlreadyExist } from "../../../utils/utils";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+} from '../../../api/chat';
+import RoomCard from './ChannelRoomCard';
+import { reduxAddConversationList } from '../../../store/convListSlice';
+import { isConvAlreadyExist } from '../../../utils/utils';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import DoneIcon from "@mui/icons-material/Done";
-import CloseIcon from "@mui/icons-material/Close";
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function ChannelSearch() {
   const [inputPwd, setInputPwd] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export default function ChannelSearch() {
   const [totalPages, setTotalPages] = useState(0);
   const dispatch = useDispatch();
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
@@ -57,10 +57,10 @@ export default function ChannelSearch() {
   const handleJoinRoom = async (room: RoomInterface | null) => {
     if (!room) return;
     if (isConvAlreadyExist(room, conversationsList))
-      return dispatch(setErrorSnackbar("Room already in conversation list"));
+      return dispatch(setErrorSnackbar('Room already in conversation list'));
     if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
-      return dispatch(setErrorSnackbar("Password required"));
+      return dispatch(setErrorSnackbar('Password required'));
 
     setIsLoading(true);
     const res: RoomInterface | ApiErrorResponse = await joinRoom({
@@ -68,20 +68,20 @@ export default function ChannelSearch() {
       password: inputPwd ? inputPwd : undefined,
     });
 
-    if ("error" in res) {
-      if (res.error === "Conflict" && res.message.includes("already in room")) {
+    if ('error' in res) {
+      if (res.error === 'Conflict' && res.message.includes('already in room')) {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         if (isConvAlreadyExist(room, conversationsList))
           dispatch(
-            setErrorSnackbar("Room already in conversation list jtevois toi ?")
+            setErrorSnackbar('Room already in conversation list jtevois toi ?'),
           );
-        else dispatch(setMsgSnackbar("Add room to conversation list"));
+        else dispatch(setMsgSnackbar('Add room to conversation list'));
       } else
         dispatch(
-          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
         );
     } else {
-      dispatch(setMsgSnackbar("Room joint"));
+      dispatch(setMsgSnackbar('Room joint'));
       dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
       setDisplayInputPwd(false);
       setInputPwd(null);
@@ -92,9 +92,9 @@ export default function ChannelSearch() {
   useEffect(() => {
     async function fetchTotalRooms() {
       const res: number | ApiErrorResponse = await getAllPublicRoomsCount();
-      if (typeof res != "number" && "error" in res)
+      if (typeof res != 'number' && 'error' in res)
         dispatch(
-          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
         );
       else setTotalPages(Math.ceil(res / userPerPage));
     }
@@ -104,15 +104,15 @@ export default function ChannelSearch() {
         await getAllPublicRooms(currentPage, userPerPage);
       setIsLoading(false);
 
-      if ("error" in allRooms)
+      if ('error' in allRooms)
         dispatch(
           setErrorSnackbar(
-            allRooms.error + allRooms.message ? ": " + allRooms.message : ""
-          )
+            allRooms.error + allRooms.message ? ': ' + allRooms.message : '',
+          ),
         );
       else {
         setRooms(allRooms);
-        topRef.current?.scrollIntoView({ behavior: "smooth" });
+        topRef.current?.scrollIntoView({ behavior: 'smooth' });
       }
       setSelectedRoom(null);
     }
@@ -122,7 +122,7 @@ export default function ChannelSearch() {
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown> | null,
-    value: number
+    value: number,
   ) => {
     setCurrentPage(value);
   };
@@ -140,17 +140,17 @@ export default function ChannelSearch() {
           fullWidth
           options={rooms}
           getOptionLabel={(option: RoomInterface) =>
-            option.name + " (" + option.id + ")"
+            option.name + ' (' + option.id + ')'
           }
           onChange={(
             event: React.ChangeEvent<object>,
-            newValue: RoomInterface | null
+            newValue: RoomInterface | null,
           ) => {
             event.stopPropagation();
             setSelectedRoom(newValue);
           }}
           value={selectedRoom}
-          renderInput={(params) => (
+          renderInput={params => (
             <TextField {...params} label="Search Channels" variant="outlined" />
           )}
         />
@@ -158,17 +158,17 @@ export default function ChannelSearch() {
           onClick={() => handleJoinRoom(selectedRoom)}
           variant="contained"
           color="primary"
-          sx={{ ml: 2, height: "40px", alignSelf: "center" }}
+          sx={{ ml: 2, height: '40px', alignSelf: 'center' }}
           disabled={!selectedRoom || isLoading}
         >
-          {" "}
-          Add{" "}
+          {' '}
+          Add{' '}
         </Button>
       </div>
 
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
-          <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+          <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
             <InputLabel htmlFor="outlined-adornment-password-room">
               Password
             </InputLabel>
@@ -176,12 +176,10 @@ export default function ChannelSearch() {
               autoFocus
               name="password"
               id="outlined-adornment-password-roon"
-              type={showPassword ? "text" : "password"}
-              value={inputPwd ? inputPwd : ""}
-              onChange={(e) => setInputPwd(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && handleJoinRoom(selectedRoom)
-              }
+              type={showPassword ? 'text' : 'password'}
+              value={inputPwd ? inputPwd : ''}
+              onChange={e => setInputPwd(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleJoinRoom(selectedRoom)}
               disabled={isLoading}
               endAdornment={
                 <InputAdornment position="end">
@@ -237,7 +235,7 @@ export default function ChannelSearch() {
             value={userPerPage}
             onChange={handleChangeUserPerPage}
             label="Cards per page"
-            sx={{ height: "35px" }}
+            sx={{ height: '35px' }}
           >
             <MenuItem value={10}>10</MenuItem>
             <MenuItem value={20}>20</MenuItem>

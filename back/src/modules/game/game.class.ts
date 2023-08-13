@@ -490,17 +490,17 @@ export class Game {
       bonusPlayer1:
         this.bonusesPlayer1?.length > 0 &&
         this.bonusesPlayer1[this.bonusesPlayer1.length - 1].activate
-          ? null
+          ? undefined
           : this.bonusesPlayer1?.length > 0
           ? this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id
-          : null,
+          : undefined,
       bonusPlayer2:
         this.bonusesPlayer2?.length > 0 &&
         this.bonusesPlayer2[this.bonusesPlayer2.length - 1].activate
-          ? null
+          ? undefined
           : this.bonusesPlayer2?.length > 0
           ? this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id
-          : null,
+          : undefined,
       racketLeftHeight: this.racketLeftHeight,
       racketRightHeight: this.racketRightHeight,
       bonusPlayer1Loading: this.bonusPlayer1Loading,
@@ -508,6 +508,8 @@ export class Game {
       player1Laser: this.player1Laser,
       player2Laser: this.player2Laser,
       bonusMode: this.bonusMode,
+      player1Avatar: this.player1Info.avatar,
+      player2Avatar: this.player2Info.avatar,
     };
   }
 

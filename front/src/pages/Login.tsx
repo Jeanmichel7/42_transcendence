@@ -1,16 +1,27 @@
-import { Link, useNavigate } from "react-router-dom";
-import styled, { keyframes, css } from "styled-components";
-import { Button } from "@mui/material";
-import { useCallback, useState } from "react";
-import { CircleBackground } from "../utils/CircleBackground";
-import { getFriends, getBlockedUsers } from "../api/relation";
-import { getUserData } from "../api/user";
-import { reduxSetConversationList } from "../store/convListSlice";
-import { reduxSetNotifications } from "../store/notificationSlice";
-import { setLogged, setUser, reduxSetFriends, reduxSetUserBlocked } from "../store/userSlice";
-import { NotificationInterface, ConversationInterface, ApiErrorResponse, UserActionInterface, UserInterface } from "../types";
-import { useDispatch } from "react-redux";
-import { setErrorSnackbar } from "../store/snackbarSlice";
+import { Link, useNavigate } from 'react-router-dom';
+import styled, { keyframes, css } from 'styled-components';
+import { Button } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { CircleBackground } from '../utils/CircleBackground';
+import { getFriends, getBlockedUsers } from '../api/relation';
+import { getUserData } from '../api/user';
+import { reduxSetConversationList } from '../store/convListSlice';
+import { reduxSetNotifications } from '../store/notificationSlice';
+import {
+  setLogged,
+  setUser,
+  reduxSetFriends,
+  reduxSetUserBlocked,
+} from '../store/userSlice';
+import {
+  NotificationInterface,
+  ConversationInterface,
+  ApiErrorResponse,
+  UserActionInterface,
+  UserInterface,
+} from '../types';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar } from '../store/snackbarSlice';
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -74,8 +85,8 @@ const BigCircle = styled.span`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%)
-    scale(${(props) => (props.expand ? 2.5 : props.hovered ? 0.3 : 0.2)});
-  opacity: ${(props) => (props.expand ? 1 : props.hovered ? 0.5 : 0.02)};
+    scale(${props => (props.expand ? 2.5 : props.hovered ? 0.3 : 0.2)});
+  opacity: ${props => (props.expand ? 1 : props.hovered ? 0.5 : 0.02)};
   width: 100vh;
   height: 100vh;
   border-radius: 50%;
@@ -97,7 +108,7 @@ export const TransitionCircle = styled.span`
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(${(props) => (props.expand ? "-50%" : "-150%")}, -50%);
+  transform: translate(${props => (props.expand ? '-50%' : '-150%')}, -50%);
   animation: ${animationCircle} 1s ease-out;
   width: 200vh;
   height: 200vh;
@@ -128,7 +139,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
     animation: ${slideInFromBottomSmallScreen} 3s ease-out;
   }
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -140,7 +151,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   }
 
   &:hover {
-    color: ${(props) => (!props.expand ? "#000" : "#fff")};
+    color: ${props => (!props.expand ? '#000' : '#fff')};
     &::before {
       width: 100%;
     }
@@ -162,38 +173,54 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const fetchData = useCallback(async function <T extends UserInterface | UserInterface[]>(
-    apiFunction: () => Promise<T | ApiErrorResponse>,
-    action: ((payload: T) => UserActionInterface),
-  ): Promise<void> {
-    const result: T | ApiErrorResponse = await apiFunction();
-    if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
-    } else {
-      dispatch(action(result));
-    }
-  }, [dispatch]);
+  const fetchData = useCallback(
+    async function <T extends UserInterface | UserInterface[]>(
+      apiFunction: () => Promise<T | ApiErrorResponse>,
+      action: (payload: T) => UserActionInterface,
+    ): Promise<void> {
+      const result: T | ApiErrorResponse = await apiFunction();
+      if ('error' in result) {
+        dispatch(
+          setErrorSnackbar(
+            result.error + result.message ? ': ' + result.message : '',
+          ),
+        );
+      } else {
+        dispatch(action(result));
+      }
+    },
+    [dispatch],
+  );
 
   //save user data in redux
-  const saveUserData = useCallback(async function (id: number) {
-    dispatch(setLogged(true));
-    dispatch(reduxSetNotifications(
-      localStorage.getItem('notifications' + id)
-        ? JSON.parse(localStorage.getItem('notifications' + id) as string)
-        : [] as NotificationInterface[],
-    ));
-    dispatch(reduxSetConversationList(
-      localStorage.getItem('conversationsList' + id)
-        ? JSON.parse(localStorage.getItem('conversationsList' + id) as string)
-        : [] as ConversationInterface[],
-    ));
-    await fetchData(getUserData, setUser);
-    await fetchData(getFriends, reduxSetFriends);
-    await fetchData(getBlockedUsers, reduxSetUserBlocked);
-  }, [dispatch, fetchData]);
+  const saveUserData = useCallback(
+    async function (id: number) {
+      dispatch(setLogged(true));
+      dispatch(
+        reduxSetNotifications(
+          localStorage.getItem('notifications' + id)
+            ? JSON.parse(localStorage.getItem('notifications' + id) as string)
+            : ([] as NotificationInterface[]),
+        ),
+      );
+      dispatch(
+        reduxSetConversationList(
+          localStorage.getItem('conversationsList' + id)
+            ? JSON.parse(
+                localStorage.getItem('conversationsList' + id) as string,
+              )
+            : ([] as ConversationInterface[]),
+        ),
+      );
+      await fetchData(getUserData, setUser);
+      await fetchData(getFriends, reduxSetFriends);
+      await fetchData(getBlockedUsers, reduxSetUserBlocked);
+    },
+    [dispatch, fetchData],
+  );
 
   const handleConnection = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
     const width = 600;
@@ -202,20 +229,20 @@ export default function Login() {
     const top = window.innerHeight / 2 - height / 2;
 
     const newWindow = window.open(
-      "http://localhost:3006/connection",
-      "_blank",
+      'http://localhost:3006/connection',
+      '_blank',
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
-        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+        scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
     );
-    if (!newWindow) return console.log("erreur new windos  ");
+    if (!newWindow) return console.log('erreur new windos  ');
 
-    window.addEventListener("message", async (event) => {
+    window.addEventListener('message', async event => {
       if (event.source !== newWindow) return;
-      if (event.data.msg === "user connected") {
+      if (event.data.msg === 'user connected') {
         setExpand(true);
-        if(event.data.id != -1) await saveUserData(event.data.id);
+        if (event.data.id != -1) await saveUserData(event.data.id);
         newWindow.close();
-        navigate("/game");
+        navigate('/game');
       }
     });
   };

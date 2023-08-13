@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
-import WaitingAcceptRequest from "../components/Friends/WaitingAcceptRequest";
-import WaitingRequestSent from "../components/Friends/WaitingRequestSent";
-import AllFriends from "../components/Friends/AllFriends";
-import BlockedUser from "../components/Friends/BlockedUser";
-import OnLineFriends from "../components/Friends/OnLineFriends";
-import AddFriends from "../components/Friends/AddFriends";
+import WaitingAcceptRequest from '../components/Friends/WaitingAcceptRequest';
+import WaitingRequestSent from '../components/Friends/WaitingRequestSent';
+import AllFriends from '../components/Friends/AllFriends';
+import BlockedUser from '../components/Friends/BlockedUser';
+import OnLineFriends from '../components/Friends/OnLineFriends';
+import AddFriends from '../components/Friends/AddFriends';
 
-import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Tab, Tabs, Toolbar, Typography } from '@mui/material';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -34,12 +34,12 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 const tabMapReverse = [
-  "online",
-  "all",
-  "waiting_received",
-  "waiting_sent",
-  "blocked",
-  "add",
+  'online',
+  'all',
+  'waiting_received',
+  'waiting_sent',
+  'blocked',
+  'add',
 ];
 const tabMap = {
   online: 0,
@@ -72,7 +72,7 @@ export default function FriendsPage() {
   //check query params
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const tabType = query.get("tab");
+    const tabType = query.get('tab');
     if (!tabType) return;
 
     if (tabType in tabMap) {
@@ -88,7 +88,7 @@ export default function FriendsPage() {
   useEffect(() => {
     if (userFriends) {
       setFriendsCount(userFriends.length);
-      setOnlineCount(userFriends.filter((f) => f.status !== "offline").length);
+      setOnlineCount(userFriends.filter(f => f.status !== 'offline').length);
     }
   }, [userFriends]);
 
@@ -119,7 +119,7 @@ export default function FriendsPage() {
     <>
       <Box
         sx={{
-          bgcolor: "var(--background-color)",
+          bgcolor: 'var(--background-color)',
         }}
       >
         <AppBar position="static">
@@ -130,7 +130,7 @@ export default function FriendsPage() {
             <Tabs
               value={value}
               onChange={handleChange}
-              indicatorColor={"secondary"}
+              indicatorColor={'secondary'}
               // selectionFollowsFocus={true}
               textColor="inherit"
               // variant="fullWidth"
@@ -140,29 +140,29 @@ export default function FriendsPage() {
               aria-label="nav friends"
             >
               <Tab
-                label={"Online" + (onlineCount ? " (" + onlineCount + ")" : "")}
+                label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')}
               />
               <Tab
                 label={
-                  "All Friends" +
-                  (friendsCount ? " (" + friendsCount + ")" : "")
+                  'All Friends' +
+                  (friendsCount ? ' (' + friendsCount + ')' : '')
                 }
               />
               <Tab
                 label={
-                  "Waiting received" +
-                  (waitingRequestCount ? " (" + waitingRequestCount + ")" : "")
+                  'Waiting received' +
+                  (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')
                 }
               />
               <Tab
                 label={
-                  "Waiting sent" +
-                  (waitingSentCount ? " (" + waitingSentCount + ")" : "")
+                  'Waiting sent' +
+                  (waitingSentCount ? ' (' + waitingSentCount + ')' : '')
                 }
               />
               <Tab
                 label={
-                  "Blocked" + (blockedCount ? " (" + blockedCount + ")" : "")
+                  'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')
                 }
               />
               <Tab label="Add Friend" />
@@ -171,28 +171,28 @@ export default function FriendsPage() {
         </AppBar>
 
         <TabPanel value={value} index={0}>
-          {" "}
-          <OnLineFriends userDataId={userData.id} />{" "}
+          {' '}
+          <OnLineFriends userDataId={userData.id} />{' '}
         </TabPanel>
         <TabPanel value={value} index={1}>
-          {" "}
-          <AllFriends userDataId={userData.id} />{" "}
+          {' '}
+          <AllFriends userDataId={userData.id} />{' '}
         </TabPanel>
         <TabPanel value={value} index={2}>
-          {" "}
-          <WaitingAcceptRequest />{" "}
+          {' '}
+          <WaitingAcceptRequest />{' '}
         </TabPanel>
         <TabPanel value={value} index={3}>
-          {" "}
-          <WaitingRequestSent />{" "}
+          {' '}
+          <WaitingRequestSent />{' '}
         </TabPanel>
         <TabPanel value={value} index={4}>
-          {" "}
-          <BlockedUser />{" "}
+          {' '}
+          <BlockedUser />{' '}
         </TabPanel>
         <TabPanel value={value} index={5}>
-          {" "}
-          <AddFriends />{" "}
+          {' '}
+          <AddFriends />{' '}
         </TabPanel>
       </Box>
     </>

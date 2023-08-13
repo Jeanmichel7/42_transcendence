@@ -18,12 +18,18 @@ const InvitationWrapper = () => {
 
   const fetchRoom = useCallback(async () => {
     if (!channelId || userData.id === -1) return;
-    const result: RoomInterface | ApiErrorResponse = await getRoomData(channelId);
+    const result: RoomInterface | ApiErrorResponse = await getRoomData(
+      channelId,
+    );
     if ('statusCode' in result && result.statusCode === 403) {
       dispatch(setErrorSnackbar('You are not allowed to access this room'));
       navigate('/chat');
     } else if ('error' in result) {
-      dispatch(setErrorSnackbar(result.error + result.message ? ': ' + result.message : ''));
+      dispatch(
+        setErrorSnackbar(
+          result.error + result.message ? ': ' + result.message : '',
+        ),
+      );
       navigate('/chat');
     } else {
       setRoom(result);
@@ -40,9 +46,12 @@ const InvitationWrapper = () => {
   }, [channelId, dispatch, navigate, userData.id]);
 
   useEffect(() => {
-    if (!channelId || !channelName
-    //  || !location.state
-    ) return;
+    if (
+      !channelId ||
+      !channelName
+      //  || !location.state
+    )
+      return;
     // console.log('location : ', location);
     // console.log('channelId : ', channelId);
     // console.log('channelName : ', channelName);
@@ -51,16 +60,9 @@ const InvitationWrapper = () => {
     //verifie acces
     // ajoute list conv
     // redirige vers conv
-
   }, [fetchRoom]);
 
-  return (
-    <>
-      {room && 
-        < RoomCard room={room} />
-      }
-    </>
-  );
+  return <>{room && <RoomCard room={room} />}</>;
 };
 
 export default InvitationWrapper;

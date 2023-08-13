@@ -29,7 +29,7 @@ const ConversationWrapper = () => {
         socketRef.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData.id, login]);
 
   useConnectionSocketChat(
@@ -43,21 +43,25 @@ const ConversationWrapper = () => {
   //   console.log('name : ', name);
   // }, [location.state, name]);
 
-  
   return (
     <>
-      { login && !name && <PrivateConversation key={convId} /> }
-      { !login && name && 
+      {login && !name && <PrivateConversation key={convId} />}
+      {!login && name && (
         <>
-          { socketRef && socketRef.current && socketRef.current.connected && location.state ?
+          {socketRef &&
+          socketRef.current &&
+          socketRef.current.connected &&
+          location.state ? (
             <ChannelConversation
               key={convId}
               conv={location.state}
               socketRef={socketRef as React.MutableRefObject<Socket>}
-            /> : <Loaderperosnalized top={50} left={50}/>
-          }
+            />
+          ) : (
+            <Loaderperosnalized top={50} left={50} />
+          )}
         </>
-      }
+      )}
     </>
   );
 };

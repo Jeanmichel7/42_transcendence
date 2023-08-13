@@ -34,7 +34,7 @@ const Number = styled.span<NumberProps>`
   font-size: 8em; // Augmenter la taille de la police
   color: #;
   animation: ${fadeAndZoomIn} 1s ease-out;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
+  opacity: ${props => (props.visible ? 1 : 0)};
   transition: opacity 0.3s ease-out;
 `;
 
@@ -52,9 +52,7 @@ const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
-      setCount((currentCount) =>
-        currentCount - 1 <= 0 ? 0 : currentCount - 1
-      );
+      setCount(currentCount => (currentCount - 1 <= 0 ? 0 : currentCount - 1));
     }, 1000);
 
     return () => {

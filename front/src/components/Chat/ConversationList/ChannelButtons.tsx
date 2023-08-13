@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 export function ButtonCreateGroup() {
   return (
-    <Link to='/chat/createChannel'>
+    <Link to="/chat/createChannel">
       <Button
         variant="contained"
         color="secondary"
@@ -19,13 +19,14 @@ export function ButtonCreateGroup() {
 
 export function ButtonInterfaceAddGroups() {
   return (
-    <Link to='/chat/addChannels' >
+    <Link to="/chat/addChannels">
       <Tooltip
-        title="Add channels" arrow
+        title="Add channels"
+        arrow
         TransitionComponent={Zoom}
         TransitionProps={{ timeout: 600 }}
       >
-        <IconButton color='primary' >
+        <IconButton color="primary">
           <GroupAddOutlinedIcon />
         </IconButton>
       </Tooltip>
@@ -35,13 +36,14 @@ export function ButtonInterfaceAddGroups() {
 
 export function ButtonInterfaceAddFriends() {
   return (
-    <Link to='/chat/addFriends'>
+    <Link to="/chat/addFriends">
       <Tooltip
-        title="Add friends" arrow
+        title="Add friends"
+        arrow
         TransitionComponent={Zoom}
         TransitionProps={{ timeout: 600 }}
       >
-        <IconButton color='primary' >
+        <IconButton color="primary">
           <PersonAddOutlinedIcon />
         </IconButton>
       </Tooltip>

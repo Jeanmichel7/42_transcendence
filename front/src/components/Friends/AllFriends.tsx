@@ -1,18 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { Nothing } from "./Nothing";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { Nothing } from './Nothing';
 
-import { apiBlockUser, deleteFriend } from "../../api/relation";
-import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { UserInterface, ApiErrorResponse, UserRelation } from "../../types";
+import { apiBlockUser, deleteFriend } from '../../api/relation';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { UserInterface, ApiErrorResponse, UserRelation } from '../../types';
 
-import { CircularProgress } from "@mui/material";
-import { reduxAddUserBlocked, reduxRemoveFriends } from "../../store/userSlice";
-import { useState } from "react";
-import FriendItem from "./FriendItem";
-import { useNavigate } from "react-router-dom";
-import { reduxAddConversationList } from "../../store/convListSlice";
-import { getConvIdFromUserOrRoom } from "../../utils/utils";
+import { CircularProgress } from '@mui/material';
+import { reduxAddUserBlocked, reduxRemoveFriends } from '../../store/userSlice';
+import { useState } from 'react';
+import FriendItem from './FriendItem';
+import { useNavigate } from 'react-router-dom';
+import { reduxAddConversationList } from '../../store/convListSlice';
+import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
 interface AllFriendsProps {
   userDataId: number;
@@ -28,47 +28,47 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("userFriends", userFriends);
+  console.log('userFriends', userFriends);
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
     const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(
-      userToBlock.id
+      userToBlock.id,
     );
     setIsLoading(false);
 
-    if ("error" in resBlockRequest)
+    if ('error' in resBlockRequest)
       dispatch(
         setErrorSnackbar(
           resBlockRequest.error + resBlockRequest.message
-            ? ": " + resBlockRequest.message
-            : ""
-        )
+            ? ': ' + resBlockRequest.message
+            : '',
+        ),
       );
     else {
       dispatch(reduxAddUserBlocked(userToBlock));
-      dispatch(setMsgSnackbar("User blocked"));
+      dispatch(setMsgSnackbar('User blocked'));
     }
   };
 
   const handleDeleteFriend = async (userToDelete: UserInterface) => {
     setIsLoading(true);
     const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(
-      userToDelete.id
+      userToDelete.id,
     );
     setIsLoading(false);
 
-    if (typeof resDeleteRequest === "object" && "error" in resDeleteRequest)
+    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
       dispatch(
         setErrorSnackbar(
           resDeleteRequest.error + resDeleteRequest.message
-            ? ": " + resDeleteRequest.message
-            : ""
-        )
+            ? ': ' + resDeleteRequest.message
+            : '',
+        ),
       );
     else {
       dispatch(reduxRemoveFriends(userToDelete));
-      dispatch(setMsgSnackbar("Friend deleted"));
+      dispatch(setMsgSnackbar('Friend deleted'));
     }
   };
 
@@ -87,14 +87,14 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
     <>
       {!userFriends && <p>Loading...</p>}
       {userFriends?.length === 0 && <Nothing text="Sorry... you're alone" />}
-      {userFriends?.map((user) => (
+      {userFriends?.map(user => (
         <FriendItem
           key={user.id}
           user={user}
           actions={[
-            { name: "Chat", callback: handleNavigateToChat },
-            { name: "Block", callback: handleBlockUser },
-            { name: "Delete", callback: handleDeleteFriend },
+            { name: 'Chat', callback: handleNavigateToChat },
+            { name: 'Block', callback: handleBlockUser },
+            { name: 'Delete', callback: handleDeleteFriend },
           ]}
           isLoading={isLoading}
         />

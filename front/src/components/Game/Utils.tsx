@@ -1,5 +1,4 @@
-import styled, { keyframes } from "styled-components";
-import React from "react";
+import styled, { keyframes } from 'styled-components';
 
 export const dotAnimation = keyframes`
   0%, 80%, 100% { 

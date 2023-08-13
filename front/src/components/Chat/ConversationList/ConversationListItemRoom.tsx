@@ -4,7 +4,11 @@ import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import { leaveRoom } from '../../../api/chat';
-import { ApiErrorResponse, ConversationInterface, RoomInterface } from '../../../types';
+import {
+  ApiErrorResponse,
+  ConversationInterface,
+  RoomInterface,
+} from '../../../types';
 
 import { CircularProgress, IconButton, Tooltip, Zoom } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,14 +18,11 @@ import { RootState } from '../../../store';
 
 import ConversationListRoomItemIcons from './ChannelIconAvatars';
 
-
 interface ConvProps {
-  conv: ConversationInterface,
+  conv: ConversationInterface;
 }
 
-const ConversationListRoomItem: React.FC<ConvProps> = ({
-  conv,
-}) => {
+const ConversationListRoomItem: React.FC<ConvProps> = ({ conv }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { userData } = useSelector((state: RootState) => state.user);
@@ -33,23 +34,34 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   const handleCloseConv = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     dispatch(setMsgSnackbar('Conv Close'));
-    dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
+    dispatch(
+      reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }),
+    );
     if (conv.id === parseInt(convId as string)) navigate('/chat');
   };
 
   const handleLeaveRoom = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsLoading(true);
-    const resLeaveRoom: RoomInterface | ApiErrorResponse = await leaveRoom(conv.room.id);
+    const resLeaveRoom: RoomInterface | ApiErrorResponse = await leaveRoom(
+      conv.room.id,
+    );
     setIsLoading(false);
 
     if ('error' in resLeaveRoom)
-      dispatch(setErrorSnackbar(resLeaveRoom.error + resLeaveRoom.message ? ': ' + resLeaveRoom.message : ''));
+      dispatch(
+        setErrorSnackbar(
+          resLeaveRoom.error + resLeaveRoom.message
+            ? ': ' + resLeaveRoom.message
+            : '',
+        ),
+      );
     else {
       dispatch(setMsgSnackbar('Leaved room'));
-      dispatch(reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }));
-      if (conv.id == parseInt(convId as string))
-        navigate('/chat');
+      dispatch(
+        reduxRemoveConversationToList({ convId: conv.id, userId: userData.id }),
+      );
+      if (conv.id == parseInt(convId as string)) navigate('/chat');
     }
   };
 
@@ -57,16 +69,16 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
   //   console.log('   convlistitemconv', conv);
   // }, [conv]);
 
-
   return (
     <div>
-      <div className="border hover:bg-gray-100 transition-all 
+      <div
+        className="border hover:bg-gray-100 transition-all 
         cursor-pointer flex flex-row items-center text-left"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link 
-          to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name} 
+        <Link
+          to={'channel/' + conv.id + '/' + conv.room.id + '/' + conv.room.name}
           state={conv}
           className="flex flex-grow text-black p-1 pl-2 items-center "
         >
@@ -74,12 +86,14 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         </Link>
 
         <Tooltip
-          title="Leave room" arrow
+          title="Leave room"
+          arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton 
-            onClick={(e) => handleLeaveRoom(e)} color='error'
+          <IconButton
+            onClick={e => handleLeaveRoom(e)}
+            color="error"
             sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '0' }}
           >
             <ExitToAppIcon />
@@ -87,19 +101,21 @@ const ConversationListRoomItem: React.FC<ConvProps> = ({
         </Tooltip>
 
         <Tooltip
-          title="Close group" arrow
+          title="Close group"
+          arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton 
-            onClick={(e) => handleCloseConv(e)} color='warning'
+          <IconButton
+            onClick={e => handleCloseConv(e)}
+            color="warning"
             sx={{ visibility: isHovered ? 'visible' : 'hidden', padding: '1' }}
           >
             <CloseIcon />
           </IconButton>
         </Tooltip>
 
-        { isLoading && <CircularProgress />}
+        {isLoading && <CircularProgress />}
       </div>
     </div>
   );

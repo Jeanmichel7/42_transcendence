@@ -1,4 +1,4 @@
-//flemme de faire le hook 
+//flemme de faire le hook
 //handleAcceptFriendRequest
 //handleDeclineFriendRequest
 //etc...

@@ -40,12 +40,12 @@ export const StyledButton = styled.button<StyledButtonProps>`
     border-radius: 3rem;
     transition: width 0.2s ease;
     z-index: -1;
-    visibility: ${(props) => (props.activateEffect ? 'visible' : 'hidden')};
+    visibility: ${props => (props.activateEffect ? 'visible' : 'hidden')};
     left: -50%;
   }
 
   &:hover {
-    ${(props) =>
+    ${props =>
       props.activateEffect &&
       `
     color: var(--color-primary);
@@ -60,16 +60,16 @@ interface ButtonWrapperProps {
   animation: boolean;
 }
 export const ButtonWrapper = styled.div<ButtonWrapperProps>`
-  top: 20%;
-  height: 30%;
+  height: 45%;
   width: 30%;
+  margin-top: 5%;
   display: flex;
-  position: absolute;
+  position: relative;
   align-items: flex-start;
   justify-content: space-between;
   flex-direction: column;
   transform: translate(-50%, 0%);
-  animation: ${(props) => (props.animation ? fadeIn : '')} 1s ease-out;
+  animation: ${props => (props.animation ? fadeIn : '')} 1s ease-out;
   left: 50%;
   z-index: 10;
   @media (max-width: 768px) {
@@ -92,7 +92,7 @@ const StyledCircle = styled.div<StyledCircleProps>`
   z-index: 1;
   left: -50%;
   transition: top 0.2s ease;
-  ${(props) => {
+  ${props => {
     return props.pos === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
 `;
@@ -170,7 +170,7 @@ function Lobby({
                 if (response === 'error') {
                   setCurrentPage('lobby');
                 }
-              }
+              },
             );
             setBonus(false);
             setCurrentPage('searchOpponent');
@@ -199,8 +199,8 @@ function Lobby({
           Bonus Mode
         </StyledButton>
       </ButtonWrapper>
-      <div className="grid md:grid-cols-3   justify-items-center  gap-4 w-1/2 absolute inset-y-2/3 w-full	">
-        {lobbyData.map((card) => {
+      <div className="grid md:grid-cols-3  items-center h-1/2 justify-items-center relative   w-full">
+        {lobbyData.map(card => {
           return (
             <div
               key={card.id.toString()}
@@ -215,7 +215,7 @@ function Lobby({
                     className="w-10 h-10 rounded-full mr-4"
                   />
                   <div className="text-left">
-                    <p classNaome="font-semibold">{card.player1Username}</p>
+                    <p className="font-semibold">{card.player1Username}</p>
                     <img
                       src={ranksImages[card.player2Rank]}
                       alt={card.player2Rank}
@@ -250,7 +250,10 @@ function Lobby({
         {fakeCards.map((_, index) => (
           <div
             key={`fake-card-${index}`}
-            className="border border-dashed rounded-lg m-4 w-72  bg-transparent"
+            // Masquez les deux dernières "fake cards" sur les petits écrans
+            className={`border border-dashed rounded-lg h-44 m-4 w-72 bg-transparent ${
+              index > 0 ? 'hidden md:block' : ''
+            }`}
           ></div>
         ))}
       </div>

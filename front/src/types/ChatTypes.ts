@@ -1,4 +1,4 @@
-import { UserInterface } from "./UserTypes";
+import { UserInterface } from './UserTypes';
 
 export interface MessageInterface {
   id: number;
@@ -21,7 +21,7 @@ export interface ChatMsgInterface {
 export interface RoomInterface {
   id: number;
   name: string;
-  type: "public" | "private";
+  type: 'public' | 'private';
   isProtected: boolean;
   password?: string;
   createdAt?: Date;

@@ -2,7 +2,9 @@ import { apiRequest } from './index';
 import { ApiErrorResponse } from '../types';
 import { GameInterface } from '../types/GameTypes';
 
-export async function getHistoryGames(userId: number): Promise< GameInterface[] | ApiErrorResponse > {
+export async function getHistoryGames(
+  userId: number,
+): Promise<GameInterface[] | ApiErrorResponse> {
   return apiRequest<GameInterface[]>(
     'get',
     '/games/users/' + userId + '/allUserGames',
@@ -12,7 +14,7 @@ export async function getHistoryGames(userId: number): Promise< GameInterface[] 
 
 export async function getGame(
   gameId: number,
-): Promise< GameInterface | ApiErrorResponse > {
+): Promise<GameInterface | ApiErrorResponse> {
   return apiRequest<GameInterface>(
     'get',
     '/games/' + gameId,
@@ -22,7 +24,7 @@ export async function getGame(
 
 export async function inviteGameUser(
   userId: number,
-): Promise< GameInterface | ApiErrorResponse > {
+): Promise<GameInterface | ApiErrorResponse> {
   return apiRequest<GameInterface>(
     'patch',
     '/games/users/' + userId + '/invite',
@@ -32,7 +34,7 @@ export async function inviteGameUser(
 
 export async function acceptGame(
   gameId: number,
-): Promise< GameInterface | ApiErrorResponse > {
+): Promise<GameInterface | ApiErrorResponse> {
   return apiRequest<GameInterface>(
     'patch',
     '/games/' + gameId + '/accept',
@@ -42,7 +44,7 @@ export async function acceptGame(
 
 export async function declineGame(
   gameId: number,
-): Promise< void | ApiErrorResponse > {
+): Promise<void | ApiErrorResponse> {
   return apiRequest<void>(
     'patch',
     '/games/' + gameId + '/decline',

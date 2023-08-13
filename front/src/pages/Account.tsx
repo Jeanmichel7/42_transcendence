@@ -1,9 +1,9 @@
-import { RootState } from "../store";
-import { useSelector } from "react-redux";
+import { RootState } from '../store';
+import { useSelector } from 'react-redux';
 
-import AccountProfile from "../components/Account/AccountProfile";
-import ProfileFriends from "../components/Profile/ProfileFriends";
-import HistoryGame from "../components/Profile/HistoryGame";
+import AccountProfile from '../components/Account/AccountProfile';
+import ProfileFriends from '../components/Profile/ProfileFriends';
+import HistoryGame from '../components/Profile/HistoryGame';
 // import { useEffect } from 'react';
 
 export default function Account() {

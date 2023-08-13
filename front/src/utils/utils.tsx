@@ -1,4 +1,10 @@
-import { UserInterface, RoomInterface, ConversationInterface, MessageInterface, ChatMsgInterface } from '../types';
+import {
+  UserInterface,
+  RoomInterface,
+  ConversationInterface,
+  MessageInterface,
+  ChatMsgInterface,
+} from '../types';
 
 export function getTimeSince(time: Date): string {
   const now: Date = new Date();
@@ -9,10 +15,8 @@ export function getTimeSince(time: Date): string {
   const hours: number = Math.floor(minutes / 60);
   let result = '';
 
-  if (hours > 24)
-    result += 'Le ' + dataTime.toLocaleDateString();
-  else if (hours == 0 && minutes == 0 && seconds <= 30)
-    result += 'Now';
+  if (hours > 24) result += 'Le ' + dataTime.toLocaleDateString();
+  else if (hours == 0 && minutes == 0 && seconds <= 30) result += 'Now';
   else {
     result += 'Il y a ';
     if (hours >= 1) {
@@ -35,20 +39,16 @@ export function isRoomInterface(obj: any): obj is RoomInterface {
 }
 
 export function isConvAlreadyExist( // isConvEntityAlreadyExist
-  conv: (UserInterface | RoomInterface),
+  conv: UserInterface | RoomInterface,
   listConvs: ConversationInterface[],
 ): boolean {
-  return listConvs.some((convInList) => {
+  return listConvs.some(convInList => {
     if (isRoomInterface(convInList.room) && isRoomInterface(conv)) {
-      if (convInList.room.id === conv.id)
-        return true;
-      else
-        return false;
+      if (convInList.room.id === conv.id) return true;
+      else return false;
     } else if (isUserInterface(convInList.user) && isUserInterface(conv)) {
-      if (convInList.user.id === conv.id)
-        return true;
-      else
-        return false;
+      if (convInList.user.id === conv.id) return true;
+      else return false;
     }
     return false;
   });
@@ -62,16 +62,19 @@ export function isChatMsgInterface(obj: any): obj is ChatMsgInterface {
 }
 
 export function getConvIdFromUserOrRoom(
-  userOrRoom: (UserInterface | RoomInterface),
+  userOrRoom: UserInterface | RoomInterface,
   listConvs: ConversationInterface[],
 ): number {
   let convId = -1;
-  listConvs.forEach((convInList) => {
+  listConvs.forEach(convInList => {
     if (isRoomInterface(convInList.room) && isRoomInterface(userOrRoom)) {
       if (convInList.room.id === userOrRoom.id) {
         convId = convInList.id;
       }
-    } else if (isUserInterface(convInList.user) && isUserInterface(userOrRoom)) {
+    } else if (
+      isUserInterface(convInList.user) &&
+      isUserInterface(userOrRoom)
+    ) {
       if (convInList.user.id === userOrRoom.id) {
         convId = convInList.id;
       }

@@ -31,18 +31,19 @@ export interface RoomUserActionInterface {
 
 export interface NotificationInterface {
   id: number;
-  type: 'friendRequest' |
-  'friendRequestAccepted' |
-  'friendRequestDeclined' |
-  'friendRequestCanceled' |
-  'friendDeleted' |
-  'blockUser' |
-  'unblockUser' |
-  'roomInvite' |
-  'gameInvite' |
-  'gameInviteAccepted' |
-  'gameInviteDeclined' |
-  'message';
+  type:
+    | 'friendRequest'
+    | 'friendRequestAccepted'
+    | 'friendRequestDeclined'
+    | 'friendRequestCanceled'
+    | 'friendDeleted'
+    | 'blockUser'
+    | 'unblockUser'
+    | 'roomInvite'
+    | 'gameInvite'
+    | 'gameInviteAccepted'
+    | 'gameInviteDeclined'
+    | 'message';
   // title: string;
   content: string;
   read: boolean;

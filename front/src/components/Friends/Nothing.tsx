@@ -1,5 +1,5 @@
-import sadBall from "../../assets/sadBall.png";
-import angryBall from "../../assets/angryBall.png";
+import sadBall from '../../assets/sadBall.png';
+import angryBall from '../../assets/angryBall.png';
 
 export function Nothing({ text, angry }) {
   return (

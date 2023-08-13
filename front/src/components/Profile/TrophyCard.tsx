@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { TrophyInterface } from "../../types/UserTypes";
-import { useImage } from "../../utils/hooks";
-import trophyImages from "./TrophyImages";
+import { useEffect, useMemo, useState } from 'react';
+import { TrophyInterface } from '../../types/UserTypes';
+import { useImage } from '../../utils/hooks';
+import trophyImages from './TrophyImages';
 
 interface Trophy {
   trophy: TrophyInterface;

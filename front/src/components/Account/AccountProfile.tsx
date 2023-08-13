@@ -1,18 +1,25 @@
-import React, { useState, createRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setErrorSnackbar, setMsgSnackbar } from "../../store/snackbarSlice";
-import { setLogged, setUser } from "../../store/userSlice";
+import React, { useState, createRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import { setLogged, setUser } from '../../store/userSlice';
 // import { RootState } from '../../store';
-import { Sticker } from "../../utils/StyledTitle";
+import { Sticker } from '../../utils/StyledTitle';
 
-import AccountItem from "./AccountItem";
+import AccountItem from './AccountItem';
 
-import { deleteAccount, patchUserAccount } from "../../api/user";
-import { UserInterface, ApiErrorResponse } from "../../types";
+import { deleteAccount, patchUserAccount } from '../../api/user';
+import { UserInterface, ApiErrorResponse } from '../../types';
 
-import Box from "@mui/material/Box";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, Slide } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import Box from '@mui/material/Box';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface AccountProfileProps {
   user: UserInterface;
@@ -42,23 +49,23 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
   const handleFileUpload = async () => {
     const fileInput: HTMLInputElement | null = fileInputRef.current;
     const formData: FormData = new FormData();
-    formData.append("avatar", fileInput?.files?.[0] as File);
+    formData.append('avatar', fileInput?.files?.[0] as File);
     setIsLoading(true);
     const updatedUser: UserInterface | ApiErrorResponse =
       await patchUserAccount(formData);
-    if ("error" in updatedUser) {
+    if ('error' in updatedUser) {
       dispatch(
         setErrorSnackbar(
           updatedUser.error + updatedUser.message
-            ? ": " + updatedUser.message
-            : ""
-        )
+            ? ': ' + updatedUser.message
+            : '',
+        ),
       );
     } else {
       dispatch(setUser({ ...user, avatar: updatedUser.avatar }));
       setOpenInputAvatar(false);
       setPreviewAvatar(null);
-      dispatch(setMsgSnackbar("Updated!"));
+      dispatch(setMsgSnackbar('Updated!'));
     }
     setIsLoading(false);
   };
@@ -66,27 +73,33 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
   const handleDeleteAccount = async () => {
     setIsLoading(true);
     const deletedUser: void | ApiErrorResponse = await deleteAccount();
-    if (typeof deletedUser === "object" && "error" in deletedUser) {
-      dispatch(setErrorSnackbar(deletedUser.error + deletedUser.message
-        ? ": " + deletedUser.message : ""
-      ));
+    if (typeof deletedUser === 'object' && 'error' in deletedUser) {
+      dispatch(
+        setErrorSnackbar(
+          deletedUser.error + deletedUser.message
+            ? ': ' + deletedUser.message
+            : '',
+        ),
+      );
     } else {
-      dispatch(setMsgSnackbar("Account successfully deleted!"));
-      dispatch(setUser({
-        id: -1,
-        login: "",
-        email: "",
-        firstName: "",
-        lastName: "",
-        status: "offline",
-        avatar: "",
-        role: "user",
-        description: "",
-        is2FAEnabled: false,
-        score: 1500,
-      }));
+      dispatch(setMsgSnackbar('Account successfully deleted!'));
+      dispatch(
+        setUser({
+          id: -1,
+          login: '',
+          email: '',
+          firstName: '',
+          lastName: '',
+          status: 'offline',
+          avatar: '',
+          role: 'user',
+          description: '',
+          is2FAEnabled: false,
+          score: 1500,
+        }),
+      );
       dispatch(setLogged(false));
-      navigate("/");
+      navigate('/');
     }
     setIsLoading(false);
   };
@@ -99,10 +112,9 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
     setOpenDialog(false);
   };
 
-
   return (
     <>
-      <Sticker dataText={"Account"} />
+      <Sticker dataText={'Account'} />
 
       {user && (
         <Box className="flex flex-col md:flex-row justify-center">
@@ -123,11 +135,11 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 }
                 className="mb-2 w-auto rounded-full max-h-[200px] border-4 border-blue-500"
                 alt="avatar"
-                onError={(e) => {
+                onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    "http://localhost:3000/avatars/defaultAvatar.png";
+                    'http://localhost:3000/avatars/defaultAvatar.png';
                 }}
               />
 
@@ -171,7 +183,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
               <div className="mt-5">
                 <p className="font-bold text-gray-700 mb-2"> Description : </p>
                 <p className="text-gray-600 text-center">
-                  {user.description ? user.description : "No description"}
+                  {user.description ? user.description : 'No description'}
                 </p>
               </div>
             </Box>
@@ -197,36 +209,38 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 variant="contained"
                 color="error"
                 onClick={handleOpenDialog}
-              > Delete Account </Button>
+              >
+                Delete Account
+              </Button>
             </div>
           </div>
         </Box>
       )}
-        <Dialog
-          open={openDialog}
-          keepMounted
-          onClose={handleCloseDialog}
-        >
-          <DialogTitle>{"Are you sure you want to delete your account?"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              By deleting your account, all your data will be removed permanently. This action cannot be undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Cancel
-            </Button>
-            <Button 
-              onClick={async () => {
-                await handleDeleteAccount();
-                handleCloseDialog();
-              }} 
-              color="error">
-              Confirm Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog open={openDialog} keepMounted onClose={handleCloseDialog}>
+        <DialogTitle>
+          {'Are you sure you want to delete your account?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            By deleting your account, all your data will be removed permanently.
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={async () => {
+              await handleDeleteAccount();
+              handleCloseDialog();
+            }}
+            color="error"
+          >
+            Confirm Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

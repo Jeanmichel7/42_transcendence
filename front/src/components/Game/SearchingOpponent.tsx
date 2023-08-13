@@ -1,13 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { io, Socket } from 'socket.io-client';
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-  SocketInterface,
-} from './Interface';
 import { ButtonWrapper, StyledButton } from './Lobby';
-import { DotWaitings, dotAnimation } from './Utils';
+import { dotAnimation } from './Utils';
 interface SearchingOpponentProps {
   // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   socket: any;
@@ -15,16 +9,20 @@ interface SearchingOpponentProps {
   bonus: boolean;
 }
 
-const StyledCircle = styled.div`
+interface StyledCircleProps {
+  top: string;
+  position: string;
+}
+const StyledCircle = styled.div<StyledCircleProps>`
   position: absolute;
   height: 5rem;
   width: 5rem;
   background-color: #fff;
   border-radius: 3rem;
   z-index: 1;
-  left: ${(props) => props.position};
+  left: ${props => props.position};
   transition: top 0.2s ease;
-  ${(props) => {
+  ${props => {
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
   animation: ${dotAnimation} 2s infinite ease-in-out both;
@@ -50,7 +48,11 @@ const FadingAnnimation = keyframes`
   }
 `;
 
-const StyledButtonOrder = styled(StyledButton)`
+interface StyledButtonOrderProps {
+  order: string;
+}
+
+const StyledButtonOrder = styled(StyledButton)<StyledButtonOrderProps>`
   animation: ${FadingAnnimation} 1s ease-in-out forwards;
   &::before {
     opacity: 0;
@@ -59,7 +61,7 @@ const StyledButtonOrder = styled(StyledButton)`
   &:hover::before {
     opacity: 1;
   }
-  order: ${(props) => props.order};
+  order: ${props => props.order};
 `;
 
 const reduceSize = keyframes`
@@ -85,7 +87,12 @@ const expandEffect = keyframes`
 }
 
 `;
-export const StyledOblong = styled.button`
+
+interface StyledOblongProps {
+  top: string;
+  ref: React.RefObject<HTMLButtonElement>;
+}
+export const StyledOblong = styled.button<StyledOblongProps>`
   position: absolute;
   height: 5rem;
   animation: ${reduceSize} 1s ease-out forwards;
@@ -95,7 +102,7 @@ export const StyledOblong = styled.button`
   z-index: 1;
   visibility: visible;
   left: -50%;
-  ${(props) => {
+  ${props => {
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
 
@@ -119,7 +126,7 @@ function SearchingOpponent({
   bonus,
 }: SearchingOpponentProps) {
   const [loadingDot, setLoadingDot] = useState(false);
-  const myRef = useRef();
+  const myRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const node = myRef.current;
 
@@ -135,11 +142,10 @@ function SearchingOpponent({
       if (node) node.removeEventListener('animationend', handleAnimationEnd);
     };
   }, []); // Cette dépendance vide indique que cet effet ne fonctionne qu'au montage et au démontage
-  console.log(bonus);
 
   return (
-    <div className="flex flex-col justify-center items-center  w-full ">
-      <ButtonWrapper>
+    <div className="h-full  w-full ">
+      <ButtonWrapper animation={true}>
         <StyledButtonOrder
           order={bonus ? '0' : '1'}
           activateEffect={loadingDot}

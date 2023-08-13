@@ -1,4 +1,12 @@
-import { Button, CircularProgress, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
@@ -28,17 +36,17 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
+  const handleClickShowPassword = () => setShowPassword(show => !show);
+  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
 
   const handleJoinRoom = async () => {
-    if (!room)
-      return;
+    if (!room) return;
     if (isConvAlreadyExist(room, conversationsList)) {
       return dispatch(setErrorSnackbar('Room already in conversation list'));
     }
-    if (room.isProtected && !displayInputPwd)
-      return setDisplayInputPwd(true);
+    if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
       return dispatch(setErrorSnackbar('Password required'));
 
@@ -54,7 +62,9 @@ const RoomCard = ({ room }: RoomCardProps) => {
         dispatch(setMsgSnackbar('Add room to conversation list'));
         setAlreadyInRoom(true);
       } else
-        dispatch(setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''));
+        dispatch(
+          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
+        );
     } else {
       // const newConvId = conversationsList.length === 0 ? 0 : conversationsList[conversationsList.length - 1].id + 1;
       dispatch(setMsgSnackbar('Room joined'));
@@ -65,44 +75,44 @@ const RoomCard = ({ room }: RoomCardProps) => {
       //navigate ?
     }
     setIsLoading(false);
-
   };
 
   useEffect(() => {
     setAlreadyInRoom(isConvAlreadyExist(room, conversationsList));
   }, [conversationsList, room]);
 
-
-
   return (
-    <div className="min-w-[200px] min-h-[200px] m-2 border rounded-lg flex flex-col justify-between" >
+    <div className="min-w-[200px] min-h-[200px] m-2 border rounded-lg flex flex-col justify-between">
       <div className="flex flex-col justify-center items-center h-[150px]">
         <p className="text-2xl">{room.name}</p>
         <p className="text-2xl">{room.type}</p>
         <p className="text-2xl">{room.isProtected ? 'protected' : ''}</p>
       </div>
-      {!displayInputPwd &&
+      {!displayInputPwd && (
         <div className="flex justify-center items-center min-h-[50px]">
           <Button
             onClick={() => handleJoinRoom()}
             variant="contained"
-            color={ alreadyInRoom ? 'secondary' : 'primary'}
-          > 
-            { alreadyInRoom ? 'In room' : 'Join'}
+            color={alreadyInRoom ? 'secondary' : 'primary'}
+          >
+            {alreadyInRoom ? 'In room' : 'Join'}
           </Button>
-        </div>}
+        </div>
+      )}
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
           <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password-room">Password</InputLabel>
+            <InputLabel htmlFor="outlined-adornment-password-room">
+              Password
+            </InputLabel>
             <OutlinedInput
               autoFocus
-              name='password'
+              name="password"
               id="outlined-adornment-password-roon"
               type={showPassword ? 'text' : 'password'}
               value={inputPwd ? inputPwd : ''}
-              onChange={(e) => setInputPwd(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom()}
+              onChange={e => setInputPwd(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -119,7 +129,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             />
           </FormControl>
 
-          <div className=''>
+          <div className="">
             <IconButton
               onClick={handleJoinRoom}
               color="primary"

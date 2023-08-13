@@ -73,15 +73,15 @@ function Pong() {
 
     const fetchGame = async () => {
       const retFetchGame: GameInterface | ApiErrorResponse = await getGame(
-        parseInt(gameId)
+        parseInt(gameId),
       );
       if ('error' in retFetchGame) {
         dispatch(
           setErrorSnackbar(
             retFetchGame.error + retFetchGame.message
               ? ': ' + retFetchGame.message
-              : ''
-          )
+              : '',
+          ),
         );
         return navigate('/game');
       }
@@ -116,7 +116,7 @@ function Pong() {
     } else {
       socket.emit('leaveLobbyRoom');
     }
-    socket.on('lobbyRoomUpdate', (data) => {
+    socket.on('lobbyRoomUpdate', data => {
       setLobbyData(data);
     });
 
@@ -138,7 +138,7 @@ function Pong() {
       setConnectStatus('disconnected');
     });
 
-    newSocket.on('userGameStatus', (message) => {
+    newSocket.on('userGameStatus', message => {
       if (message === 'foundNormal') {
         setBonus(false);
         setCurrentPage('game');

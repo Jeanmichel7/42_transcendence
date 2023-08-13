@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {DotWaitings} from './Utils';
+import { DotWaitings } from './Utils';
 
 const OverlayWrapper = styled.div`
   background-color: rgba(128, 128, 128, 0.5);

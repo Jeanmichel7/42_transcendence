@@ -1,33 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { getHistoryGames } from "../../api/game";
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  tableCellClasses,
-  DataGrid,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { Sticker } from "../../utils/StyledTitle.tsx";
+import { getHistoryGames } from '../../api/game';
+import { TableCell, TableRow, tableCellClasses } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Sticker } from '../../utils/StyledTitle.tsx';
 
-import { UserInterface } from "../../types";
-import { GameInterface } from "../../types/GameTypes";
+import { UserInterface } from '../../types';
+import { GameInterface } from '../../types/GameTypes';
 
 const columns = [
-  { field: "id", headerName: "ID", width: 90 },
-  { field: "status", headerName: "Status", width: 130 },
-  { field: "player1", headerName: "Player1", width: 130 },
-  { field: "player2", headerName: "Player2", width: 130 },
-  { field: "scoreP1", headerName: "Score P1", width: 130 },
-  { field: "scoreP2", headerName: "Score P2", width: 130 },
-  { field: "duration", headerName: "Duration", width: 130 },
-  { field: "winner", headerName: "Winner", width: 130 },
-  { field: "date", headerName: "Date", width: 200 },
+  { field: 'id', headerName: 'ID', width: 90 },
+  { field: 'status', headerName: 'Status', width: 130 },
+  { field: 'player1', headerName: 'Player1', width: 130 },
+  { field: 'player2', headerName: 'Player2', width: 130 },
+  { field: 'scoreP1', headerName: 'Score P1', width: 130 },
+  { field: 'scoreP2', headerName: 'Score P2', width: 130 },
+  { field: 'duration', headerName: 'Duration', width: 130 },
+  { field: 'winner', headerName: 'Winner', width: 130 },
+  { field: 'date', headerName: 'Date', width: 200 },
 ];
 
 export default function HistoryGame({ user }: { user: UserInterface }) {
@@ -44,11 +34,11 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
   const currentGames = games.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
-    if (typeof user === "undefined" || !user.id) return;
+    if (typeof user === 'undefined' || !user.id) return;
     async function fetchAndSetFriendsProfile() {
       const gamesFetched = await getHistoryGames(user.id);
       // console.log(gamesFetched);
-      if ("error" in gamesFetched) {
+      if ('error' in gamesFetched) {
         // console.log(res);
       } else {
         setGames(gamesFetched);
@@ -68,11 +58,11 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
   }));
 
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
+    '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.action.hover,
     },
     // hide last border
-    "&:last-child td, &:last-child th": {
+    '&:last-child td, &:last-child th': {
       border: 0,
     },
   }));
@@ -83,16 +73,16 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
     const diff = Math.abs(end.getTime() - start.getTime());
     const minutes = Math.floor(diff / 1000 / 60);
     const seconds = Math.floor((diff / 1000) % 60);
-    return minutes + "min " + seconds + "s";
+    return minutes + 'min ' + seconds + 's';
   };
 
   const options: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   };
 
   return (
@@ -106,7 +96,7 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
         )}
         {games && games.length > 0 && (
           <div className="overflow-x-auto overflow-auto  w-full m-5  shadow-custom">
-            {" "}
+            {' '}
             <div className="align-middle text-xs inline-block min-w-full bg-white  rounded-lg">
               <table className="min-w-full">
                 <thead className="h-16">
@@ -144,7 +134,7 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
                   {currentGames.map((row, index) => (
                     <tr
                       key={row.id}
-                      className={index % 2 === 0 ? "bg-blue-50" : "bg-white"}
+                      className={index % 2 === 0 ? 'bg-blue-50' : 'bg-white'}
                     >
                       <td className="px-6 py-4 hidden md:table-cell whitespace-nowrap border-t border-r border-b border-gray-200">
                         {row.id}
@@ -153,16 +143,16 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
                         {row.status}
                       </td>
                       <td className="px-6 w-8 py-4 whitespace-nowrap border whitespace-no-wrap border-gray-200">
-                        {row.player1 ? row.player1.login : ""}
+                        {row.player1 ? row.player1.login : ''}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap border whitespace-no-wrap border-gray-200">
-                        {row.player2 ? row.player2.login : ""}
+                        {row.player2 ? row.player2.login : ''}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap border whitespace-no-wrap border-gray-200">
-                        {row.scorePlayer1 ? row.scorePlayer1 : "0"}
+                        {row.scorePlayer1 ? row.scorePlayer1 : '0'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap border whitespace-no-wrap border-gray-200">
-                        {row.scorePlayer2 ? row.scorePlayer2 : "0"}
+                        {row.scorePlayer2 ? row.scorePlayer2 : '0'}
                       </td>
                       <td className="px-6 py-4 hidden md:table-cell  whitespace-nowrap border whitespace-no-wrap border-gray-200">
                         {row.finishAt
@@ -174,8 +164,8 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
                       </td>
                       <td className="px-6 py-4 hidden md:table-cell  border-l border-b border-t border-gray-200">
                         {new Date(row.createdAt).toLocaleString(
-                          "fr-FR",
-                          options
+                          'fr-FR',
+                          options,
                         )}
                       </td>
                     </tr>
@@ -202,13 +192,13 @@ export default function HistoryGame({ user }: { user: UserInterface }) {
               onClick={() => handlePageChange(index + 1)}
               className={`w-10 h-10 mx-2 border border-gray-300 cursor-pointer hover:bg-[var(--color-tertiary)] rounded-full transition duration-300 ease-in-out ${
                 currentPage === index + 1
-                  ? "bg-[var(--color-primary)] text-gray-800"
-                  : "bg-[var(--background-color)]"
+                  ? 'bg-[var(--color-primary)] text-gray-800'
+                  : 'bg-[var(--background-color)]'
               }`}
             >
               {index + 1}
             </button>
-          )
+          ),
         )}
         <button
           onClick={() => handlePageChange(currentPage + 1)}

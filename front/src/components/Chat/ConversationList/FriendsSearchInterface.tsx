@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store";
-import { setErrorSnackbar, setMsgSnackbar } from "../../../store/snackbarSlice";
-import { reduxAddWaitingFriendsSent } from "../../../store/userSlice";
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { reduxAddWaitingFriendsSent } from '../../../store/userSlice';
 
-import FriendCard from "../../Profile/FriendsCard";
-import { getAllUsers, getAllUsersCount } from "../../../api/user";
-import { requestAddFriend } from "../../../api/relation";
-import { ApiErrorResponse, UserInterface, UserRelation } from "../../../types";
+import FriendCard from '../../Profile/FriendsCard';
+import { getAllUsers, getAllUsersCount } from '../../../api/user';
+import { requestAddFriend } from '../../../api/relation';
+import { ApiErrorResponse, UserInterface, UserRelation } from '../../../types';
 
 import {
   Autocomplete,
@@ -18,7 +18,7 @@ import {
   Select,
   Stack,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 export default function FriendsSearch() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,9 +37,9 @@ export default function FriendsSearch() {
   useEffect(() => {
     async function fetchTotalUsers() {
       const res: number | ApiErrorResponse = await getAllUsersCount();
-      if (typeof res != "number" && "error" in res)
+      if (typeof res != 'number' && 'error' in res)
         dispatch(
-          setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+          setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
         );
       else setTotalPages(Math.ceil(res / userPerPage));
     }
@@ -54,25 +54,25 @@ export default function FriendsSearch() {
       setIsLoading(true);
       const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsers(
         currentPage,
-        userPerPage
+        userPerPage,
       );
       setIsLoading(false);
 
-      if ("error" in allUsers)
+      if ('error' in allUsers)
         dispatch(
           setErrorSnackbar(
-            allUsers.error + allUsers.message ? ": " + allUsers.message : ""
-          )
+            allUsers.error + allUsers.message ? ': ' + allUsers.message : '',
+          ),
         );
       else {
         const resFiltered = allUsers.filter(
           (u: UserInterface) =>
             u.id != userData.id &&
             !userFriends?.find((f: UserInterface) => f.id === u.id) &&
-            !userBlocked?.find((f: UserInterface) => f.id === u.id)
+            !userBlocked?.find((f: UserInterface) => f.id === u.id),
         );
         setUsers(resFiltered);
-        topRef.current?.scrollIntoView({ behavior: "smooth" });
+        topRef.current?.scrollIntoView({ behavior: 'smooth' });
       }
       setSelectedUser(null);
     }
@@ -89,22 +89,22 @@ export default function FriendsSearch() {
   const handleRequestAddFriend = async (user: UserInterface | null) => {
     if (!user) return;
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(
-      user.id
+      user.id,
     );
-    if ("error" in res)
+    if ('error' in res)
       dispatch(
-        setErrorSnackbar(res.error + res.message ? ": " + res.message : "")
+        setErrorSnackbar(res.error + res.message ? ': ' + res.message : ''),
       );
     else {
       dispatch(reduxAddWaitingFriendsSent(user));
-      dispatch(setMsgSnackbar("Request sent"));
+      dispatch(setMsgSnackbar('Request sent'));
       setSelectedUser(null);
     }
   };
 
   const handleChangePage = (
     event: React.ChangeEvent<unknown> | null,
-    value: number
+    value: number,
   ) => {
     setCurrentPage(value);
   };
@@ -123,19 +123,19 @@ export default function FriendsSearch() {
           options={users.filter(
             (u: UserInterface) =>
               !waitingFriendsRequestSent?.find(
-                (f: UserInterface) => f.id === u.id
-              )
+                (f: UserInterface) => f.id === u.id,
+              ),
           )}
           getOptionLabel={(option: UserInterface) => option.login}
           onChange={(
             event: React.ChangeEvent<object>,
-            newValue: UserInterface | null
+            newValue: UserInterface | null,
           ) => {
             event.stopPropagation();
             setSelectedUser(newValue);
           }}
           value={selectedUser}
-          renderInput={(params) => (
+          renderInput={params => (
             <TextField {...params} label="Search Friends" variant="outlined" />
           )}
         />
@@ -146,16 +146,16 @@ export default function FriendsSearch() {
           disabled={!selectedUser || isLoading}
           sx={{
             ml: 2,
-            height: "40px",
-            alignSelf: "center",
+            height: '40px',
+            alignSelf: 'center',
             visibility:
               !selectedUser || isMyFriend(selectedUser.id)
-                ? "hidden"
-                : "visible",
+                ? 'hidden'
+                : 'visible',
           }}
         >
-          {" "}
-          Add{" "}
+          {' '}
+          Add{' '}
         </Button>
       </div>
       {isLoading && (
@@ -163,9 +163,9 @@ export default function FriendsSearch() {
           size={100}
           color="primary"
           sx={{
-            position: "absolute",
-            top: "25%",
-            left: "50%",
+            position: 'absolute',
+            top: '25%',
+            left: '50%',
           }}
         />
       )}
@@ -187,7 +187,7 @@ export default function FriendsSearch() {
             value={userPerPage}
             onChange={handleChangeUserPerPage}
             label="Cards per page"
-            sx={{ height: "35px" }}
+            sx={{ height: '35px' }}
           >
             <MenuItem value={10}>10</MenuItem>
             <MenuItem value={20}>20</MenuItem>

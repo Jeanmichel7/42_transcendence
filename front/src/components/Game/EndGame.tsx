@@ -1,12 +1,11 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes } from 'styled-components';
 // import { StyledButton } from './Lobby';
-import confetti from "canvas-confetti";
-import { useEffect } from "react";
-import { Smiley } from "./SmileyWrapper";
-import "./font.css";
-import { ClientToServerEvents, ServerToClientEvents } from "./Interface";
-import { Socket } from "socket.io-client";
-import neonBrickWall from "../../assets/neonBrickWall.jpeg";
+import confetti from 'canvas-confetti';
+import { useEffect } from 'react';
+import { Smiley } from './SmileyWrapper';
+import './font.css';
+import { ClientToServerEvents, ServerToClientEvents } from './Interface';
+import { Socket } from 'socket.io-client';
 
 const fadeIn = keyframes`
 0% {
@@ -20,7 +19,7 @@ const fadeIn = keyframes`
 }
 `;
 
-const StyledButton = styled.button`
+export const StyledButton = styled.button`
   align-items: center;
   appearance: none;
   background-clip: padding-box;
@@ -67,7 +66,7 @@ const StyledButton = styled.button`
 
   &:before {
     background-image: linear-gradient(92.83deg, #1976d2 0, #132ef9 100%);
-    content: "";
+    content: '';
     display: block;
     height: 100%;
     left: 0;
@@ -82,7 +81,7 @@ const StyledButton = styled.button`
     background-color: initial;
     background-image: linear-gradient(#0f1454 0, #000000 100%);
     bottom: 4px;
-    content: "";
+    content: '';
     display: block;
     left: 4px;
     overflow: hidden;
@@ -268,7 +267,7 @@ const FullScreenCanvas = styled.canvas`
 `;
 
 interface LastGameInfo {
-  win: Boolean;
+  win: boolean;
   winnerName: string;
   looserName: string;
 }
@@ -277,13 +276,13 @@ interface LooseProps {
   lastGameInfo: React.RefObject<LastGameInfo>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
-function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
+function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
   useEffect(() => {
     if (lastGameInfo.current && lastGameInfo.current.win) {
       setTimeout(() => {
         const myConfetti = confetti.create(
-          document.getElementById("myCanvas"),
-          { useWorker: true, resize: true }
+          document.getElementById('myCanvas') as HTMLCanvasElement,
+          { useWorker: true, resize: true },
         );
         myConfetti({
           particleCount: 100,
@@ -296,20 +295,16 @@ function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
     return null;
   }
 
-  const opponent = lastGameInfo.current.win
-    ? lastGameInfo.current.looserName
-    : lastGameInfo.current.winnerName;
-
   return (
-    <Smiley mood={lastGameInfo.current.win ? "happy" : "sad"}>
+    <Smiley mood={lastGameInfo.current.win ? 'happy' : 'sad'}>
       <LooseWrapper>
         {lastGameInfo.current.win ? (
           <>
-            <StyledNeonH1 victory={true}>
+            <StyledNeonH1>
               Victory !
               <br />
               Winner: <br />
-              {lastGameInfo.current.winnerName}{" "}
+              {lastGameInfo.current.winnerName}{' '}
             </StyledNeonH1>
             <NeonSign>Good Game</NeonSign>
             <FullScreenCanvas id="myCanvas"></FullScreenCanvas>
@@ -319,7 +314,7 @@ function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
             <StyledNeonH1>
               Defeate
               <br />
-              Winner: <br /> {lastGameInfo.current.winnerName}{" "}
+              Winner: <br /> {lastGameInfo.current.winnerName}{' '}
             </StyledNeonH1>
             <NeonSign>Nice Try</NeonSign>
           </>
@@ -327,9 +322,8 @@ function EndGame({ setCurrentPage, lastGameInfo, socket }: LooseProps) {
         <StyledNeonH2>Looser: {lastGameInfo.current.looserName}</StyledNeonH2>
         <StyledButton
           onClick={() => {
-            setCurrentPage("lobby");
+            setCurrentPage('lobby');
           }}
-          activateEffect
         >
           Return to Lobby
         </StyledButton>

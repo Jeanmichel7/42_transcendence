@@ -1,13 +1,12 @@
-import React from "react";
-import styled, { keyframes, css } from "styled-components";
-import laser from "../../assets/laser.png";
-import slow from "../../assets/slow.png";
-import bigRacket from "../../assets/bigRacket.png";
-import spriteBonusSelection from "../../assets/spriteBonusSelection.png";
+import styled, { keyframes, css } from 'styled-components';
+import laser from '../../assets/laser.png';
+import slow from '../../assets/slow.png';
+import bigRacket from '../../assets/bigRacket.png';
+import spriteBonusSelection from '../../assets/spriteBonusSelection.png';
 
 // Précharger les images
 const images = [laser, slow, bigRacket];
-images.forEach((imgSrc) => {
+images.forEach(imgSrc => {
   const img = new Image();
   img.src = imgSrc;
 });
@@ -16,11 +15,11 @@ images.forEach((imgSrc) => {
 
 const getBonusImage = (bonusName: string) => {
   switch (bonusName) {
-    case "laser":
+    case 'laser':
       return `url(${laser})`;
-    case "slow":
+    case 'slow':
       return `url(${slow})`;
-    case "bigRacket":
+    case 'bigRacket':
       return `url(${bigRacket})`;
     default:
       return null;
@@ -56,27 +55,28 @@ const WhiteBackground = keyframes`
 interface BonusBoxWrapperProps {
   isLoading: boolean;
   bonusName: string;
+  left: boolean;
 }
 const BonusBoxWrapper = styled.div<BonusBoxWrapperProps>`
   width: 75px;
   height: 75px;
   border: 1px solid white;
-  position: absolute;
-  left: 10px;
+  left: ${props => (props.left ? '10px' : 'auto')};
+  right: ${props => (!props.left ? '10px' : 'auto')};
   border: 0.2rem solid #fff;
   border-radius: 2rem;
   padding: 0.4em;
-  background-image: ${(props) =>
+  background-image: ${props =>
     props.isLoading
       ? `url(${spriteBonusSelection})`
       : getBonusImage(props.bonusName)};
   background-size: cover;
-  ${(props) =>
+  ${props =>
     props.isLoading &&
     css`
       animation: ${ScrollImages} 0.5s steps(24) infinite;
     `}
-  ${(props) =>
+  ${props =>
     !props.isLoading &&
     getBonusImage(props.bonusName) &&
     css`
@@ -84,11 +84,17 @@ const BonusBoxWrapper = styled.div<BonusBoxWrapperProps>`
     `}
 `;
 
-function BonusBox({ bonusIsLoading, bonusName }: any) {
+interface BonusBoxProps {
+  bonusIsLoading: boolean;
+  bonusName: string | undefined;
+  left?: boolean;
+}
+function BonusBox({ bonusIsLoading, bonusName, left }: BonusBoxProps) {
   return (
     <BonusBoxWrapper
       isLoading={bonusIsLoading}
-      bonusName={bonusName}
+      bonusName={bonusName ? bonusName : ''}
+      left={left ?? true}
     ></BonusBoxWrapper>
   );
 }

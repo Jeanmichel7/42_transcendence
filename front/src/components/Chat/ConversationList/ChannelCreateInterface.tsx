@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store";
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store';
 
-import { ApiErrorResponse, RoomInterface, UserInterface } from "../../../types";
+import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../types';
 
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 // import Input from '@mui/material/Input';
 // import FilledInput from '@mui/material/FilledInput';
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import TextField from '@mui/material/TextField';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import {
   Button,
@@ -24,54 +24,54 @@ import {
   FormControlLabel,
   FormGroup,
   MenuItem,
-} from "@mui/material";
-import { setErrorSnackbar, setMsgSnackbar } from "../../../store/snackbarSlice";
-import { createChannel } from "../../../api/chat";
-import { reduxAddConversationList } from "../../../store/convListSlice";
-import RowOfFriendToInvit from "../Channel/admin/RowInvitation";
+} from '@mui/material';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
+import { createChannel } from '../../../api/chat';
+import { reduxAddConversationList } from '../../../store/convListSlice';
+import RowOfFriendToInvit from '../Channel/admin/RowInvitation';
 
 const CreateGroupInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const channelType = ["public", "private"];
+  const channelType = ['public', 'private'];
   const dispatch = useDispatch();
 
   const { userFriends } = useSelector((state: RootState) => state.user);
   const { userData } = useSelector((state: RootState) => state.user);
   const [form, setForm] = useState({
-    name: "",
-    type: "public",
+    name: '',
+    type: 'public',
     password: null as string | null,
     acceptedUsers: null as UserInterface[] | null,
   });
 
   const handleChangeInput = (
-    e: React.ChangeEvent<{ name?: string; value: unknown }>
+    e: React.ChangeEvent<{ name?: string; value: unknown }>,
   ) => {
     const { name, value } = e.target as HTMLInputElement;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
 
   const handleSelectUser = (user: UserInterface, isChecked: boolean) => {
     if (isChecked) {
-      setForm((prev) =>
+      setForm(prev =>
         prev.acceptedUsers
           ? { ...prev, acceptedUsers: [...prev.acceptedUsers, user] }
-          : { ...prev, acceptedUsers: [user] }
+          : { ...prev, acceptedUsers: [user] },
       );
     } else {
-      setForm((prev) =>
+      setForm(prev =>
         prev.acceptedUsers
           ? {
               ...prev,
-              acceptedUsers: prev.acceptedUsers.filter((u) => u.id !== user.id),
+              acceptedUsers: prev.acceptedUsers.filter(u => u.id !== user.id),
             }
-          : { ...prev, acceptedUsers: null }
+          : { ...prev, acceptedUsers: null },
       );
     }
   };
@@ -79,10 +79,10 @@ const CreateGroupInterface = () => {
   const handleValidateForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (form.name.length < 2)
-      return dispatch(setErrorSnackbar("Name must be at least 2 characters"));
+      return dispatch(setErrorSnackbar('Name must be at least 2 characters'));
 
     const acceptedUsersFormated = form.acceptedUsers
-      ? form.acceptedUsers.map((u) => u.id)
+      ? form.acceptedUsers.map(u => u.id)
       : null;
     const data = {
       name: form.name,
@@ -95,27 +95,27 @@ const CreateGroupInterface = () => {
       await createChannel(data);
     setIsLoading(false);
 
-    if ("error" in resCreateChannel) {
+    if ('error' in resCreateChannel) {
       dispatch(
         setErrorSnackbar(
           resCreateChannel.error + resCreateChannel.message
-            ? ": " + resCreateChannel.message
-            : ""
-        )
+            ? ': ' + resCreateChannel.message
+            : '',
+        ),
       );
     } else {
-      dispatch(setMsgSnackbar("Channel created"));
+      dispatch(setMsgSnackbar('Channel created'));
 
       // console.log('room res : ', resCreateChannel);
       dispatch(
         reduxAddConversationList({
           item: resCreateChannel,
           userId: userData.id,
-        })
+        }),
       );
       setForm({
-        name: "",
-        type: "public",
+        name: '',
+        type: 'public',
         password: null,
         acceptedUsers: null,
       });
@@ -134,7 +134,7 @@ const CreateGroupInterface = () => {
           component="form"
           onSubmit={handleValidateForm}
           sx={{
-            "& .MuiTextField-root": { m: 1, width: "25ch" },
+            '& .MuiTextField-root': { m: 1, width: '25ch' },
           }}
           // noValidate
           // autoComplete="off"
@@ -161,21 +161,21 @@ const CreateGroupInterface = () => {
               onChange={handleChangeInput}
               // sx={{ m: 1, width: '25ch' }}
             >
-              {channelType.map((option) => (
+              {channelType.map(option => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
               ))}
             </TextField>
-            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-password">
                 Password
               </InputLabel>
               <OutlinedInput
                 name="password"
                 id="outlined-adornment-password"
-                type={showPassword ? "text" : "password"}
-                value={form.password ? form.password : ""}
+                type={showPassword ? 'text' : 'password'}
+                value={form.password ? form.password : ''}
                 onChange={handleChangeInput}
                 endAdornment={
                   <InputAdornment position="end">
@@ -197,7 +197,7 @@ const CreateGroupInterface = () => {
             </FormControl>
           </div>
 
-          {form.type === "private" && (
+          {form.type === 'private' && (
             <FormGroup>
               {userFriends?.length === 0 && (
                 <p className="ml-4 mb-4">No friends to invite</p>
@@ -208,7 +208,7 @@ const CreateGroupInterface = () => {
                   label={<RowOfFriendToInvit user={user} />}
                   control={
                     <Checkbox
-                      onChange={(e) => handleSelectUser(user, e.target.checked)}
+                      onChange={e => handleSelectUser(user, e.target.checked)}
                     />
                   }
                 />

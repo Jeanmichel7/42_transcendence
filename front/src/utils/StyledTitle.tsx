@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const shineAnimation = keyframes`

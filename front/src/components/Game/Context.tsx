@@ -1,8 +1,11 @@
-import Reac, { useState, createContext } from 'react';
+import { useState, createContext } from 'react';
 
 export const ThemeContexte = createContext({});
 
-export const ThemeProvider = ({ children }) => {
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [theme, setTheme] = useState('connected');
   const toggleTheme = () => {
     setTheme(theme === 'connected' ? 'disconnected' : 'connected');

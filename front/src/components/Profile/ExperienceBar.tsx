@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 interface Props {
   currentExp: number;
@@ -50,7 +50,7 @@ const Graduation = styled.div`
   transform: translate(-50%, -50%);
   &:before {
     border-radius: 50%;
-    content: "";
+    content: '';
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -86,7 +86,7 @@ const LevelLabel = styled.div<{ bottom?: boolean }>`
   font-weight: bold;
   z-index: 3;
   color: gray;
-  ${({ bottom }) => (bottom ? "top: 110% " : "bottom: 10%; color: black")};
+  ${({ bottom }) => (bottom ? 'top: 110% ' : 'bottom: 10%; color: black')};
 `;
 
 const ExperienceBar: React.FC<Props> = ({ currentExp, currentLevel }) => {
@@ -99,12 +99,12 @@ const ExperienceBar: React.FC<Props> = ({ currentExp, currentLevel }) => {
 
   return (
     <ExperienceWrapper>
-      <LevelLabel style={{ left: "10px" }}>{currentLevel}</LevelLabel>
-      <LevelLabel style={{ right: "10px" }}>{currentLevel + 1}</LevelLabel>
-      <LevelLabel bottom style={{ left: "10px" }}>
+      <LevelLabel style={{ left: '10px' }}>{currentLevel}</LevelLabel>
+      <LevelLabel style={{ right: '10px' }}>{currentLevel + 1}</LevelLabel>
+      <LevelLabel bottom style={{ left: '10px' }}>
         {expForCurrentLevel} XP
       </LevelLabel>
-      <LevelLabel bottom style={{ right: "10px" }}>
+      <LevelLabel bottom style={{ right: '10px' }}>
         {expForNextLevel} XP
       </LevelLabel>
       <ExperienceBarWrapper>
