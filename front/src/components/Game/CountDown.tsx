@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 // Définir une animation keyframes pour le fondu et le zoom.
 const fadeAndZoomIn = keyframes`
@@ -34,15 +34,15 @@ const Number = styled.span<NumberProps>`
   font-size: 8em; // Augmenter la taille de la police
   color: #;
   animation: ${fadeAndZoomIn} 1s ease-out;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
+  opacity: ${props => (props.visible ? 1 : 0)};
   transition: opacity 0.3s ease-out;
 `;
 
-const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
+const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
   useEffect(() => {
-    console.log("GameStarder value : ", gameStarted);
+    console.log('GameStarder value : ', gameStarted);
     if (gameStarted) {
       setVisible(false);
     } else {
@@ -52,9 +52,7 @@ const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
-      setCount((currentCount) =>
-        currentCount - 1 <= 0 ? 0 : currentCount - 1
-      );
+      setCount(currentCount => (currentCount - 1 <= 0 ? 0 : currentCount - 1));
     }, 1000);
 
     return () => {
@@ -65,7 +63,7 @@ const Countdown = ({ gameStarted }: { gameStarted: Boolean }) => {
   return (
     <CountdownWrapper>
       <Number visible={visible} key={count}>
-        {count > 0 ? count : "Go!"}
+        {count > 0 ? count : 'Go!'}
       </Number>
     </CountdownWrapper>
   );

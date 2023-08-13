@@ -4,16 +4,12 @@ import { Link } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SearchIcon from '@mui/icons-material/Search';
 
-
 export function ButtonCreateGroup() {
   return (
-    <Link to='/chat/createChannel' className="w-full">
-      <Button
-        color="primary"
-        className='w-full'
-      >
+    <Link to="/chat/createChannel" className="w-full">
+      <Button color="primary" className="w-full">
         <p className="mr-2 text-green-700">Create</p>
-        <AddCircleOutlineIcon color="success"/>
+        <AddCircleOutlineIcon color="success" />
       </Button>
     </Link>
   );
@@ -21,11 +17,8 @@ export function ButtonCreateGroup() {
 
 export function ButtonInterfaceAddGroups() {
   return (
-    <Link to='/chat/addChannels' >
-      <Button
-        color="primary"
-        className='w-full'
-      >
+    <Link to="/chat/addChannels">
+      <Button color="primary" className="w-full">
         <p className="mr-2">Search</p>
         <SearchIcon />
       </Button>
@@ -35,9 +28,9 @@ export function ButtonInterfaceAddGroups() {
 
 export function ButtonInterfaceAddFriends() {
   return (
-    <div className='bg-gray-300'>
-      <Link to='/chat/addFriends'>
-        <Button color="primary" >
+    <div className="bg-gray-300">
+      <Link to="/chat/addFriends">
+        <Button color="primary">
           <p className="mr-24 text-blue-700 "> add friends </p>
           <PersonAddOutlinedIcon color="success" />
         </Button>

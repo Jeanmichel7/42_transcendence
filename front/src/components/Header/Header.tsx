@@ -107,8 +107,7 @@ function Header() {
 
   async function handleLogout() {
     const res: AuthLogout | ApiErrorResponse = await logout();
-    if ('error' in res) 
-      dispatch(setErrorSnackbar(res));
+    if ('error' in res) dispatch(setErrorSnackbar(res));
     else {
       dispatch(setLogout());
       dispatch(setLogged(false));
@@ -116,7 +115,6 @@ function Header() {
       navigate('/');
     }
   }
-
 
   const notificationMenu = (
     <Menu
@@ -148,12 +146,10 @@ function Header() {
   );
 
   return (
-    <Box
-      className="bg-blue-700 text-white flex justify-between items-center fixed w-full h-[56px] z-50"
-    >
+    <Box className="bg-blue-700 text-white flex justify-between items-center fixed w-full h-[56px] z-50">
       {/**
-           * Display Menu pages on small screen
-           */}
+       * Display Menu pages on small screen
+       */}
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
         <IconButton
           size="large"
@@ -188,35 +184,40 @@ function Header() {
         >
           <NavLink to="/game">
             <MenuItem onClick={handleCloseNavMenu}>
-              <SportsEsportsIcon className="m-2" />Game
+              <SportsEsportsIcon className="m-2" />
+              Game
             </MenuItem>
           </NavLink>
           <Divider />
 
           <NavLink to="/leaderboard">
             <MenuItem onClick={handleCloseNavMenu}>
-              <LeaderboardIcon className="m-2" />Leaderboard
+              <LeaderboardIcon className="m-2" />
+              Leaderboard
             </MenuItem>
           </NavLink>
           <Divider />
 
           <NavLink to="/chat">
             <MenuItem onClick={handleCloseNavMenu}>
-              <ChatIcon className="m-2" />Chat
+              <ChatIcon className="m-2" />
+              Chat
             </MenuItem>
           </NavLink>
           <Divider />
 
           <NavLink to="/friends">
             <MenuItem onClick={handleCloseNavMenu}>
-              <GroupIcon className="m-2" />Friends
+              <GroupIcon className="m-2" />
+              Friends
             </MenuItem>
           </NavLink>
           <Divider />
 
           <NavLink to={'/profile/' + userData.login}>
             <MenuItem onClick={handleCloseNavMenu}>
-              <PersonSearchIcon className="m-2" />Profile
+              <PersonSearchIcon className="m-2" />
+              Profile
             </MenuItem>
           </NavLink>
         </Menu>
@@ -241,8 +242,8 @@ function Header() {
       </Box>
 
       {/**
-           * Display pages on large screen
-           */}
+       * Display pages on large screen
+       */}
       <Box sx={{ display: { xs: 'none', md: 'flex' }, padding: 0 }}>
         <NavLink to="/game" className="flex justify-center items-center">
           <IconButton sx={{ padding: 0 }}>
@@ -277,86 +278,100 @@ function Header() {
           height: '100%',
         }}
       >
-        <NavLink to="/game"
+        <NavLink
+          to="/game"
           className={`h-full flex justify-center items-center px-3
           ${activePath === 'game' ? 'bg-blue-600' : 'initial'} `}
         >
-          <Button sx={{
-            color: 'white',
-            paddingX: 1,
-            paddingY: 1,
-            ':hover': { backgroundColor: 'rgb(59 130 246)' },
-          }}>
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
             <SportsEsportsIcon className="mr-2" />
-            <p className='mt-0.5'>Game</p>
+            <p className="mt-0.5">Game</p>
           </Button>
         </NavLink>
 
-        <NavLink to="/leaderboard"
+        <NavLink
+          to="/leaderboard"
           className={`h-full flex justify-center items-center px-3
           ${activePath === 'leaderboard' ? 'bg-blue-600' : 'initial'} `}
         >
-          <Button sx={{
-            color: 'white',
-            paddingX: 1,
-            paddingY: 1,
-            ':hover': { backgroundColor: 'rgb(59 130 246)' },
-          }}>
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
             <LeaderboardIcon className="mr-2" />
-            <p className='mt-0.5'>Leaderboard</p>
-
+            <p className="mt-0.5">Leaderboard</p>
           </Button>
         </NavLink>
 
-        <NavLink to="/chat"
+        <NavLink
+          to="/chat"
           className={`h-full flex justify-center items-center px-3
          ${activePath === 'chat' ? 'bg-blue-600' : 'initial'} `}
         >
-          <Button sx={{
-            color: 'white',
-            paddingX: 1,
-            paddingY: 1,
-            ':hover': { backgroundColor: 'rgb(59 130 246)' },
-          }}>
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
             <ChatIcon className="mr-2" />
-            <p className='mt-0.5'>Chat</p>
+            <p className="mt-0.5">Chat</p>
           </Button>
         </NavLink>
 
-        <NavLink to="/friends"
+        <NavLink
+          to="/friends"
           className={`h-full flex justify-center items-center px-3
           ${activePath === 'friends' ? 'bg-blue-600' : 'initial'} `}
         >
-          <Button sx={{
-            color: 'white',
-            paddingX: 1,
-            paddingY: 1,
-            ':hover': { backgroundColor: 'rgb(59 130 246)' },
-          }}>
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
             <GroupIcon className="mr-2" />
-            <p className='mt-0.5'>Friends</p>
+            <p className="mt-0.5">Friends</p>
           </Button>
         </NavLink>
 
-        <NavLink to={'/profile/' + userData.login}
+        <NavLink
+          to={'/profile/' + userData.login}
           className={`h-full flex justify-center items-center px-3
           ${activePath === 'profile' ? 'bg-blue-600' : 'initial'} `}
         >
-          <Button sx={{
-            color: 'white',
-            paddingX: 1,
-            paddingY: 1,
-            ':hover': { backgroundColor: 'rgb(59 130 246)' },
-          }}>
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
             <PersonSearchIcon className="mr-2" />
-            <p className='mt-0.5'>Profile</p>
+            <p className="mt-0.5">Profile</p>
           </Button>
         </NavLink>
       </Box>
 
       {/**
-           * Always display
-           */}
+       * Always display
+       */}
       {userIsLogged == false && (
         <div className="flex">
           <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
@@ -378,12 +393,14 @@ function Header() {
         </div>
       )}
       {userIsLogged && (
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          // height: "100%",
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            // height: "100%",
+          }}
+        >
           <Box>
             <Tooltip title={`${notifications.length} notifications`} arrow>
               <IconButton
@@ -394,23 +411,23 @@ function Header() {
               >
                 <Badge
                   badgeContent={
-                    notifications.filter((n: NotificationInterface) => !n.read).length
+                    notifications.filter((n: NotificationInterface) => !n.read)
+                      .length
                   }
                   color="error"
                 >
                   {notifications.filter((n: NotificationInterface) => !n.read)
                     .length ? (
                     <NotificationsActiveIcon />
-                    ) : notifications.length ? (
+                  ) : notifications.length ? (
                     <NotificationsIcon />
-                    ) : (
+                  ) : (
                     <NotificationsNoneIcon />
-                    )}
+                  )}
                 </Badge>
               </IconButton>
             </Tooltip>
           </Box>
-
 
           <Tooltip title="Open settings" arrow>
             <IconButton
@@ -424,7 +441,7 @@ function Header() {
                 <Avatar
                   alt="avatar"
                   src={userData.avatar}
-                  onError={(e) => {
+                  onError={e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
                     target.src =
@@ -454,7 +471,6 @@ function Header() {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-
             <NavLink to="/about">
               <MenuItem onClick={handleCloseUserMenu}>
                 <InfoIcon className="mr-2" />

@@ -24,8 +24,7 @@ const AddFriendsRaw = () => {
       await getAllUsers();
     setIsLoading(false);
 
-    if ('error' in allUsersFetched)
-      dispatch(setErrorSnackbar(allUsersFetched));
+    if ('error' in allUsersFetched) dispatch(setErrorSnackbar(allUsersFetched));
     else {
       const resFiltered = allUsersFetched.filter(
         (u: UserInterface) =>
@@ -73,8 +72,7 @@ const AddFriendsRaw = () => {
     );
     setIsLoading(false);
 
-    if ('error' in res)
-      dispatch(setErrorSnackbar(res));
+    if ('error' in res) dispatch(setErrorSnackbar(res));
     else {
       dispatch(setMsgSnackbar('Request sent'));
       dispatch(reduxAddWaitingFriendsSent(user));
@@ -88,16 +86,16 @@ const AddFriendsRaw = () => {
       !userBlocked ||
       !waitingFriendsRequestSent ? (
         <p>Loading...</p>
-        ) : (
-          allUsers?.map((user) => (
+      ) : (
+        allUsers?.map(user => (
           <FriendItem
             key={user.id}
             user={user}
             actions={[{ name: 'Add', callback: handleRequestAddFriend }]}
             isLoading={isLoading}
           />
-          ))
-        )}
+        ))
+      )}
       {isLoading && <CircularProgress />}
     </>
   );

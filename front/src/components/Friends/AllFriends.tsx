@@ -33,8 +33,7 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
     );
     setIsLoading(false);
 
-    if ('error' in resBlockRequest)
-      dispatch(setErrorSnackbar(resBlockRequest));
+    if ('error' in resBlockRequest) dispatch(setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(userToBlock.id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -71,7 +70,7 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
     <>
       {!userFriends && <p>Loading...</p>}
       {userFriends?.length === 0 && <Nothing text="Sorry... you're alone" />}
-      {userFriends?.map((user) => (
+      {userFriends?.map(user => (
         <FriendItem
           key={user.id}
           user={user}

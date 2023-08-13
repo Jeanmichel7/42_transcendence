@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
-import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setMsgSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../../../store/snackbarSlice';
 
 import { ApiErrorResponse, RoomInterface } from '../../../../types';
 
@@ -49,7 +53,7 @@ export default function ChannelSearch() {
   const [totalPages, setTotalPages] = useState(0);
   const dispatch = useDispatch();
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
@@ -57,7 +61,9 @@ export default function ChannelSearch() {
   const handleJoinRoom = async (room: RoomInterface | null) => {
     if (!room) return;
     if (isConvAlreadyExist(room, conversationsList))
-      return dispatch(setPersonalizedErrorSnackbar('Room already in conversation list'));
+      return dispatch(
+        setPersonalizedErrorSnackbar('Room already in conversation list'),
+      );
     if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
       return dispatch(setPersonalizedErrorSnackbar('Password required'));
@@ -73,8 +79,7 @@ export default function ChannelSearch() {
         dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
         if (!isConvAlreadyExist(room, conversationsList))
           dispatch(setMsgSnackbar('Add room to conversation list'));
-      } else
-        dispatch( setErrorSnackbar(res) );
+      } else dispatch(setErrorSnackbar(res));
     } else {
       dispatch(setMsgSnackbar('Room joint'));
       dispatch(reduxAddConversationList({ item: room, userId: userData.id }));
@@ -97,8 +102,7 @@ export default function ChannelSearch() {
         await getAllPublicRooms(currentPage, userPerPage);
       setIsLoading(false);
 
-      if ('error' in allRooms)
-        dispatch(setErrorSnackbar(allRooms));
+      if ('error' in allRooms) dispatch(setErrorSnackbar(allRooms));
       else {
         setRooms(allRooms);
         topRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -139,7 +143,7 @@ export default function ChannelSearch() {
             setSelectedRoom(newValue);
           }}
           value={selectedRoom}
-          renderInput={(params) => (
+          renderInput={params => (
             <TextField {...params} label="Search Channels" variant="outlined" />
           )}
         />
@@ -155,7 +159,6 @@ export default function ChannelSearch() {
       </div>
 
       {displayInputPwd && (
-
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
           <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
             <InputLabel htmlFor="outlined-adornment-password-room">
@@ -167,10 +170,8 @@ export default function ChannelSearch() {
               id="outlined-adornment-password-roon"
               type={showPassword ? 'text' : 'password'}
               value={inputPwd ? inputPwd : ''}
-              onChange={(e) => setInputPwd(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === 'Enter' && handleJoinRoom(selectedRoom)
-              }
+              onChange={e => setInputPwd(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleJoinRoom(selectedRoom)}
               disabled={isLoading}
               endAdornment={
                 <InputAdornment position="end">
@@ -228,7 +229,8 @@ export default function ChannelSearch() {
         <div className="flex h-full absolute justify-end items-center right-0 top-0 mr-3">
           <InputLabel
             id="Cards per page"
-            className="w-1/12 sm:w-4/12 md:w-8/12 truncate mr-2">
+            className="w-1/12 sm:w-4/12 md:w-8/12 truncate mr-2"
+          >
             Cards per page
           </InputLabel>
           <Select

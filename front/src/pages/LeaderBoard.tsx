@@ -12,7 +12,7 @@ const LeaderBoard = () => {
       const resFatchLeaderBoard = await getLeaderboard(page, offset);
       if ('error' in resFatchLeaderBoard)
         return console.warn(resFatchLeaderBoard.error);
-      setLeaderBoard((prev) => [...prev, ...resFatchLeaderBoard]);
+      setLeaderBoard(prev => [...prev, ...resFatchLeaderBoard]);
     };
     fetchLeaderBoard();
   }, []);

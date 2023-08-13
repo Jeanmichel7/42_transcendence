@@ -13,7 +13,15 @@ import AddFriendsRaw from '../components/Friends/AddFriends';
 import GridViewIcon from '@mui/icons-material/GridView';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 
-import { AppBar, Box, Button, Tab, Tabs, Theme, useMediaQuery } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Button,
+  Tab,
+  Tabs,
+  Theme,
+  useMediaQuery,
+} from '@mui/material';
 import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSearchInterface';
 
 interface TabPanelProps {
@@ -65,7 +73,9 @@ export default function FriendsPage() {
   const [waitingSentCount, setWaitingSentCount] = useState<number>(0);
   const [viewType, setViewType] = useState<string>('list');
 
-  const matchesSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const matchesSmallScreen = useMediaQuery((theme: Theme) =>
+    theme.breakpoints.down('sm'),
+  );
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -91,7 +101,7 @@ export default function FriendsPage() {
   useEffect(() => {
     if (userFriends) {
       setFriendsCount(userFriends.length);
-      setOnlineCount(userFriends.filter((f) => f.status !== 'offline').length);
+      setOnlineCount(userFriends.filter(f => f.status !== 'offline').length);
     }
   }, [userFriends]);
 
@@ -119,7 +129,7 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className='bg-inherit'>
+    <div className="bg-inherit">
       <AppBar position="static">
         <div className="flex bg-gray-800">
           <Tabs
@@ -132,18 +142,47 @@ export default function FriendsPage() {
             aria-label="nav friends"
             sx={{ width: '100%' }}
           >
-            <Tab label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')} />
-            <Tab label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')} />
-            <Tab label={'Invit received' + (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')} />
-            <Tab label={'Invit sent' + (waitingSentCount ? ' (' + waitingSentCount + ')' : '')} />
-            <Tab label={'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')} />
-            <Tab sx={{ p: 0, m: 0, padding: 0, margin: 0, width: 0 }} disabled />
+            <Tab
+              label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')}
+            />
+            <Tab
+              label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')}
+            />
+            <Tab
+              label={
+                'Invit received' +
+                (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')
+              }
+            />
+            <Tab
+              label={
+                'Invit sent' +
+                (waitingSentCount ? ' (' + waitingSentCount + ')' : '')
+              }
+            />
+            <Tab
+              label={
+                'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')
+              }
+            />
+            <Tab
+              sx={{ p: 0, m: 0, padding: 0, margin: 0, width: 0 }}
+              disabled
+            />
           </Tabs>
 
           <Button
-            sx={{ pr: 2, m: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            sx={{
+              pr: 2,
+              m: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             onClick={() => setViewType(viewType === 'grid' ? 'list' : 'grid')}
-          > {viewType === 'grid' ? <ViewHeadlineIcon /> : <GridViewIcon />}
+          >
+            {' '}
+            {viewType === 'grid' ? <ViewHeadlineIcon /> : <GridViewIcon />}
           </Button>
 
           <Tab
@@ -183,7 +222,11 @@ export default function FriendsPage() {
       </TabPanel>
 
       <TabPanel value={value} index={5}>
-        {viewType === 'grid' ? <FriendsSearch setHeight={false} /> : <AddFriendsRaw />}
+        {viewType === 'grid' ? (
+          <FriendsSearch setHeight={false} />
+        ) : (
+          <AddFriendsRaw />
+        )}
       </TabPanel>
     </div>
   );

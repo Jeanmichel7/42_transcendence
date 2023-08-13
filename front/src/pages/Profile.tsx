@@ -32,11 +32,9 @@ function Profile() {
 
       setIsLoadingFriends(true);
       const gamesFetched = await getHistoryGames(userProfile.id);
-  
-      if ('error' in gamesFetched)
-        dispatch(setErrorSnackbar(gamesFetched));
-      else
-        setGames(gamesFetched);
+
+      if ('error' in gamesFetched) dispatch(setErrorSnackbar(gamesFetched));
+      else setGames(gamesFetched);
       setIsLoadingFriends(false);
     }
 
@@ -52,11 +50,10 @@ function Profile() {
         await getProfileByPseudo(pseudo);
 
       if ('error' in profilesFetched) {
-        if (profilesFetched.statusCode === 404) 
-          return navigate('/404');
+        if (profilesFetched.statusCode === 404) return navigate('/404');
         dispatch(setErrorSnackbar(profilesFetched));
       } else setUserProfile(profilesFetched);
-  
+
       setIsLoadingGames(false);
     }
     fetchAndSetUserProfile();
@@ -74,19 +71,17 @@ function Profile() {
       <Box className="w-full ">
         <ProfileInfo user={userProfile} />
         <ProfileFriends user={userProfile} />
-        { isLoadingFriends 
-          ? loader
-          : <ProfileTrophies user={userProfile} />
-        }
-        { isLoadingGames 
-          ? loader
-          : <StatsGame user={userProfile} games={games}/>
-        }
-        { isLoadingGames 
-          ? loader
-          : <HistoryGame user={userProfile} games={games}/>
-        }
-       
+        {isLoadingFriends ? loader : <ProfileTrophies user={userProfile} />}
+        {isLoadingGames ? (
+          loader
+        ) : (
+          <StatsGame user={userProfile} games={games} />
+        )}
+        {isLoadingGames ? (
+          loader
+        ) : (
+          <HistoryGame user={userProfile} games={games} />
+        )}
       </Box>
     </div>
   );

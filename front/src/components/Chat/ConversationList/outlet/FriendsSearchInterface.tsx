@@ -1,13 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
-import { setErrorSnackbar, setMsgSnackbar } from '../../../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setMsgSnackbar,
+} from '../../../../store/snackbarSlice';
 import { reduxAddWaitingFriendsSent } from '../../../../store/userSlice';
 
 import FriendCard from '../../../Profile/FriendsCard';
 import { getAllUsersCount, getAllUsersPaginate } from '../../../../api/user';
 import { requestAddFriend } from '../../../../api/relation';
-import { ApiErrorResponse, UserInterface, UserRelation } from '../../../../types';
+import {
+  ApiErrorResponse,
+  UserInterface,
+  UserRelation,
+} from '../../../../types';
 
 import {
   Autocomplete,
@@ -20,7 +27,7 @@ import {
   TextField,
 } from '@mui/material';
 
-export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
+export default function FriendsSearch({ setHeight }: { setHeight: boolean }) {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState<UserInterface[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
@@ -50,14 +57,11 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
       )
         return;
       setIsLoading(true);
-      const allUsers: UserInterface[] | ApiErrorResponse = await getAllUsersPaginate(
-        currentPage,
-        userPerPage,
-      );
+      const allUsers: UserInterface[] | ApiErrorResponse =
+        await getAllUsersPaginate(currentPage, userPerPage);
       setIsLoading(false);
 
-      if ('error' in allUsers)
-        dispatch(setErrorSnackbar(allUsers));
+      if ('error' in allUsers) dispatch(setErrorSnackbar(allUsers));
       else {
         const resFiltered = allUsers.filter(
           (u: UserInterface) =>
@@ -85,8 +89,7 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
     const res: UserRelation | ApiErrorResponse = await requestAddFriend(
       user.id,
     );
-    if ('error' in res)
-      dispatch(setErrorSnackbar(res));
+    if ('error' in res) dispatch(setErrorSnackbar(res));
     else {
       dispatch(reduxAddWaitingFriendsSent(user));
       dispatch(setMsgSnackbar('Request sent'));
@@ -127,7 +130,7 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
             setSelectedUser(newValue);
           }}
           value={selectedUser}
-          renderInput={(params) => (
+          renderInput={params => (
             <TextField {...params} label="Search Friends" variant="outlined" />
           )}
         />
@@ -161,8 +164,11 @@ export default function FriendsSearch({ setHeight } : { setHeight: boolean }) {
           }}
         />
       )}
-      <div className={`flex flex-wrap justify-center 
-        overflow-auto ${setHeight ? 'max-h-[calc(100vh-202px)]' : ''} h-full px-2`}
+      <div
+        className={`flex flex-wrap justify-center 
+        overflow-auto ${
+          setHeight ? 'max-h-[calc(100vh-202px)]' : ''
+        } h-full px-2`}
       >
         <div ref={topRef} />
         {users.map((user: UserInterface) => {

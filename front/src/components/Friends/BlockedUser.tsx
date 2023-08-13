@@ -34,7 +34,7 @@ const BlockedUser = () => {
     <>
       {!userBlocked && <p>Loading...</p>}
       {userBlocked?.length === 0 && <Nothing angry text="No blocked user" />}
-      {userBlocked?.map((user) => (
+      {userBlocked?.map(user => (
         <FriendItem
           key={user.id}
           user={user}

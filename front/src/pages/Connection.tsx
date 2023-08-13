@@ -62,8 +62,8 @@ function ConnectPage() {
       code2FA.length !== 6
         ? 'Code must be 6 digits'
         : !/^[0-9]{6}$/.test(code2FA)
-          ? 'Code must be digits'
-          : 'Wrong Code',
+        ? 'Code must be digits'
+        : 'Wrong Code',
     );
 
     setIsLoading(true);
@@ -150,8 +150,8 @@ function ConnectPage() {
                 id="component-outlined"
                 placeholder="123456"
                 label="Name"
-                onChange={(e) => setCode2FA(e.target.value)}
-                onKeyDown={(e) => {
+                onChange={e => setCode2FA(e.target.value)}
+                onKeyDown={e => {
                   if (e.key === 'Enter') {
                     handleSendCode();
                   }

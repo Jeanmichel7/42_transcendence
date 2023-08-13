@@ -29,13 +29,16 @@ const HomeChat = () => {
 
 const AppRoutes: React.FC = () => (
   <>
-    <div className="mt-[56px]"/>
+    <div className="mt-[56px]" />
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/game" element={<Pong />} />
       <Route path="/chat" element={<Chat />}>
         <Route index element={<HomeChat />} />
-        <Route path="conv/:convId/:id/:login" element={<ConversationWrapper />} />
+        <Route
+          path="conv/:convId/:id/:login"
+          element={<ConversationWrapper />}
+        />
         <Route
           path="channel/:convId/:id/:name"
           element={<ConversationWrapper />}

@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ApiErrorResponse, RoomInterface } from '../../../types';
 import { getRoomData } from '../../../api/chat';
-import { setErrorSnackbar, setPersonalizedErrorSnackbar } from '../../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../../store/snackbarSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 // import { reduxAddConversationList } from '../../../store/chatSlicer';
@@ -18,9 +21,13 @@ const InvitationWrapper = () => {
 
   const fetchRoom = useCallback(async () => {
     if (!channelId || userData.id === -1) return;
-    const result: RoomInterface | ApiErrorResponse = await getRoomData(channelId);
+    const result: RoomInterface | ApiErrorResponse = await getRoomData(
+      channelId,
+    );
     if ('statusCode' in result && result.statusCode === 403) {
-      dispatch(setPersonalizedErrorSnackbar('You are not allowed to access this room'));
+      dispatch(
+        setPersonalizedErrorSnackbar('You are not allowed to access this room'),
+      );
       navigate('/chat');
     } else if ('error' in result) {
       dispatch(setErrorSnackbar(result));
@@ -29,7 +36,11 @@ const InvitationWrapper = () => {
       setRoom(result);
 
       if (!result.acceptedUsers?.some(u => u.id === userData.id)) {
-        dispatch(setPersonalizedErrorSnackbar('You are not allowed to access this room'));
+        dispatch(
+          setPersonalizedErrorSnackbar(
+            'You are not allowed to access this room',
+          ),
+        );
         navigate('/chat');
       } else {
         // check private and password
@@ -40,9 +51,12 @@ const InvitationWrapper = () => {
   }, [channelId, dispatch, navigate, userData.id]);
 
   useEffect(() => {
-    if (!channelId || !channelName
-    //  || !location.state
-    ) return;
+    if (
+      !channelId ||
+      !channelName
+      //  || !location.state
+    )
+      return;
     // console.log('location : ', location);
     // console.log('channelId : ', channelId);
     // console.log('channelName : ', channelName);
@@ -51,16 +65,9 @@ const InvitationWrapper = () => {
     //verifie acces
     // ajoute list conv
     // redirige vers conv
-
   }, [fetchRoom]);
 
-  return (
-    <>
-      {room && 
-        < RoomCard room={room} />
-      }
-    </>
-  );
+  return <>{room && <RoomCard room={room} />}</>;
 };
 
 export default InvitationWrapper;

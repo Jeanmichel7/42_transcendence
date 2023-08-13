@@ -37,7 +37,7 @@ export interface RoomInterface {
 
 export interface ConversationInterface {
   id: number;
-  user: UserInterface
+  user: UserInterface;
   room: RoomInterface;
   msgNotRead: number;
 }

@@ -1,8 +1,9 @@
 import { apiRequest } from './index';
 import { TrophyInterface, ApiErrorResponse } from '../types';
 
-export async function getAllTrophies()
-: Promise<TrophyInterface[] | ApiErrorResponse> {
+export async function getAllTrophies(): Promise<
+  TrophyInterface[] | ApiErrorResponse
+> {
   return apiRequest<TrophyInterface[]>(
     'get',
     '/trophies/all',
@@ -12,7 +13,7 @@ export async function getAllTrophies()
 
 export async function getUserIdTrophies(
   login: string | null,
-) : Promise<TrophyInterface[] | ApiErrorResponse> {
+): Promise<TrophyInterface[] | ApiErrorResponse> {
   return apiRequest<TrophyInterface[]>(
     'get',
     '/trophies/user/' + (login ? login : ''),

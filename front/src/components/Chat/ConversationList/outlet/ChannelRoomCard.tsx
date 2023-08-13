@@ -1,7 +1,23 @@
-import { Button, Card, CardContent, CircularProgress, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  FormControl,
+  FormHelperText,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
+import {
+  setMsgSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../../../store/snackbarSlice';
 import { RoomInterface, ApiErrorResponse } from '../../../../types';
 import { joinRoom } from '../../../../api/chat';
 import { reduxAddConversationList } from '../../../../store/convListSlice';
@@ -30,17 +46,19 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => { e.preventDefault(); };
+  const handleClickShowPassword = () => setShowPassword(show => !show);
+  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+  };
 
   const handleJoinRoom = async () => {
-    if (!room)
-      return;
+    if (!room) return;
     if (isConvAlreadyExist(room, conversationsList)) {
-      return dispatch(setPersonalizedErrorSnackbar('Room already in conversation list'));
+      return dispatch(
+        setPersonalizedErrorSnackbar('Room already in conversation list'),
+      );
     }
-    if (room.isProtected && !displayInputPwd)
-      return setDisplayInputPwd(true);
+    if (room.isProtected && !displayInputPwd) return setDisplayInputPwd(true);
     if (room.isProtected && !inputPwd)
       return dispatch(setPersonalizedErrorSnackbar('Password required'));
 
@@ -96,16 +114,13 @@ const RoomCard = ({ room }: RoomCardProps) => {
           Owner: {room.ownerUser?.login}
         </Typography>
         <Typography color="textSecondary" variant="body2">
-          {room.users?.length} member{room.users?.length as number > 1 ? 's' : ''}
+          {room.users?.length} member
+          {(room.users?.length as number) > 1 ? 's' : ''}
         </Typography>
       </CardContent>
 
-
-
-
-
       {/* Protected */}
-      {!displayInputPwd &&
+      {!displayInputPwd && (
         <div className="flex justify-center items-center min-h-[50px] w-auto">
           <Button
             onClick={() => handleJoinRoom()}
@@ -114,19 +129,22 @@ const RoomCard = ({ room }: RoomCardProps) => {
           >
             {alreadyInRoom ? 'In room' : 'Join'}
           </Button>
-        </div>}
+        </div>
+      )}
       {displayInputPwd && (
         <div className="flex flex-col justify-center items-center min-h-[50px] border-t-2 p-2">
           <FormControl sx={{ m: 1, width: '20ch' }} variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password-room">Password</InputLabel>
+            <InputLabel htmlFor="outlined-adornment-password-room">
+              Password
+            </InputLabel>
             <OutlinedInput
               autoFocus
-              name='password'
+              name="password"
               id="outlined-adornment-password-roon"
               type={showPassword ? 'text' : 'password'}
               value={inputPwd ? inputPwd : ''}
-              onChange={(e) => setInputPwd(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoinRoom()}
+              onChange={e => setInputPwd(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
               label="Password"
               endAdornment={
                 <InputAdornment position="end">
@@ -141,7 +159,9 @@ const RoomCard = ({ room }: RoomCardProps) => {
                 </InputAdornment>
               }
             />
-            {wrongPwd && <FormHelperText error >Invalid password</FormHelperText>}
+            {wrongPwd && (
+              <FormHelperText error>Invalid password</FormHelperText>
+            )}
           </FormControl>
           {isLoading && <CircularProgress />}
           <div>
@@ -153,10 +173,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
               <DoneIcon />
             </IconButton>
 
-            <IconButton
-              onClick={handleClosePwdForm}
-              color="secondary"
-            >
+            <IconButton onClick={handleClosePwdForm} color="secondary">
               <CloseIcon />
             </IconButton>
           </div>

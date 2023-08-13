@@ -13,28 +13,45 @@ export const notificationSlice = createSlice({
 
   reducers: {
     // manage notifications
-    reduxSetNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
+    reduxSetNotifications: (
+      state,
+      action: PayloadAction<NotificationInterface[]>,
+    ) => {
       state.notifications = action.payload;
     },
-    reduxAddNotification: (state, action: PayloadAction<NotificationInterface>) => {
+    reduxAddNotification: (
+      state,
+      action: PayloadAction<NotificationInterface>,
+    ) => {
       if (state.notifications === undefined)
         state.notifications = [action.payload];
-      else
-        state.notifications = [...state.notifications, action.payload];
+      else state.notifications = [...state.notifications, action.payload];
     },
-    reduxRemoveNotification: (state, action: PayloadAction<NotificationInterface>) => {
-      state.notifications = state.notifications
-        .filter((notif: NotificationInterface) => JSON.stringify(notif) !== JSON.stringify(action.payload));
+    reduxRemoveNotification: (
+      state,
+      action: PayloadAction<NotificationInterface>,
+    ) => {
+      state.notifications = state.notifications.filter(
+        (notif: NotificationInterface) =>
+          JSON.stringify(notif) !== JSON.stringify(action.payload),
+      );
     },
-    reduxReadNotification: (state, action: PayloadAction<NotificationInterface>) => {
-      state.notifications = state.notifications
-        .map((notif: NotificationInterface) => {
+    reduxReadNotification: (
+      state,
+      action: PayloadAction<NotificationInterface>,
+    ) => {
+      state.notifications = state.notifications.map(
+        (notif: NotificationInterface) => {
           if (JSON.stringify(notif) === JSON.stringify(action.payload))
             return { ...notif, read: true };
           return notif;
-        });
+        },
+      );
     },
-    reduxAddManyNotifications: (state, action: PayloadAction<NotificationInterface[]>) => {
+    reduxAddManyNotifications: (
+      state,
+      action: PayloadAction<NotificationInterface[]>,
+    ) => {
       state.notifications = [...state.notifications, ...action.payload];
     },
   },

@@ -1,13 +1,38 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxRemoveFriends, reduxAddUserBlocked, reduxAddWaitingFriendsSent } from '../../store/userSlice';
+import {
+  reduxRemoveFriends,
+  reduxAddUserBlocked,
+  reduxAddWaitingFriendsSent,
+} from '../../store/userSlice';
 import { RootState } from '../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { deleteFriend, apiBlockUser, requestAddFriend } from '../../api/relation';
-import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../types';
+import {
+  deleteFriend,
+  apiBlockUser,
+  requestAddFriend,
+} from '../../api/relation';
+import {
+  ApiErrorResponse,
+  GameInterface,
+  UserInterface,
+  UserRelation,
+} from '../../types';
 
-import { Card, CardActionArea, CardMedia, CardContent, Typography, CardActions, IconButton, Tooltip, Zoom, Divider, Badge } from '@mui/material';
+import {
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent,
+  Typography,
+  CardActions,
+  IconButton,
+  Tooltip,
+  Zoom,
+  Divider,
+  Badge,
+} from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
@@ -17,9 +42,9 @@ import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
 
 interface FriendCardProps {
-  actualUserLogin?: string,
-  friend: UserInterface,
-  setFriends?: React.Dispatch<React.SetStateAction<UserInterface[]>>
+  actualUserLogin?: string;
+  friend: UserInterface;
+  setFriends?: React.Dispatch<React.SetStateAction<UserInterface[]>>;
 }
 
 const FriendCard: React.FC<FriendCardProps> = ({
@@ -30,14 +55,20 @@ const FriendCard: React.FC<FriendCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userData, userFriends, waitingFriendsRequestSent } = useSelector((state: RootState) => state.user);
+  const { userData, userFriends, waitingFriendsRequestSent } = useSelector(
+    (state: RootState) => state.user,
+  );
   const [isFriendOrRequestSent, setIsFriendOrRequestSent] = useState(false);
   const badgeColor =
-    friend.status === 'online' ? 'success' :
-      friend.status === 'absent' ? 'warning' :
-        friend.status === 'inactive' ? 'secondary' :
-          friend.status === 'in game' ? 'info' :
-            'error';
+    friend.status === 'online'
+      ? 'success'
+      : friend.status === 'absent'
+      ? 'warning'
+      : friend.status === 'inactive'
+      ? 'secondary'
+      : friend.status === 'in game'
+      ? 'info'
+      : 'error';
 
   const handleDefi = async () => {
     const resInvitGameUser: GameInterface | ApiErrorResponse =
@@ -48,13 +79,17 @@ const FriendCard: React.FC<FriendCardProps> = ({
   };
 
   function isRequestFriendSent() {
-    return waitingFriendsRequestSent?.some((f: UserInterface) => f.id === friend.id);
+    return waitingFriendsRequestSent?.some(
+      (f: UserInterface) => f.id === friend.id,
+    );
   }
 
   const handleRequestAddFriend = async (userIdToAdd: number) => {
     if (isRequestFriendSent()) return;
     setIsLoading(true);
-    const res: UserRelation | ApiErrorResponse = await requestAddFriend(userIdToAdd);
+    const res: UserRelation | ApiErrorResponse = await requestAddFriend(
+      userIdToAdd,
+    );
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {
@@ -73,28 +108,35 @@ const FriendCard: React.FC<FriendCardProps> = ({
       dispatch(reduxRemoveFriends(friend.id));
       dispatch(setMsgSnackbar('Friend deleted'));
       if (userData.login == actualUserLogin && setFriends)
-        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userIdToRemove));
+        setFriends((prev: UserInterface[]) =>
+          prev.filter((f: UserInterface) => f.id !== userIdToRemove),
+        );
     }
     setIsLoading(false);
   };
 
   const handleBlockUser = async (userToBlock: UserInterface) => {
     setIsLoading(true);
-    const res: UserRelation | ApiErrorResponse = await apiBlockUser(userToBlock.id);
+    const res: UserRelation | ApiErrorResponse = await apiBlockUser(
+      userToBlock.id,
+    );
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {
       dispatch(setMsgSnackbar('User blocked'));
       dispatch(reduxAddUserBlocked(userToBlock.id));
       if (userData.login == actualUserLogin && setFriends)
-        setFriends((prev: UserInterface[]) => prev.filter((f: UserInterface) => f.id !== userToBlock.id));
+        setFriends((prev: UserInterface[]) =>
+          prev.filter((f: UserInterface) => f.id !== userToBlock.id),
+        );
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
     function isMyFriend() {
-      if (userData.login == friend.login) // if it's own profile
+      if (userData.login == friend.login)
+        // if it's own profile
         return setIsFriendOrRequestSent(true);
       const found = userFriends?.find((f: UserInterface) => f.id == friend.id);
       if (found) setIsFriendOrRequestSent(true);
@@ -107,51 +149,58 @@ const FriendCard: React.FC<FriendCardProps> = ({
   }, [isFriendOrRequestSent]);
 
   return (
-    <Card key={friend.login} sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      maxWidth: 140,
-      maxHeight: 332,
-      margin: '10px',
-    }}>
+    <Card
+      key={friend.login}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        maxWidth: 140,
+        maxHeight: 332,
+        margin: '10px',
+      }}
+    >
       <Link to={`/profile/${friend.login}`}>
         <CardActionArea>
-          {isFriendOrRequestSent
-            ? <Badge
+          {isFriendOrRequestSent ? (
+            <Badge
               color={badgeColor}
               overlap="circular"
               anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-              badgeContent={ <span className='p-1'>{friend.status}</span> }
+              badgeContent={<span className="p-1">{friend.status}</span>}
             >
               <CardMedia
                 component="img"
                 image={friend.avatar}
                 alt={friend.login}
                 sx={{ height: 140, objectFit: 'cover' }}
-                onError={(e) => {
+                onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                  target.src =
+                    'http://localhost:3000/avatars/defaultAvatar.png';
                 }}
               />
             </Badge>
-            :
+          ) : (
             <CardMedia
               component="img"
               image={friend.avatar}
               alt={friend.login}
               sx={{ height: 140, objectFit: 'cover' }}
-              onError={(e) => {
+              onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
                 target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
               }}
             />
-          }
+          )}
           <Divider />
           {/* </Badge> */}
           <CardContent sx={{ padding: 1 }}>
-            <Typography gutterBottom variant="h2" component="div"
+            <Typography
+              gutterBottom
+              variant="h2"
+              component="div"
               sx={{
                 marginBottom: 2,
                 fontSize: '1.1rem',
@@ -163,7 +212,9 @@ const FriendCard: React.FC<FriendCardProps> = ({
             >
               {friend.firstName} {friend.lastName}
             </Typography>
-            <Typography variant="body2" color="text.secondary"
+            <Typography
+              variant="body2"
+              color="text.secondary"
               sx={{ height: 56, overflow: 'hidden', textOverflow: 'ellipsis' }}
               title={friend.description}
             >
@@ -179,13 +230,15 @@ const FriendCard: React.FC<FriendCardProps> = ({
       {/**
        * Bouton action
        **/}
-      <CardActions className='flex flex-wrap items-center justify-between w-full'>
+      <CardActions className="flex flex-wrap items-center justify-between w-full">
         <Tooltip
-          title="Defier" arrow
+          title="Defier"
+          arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton aria-label="defi friend"
+          <IconButton
+            aria-label="defi friend"
             onClick={handleDefi}
             sx={{
               margin: 0,
@@ -193,11 +246,11 @@ const FriendCard: React.FC<FriendCardProps> = ({
               visibility: userData.id == friend.id ? 'hidden' : 'visible',
             }}
           >
-            <SportsEsportsIcon color='success' />
+            <SportsEsportsIcon color="success" />
           </IconButton>
-        </Tooltip> 
+        </Tooltip>
 
-        {!isFriendOrRequestSent ?
+        {!isFriendOrRequestSent ? (
           <Tooltip
             title={isRequestFriendSent() ? 'Waiting accept' : 'Add friend'}
             arrow
@@ -205,18 +258,21 @@ const FriendCard: React.FC<FriendCardProps> = ({
             TransitionProps={{ timeout: 600 }}
           >
             <div>
-              <IconButton aria-label="add friend"
+              <IconButton
+                aria-label="add friend"
                 sx={{ margin: 0, padding: 0 }}
                 onClick={() => handleRequestAddFriend(friend.id)}
                 disabled={isRequestFriendSent() || isLoading}
               >
-                <AddIcon color={isRequestFriendSent() ? 'disabled' : 'primary'} />
+                <AddIcon
+                  color={isRequestFriendSent() ? 'disabled' : 'primary'}
+                />
               </IconButton>
             </div>
           </Tooltip>
-          :
+        ) : (
           <>
-            {userData.id != friend.id &&
+            {userData.id != friend.id && (
               <Tooltip
                 title={'Chat'}
                 arrow
@@ -224,27 +280,31 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 TransitionProps={{ timeout: 600 }}
               >
                 <div>
-                  <IconButton aria-label="chat friend"
+                  <IconButton
+                    aria-label="chat friend"
                     sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
-                    onClick={() => navigate(`/chat/conv/x/${friend.id}/${friend.login}`)}
+                    onClick={() =>
+                      navigate(`/chat/conv/x/${friend.id}/${friend.login}`)
+                    }
                   >
-                    <ChatIcon color='primary' />
+                    <ChatIcon color="primary" />
                   </IconButton>
                 </div>
               </Tooltip>
-            }
+            )}
           </>
+        )}
 
-        }
-
-        {userData && userData.login == actualUserLogin &&
+        {userData && userData.login == actualUserLogin && (
           <>
             <Tooltip
-              title="Block user" arrow
+              title="Block user"
+              arrow
               TransitionComponent={Zoom}
               TransitionProps={{ timeout: 600 }}
             >
-              <IconButton aria-label="delete friend"
+              <IconButton
+                aria-label="delete friend"
                 onClick={() => handleBlockUser(friend)}
                 sx={{ margin: 0, padding: 0 }}
                 disabled={isLoading}
@@ -254,11 +314,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
             </Tooltip>
 
             <Tooltip
-              title="Delete friend" arrow
+              title="Delete friend"
+              arrow
               TransitionComponent={Zoom}
               TransitionProps={{ timeout: 600 }}
             >
-              <IconButton aria-label="delete friend"
+              <IconButton
+                aria-label="delete friend"
                 sx={{ margin: 0, padding: 0 }}
                 onClick={() => handleRemoveFriend(friend.id)}
                 disabled={isLoading}
@@ -266,9 +328,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 <DeleteForeverIcon color="error" />
               </IconButton>
             </Tooltip>
-
           </>
-        }
+        )}
       </CardActions>
     </Card>
   );

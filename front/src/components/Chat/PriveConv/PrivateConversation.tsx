@@ -3,13 +3,25 @@ import { Socket, io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { setErrorSnackbar, setMsgSnackbar, setPersonalizedErrorSnackbar } from '../../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setMsgSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../../store/snackbarSlice';
 
 import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';
 import { getOldMessages, apiDeleteMessage } from '../../../api/message';
-import { ApiErrorResponse, GameInterface, UserInterface, UserRelation } from '../../../types';
-import { ConversationInterface, MessageInterface } from '../../../types/ChatTypes';
+import {
+  ApiErrorResponse,
+  GameInterface,
+  UserInterface,
+  UserRelation,
+} from '../../../types';
+import {
+  ConversationInterface,
+  MessageInterface,
+} from '../../../types/ChatTypes';
 
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -19,23 +31,46 @@ import { CircularProgress, IconButton, Tooltip, Zoom } from '@mui/material';
 import { HttpStatusCode } from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { inviteGameUser } from '../../../api/game';
-import { reduxAddConversationList, reduxRemoveConversationToList, reduxResetNotReadMP, reduxUpdatePrivateConvList } from '../../../store/convListSlice';
-import { apiBlockUser, apiUnblockUser, deleteFriend, requestAddFriend } from '../../../api/relation';
-import { reduxAddUserBlocked, reduxAddWaitingFriendsSent, reduxRemoveFriends, reduxRemoveUserBlocked } from '../../../store/userSlice';
+import {
+  reduxAddConversationList,
+  reduxRemoveConversationToList,
+  reduxResetNotReadMP,
+  reduxUpdatePrivateConvList,
+} from '../../../store/convListSlice';
+import {
+  apiBlockUser,
+  apiUnblockUser,
+  deleteFriend,
+  requestAddFriend,
+} from '../../../api/relation';
+import {
+  reduxAddUserBlocked,
+  reduxAddWaitingFriendsSent,
+  reduxRemoveFriends,
+  reduxRemoveUserBlocked,
+} from '../../../store/userSlice';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
 
 const PrivateConversation: React.FC = () => {
   const convId = +(useParams<{ convId: string }>().convId || '-1');
   const id = +(useParams<{ id: string }>().id || '-1');
-  const login = (useParams<{ login: string }>().login || 'unknown');
+  const login = useParams<{ login: string }>().login || 'unknown';
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userData: UserInterface = useSelector((state: RootState) => state.user.userData);
-  const userFriend: UserInterface[] | null = useSelector((state: RootState) => state.user.userFriends);
-  const userBlocked: UserInterface[] | null = useSelector((state: RootState) => state.user.userBlocked);
-  const ConversationList: ConversationInterface[] | null = useSelector((state: RootState) => state.chat.conversationsList);
+  const userData: UserInterface = useSelector(
+    (state: RootState) => state.user.userData,
+  );
+  const userFriend: UserInterface[] | null = useSelector(
+    (state: RootState) => state.user.userFriends,
+  );
+  const userBlocked: UserInterface[] | null = useSelector(
+    (state: RootState) => state.user.userBlocked,
+  );
+  const ConversationList: ConversationInterface[] | null = useSelector(
+    (state: RootState) => state.chat.conversationsList,
+  );
 
   const [offsetPagniation, setOffsetPagniation] = useState<number>(0);
   const [messages, setMessages] = useState<MessageInterface[]>([]);
@@ -53,13 +88,11 @@ const PrivateConversation: React.FC = () => {
     if (id == -1 || userData.id == -1) return;
     setShouldScrollToBottom(false);
 
-    const allMessages: MessageInterface[] | ApiErrorResponse = await getOldMessages(id, pageDisplay, offsetPagniation);
-    if ('error' in allMessages)
-      dispatch(setErrorSnackbar(allMessages));
+    const allMessages: MessageInterface[] | ApiErrorResponse =
+      await getOldMessages(id, pageDisplay, offsetPagniation);
+    if ('error' in allMessages) dispatch(setErrorSnackbar(allMessages));
     else {
-      dispatch(
-        reduxResetNotReadMP({ userIdFrom: id, userId: userData.id }),
-      );
+      dispatch(reduxResetNotReadMP({ userIdFrom: id, userId: userData.id }));
       if (allMessages.length === 0) return;
       //save pos scrool
       const scrollContainer = document.querySelector('.overflow-y-auto');
@@ -69,8 +102,10 @@ const PrivateConversation: React.FC = () => {
       if (pageDisplay === 1) {
         setMessages(allMessages.reverse());
       } else {
-        const reversedMessageArray = allMessages.reverse().filter((message) => !messages.some((msg) => msg.id === message.id));
-        setMessages((prev) => [...reversedMessageArray, ...prev]);
+        const reversedMessageArray = allMessages
+          .reverse()
+          .filter(message => !messages.some(msg => msg.id === message.id));
+        setMessages(prev => [...reversedMessageArray, ...prev]);
       }
 
       //set pos scrool to top old messages
@@ -90,17 +125,14 @@ const PrivateConversation: React.FC = () => {
       withCredentials: true,
     });
 
-    socket.on('message', (message) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        message,
-      ]);
-      setOffsetPagniation((prev) => prev + 1);
+    socket.on('message', message => {
+      setMessages(prevMessages => [...prevMessages, message]);
+      setOffsetPagniation(prev => prev + 1);
     });
 
-    socket.on('editMessage', (message) => {
-      setMessages((prevMessages) => {
-        const newMessages = prevMessages.map((msg) => {
+    socket.on('editMessage', message => {
+      setMessages(prevMessages => {
+        const newMessages = prevMessages.map(msg => {
           if (msg.id === message.id)
             return { ...msg, text: message.text, updatedAt: message.updatedAt };
           return msg;
@@ -109,12 +141,16 @@ const PrivateConversation: React.FC = () => {
       });
     });
 
-    socket.on('deleteMessage', (message) => {
-      setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== message.id));
-      setOffsetPagniation((prev) => prev - 1);
+    socket.on('deleteMessage', message => {
+      setMessages(prevMessages =>
+        prevMessages.filter(msg => msg.id !== message.id),
+      );
+      setOffsetPagniation(prev => prev - 1);
     });
 
-    socket.on('error', (error) => { console.log('erreur socket : ', error); });
+    socket.on('error', error => {
+      console.log('erreur socket : ', error);
+    });
 
     socket.emit('joinPrivateRoom', {
       user1Id: userData.id,
@@ -123,29 +159,31 @@ const PrivateConversation: React.FC = () => {
     socketRef.current = socket;
   }, [userData.id, id]);
 
-
-
   const checkUpdateUser = useCallback(async () => {
     if (id == -1 || userData.id == -1 || !login) return;
 
-    const userFetch: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
-    if ('error' in userFetch)
-      dispatch(setErrorSnackbar(userFetch));
+    const userFetch: UserInterface | ApiErrorResponse =
+      await getProfileByPseudo(login);
+    if ('error' in userFetch) dispatch(setErrorSnackbar(userFetch));
     else {
       // check diff before update
-      dispatch(reduxUpdatePrivateConvList({
-        item: userFetch,
-        userId: userData.id,
-      }));
+      dispatch(
+        reduxUpdatePrivateConvList({
+          item: userFetch,
+          userId: userData.id,
+        }),
+      );
 
       if (ConversationList === null) return;
-      if (ConversationList.some((conv) => conv.id == convId)) return;
-      dispatch(reduxAddConversationList({
-        item: userFetch, userId: userData.id,
-      }));
+      if (ConversationList.some(conv => conv.id == convId)) return;
+      dispatch(
+        reduxAddConversationList({
+          item: userFetch,
+          userId: userData.id,
+        }),
+      );
     }
   }, [id, userData.id, login, dispatch]);
-
 
   useEffect(() => {
     connectSocket();
@@ -168,29 +206,32 @@ const PrivateConversation: React.FC = () => {
     fetchOldMessages();
   }, [pageDisplay, id, userData.id, fetchOldMessages, dispatch]);
 
-
   // scroll to bottom
   useEffect(() => {
     if (shouldScrollToBottom && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+      bottomRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest',
+      });
     }
   }, [messages]);
 
   useEffect(() => {
     if (id == -1 || !userFriend) return;
-    setIsFriend(userFriend.some((f) => f.id == id));
+    setIsFriend(userFriend.some(f => f.id == id));
   }, [id, userFriend]);
 
   useEffect(() => {
     if (id == -1 || !userBlocked) return;
-    setIsBlocked(userBlocked.some((f) => f.id == id));
+    setIsBlocked(userBlocked.some(f => f.id == id));
   }, [id, userBlocked]);
 
   //scrool top = fetch new page messages
   const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const element = e.target as HTMLDivElement;
     if (element.scrollTop === 0) {
-      setPageDisplay((prev) => prev + 1);
+      setPageDisplay(prev => prev + 1);
       //display waiting message
     }
   };
@@ -201,8 +242,7 @@ const PrivateConversation: React.FC = () => {
       id,
     );
 
-    if ('error' in resBlockRequest)
-      dispatch(setErrorSnackbar(resBlockRequest));
+    if ('error' in resBlockRequest) dispatch(setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -212,19 +252,19 @@ const PrivateConversation: React.FC = () => {
 
   const handleDeleteFriend = async () => {
     setIsLoading(true);
-    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(
-      id,
-    );
+    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(id);
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
       dispatch(setErrorSnackbar(resDeleteRequest));
     else {
       dispatch(reduxRemoveFriends(id));
-      dispatch(reduxRemoveConversationToList({
-        convId: convId,
-        userId: userData.id,
-      }));
+      dispatch(
+        reduxRemoveConversationToList({
+          convId: convId,
+          userId: userData.id,
+        }),
+      );
       // dispatch(setMsgSnackbar('Friend deleted'));
       navigate('/chat');
     }
@@ -232,9 +272,7 @@ const PrivateConversation: React.FC = () => {
 
   const handleUnblockUser = async () => {
     setIsLoading(true);
-    const resUnblockRequest: void | ApiErrorResponse = await apiUnblockUser(
-      id,
-    );
+    const resUnblockRequest: void | ApiErrorResponse = await apiUnblockUser(id);
     setIsLoading(false);
 
     if (typeof resUnblockRequest === 'object' && 'error' in resUnblockRequest)
@@ -246,12 +284,11 @@ const PrivateConversation: React.FC = () => {
   };
 
   const handleAddFriend = async () => {
-    const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(login);
-    if ('error' in getUser)
-      return dispatch(setErrorSnackbar(getUser));
-    const res: UserRelation | ApiErrorResponse = await requestAddFriend(
-      id,
+    const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(
+      login,
     );
+    if ('error' in getUser) return dispatch(setErrorSnackbar(getUser));
+    const res: UserRelation | ApiErrorResponse = await requestAddFriend(id);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {
@@ -262,13 +299,15 @@ const PrivateConversation: React.FC = () => {
 
   const handleDeleteMessage = async (msgId: number) => {
     setIsLoadingDeleteMsg(true);
-    const res: HttpStatusCode | ApiErrorResponse = await apiDeleteMessage(msgId);
+    const res: HttpStatusCode | ApiErrorResponse = await apiDeleteMessage(
+      msgId,
+    );
     setIsLoadingDeleteMsg(false);
 
     if (typeof res === 'object' && 'error' in res)
       dispatch(setErrorSnackbar(res));
     else {
-      setMessages((prev) => prev.filter((message) => message.id !== msgId));
+      setMessages(prev => prev.filter(message => message.id !== msgId));
       dispatch(setPersonalizedErrorSnackbar('Message deleted'));
     }
   };
@@ -281,12 +320,11 @@ const PrivateConversation: React.FC = () => {
     dispatch(setMsgSnackbar('Invitation sent'));
   };
 
-
   return (
     <>
       <div className="flex flex-col h-full justify-between">
         <div className="flex w-full justify-between items-center text-lg text-blue text-center">
-          <div className='mr-6'>
+          <div className="mr-6">
             <Tooltip
               title="Defi"
               arrow
@@ -294,54 +332,43 @@ const PrivateConversation: React.FC = () => {
               TransitionProps={{ timeout: 600 }}
               sx={{ p: 0, paddingX: 1, m: 0 }}
             >
-              <IconButton
-                onClick={handleDefi}
-                color="success"
-              >
+              <IconButton onClick={handleDefi} color="success">
                 <SportsEsportsIcon />
               </IconButton>
             </Tooltip>
           </div>
 
-          <p className='font-bold text-lg py-1'>
-            <Link to={`/profile/${login}`} >
-              {login.toUpperCase()}
-            </Link>
+          <p className="font-bold text-lg py-1">
+            <Link to={`/profile/${login}`}>{login.toUpperCase()}</Link>
           </p>
 
           <div>
-            {isFriend
-              ? <Tooltip
+            {isFriend ? (
+              <Tooltip
                 title="Remove friend"
                 arrow
                 TransitionComponent={Zoom}
                 TransitionProps={{ timeout: 600 }}
                 sx={{ p: 0, paddingX: 1, m: 0 }}
               >
-                <IconButton
-                  onClick={handleDeleteFriend}
-                  color="warning"
-                >
+                <IconButton onClick={handleDeleteFriend} color="warning">
                   <PersonRemoveIcon />
                 </IconButton>
               </Tooltip>
-
-              : <Tooltip
+            ) : (
+              <Tooltip
                 title="Add friend"
                 arrow
                 TransitionComponent={Zoom}
                 TransitionProps={{ timeout: 600 }}
                 sx={{ p: 0, paddingX: 1, m: 0 }}
               >
-                <IconButton
-                  onClick={handleAddFriend}
-                  color="success"
-                >
+                <IconButton onClick={handleAddFriend} color="success">
                   <PersonAddIcon />
                 </IconButton>
               </Tooltip>
-            }
-            {isBlocked ?
+            )}
+            {isBlocked ? (
               <Tooltip
                 title="Unblock friend"
                 arrow
@@ -349,37 +376,34 @@ const PrivateConversation: React.FC = () => {
                 TransitionProps={{ timeout: 600 }}
                 sx={{ p: 0, paddingX: 1, m: 0 }}
               >
-                <IconButton
-                  onClick={handleUnblockUser}
-                  color="warning"
-                >
+                <IconButton onClick={handleUnblockUser} color="warning">
                   <BlockIcon />
                 </IconButton>
               </Tooltip>
-
-              : <Tooltip
+            ) : (
+              <Tooltip
                 title="Block friend"
                 arrow
                 TransitionComponent={Zoom}
                 TransitionProps={{ timeout: 600 }}
                 sx={{ p: 0, paddingX: 1, m: 0 }}
               >
-                <IconButton
-                  onClick={handleBlockUser}
-                  color="error"
-                >
+                <IconButton onClick={handleBlockUser} color="error">
                   <BlockIcon />
                 </IconButton>
               </Tooltip>
-            }
+            )}
           </div>
           {isLoading && <CircularProgress />}
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-108px)] bg-[#efeff8]" onScroll={handleScroll}>
+        <div
+          className="overflow-y-auto max-h-[calc(100vh-108px)] bg-[#efeff8]"
+          onScroll={handleScroll}
+        >
           {/* display messages */}
-          {messages &&
-            <div className='text-lg m-1 p-2 '>
+          {messages && (
+            <div className="text-lg m-1 p-2 ">
               {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
               {messages.map((message: MessageInterface) => (
                 <MessageItem
@@ -392,13 +416,14 @@ const PrivateConversation: React.FC = () => {
 
               {/* display form message */}
               <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
-                <FormPriveConv setShouldScrollToBottom={setShouldScrollToBottom} />
+                <FormPriveConv
+                  setShouldScrollToBottom={setShouldScrollToBottom}
+                />
               </div>
             </div>
-          }
+          )}
           <div ref={bottomRef}></div>
         </div>
-
       </div>
       {/* } */}
     </>

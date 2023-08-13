@@ -35,12 +35,12 @@ const FriendItem: React.FC<FriendItemProps> = ({
               user.status === 'online'
                 ? 'success'
                 : user.status === 'absent'
-                  ? 'warning'
-                  : user.status === 'inactive'
-                    ? 'secondary'
-                    : user.status === 'in game'
-                      ? 'info'
-                      : 'error'
+                ? 'warning'
+                : user.status === 'inactive'
+                ? 'secondary'
+                : user.status === 'in game'
+                ? 'info'
+                : 'error'
             }
             overlap="circular"
             variant="dot"
@@ -72,7 +72,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
                 <img
                   className="w-10 h-10 rounded-full object-cover mr-2 "
                   src={user.avatar}
-                  onError={(e) => {
+                  onError={e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
                     target.src =
@@ -112,12 +112,12 @@ const FriendItem: React.FC<FriendItemProps> = ({
                   : action.name === 'Delete' ||
                     action.name === 'Cancel' ||
                     action.name === 'Decline'
-                    ? 'error'
-                    : action.name === 'Block'
-                      ? 'warning'
-                      : action.name === 'Defi'
-                        ? 'success'
-                        : 'primary'
+                  ? 'error'
+                  : action.name === 'Block'
+                  ? 'warning'
+                  : action.name === 'Defi'
+                  ? 'success'
+                  : 'primary'
               }
               sx={{ marginRight: '10px' }}
             >

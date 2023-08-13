@@ -34,15 +34,14 @@ const SnackBarApp = () => {
   const InvitationSnackbar = (
     <SnackbarContent
       message={
-        <div className='flex' onClick={handleClickSnackbar}>
+        <div className="flex" onClick={handleClickSnackbar}>
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
             src={snackbar.avatar}
-            onError={(e) => {
+            onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src =
-                'http://localhost:3000/avatars/defaultAvatar.png';
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -57,7 +56,7 @@ const SnackBarApp = () => {
           size="small"
           aria-label="close"
           color="inherit"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             handleClose();
           }}
@@ -71,15 +70,14 @@ const SnackBarApp = () => {
   const TrophySnackbar = (
     <SnackbarContent
       message={
-        <div className='flex items-center' onClick={handleClickSnackbar}>
+        <div className="flex items-center" onClick={handleClickSnackbar}>
           <img
             className="w-10 h-10 rounded-full object-cover mr-2 "
             src={trophyImages[snackbar.trophyImg as keyof typeof trophyImages]}
-            onError={(e) => {
+            onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src =
-                'http://localhost:3000/avatars/defaultAvatar.png';
+              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -91,7 +89,7 @@ const SnackBarApp = () => {
           size="small"
           aria-label="close"
           color="inherit"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             handleClose();
           }}
@@ -112,7 +110,7 @@ const SnackBarApp = () => {
       }}
     >
       <div>
-        <p className='font-bold'>{snackbar.error.error}</p>
+        <p className="font-bold">{snackbar.error.error}</p>
         <p>{snackbar.error.message}</p>
       </div>
     </Alert>
@@ -142,11 +140,13 @@ const SnackBarApp = () => {
       onClose={handleClose}
       onClick={handleClick}
     >
-      {snackbar.link ? InvitationSnackbar :
-        snackbar.trophyImg ? TrophySnackbar :
-          snackbar.error.error ? ErrorSnackBack :
-            alertSnackbar
-      }
+      {snackbar.link
+        ? InvitationSnackbar
+        : snackbar.trophyImg
+        ? TrophySnackbar
+        : snackbar.error.error
+        ? ErrorSnackBack
+        : alertSnackbar}
     </Snackbar>
   );
 };

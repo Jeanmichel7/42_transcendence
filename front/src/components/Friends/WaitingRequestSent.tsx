@@ -37,7 +37,7 @@ const WaitingRequestSent = () => {
       {waitingFriendsRequestSent?.length === 0 && (
         <Nothing text="No friend request sent" />
       )}
-      {waitingFriendsRequestSent?.map((user) => (
+      {waitingFriendsRequestSent?.map(user => (
         <FriendItem
           key={user.id}
           user={user}

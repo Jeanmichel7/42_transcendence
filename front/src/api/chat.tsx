@@ -1,6 +1,11 @@
 import { ApiErrorResponse } from '../types';
 import { apiRequest } from './index';
-import { ChatMsgInterface, JoinRoomDTO, RoomInterface, UpdateRoomData } from '../types/ChatTypes';
+import {
+  ChatMsgInterface,
+  JoinRoomDTO,
+  RoomInterface,
+  UpdateRoomData,
+} from '../types/ChatTypes';
 import { HttpStatusCode } from 'axios';
 
 /* ****************************
@@ -9,19 +14,14 @@ import { HttpStatusCode } from 'axios';
 
 export async function createChannel(
   body: UpdateRoomData,
-): Promise< RoomInterface | ApiErrorResponse> {
-  return apiRequest(
-    'post',
-    'chat/rooms/add',
-    'Failed to create room: ',
-    body,
-  );
+): Promise<RoomInterface | ApiErrorResponse> {
+  return apiRequest('post', 'chat/rooms/add', 'Failed to create room: ', body);
 }
 
 export async function inviteUser(
   roomId: number,
   userId: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userId + '/invite',
@@ -32,7 +32,7 @@ export async function inviteUser(
 export async function editChannel(
   roomId: number,
   data: UpdateRoomData,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId,
@@ -43,7 +43,7 @@ export async function editChannel(
 
 export async function deleteChannel(
   roomId: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'delete',
     'chat/rooms/' + roomId,
@@ -54,7 +54,7 @@ export async function deleteChannel(
 export async function getAllPublicRooms(
   page: number,
   limit: number,
-): Promise< RoomInterface[] | ApiErrorResponse> {
+): Promise<RoomInterface[] | ApiErrorResponse> {
   return apiRequest(
     'get',
     'chat/rooms/public?page=' + page + '&limit=' + limit,
@@ -62,8 +62,9 @@ export async function getAllPublicRooms(
   );
 }
 
-export async function getAllPublicRoomsCount(
-): Promise< number | ApiErrorResponse> {
+export async function getAllPublicRoomsCount(): Promise<
+  number | ApiErrorResponse
+> {
   return apiRequest(
     'get',
     'chat/rooms/public/count',
@@ -73,7 +74,7 @@ export async function getAllPublicRoomsCount(
 
 export async function joinRoom(
   data: JoinRoomDTO,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'post',
     'chat/rooms/' + data.roomId + '/join',
@@ -84,7 +85,7 @@ export async function joinRoom(
 
 export async function declineRoom(
   roomId: number,
-): Promise< void | ApiErrorResponse> {
+): Promise<void | ApiErrorResponse> {
   return apiRequest(
     'post',
     'chat/rooms/' + roomId + '/decline',
@@ -94,7 +95,7 @@ export async function declineRoom(
 
 export async function leaveRoom(
   roomId: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/leave',
@@ -104,12 +105,8 @@ export async function leaveRoom(
 
 export async function getRoomData(
   roomId: string,
-): Promise< RoomInterface | ApiErrorResponse> {
-  return apiRequest(
-    'get',
-    'chat/rooms/' + roomId,
-    'Failed to get room data: ',
-  );
+): Promise<RoomInterface | ApiErrorResponse> {
+  return apiRequest('get', 'chat/rooms/' + roomId, 'Failed to get room data: ');
 }
 
 /* ****************************
@@ -120,7 +117,7 @@ export async function muteUser(
   roomId: number,
   userIdToBeMuted: number,
   duration?: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   let muteDuration = 30;
   if (duration) muteDuration = duration;
   return apiRequest(
@@ -134,7 +131,7 @@ export async function muteUser(
 export async function unMuteUser(
   roomId: number,
   userIdToBeUnMuted: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeUnMuted + '/unmute',
@@ -145,7 +142,7 @@ export async function unMuteUser(
 export async function kickUser(
   roomId: number,
   userIdToBeKicked: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeKicked + '/kick',
@@ -156,7 +153,7 @@ export async function kickUser(
 export async function banUser(
   roomId: number,
   userIdToBeBanned: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeBanned + '/ban',
@@ -167,7 +164,7 @@ export async function banUser(
 export async function unBanUser(
   roomId: number,
   userIdToBeUnBanned: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeUnBanned + '/unban',
@@ -179,7 +176,7 @@ export async function unBanUser(
 export async function addAdminToRoom(
   roomId: number,
   userIdToBeAdmin: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeAdmin + '/admins/add',
@@ -190,7 +187,7 @@ export async function addAdminToRoom(
 export async function removeAdminFromRoom(
   roomId: number,
   userIdToBeRemoved: number,
-): Promise< RoomInterface | ApiErrorResponse> {
+): Promise<RoomInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/rooms/' + roomId + '/users/' + userIdToBeRemoved + '/admins/remove',
@@ -198,20 +195,14 @@ export async function removeAdminFromRoom(
   );
 }
 
-
-
-
-
-
-
 /* ***************************
-*            MESSAGE         *
-**************************** */
+ *            MESSAGE         *
+ **************************** */
 
 export async function sendChatMessage(
   roomId: string,
   data: any,
-): Promise< ChatMsgInterface | ApiErrorResponse> {
+): Promise<ChatMsgInterface | ApiErrorResponse> {
   return apiRequest(
     'post',
     'chat/rooms/' + roomId + '/messages/add',
@@ -223,7 +214,7 @@ export async function sendChatMessage(
 export async function editChatMessage(
   messageId: number,
   data: any,
-): Promise< ChatMsgInterface | ApiErrorResponse> {
+): Promise<ChatMsgInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
     'chat/messages/' + messageId + '/edit',
@@ -234,7 +225,7 @@ export async function editChatMessage(
 
 export async function deleteChatMessage(
   messageId: number,
-): Promise< HttpStatusCode | ApiErrorResponse> {
+): Promise<HttpStatusCode | ApiErrorResponse> {
   return apiRequest(
     'delete',
     'chat/messages/' + messageId + '/delete',
@@ -246,8 +237,8 @@ export async function chatOldMessages(
   roomId: string,
   page: number,
   offset: number,
-): Promise< ChatMsgInterface[] | ApiErrorResponse > {
-  return apiRequest< ChatMsgInterface[] >(
+): Promise<ChatMsgInterface[] | ApiErrorResponse> {
+  return apiRequest<ChatMsgInterface[]>(
     'get',
     'chat/rooms/' + roomId + '/messages?page=' + page + '&offset=' + offset,
     'Failed to get old messages: ',

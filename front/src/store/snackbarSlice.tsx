@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApiErrorResponse, PutSnackbarInterface, SnackbarInterface } from '../types';
+import {
+  ApiErrorResponse,
+  PutSnackbarInterface,
+  SnackbarInterface,
+} from '../types';
 
 export interface SnackbarState {
   snackbar: SnackbarInterface;
@@ -18,7 +22,7 @@ export const snackbarSlice = createSlice({
       horizontal: 'right',
       link: '',
       trophyImg: '',
-      error : {
+      error: {
         error: '',
         message: '',
         statusCode: 0,
@@ -69,7 +73,7 @@ export const snackbarSlice = createSlice({
         open: true,
       };
     },
-    closeSnackbar: (state) => {
+    closeSnackbar: state => {
       state.snackbar.open = false;
       state.snackbar.message = '';
       state.snackbar.loginFrom = '';

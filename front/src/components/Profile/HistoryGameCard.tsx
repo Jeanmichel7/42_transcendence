@@ -14,14 +14,13 @@ const GameCard = ({ game, user }: GameCardProps) => {
     setP1IsWinner(game.player1.id === game.winner?.id);
   }, [game, user.id]);
 
-
   const calculDuration = (dateStart: Date, dateEnd: Date) => {
     const start = new Date(dateStart);
     const end = new Date(dateEnd);
     const diff = Math.abs(end.getTime() - start.getTime());
     const minutes = Math.floor(diff / 1000 / 60);
     const seconds = Math.floor((diff / 1000) % 60);
-    return minutes ? (minutes + 'min ') : '' + seconds + 's';
+    return minutes ? minutes + 'min ' : '' + seconds + 's';
   };
 
   useEffect(() => {
@@ -31,13 +30,12 @@ const GameCard = ({ game, user }: GameCardProps) => {
   }, [game]);
 
   return (
-    <div className="flex justify-center items-center w-full bg-blue-100 border-b-2 border-blue-200 " >
-
+    <div className="flex justify-center items-center w-full bg-blue-100 border-b-2 border-blue-200 ">
       <div className="p-2 text-center">
         <img
           className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
           src={p1IsWinner ? game.player1.avatar : game.player2.avatar}
-          onError={(e) => {
+          onError={e => {
             const target = e.target as HTMLImageElement;
             target.onerror = null;
             target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
@@ -47,15 +45,14 @@ const GameCard = ({ game, user }: GameCardProps) => {
       </div>
 
       <div className="p-2 min-w-[25vw]">
-        <p className='font-bold'>
+        <p className="font-bold">
           {p1IsWinner ? game.player1.login : game.player2.login}
         </p>
         <p> Win </p>
       </div>
 
-
       <div className="flex-grow text-center">
-        <p className='text-[1.3rem] font-bold'>
+        <p className="text-[1.3rem] font-bold">
           {p1IsWinner ? game.scorePlayer1 : game.scorePlayer2}
           {' - '}
           {!p1IsWinner ? game.scorePlayer1 : game.scorePlayer2}
@@ -64,17 +61,17 @@ const GameCard = ({ game, user }: GameCardProps) => {
       </div>
 
       <div className="p-2 min-w-[25vw]">
-        <p className='font-bold text-end'>
+        <p className="font-bold text-end">
           {!p1IsWinner ? game.player1.login : game.player2.login}
         </p>
-        <p className='text-end'> Lose </p>
+        <p className="text-end"> Lose </p>
       </div>
 
       <div className="p-2">
         <img
           className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
           src={!p1IsWinner ? game.player1.avatar : game.player2.avatar}
-          onError={(e) => {
+          onError={e => {
             const target = e.target as HTMLImageElement;
             target.onerror = null;
             target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
@@ -82,7 +79,6 @@ const GameCard = ({ game, user }: GameCardProps) => {
           alt="avatar"
         />
       </div>
-
     </div>
   );
 };

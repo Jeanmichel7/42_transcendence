@@ -1,6 +1,6 @@
-import { Dispatch } from "@reduxjs/toolkit";
-import { RefObject, SetStateAction } from "react";
-import { Socket } from "socket.io-client";
+import { Dispatch } from '@reduxjs/toolkit';
+import { RefObject, SetStateAction } from 'react';
+import { Socket } from 'socket.io-client';
 
 export interface ServerToClientEvents {
   connect: () => void;
@@ -71,7 +71,7 @@ type GameProps = {
   keyStateRef: RefObject<{
     ArrowUp: boolean;
     ArrowDown: boolean;
-    " ": boolean;
+    ' ': boolean;
   }>;
   posRacket: RefObject<{ left: number; right: number }>;
   gameId: RefObject<bigint>;

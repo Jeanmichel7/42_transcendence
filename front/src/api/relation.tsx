@@ -1,7 +1,9 @@
 import { apiRequest } from './index';
 import { ApiErrorResponse, UserInterface, UserRelation } from '../types';
 
-export async function getFriends(): Promise< ApiErrorResponse | UserInterface[] > {
+export async function getFriends(): Promise<
+  ApiErrorResponse | UserInterface[]
+> {
   return apiRequest<UserInterface[]>(
     'get',
     '/relations/friends',
@@ -11,7 +13,7 @@ export async function getFriends(): Promise< ApiErrorResponse | UserInterface[] 
 
 export async function getFriendProfile(
   login: string,
-): Promise< ApiErrorResponse | UserInterface[] > {
+): Promise<ApiErrorResponse | UserInterface[]> {
   return apiRequest<UserInterface[]>(
     'get',
     '/relations/profilefriends/' + login,
@@ -19,8 +21,9 @@ export async function getFriendProfile(
   );
 }
 
-export async function getBlockedUsers()
-: Promise< ApiErrorResponse | UserInterface[] > {
+export async function getBlockedUsers(): Promise<
+  ApiErrorResponse | UserInterface[]
+> {
   return apiRequest<UserInterface[]>(
     'get',
     '/relations/blocked',
@@ -40,7 +43,7 @@ export async function deleteFriend(
 
 export async function requestAddFriend(
   userIdToAdd: number,
-): Promise< UserRelation | ApiErrorResponse > {
+): Promise<UserRelation | ApiErrorResponse> {
   return apiRequest<UserRelation>(
     'get',
     '/relations/friends/' + userIdToAdd + '/request',
@@ -50,7 +53,7 @@ export async function requestAddFriend(
 
 export async function acceptFriend(
   userIdToAdd: number,
-): Promise< UserRelation | ApiErrorResponse > {
+): Promise<UserRelation | ApiErrorResponse> {
   return apiRequest<UserRelation>(
     'put',
     '/relations/friends/' + userIdToAdd + '/accept',
@@ -60,7 +63,7 @@ export async function acceptFriend(
 
 export async function declineFriend(
   userIdToAdd: number,
-): Promise< void | ApiErrorResponse > {
+): Promise<void | ApiErrorResponse> {
   return apiRequest<void>(
     'put',
     '/relations/friends/' + userIdToAdd + '/decline',
@@ -70,7 +73,7 @@ export async function declineFriend(
 
 export async function cancelFriendRequest(
   userIdToAdd: number,
-): Promise< void | ApiErrorResponse > {
+): Promise<void | ApiErrorResponse> {
   return apiRequest<void>(
     'put',
     '/relations/friends/' + userIdToAdd + '/cancel',
@@ -78,8 +81,9 @@ export async function cancelFriendRequest(
   );
 }
 
-export async function getFriendRequests(
-): Promise< UserInterface[] | ApiErrorResponse > {
+export async function getFriendRequests(): Promise<
+  UserInterface[] | ApiErrorResponse
+> {
   return apiRequest<UserInterface[]>(
     'get',
     '/relations/friends/requestsPending',
@@ -87,8 +91,9 @@ export async function getFriendRequests(
   );
 }
 
-export async function getFriendRequestsSent(
-): Promise< UserInterface[] | ApiErrorResponse > {
+export async function getFriendRequestsSent(): Promise<
+  UserInterface[] | ApiErrorResponse
+> {
   return apiRequest<UserInterface[]>(
     'get',
     '/relations/friends/requestsSent',
@@ -98,7 +103,7 @@ export async function getFriendRequestsSent(
 
 export async function addFriend(
   userIdToAdd: number,
-): Promise< UserRelation | ApiErrorResponse > {
+): Promise<UserRelation | ApiErrorResponse> {
   return apiRequest<UserRelation>(
     'put',
     '/relations/friends/' + userIdToAdd + '/add',
@@ -108,7 +113,7 @@ export async function addFriend(
 
 export async function apiBlockUser(
   userIdToBlock: UserInterface['id'],
-): Promise< UserRelation | ApiErrorResponse> {
+): Promise<UserRelation | ApiErrorResponse> {
   return apiRequest<UserRelation>(
     'put',
     '/relations/friends/' + userIdToBlock + '/block',
@@ -117,7 +122,7 @@ export async function apiBlockUser(
 }
 export async function apiUnblockUser(
   userIdToUnblock: UserInterface['id'],
-): Promise< void | ApiErrorResponse> {
+): Promise<void | ApiErrorResponse> {
   return apiRequest<void>(
     'put',
     '/relations/friends/' + userIdToUnblock + '/unblock',

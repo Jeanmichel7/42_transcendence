@@ -5,19 +5,15 @@ module.exports = {
     jest: true,
   },
   extends: [
-    // 'plugin:react',
     'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
-    // 'airbnb',
     'airbnb-typescript',
-    // 'airbnb/hooks',
     'plugin:import/typescript',
+    'plugin:prettier/recommended', // Ajout de Prettier après les autres extensions
   ],
   parser: '@typescript-eslint/parser',
-  overrides: [
-  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -29,7 +25,9 @@ module.exports = {
   plugins: [
     'react',
     '@typescript-eslint',
+    'prettier', // Assurez-vous d'ajouter 'prettier' ici
   ],
   rules: {
+    'prettier/prettier': 'error', // Activez la règle prettier
   },
 };

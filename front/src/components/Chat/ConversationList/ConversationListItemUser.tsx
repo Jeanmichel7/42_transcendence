@@ -4,7 +4,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ConversationInterface } from '../../../types';
 import { reduxRemoveConversationToList } from '../../../store/convListSlice';
 import { RootState } from '../../../store';
-import { Badge, Chip, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
+import {
+  Badge,
+  Chip,
+  IconButton,
+  Tooltip,
+  Typography,
+  Zoom,
+} from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -44,12 +51,12 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
               conv.user.status === 'online'
                 ? 'success'
                 : conv.user.status === 'absent'
-                  ? 'warning'
-                  : conv.user.status === 'inactive'
-                    ? 'secondary'
-                    : conv.user.status === 'in game'
-                      ? 'info'
-                      : 'error'
+                ? 'warning'
+                : conv.user.status === 'inactive'
+                ? 'secondary'
+                : conv.user.status === 'in game'
+                ? 'info'
+                : 'error'
             }
             overlap="circular"
             badgeContent=" "
@@ -81,10 +88,11 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
               <img
                 className="w-10 h-10 rounded-full object-cover mr-2 border border-[#5f616f]"
                 src={conv.user.avatar}
-                onError={(e) => {
+                onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                  target.src =
+                    'http://localhost:3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />
@@ -106,7 +114,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
           </Typography>
         </Link>
 
-        {isHovered ?
+        {isHovered ? (
           <Tooltip
             title="Close conversation"
             arrow
@@ -114,21 +122,23 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
             TransitionProps={{ timeout: 600 }}
           >
             <IconButton
-              onClick={(e) => handleCloseConv(e)}
+              onClick={e => handleCloseConv(e)}
               color="warning"
               sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
             >
               <CloseIcon />
             </IconButton>
           </Tooltip>
-          :
-          <Chip label={conv.msgNotRead > 0 ? conv.msgNotRead : ''} size="small"
+        ) : (
+          <Chip
+            label={conv.msgNotRead > 0 ? conv.msgNotRead : ''}
+            size="small"
             sx={{
               visibility: conv.msgNotRead > 0 ? 'visible' : 'hidden',
               marginRight: 2,
             }}
           />
-        }
+        )}
       </div>
     </div>
   );

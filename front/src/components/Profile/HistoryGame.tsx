@@ -11,13 +11,12 @@ interface PropsGames {
 export default function HistoryGame({ user, games }: PropsGames) {
   return (
     <>
-      <p className='mt-6'>
+      <p className="mt-6">
         <Sticker dataText="Games" />
       </p>
-      {
-        games && games.length > 0 &&
-        games.map(game => <GameCard game={game} user={user} key={game.id} />)
-      }
+      {games &&
+        games.length > 0 &&
+        games.map(game => <GameCard game={game} user={user} key={game.id} />)}
     </>
   );
 }

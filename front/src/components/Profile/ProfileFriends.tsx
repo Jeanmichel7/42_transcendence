@@ -28,7 +28,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
 
   return (
     <>
-      <p className='mt-6'>
+      <p className="mt-6">
         <Sticker dataText={'friends'} />
       </p>
 
@@ -41,19 +41,20 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
             />
           </NavLink>
         ) : (
-        <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
-          {friends.map((friend) => {
-            if (friend.login != user.login)
-              return (
-                <FriendCard
-                  key={friend.id}
-                  actualUserLogin={user.login}
-                  friend={friend}
-                  setFriends={setFriends}
-                />
-              );
-          })}
-        </div> )}
+          <div className="flex flex-wrap justify-center overflow-auto max-h-[calc(100vh-220px)] h-full px-2">
+            {friends.map(friend => {
+              if (friend.login != user.login)
+                return (
+                  <FriendCard
+                    key={friend.id}
+                    actualUserLogin={user.login}
+                    friend={friend}
+                    setFriends={setFriends}
+                  />
+                );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

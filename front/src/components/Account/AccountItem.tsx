@@ -82,12 +82,11 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   }
 
   async function handleForm(): Promise<void> {
-    await new Promise((r) => setTimeout(r, 300)); // pour le style
+    await new Promise(r => setTimeout(r, 300)); // pour le style
 
     const formData: FormData = new FormData();
     formData.append(keyName, inputValue as string);
-    if (keyName === 'password')
-      formData.append('oldPassword', inputOldPwd);
+    if (keyName === 'password') formData.append('oldPassword', inputOldPwd);
 
     setLoading(true);
     const updatedUser: UserInterface | ApiErrorResponse =
@@ -109,8 +108,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   function handleClose() {
     setEdit(false);
     setInputValue(value);
-    if (keyName == 'password')
-      setEditPwd(false);
+    if (keyName == 'password') setEditPwd(false);
   }
 
   function parseKeyName(valueKeyname: string | number | boolean) {
@@ -176,8 +174,9 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       <div className="w-1/2">
         {!edit ? (
           <>
-            {typeof value === 'string' && 
-            keyName != 'password' && <p> {inputValue} </p>}
+            {typeof value === 'string' && keyName != 'password' && (
+              <p> {inputValue} </p>
+            )}
             {typeof value === 'number' && <p> {inputValue} </p>}
             {typeof value === 'boolean' && (
               <p> {inputValue ? 'Actived' : 'Desactived'} </p>
@@ -190,13 +189,12 @@ export default function AccountItem({ keyName, value }: ItemProps) {
               aria-describedby={keyName + '_text'}
               className="w-full "
               defaultValue={value}
-              onChange={(e) => {
+              onChange={e => {
                 setInputValue(e.target.value);
               }}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter') handleForm();
               }}
-            // autoFocus
             />
             <FormHelperText
               id={keyName + '_text'}
@@ -209,12 +207,12 @@ export default function AccountItem({ keyName, value }: ItemProps) {
           </FormControl>
         )}
 
-        {keyName == 'password' &&
+        {keyName == 'password' && (
           <>
             {!editPwd ? (
-                <p> ********** </p>
+              <p> ********** </p>
             ) : (
-              <div className='w-full'>
+              <div className="w-full">
                 <FormControl variant="standard" className="w-full">
                   <Input
                     id={'oldPwd' + '_id'}
@@ -223,13 +221,9 @@ export default function AccountItem({ keyName, value }: ItemProps) {
                     name="oldPwd"
                     placeholder="old password"
                     // defaultValue={value}
-                    onChange={(e) => {
+                    onChange={e => {
                       setInputOldPwd(e.target.value);
                     }}
-                    // onKeyDown={(e) => {
-                    //   if (e.key === "Enter") handleForm();
-                    // }}
-                  // autoFocus
                   />
                 </FormControl>
                 <FormControl variant="standard" className="w-full">
@@ -240,13 +234,12 @@ export default function AccountItem({ keyName, value }: ItemProps) {
                     className="w-full"
                     // defaultValue={value}
                     placeholder="new password"
-                    onChange={(e) => {
+                    onChange={e => {
                       setInputValue(e.target.value);
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter') handleForm();
                     }}
-                    // autoFocus
                   />
                   <FormHelperText
                     id={keyName + '_text'}
@@ -260,8 +253,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
               </div>
             )}
           </>
-        }
-
+        )}
       </div>
 
       {/* Buttons */}
@@ -332,8 +324,8 @@ export default function AccountItem({ keyName, value }: ItemProps) {
           <TextField
             label="Enter the code"
             value={userCode}
-            onChange={(e) => setUserCode(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={e => setUserCode(e.target.value)}
+            onKeyDown={e => {
               if (e.key === 'Enter') handleClose2FA();
             }}
           />

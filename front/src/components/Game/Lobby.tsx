@@ -1,14 +1,5 @@
-import styled, { keyframes } from "styled-components";
-import { Socket } from "socket.io-client";
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-  SocketInterface,
-} from "./Interface";
-import { useEffect, useRef, useState } from "react";
-import { unstable_createMuiStrictModeTheme } from "@mui/material";
-import { en } from "@faker-js/faker";
-import { createImmutableStateInvariantMiddleware } from "@reduxjs/toolkit";
+import styled, { keyframes } from 'styled-components';
+import { useEffect, useRef, useState } from 'react';
 
 export const fadeIn = keyframes`
   from {
@@ -37,7 +28,7 @@ export const StyledButton = styled.button<StyledButtonProps>`
   z-index: 10;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     height: 5rem;
@@ -46,12 +37,12 @@ export const StyledButton = styled.button<StyledButtonProps>`
     border-radius: 3rem;
     transition: width 0.2s ease;
     z-index: -1;
-    visibility: ${(props) => (props.activateEffect ? "visible" : "hidden")};
+    visibility: ${props => (props.activateEffect ? 'visible' : 'hidden')};
     left: -50%;
   }
 
   &:hover {
-    ${(props) =>
+    ${props =>
       props.activateEffect &&
       `
     color: var(--color-primary);
@@ -75,7 +66,7 @@ export const ButtonWrapper = styled.div<ButtonWrapperProps>`
   flex-direction: column;
   position: absolute;
   transform: translate(-50%, 0%);
-  animation: ${(props) => (props.animation ? fadeIn : "")} 1s ease-out;
+  animation: ${props => (props.animation ? fadeIn : '')} 1s ease-out;
   left: 50%;
   z-index: 10;
   @media (max-width: 768px) {
@@ -98,8 +89,8 @@ const StyledCircle = styled.div<StyledCircleProps>`
   z-index: 1;
   left: -50%;
   transition: top 0.2s ease;
-  ${(props) => {
-    return props.pos === "top" ? "top: 0%;" : " top: calc(100% - 5rem);";
+  ${props => {
+    return props.pos === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
 `;
 
@@ -111,7 +102,7 @@ interface LobbyProps {
 }
 
 function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
-  const circlePostion = useRef("top");
+  const circlePostion = useRef('top');
   const [enableEffect, setEnableEffect] = useState({
     top: true,
     bottom: false,
@@ -122,7 +113,7 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
 
     const handleTransitionEnd = () => {
       if (circle) {
-        if (circlePostion.current === "top") {
+        if (circlePostion.current === 'top') {
           setEnableEffect({ top: true, bottom: false });
         } else {
           setEnableEffect({ top: false, bottom: true });
@@ -131,12 +122,12 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
     };
 
     if (circle) {
-      circle.addEventListener("transitionend", handleTransitionEnd);
+      circle.addEventListener('transitionend', handleTransitionEnd);
     }
 
     return () => {
       if (circle) {
-        circle.removeEventListener("transitionend", handleTransitionEnd);
+        circle.removeEventListener('transitionend', handleTransitionEnd);
       }
     };
   }, []);
@@ -146,19 +137,19 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
       <StyledButton
         activateEffect={enableEffect.top}
         onMouseOver={() => {
-          if (circlePostion.current != "top") {
+          if (circlePostion.current != 'top') {
             setEnableEffect({ top: false, bottom: false });
-            circlePostion.current = "top";
+            circlePostion.current = 'top';
           }
         }}
         onClick={() => {
-          socket.emit("userGameStatus", "searchNormal", (response: string) => {
-            if (response === "error") {
-              setCurrentPage("lobby");
+          socket.emit('userGameStatus', 'searchNormal', (response: string) => {
+            if (response === 'error') {
+              setCurrentPage('lobby');
             }
           });
           setBonus(false);
-          setCurrentPage("searchOpponent");
+          setCurrentPage('searchOpponent');
         }}
       >
         Normal Mode
@@ -166,19 +157,19 @@ function Lobby({ setCurrentPage, socket, setBonus }: LobbyProps) {
       <StyledButton
         activateEffect={enableEffect.bottom}
         onMouseOver={() => {
-          if (circlePostion.current != "bottom") {
+          if (circlePostion.current != 'bottom') {
             setEnableEffect({ top: false, bottom: false });
-            circlePostion.current = "bottom";
+            circlePostion.current = 'bottom';
           }
         }}
         onClick={() => {
-          socket.emit("userGameStatus", "searchBonus", (response: string) => {
-            if (response === "error") {
-              setCurrentPage("lobby");
+          socket.emit('userGameStatus', 'searchBonus', (response: string) => {
+            if (response === 'error') {
+              setCurrentPage('lobby');
             }
           });
           setBonus(true);
-          setCurrentPage("searchOpponent");
+          setCurrentPage('searchOpponent');
         }}
       >
         Bonus Mode

@@ -10,7 +10,14 @@ import { deleteAccount, patchUserAccount } from '../../api/user';
 import { UserInterface, ApiErrorResponse } from '../../types';
 
 import Box from '@mui/material/Box';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 
 interface AccountProfileProps {
   user: UserInterface;
@@ -61,20 +68,22 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
       dispatch(setErrorSnackbar(deletedUser));
     } else {
       dispatch(setMsgSnackbar('Account successfully deleted!'));
-      dispatch(setUser({
-        id: -1,
-        login: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        status: 'offline',
-        avatar: '',
-        role: 'user',
-        description: '',
-        is2FAEnabled: false,
-        score: 1500,
-        level: 0,
-      }));
+      dispatch(
+        setUser({
+          id: -1,
+          login: '',
+          email: '',
+          firstName: '',
+          lastName: '',
+          status: 'offline',
+          avatar: '',
+          role: 'user',
+          description: '',
+          is2FAEnabled: false,
+          score: 1500,
+          level: 0,
+        }),
+      );
       dispatch(setLogged(false));
       navigate('/');
     }
@@ -88,7 +97,6 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-
 
   return (
     <>
@@ -113,7 +121,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 }
                 className="mb-2 w-auto rounded-lg max-h-[200px] border-2 border-blue-500"
                 alt="avatar"
-                onError={(e) => {
+                onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
@@ -131,24 +139,23 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                       onChange={handleFileChange}
                     />
                     <div>
-
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleFileUpload}
-                      disabled={isLoading}
-                      sx={{ mr: 1 }}
-                    >
-                      Validate
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      className="mt-2"
-                      onClick={() => setOpenInputAvatar(!openInputAvatar)}
-                    >
-                      Cancel
-                    </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleFileUpload}
+                        disabled={isLoading}
+                        sx={{ mr: 1 }}
+                      >
+                        Validate
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        className="mt-2"
+                        onClick={() => setOpenInputAvatar(!openInputAvatar)}
+                      >
+                        Cancel
+                      </Button>
                     </div>
                   </>
                 ) : (
@@ -191,36 +198,39 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 variant="contained"
                 color="error"
                 onClick={handleOpenDialog}
-              > Delete Account </Button>
+              >
+                {' '}
+                Delete Account{' '}
+              </Button>
             </div>
           </div>
         </Box>
       )}
-        <Dialog
-          open={openDialog}
-          keepMounted
-          onClose={handleCloseDialog}
-        >
-          <DialogTitle>{'Are you sure you want to delete your account?'}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              By deleting your account, all your data will be removed permanently. This action cannot be undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Cancel
-            </Button>
-            <Button 
-              onClick={async () => {
-                await handleDeleteAccount();
-                handleCloseDialog();
-              }} 
-              color="error">
-              Confirm Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog open={openDialog} keepMounted onClose={handleCloseDialog}>
+        <DialogTitle>
+          {'Are you sure you want to delete your account?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            By deleting your account, all your data will be removed permanently.
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={async () => {
+              await handleDeleteAccount();
+              handleCloseDialog();
+            }}
+            color="error"
+          >
+            Confirm Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

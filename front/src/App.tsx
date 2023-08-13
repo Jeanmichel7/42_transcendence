@@ -45,7 +45,6 @@ import { getNotifsNotRead } from './api/notification';
 import { CircleBackground } from './utils/CircleBackground';
 import SnackBarApp from './components/SnackBarApp';
 
-
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -148,26 +147,22 @@ function App() {
     }
   }, [dispatch, navigate, fetchData, checkAuth]);
 
-
-
   return (
-      <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
-        {location?.pathname !== '/' &&
-          location?.pathname != '/connection' &&
-          location?.pathname != '/fakeconnection' &&
-           <Header />
-        }
-        {( location?.pathname == '/' || location?.pathname == '/game') && <CircleBackground /> }
-        
-        <AppRoutes />
-        
-        {location?.pathname !== '/' &&
-          location?.pathname != '/connection' &&
-          location?.pathname != '/fakeconnection' && 
-            <Footer />
-        }
+    <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
+      {location?.pathname !== '/' &&
+        location?.pathname != '/connection' &&
+        location?.pathname != '/fakeconnection' && <Header />}
+      {(location?.pathname == '/' || location?.pathname == '/game') && (
+        <CircleBackground />
+      )}
 
-        <SnackBarApp/>
+      <AppRoutes />
+
+      {location?.pathname !== '/' &&
+        location?.pathname != '/connection' &&
+        location?.pathname != '/fakeconnection' && <Footer />}
+
+      <SnackBarApp />
     </div>
   );
 }

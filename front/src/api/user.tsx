@@ -10,7 +10,7 @@ export async function getUserData(): Promise<UserInterface | ApiErrorResponse> {
 }
 
 export async function fetchUserAccount(): Promise<
-UserInterface | ApiErrorResponse
+  UserInterface | ApiErrorResponse
 > {
   return apiRequest<UserInterface>(
     'get',
@@ -50,8 +50,9 @@ export async function patchUserAccount(
   );
 }
 
-export async function getAllUsers(
-): Promise< UserInterface[] | ApiErrorResponse > {
+export async function getAllUsers(): Promise<
+  UserInterface[] | ApiErrorResponse
+> {
   return apiRequest<UserInterface[]>(
     'get',
     '/users/all',

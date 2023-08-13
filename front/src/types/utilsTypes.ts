@@ -11,11 +11,11 @@ export interface SnackbarInterface {
   horizontal: 'left' | 'center' | 'right';
   link: string;
   trophyImg?: string;
-  error : {
-    error: string,
-    message: string,
-    statusCode: number,
-  },
+  error: {
+    error: string;
+    message: string;
+    statusCode: number;
+  };
 }
 
 export interface PutSnackbarInterface {
@@ -42,18 +42,19 @@ export interface RoomUserActionInterface {
 
 export interface NotificationInterface {
   id: number;
-  type: 'friendRequest' |
-  'friendRequestAccepted' |
-  'friendRequestDeclined' |
-  'friendRequestCanceled' |
-  'friendDeleted' |
-  'blockUser' |
-  'unblockUser' |
-  'roomInvite' |
-  'gameInvite' |
-  'gameInviteAccepted' |
-  'gameInviteDeclined' |
-  'message';
+  type:
+    | 'friendRequest'
+    | 'friendRequestAccepted'
+    | 'friendRequestDeclined'
+    | 'friendRequestCanceled'
+    | 'friendDeleted'
+    | 'blockUser'
+    | 'unblockUser'
+    | 'roomInvite'
+    | 'gameInvite'
+    | 'gameInviteAccepted'
+    | 'gameInviteDeclined'
+    | 'message';
   content: string;
   read: boolean;
   createdAt: Date;

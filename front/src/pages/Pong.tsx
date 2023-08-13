@@ -10,7 +10,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiErrorResponse, GameInterface } from '../types';
 import { getGame } from '../api/game';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setPersonalizedErrorSnackbar } from '../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../store/snackbarSlice';
 import { RootState } from '../store';
 import PrivateLobby from '../components/Game/PrivateLobby';
 import { activateEffect, desactivateEffect } from '../store/gameSlice';
@@ -54,7 +57,9 @@ function Pong() {
         retFetchGame.player1.id != userData.id &&
         retFetchGame.player2.id != userData.id
       )
-        return dispatch(setPersonalizedErrorSnackbar('You are not in this game'));
+        return dispatch(
+          setPersonalizedErrorSnackbar('You are not in this game'),
+        );
       console.log('retFetchGame : ', retFetchGame);
 
       setIsPlayer1(retFetchGame.player1.id == userData.id);
@@ -88,7 +93,7 @@ function Pong() {
       console.log('ERROR SOCKET DISCONNECTED');
     });
 
-    newSocket.on('userGameStatus', (message) => {
+    newSocket.on('userGameStatus', message => {
       if (message === 'foundNormal') {
         dispatch(activateEffect());
         setBonus(false);
@@ -126,7 +131,6 @@ function Pong() {
       dispatch(desactivateEffect());
     }
   }, [currentPage, gameId, dispatch]);
-
 
   let statusComponent;
   if (connectStatus === 'connecting') {

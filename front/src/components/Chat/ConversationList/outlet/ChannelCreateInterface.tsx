@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 
-import { ApiErrorResponse, RoomInterface, UserInterface } from '../../../../types';
+import {
+  ApiErrorResponse,
+  RoomInterface,
+  UserInterface,
+} from '../../../../types';
 
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -23,7 +27,10 @@ import {
   FormGroup,
   MenuItem,
 } from '@mui/material';
-import { setErrorSnackbar, setPersonalizedErrorSnackbar } from '../../../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../../../store/snackbarSlice';
 import { createChannel } from '../../../../api/chat';
 import { reduxAddConversationList } from '../../../../store/convListSlice';
 import RowOfFriendToInvit from '../../Channel/admin/RowInvitation';
@@ -47,28 +54,28 @@ const CreateGroupInterface = () => {
     e: React.ChangeEvent<{ name?: string; value: unknown }>,
   ) => {
     const { name, value } = e.target as HTMLInputElement;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
 
   const handleSelectUser = (user: UserInterface, isChecked: boolean) => {
     if (isChecked) {
-      setForm((prev) =>
+      setForm(prev =>
         prev.acceptedUsers
           ? { ...prev, acceptedUsers: [...prev.acceptedUsers, user] }
           : { ...prev, acceptedUsers: [user] },
       );
     } else {
-      setForm((prev) =>
+      setForm(prev =>
         prev.acceptedUsers
           ? {
-            ...prev,
-            acceptedUsers: prev.acceptedUsers.filter((u) => u.id !== user.id),
-          }
+              ...prev,
+              acceptedUsers: prev.acceptedUsers.filter(u => u.id !== user.id),
+            }
           : { ...prev, acceptedUsers: null },
       );
     }
@@ -77,10 +84,12 @@ const CreateGroupInterface = () => {
   const handleValidateForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (form.name.length < 2)
-      return dispatch(setPersonalizedErrorSnackbar('Name must be at least 2 characters'));
+      return dispatch(
+        setPersonalizedErrorSnackbar('Name must be at least 2 characters'),
+      );
 
     const acceptedUsersFormated = form.acceptedUsers
-      ? form.acceptedUsers.map((u) => u.id)
+      ? form.acceptedUsers.map(u => u.id)
       : null;
     const data = {
       name: form.name,
@@ -150,7 +159,7 @@ const CreateGroupInterface = () => {
               onChange={handleChangeInput}
               // sx={{ m: 1, width: '25ch' }}
             >
-              {channelType.map((option) => (
+              {channelType.map(option => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -197,7 +206,7 @@ const CreateGroupInterface = () => {
                   label={<RowOfFriendToInvit user={user} />}
                   control={
                     <Checkbox
-                      onChange={(e) => handleSelectUser(user, e.target.checked)}
+                      onChange={e => handleSelectUser(user, e.target.checked)}
                     />
                   }
                 />

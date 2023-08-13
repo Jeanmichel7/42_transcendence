@@ -50,7 +50,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     const navigate = useNavigate();
     const { room } = useSelector(
       (state: RootState) =>
-        state.chat.conversationsList.find((c) => c.id === conv.id) ||
+        state.chat.conversationsList.find(c => c.id === conv.id) ||
         ({} as ConversationInterface),
     );
     const { userData } = useSelector((state: RootState) => state.user);
@@ -87,8 +87,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       const allMessages: ChatMsgInterface[] | ApiErrorResponse =
         await chatOldMessages(id, pageDisplay, offsetPagniation);
 
-      if ('error' in allMessages)
-        dispatch(setErrorSnackbar(allMessages));
+      if ('error' in allMessages) dispatch(setErrorSnackbar(allMessages));
       else {
         if (allMessages.length === 0) return;
         if (allMessages.length < 20) setAllMessagesDisplayed(true);
@@ -103,9 +102,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
 
         const reversedMessageFiltred = allMessages
           .reverse()
-          .filter((message) => !messages.some((msg) => msg.id === message.id));
+          .filter(message => !messages.some(msg => msg.id === message.id));
         if (pageDisplay === 1) setMessages(reversedMessageFiltred);
-        else setMessages((prev) => [...reversedMessageFiltred, ...prev]);
+        else setMessages(prev => [...reversedMessageFiltred, ...prev]);
 
         //set pos scrool to top old messages
         requestAnimationFrame(() => {
@@ -158,8 +157,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         //check if user is accepted in room
         if (roomData.users && roomData.acceptedUsers) {
           const isUserInRoom =
-            roomData.users.some((u) => u.id === userData.id) ||
-            roomData.acceptedUsers.some((u) => u.id === userData.id);
+            roomData.users.some(u => u.id === userData.id) ||
+            roomData.acceptedUsers.some(u => u.id === userData.id);
 
           if (!isUserInRoom) {
             socketRef.current?.emit('leaveRoom', {
@@ -207,7 +206,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     useEffect(() => {
       if (!room || !userData) return;
       if (room.admins)
-        setIsAdmin(room.admins.some((admin) => admin.id === userData.id));
+        setIsAdmin(room.admins.some(admin => admin.id === userData.id));
     }, [room, userData]);
 
     // scroll to bottom
@@ -231,7 +230,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       if (typeof res === 'object' && 'error' in res)
         dispatch(setErrorSnackbar(res));
       else {
-        setMessages((prev) => prev.filter((message) => message.id !== msgId));
+        setMessages(prev => prev.filter(message => message.id !== msgId));
         dispatch(setMsgSnackbar('Message deleted'));
       }
     };
@@ -244,7 +243,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         !isLoadingPagination &&
         !allMessagesDisplayed
       ) {
-        setPageDisplay((prev) => prev + 1);
+        setPageDisplay(prev => prev + 1);
         //display waiting message
       }
     };
@@ -256,15 +255,18 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         ) : (
           <div className="flex h-full">
             <div className="flex flex-grow flex-col h-full justify-between">
-
               <div className="w-full flex text-lg justify-between">
-                { room && isAdmin ?
-                  <InvitationRoom room={room} /> : <span></span>
-                }
+                {room && isAdmin ? (
+                  <InvitationRoom room={room} />
+                ) : (
+                  <span></span>
+                )}
                 <p className="font-bold text-lg py-1">{name.toUpperCase()}</p>
-                { room && isAdmin ? 
-                  <SideBarAdmin room={room} convId={conv.id} /> : <span></span>
-                }
+                {room && isAdmin ? (
+                  <SideBarAdmin room={room} convId={conv.id} />
+                ) : (
+                  <span></span>
+                )}
               </div>
 
               <div
@@ -278,7 +280,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                     {messages.map(
                       (message: ChatMsgInterface) =>
                         userBlocked.some(
-                          (u) => u.id === message.ownerUser.id,
+                          u => u.id === message.ownerUser.id,
                         ) ? null : (
                           // <ErrorBoundary>
                           <MessageItem
@@ -288,7 +290,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                             handleDeleteMessage={handleDeleteMessage}
                             // isAdminMenuOpen={isAdminMenuOpen}
                           />
-                          ),
+                        ),
                       // </ErrorBoundary>
                     )}
                   </div>

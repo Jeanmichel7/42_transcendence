@@ -26,9 +26,9 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
   };
 
   return (
-    <div className='p-5'>
+    <div className="p-5">
       <div className="md:flex justify-center bg-blue-100 text-center py-2 font-bold rounded-t-lg box-border shadow-custom">
-        <span className='min-w-[300px]'></span>
+        <span className="min-w-[300px]"></span>
         <h2 className="text-3xl"> {user.firstName + ' ' + user.lastName} </h2>
       </div>
       <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white p-3 ">
@@ -39,23 +39,24 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
                 src={user.avatar}
                 className="rounded-lg shadow-lg w-[346px] md:max-w-[256px] mx-auto"
                 alt="avatar"
-                onError={(e) => {
+                onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+                  target.src =
+                    'http://localhost:3000/avatars/defaultAvatar.png';
                 }}
               />
             )}
           </div>
           <p className=" text-center md:mt-[150px] ml-1 md:w-[256px] pt-3">
-            { user.description ? user.description : 'No description' }
+            {user.description ? user.description : 'No description'}
           </p>
         </div>
 
         <div className="relative flex-grow">
           {userData.id &&
             userFriends &&
-            !userFriends.find((u) => u.id === user.id) &&
+            !userFriends.find(u => u.id === user.id) &&
             userData.id != user.id && (
               <Button
                 variant="contained"
@@ -65,7 +66,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               >
                 Add friend
               </Button>
-          )}
+            )}
           <div className="flex justify-between items-stretch h-3/4 p-3 ml-5">
             <div className="w-1/4 space-y-2 flex flex-col justify-between">
               <p className="md:text-xl opacity-60">Pseudo</p>

@@ -36,9 +36,9 @@ const StickerWrapper = styled.span`
 
   --shine-angle: 15deg;
   display: inline-grid;
-  grid-template-areas: "text";
+  grid-template-areas: 'text';
   place-items: center;
-  font-family: "Alegreya Sans SC", sans-serif;
+  font-family: 'Alegreya Sans SC', sans-serif;
   font-weight: 900;
   width: 100%;
   font-style: italic;

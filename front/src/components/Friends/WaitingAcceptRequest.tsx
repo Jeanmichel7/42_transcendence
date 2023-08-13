@@ -47,7 +47,7 @@ const WaitingAcceptRequest = () => {
 
       //search notif ans delete
       const notif: NotificationInterface = notifications.find(
-        (n) =>
+        n =>
           n.type === 'friendRequest' &&
           n.sender.id === userToAccept.id &&
           n.receiver.id === userData.id,
@@ -72,7 +72,7 @@ const WaitingAcceptRequest = () => {
 
       //search notif ans delete
       const notif: NotificationInterface = notifications.find(
-        (n) =>
+        n =>
           n.type === 'friendRequest' &&
           n.sender.id === userToDecline.id &&
           n.receiver.id === userData.id,
@@ -89,7 +89,7 @@ const WaitingAcceptRequest = () => {
       {waitingFriendsRequestReceived?.length === 0 && (
         <Nothing text="No waiting request received" />
       )}
-      {waitingFriendsRequestReceived?.map((user) => (
+      {waitingFriendsRequestReceived?.map(user => (
         <FriendItem
           key={user.id}
           user={user}

@@ -1,49 +1,51 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NotificationInterface, UserInterface, UserStatusInterface } from '../types';
+import {
+  NotificationInterface,
+  UserInterface,
+  UserStatusInterface,
+} from '../types';
 
 export interface UserState {
   userData: UserInterface;
   isLogged: boolean;
-  userFriends: UserInterface[] | null,
-  userBlocked: UserInterface[] | null,
-  waitingFriendsRequestReceived: UserInterface[] | null,
-  waitingFriendsRequestSent: UserInterface[] | null,
+  userFriends: UserInterface[] | null;
+  userBlocked: UserInterface[] | null;
+  waitingFriendsRequestReceived: UserInterface[] | null;
+  waitingFriendsRequestSent: UserInterface[] | null;
 }
 
 // Friends management
 const addFriend = (state: UserState, user: UserInterface) => {
-  if (!state.userFriends)
-    state.userFriends = [user];
-  else
-    state.userFriends = [...state.userFriends, user];
+  if (!state.userFriends) state.userFriends = [user];
+  else state.userFriends = [...state.userFriends, user];
 };
 
 const removeFriend = (state: UserState, userId: number) => {
-  if (!state.userFriends)
-    return;
-  state.userFriends = state.userFriends
-    .filter((friend: UserInterface) => friend.id !== userId);
+  if (!state.userFriends) return;
+  state.userFriends = state.userFriends.filter(
+    (friend: UserInterface) => friend.id !== userId,
+  );
 };
 
 // User blocked management
 const addUserBlocked = (state: UserState, userId: number) => {
-  const userToBlock: UserInterface | undefined 
-    = state.userFriends?.find((u) => u.id === userId);
+  const userToBlock: UserInterface | undefined = state.userFriends?.find(
+    u => u.id === userId,
+  );
   if (!userToBlock) return;
-  if (!state.userBlocked)
-    state.userBlocked = [userToBlock];
-  else
-    state.userBlocked = [...state.userBlocked, userToBlock];
+  if (!state.userBlocked) state.userBlocked = [userToBlock];
+  else state.userBlocked = [...state.userBlocked, userToBlock];
 };
 
 const removeUserBlocked = (state: UserState, userId: number) => {
-  const userToUnBlock: UserInterface | undefined 
-    = state.userFriends?.find((u) => u.id === userId);
+  const userToUnBlock: UserInterface | undefined = state.userFriends?.find(
+    u => u.id === userId,
+  );
   if (!userToUnBlock) return;
-  if (!state.userBlocked)
-    return;
-  state.userBlocked = state.userBlocked
-    .filter((userBlocked: UserInterface) => userBlocked.id !== userId);
+  if (!state.userBlocked) return;
+  state.userBlocked = state.userBlocked.filter(
+    (userBlocked: UserInterface) => userBlocked.id !== userId,
+  );
 };
 
 // Waiting friends request management
@@ -51,14 +53,18 @@ const addWaitingFriends = (state: UserState, user: UserInterface) => {
   if (!state.waitingFriendsRequestReceived)
     state.waitingFriendsRequestReceived = [user];
   else
-    state.waitingFriendsRequestReceived = [...state.waitingFriendsRequestReceived, user];
+    state.waitingFriendsRequestReceived = [
+      ...state.waitingFriendsRequestReceived,
+      user,
+    ];
 };
 
 const removeWaitingFriends = (state: UserState, user: UserInterface) => {
-  if (!state.waitingFriendsRequestReceived)
-    return;
-  state.waitingFriendsRequestReceived = state.waitingFriendsRequestReceived
-    .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
+  if (!state.waitingFriendsRequestReceived) return;
+  state.waitingFriendsRequestReceived =
+    state.waitingFriendsRequestReceived.filter(
+      (waitingFriend: UserInterface) => waitingFriend.id !== user.id,
+    );
 };
 
 // Waiting friends request sent management
@@ -66,41 +72,48 @@ const addWaitingFriendsSent = (state: UserState, user: UserInterface) => {
   if (!state.waitingFriendsRequestSent)
     state.waitingFriendsRequestSent = [user];
   else
-    state.waitingFriendsRequestSent = [...state.waitingFriendsRequestSent, user];
+    state.waitingFriendsRequestSent = [
+      ...state.waitingFriendsRequestSent,
+      user,
+    ];
 };
 
 const removeWaitingFriendsSent = (state: UserState, user: UserInterface) => {
-  if (!state.waitingFriendsRequestSent)
-    return;
-  state.waitingFriendsRequestSent = state.waitingFriendsRequestSent
-    .filter((waitingFriend: UserInterface) => waitingFriend.id !== user.id);
+  if (!state.waitingFriendsRequestSent) return;
+  state.waitingFriendsRequestSent = state.waitingFriendsRequestSent.filter(
+    (waitingFriend: UserInterface) => waitingFriend.id !== user.id,
+  );
 };
 
-const helperUpdateUserStatus = (state: UserState, userStatus: UserStatusInterface) => {
+const helperUpdateUserStatus = (
+  state: UserState,
+  userStatus: UserStatusInterface,
+) => {
   // userFriends
   if (state.userFriends) {
-    const userFriend = state.userFriends.find((u) => u.id === userStatus.id);
-    if (userFriend)
-      userFriend.status = userStatus.status;
+    const userFriend = state.userFriends.find(u => u.id === userStatus.id);
+    if (userFriend) userFriend.status = userStatus.status;
   }
 
   // userBlocked
   if (state.userBlocked) {
-    const userBlocked = state.userBlocked.find((u) => u.id === userStatus.id);
-    if (userBlocked)
-      userBlocked.status = userStatus.status;
+    const userBlocked = state.userBlocked.find(u => u.id === userStatus.id);
+    if (userBlocked) userBlocked.status = userStatus.status;
   }
 
   // waitingFriendsRequestReceived
   if (state.waitingFriendsRequestReceived) {
-    const waitingFriendsRequestReceived = state.waitingFriendsRequestReceived.find((u) => u.id === userStatus.id);
+    const waitingFriendsRequestReceived =
+      state.waitingFriendsRequestReceived.find(u => u.id === userStatus.id);
     if (waitingFriendsRequestReceived)
       waitingFriendsRequestReceived.status = userStatus.status;
   }
 
   // waitingFriendsRequestSent
   if (state.waitingFriendsRequestSent) {
-    const waitingFriendsRequestSent = state.waitingFriendsRequestSent.find((u) => u.id === userStatus.id);
+    const waitingFriendsRequestSent = state.waitingFriendsRequestSent.find(
+      u => u.id === userStatus.id,
+    );
     if (waitingFriendsRequestSent)
       waitingFriendsRequestSent.status = userStatus.status;
   }
@@ -109,7 +122,6 @@ const helperUpdateUserStatus = (state: UserState, userStatus: UserStatusInterfac
   if (state.userData.id === userStatus.id)
     state.userData.status = userStatus.status;
 };
-
 
 export const userSlice = createSlice({
   name: 'user',
@@ -153,7 +165,7 @@ export const userSlice = createSlice({
     setLogged: (state, action: PayloadAction<boolean>) => {
       state.isLogged = action.payload;
     },
-    setLogout: (state) => {
+    setLogout: state => {
       state.isLogged = false;
       state.userData = {
         id: -1,
@@ -177,7 +189,10 @@ export const userSlice = createSlice({
     },
 
     // status
-    reduxUpdateUserStatus: (state, action: PayloadAction<UserStatusInterface>) => {
+    reduxUpdateUserStatus: (
+      state,
+      action: PayloadAction<UserStatusInterface>,
+    ) => {
       helperUpdateUserStatus(state, action.payload);
     },
 
@@ -212,40 +227,69 @@ export const userSlice = createSlice({
     reduxAddWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
       addWaitingFriends(state, action.payload);
     },
-    reduxRemoveWaitingFriends: (state, action: PayloadAction<UserInterface>) => {
+    reduxRemoveWaitingFriends: (
+      state,
+      action: PayloadAction<UserInterface>,
+    ) => {
       removeWaitingFriends(state, action.payload);
     },
 
     //manage waiting friends request sent
-    reduxSetWaitingFriendsSent: (state, action: PayloadAction<UserInterface[]>) => {
+    reduxSetWaitingFriendsSent: (
+      state,
+      action: PayloadAction<UserInterface[]>,
+    ) => {
       state.waitingFriendsRequestSent = action.payload;
     },
-    reduxAddWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
+    reduxAddWaitingFriendsSent: (
+      state,
+      action: PayloadAction<UserInterface>,
+    ) => {
       addWaitingFriendsSent(state, action.payload);
     },
-    reduxRemoveWaitingFriendsSent: (state, action: PayloadAction<UserInterface>) => {
+    reduxRemoveWaitingFriendsSent: (
+      state,
+      action: PayloadAction<UserInterface>,
+    ) => {
       removeWaitingFriendsSent(state, action.payload);
     },
 
     //manage actions request
-    reduxAcceptedRequest: (state, action: PayloadAction<NotificationInterface>) => {
+    reduxAcceptedRequest: (
+      state,
+      action: PayloadAction<NotificationInterface>,
+    ) => {
       addFriend(state, action.payload.sender);
       removeWaitingFriendsSent(state, action.payload.sender);
     },
-    reduxDeclinedRequest: (state, action: PayloadAction<NotificationInterface>) => {
+    reduxDeclinedRequest: (
+      state,
+      action: PayloadAction<NotificationInterface>,
+    ) => {
       removeWaitingFriendsSent(state, action.payload.sender);
     },
   },
 });
 
 export const {
-  setUser, setLogged, setLogout,
+  setUser,
+  setLogged,
+  setLogout,
   reduxUpdateUserStatus,
-  reduxSetFriends, reduxAddFriends, reduxRemoveFriends,
-  reduxSetUserBlocked, reduxAddUserBlocked, reduxRemoveUserBlocked,
-  reduxSetWaitingFriends, reduxAddWaitingFriends, reduxRemoveWaitingFriends,
-  reduxSetWaitingFriendsSent, reduxAddWaitingFriendsSent, reduxRemoveWaitingFriendsSent,
-  reduxAcceptedRequest, reduxDeclinedRequest,
+  reduxSetFriends,
+  reduxAddFriends,
+  reduxRemoveFriends,
+  reduxSetUserBlocked,
+  reduxAddUserBlocked,
+  reduxRemoveUserBlocked,
+  reduxSetWaitingFriends,
+  reduxAddWaitingFriends,
+  reduxRemoveWaitingFriends,
+  reduxSetWaitingFriendsSent,
+  reduxAddWaitingFriendsSent,
+  reduxRemoveWaitingFriendsSent,
+  reduxAcceptedRequest,
+  reduxDeclinedRequest,
 } = userSlice.actions;
 
 export default userSlice.reducer;

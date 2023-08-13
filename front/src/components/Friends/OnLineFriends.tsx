@@ -37,8 +37,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
     );
     setIsLoading(false);
 
-    if ('error' in resBlockRequest)
-      dispatch(setErrorSnackbar(resBlockRequest));
+    if ('error' in resBlockRequest) dispatch(setErrorSnackbar(resBlockRequest));
     else {
       dispatch(reduxAddUserBlocked(userToBlock.id));
       dispatch(setMsgSnackbar('User blocked'));
@@ -61,8 +60,7 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
     setIsLoading(false);
 
     if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(
-        setErrorSnackbar(resDeleteRequest));
+      dispatch(setErrorSnackbar(resDeleteRequest));
     else {
       dispatch(reduxRemoveFriends(userToDelete.id));
       dispatch(setMsgSnackbar('Friend deleted'));
@@ -88,13 +86,13 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
       )}
 
       {userFriends?.length !== 0 &&
-        !userFriends?.find((u) => u.status != 'offline') && (
+        !userFriends?.find(u => u.status != 'offline') && (
           <Nothing text="Sorry... you're alone" />
-      )}
+        )}
 
       {userFriends
-        ?.filter((u) => u.status != 'offline')
-        .map((user) => (
+        ?.filter(u => u.status != 'offline')
+        .map(user => (
           <FriendItem
             key={user.id}
             user={user}

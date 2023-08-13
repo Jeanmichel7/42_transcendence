@@ -18,35 +18,45 @@ const Achievement = () => {
     const fetchData = async () => {
       if (typeof login === 'undefined') return;
 
-      const fetchUserTrophies: TrophyInterface[] | ApiErrorResponse
-      = await getUserIdTrophies(login ? login : null);
+      const fetchUserTrophies: TrophyInterface[] | ApiErrorResponse =
+        await getUserIdTrophies(login ? login : null);
       if ('error' in fetchUserTrophies)
         return dispatch(setErrorSnackbar(fetchUserTrophies));
       console.log('la : ', fetchUserTrophies);
-      
-      const fetchAllTrophies: TrophyInterface[] | ApiErrorResponse
-        = await getAllTrophies();
+
+      const fetchAllTrophies: TrophyInterface[] | ApiErrorResponse =
+        await getAllTrophies();
       if ('error' in fetchAllTrophies)
         dispatch(setErrorSnackbar(fetchAllTrophies));
       else {
         const profilesFetched: UserInterface | ApiErrorResponse =
-        await getTrophiesProgressByPseudo(login);
+          await getTrophiesProgressByPseudo(login);
 
-        if ('error' in profilesFetched) dispatch(setErrorSnackbar(profilesFetched));
+        if ('error' in profilesFetched)
+          dispatch(setErrorSnackbar(profilesFetched));
         else {
           const trophiesProgress = profilesFetched.trophiesProgress;
           const tmp: TrophyInterface[] = (fetchAllTrophies as TrophyInterface[])
-            .map(t => fetchUserTrophies.find(ut => ut.id === t.id)
-              ? { ...t, isHeld: true }
-              : { ...t, isHeld: false },
-            ).map(
-              t => trophiesProgress?.find(tp => tp.trophy.id === t.id)
-                ? { ...t, progress: trophiesProgress.find(tp => tp.trophy.id === t.id)?.progress ?? 0 }
+            .map(t =>
+              fetchUserTrophies.find(ut => ut.id === t.id)
+                ? { ...t, isHeld: true }
+                : { ...t, isHeld: false },
+            )
+            .map(t =>
+              trophiesProgress?.find(tp => tp.trophy.id === t.id)
+                ? {
+                    ...t,
+                    progress:
+                      trophiesProgress.find(tp => tp.trophy.id === t.id)
+                        ?.progress ?? 0,
+                  }
                 : { ...t, progress: 0 },
-            ).sort((a, b) => a.isHeld == true 
-              ? -1 
-              : b.isHeld == true 
-                ? 1 
+            )
+            .sort((a, b) =>
+              a.isHeld == true
+                ? -1
+                : b.isHeld == true
+                ? 1
                 : a.name.localeCompare(b.name),
             );
           setAllTrophies(tmp);
@@ -58,19 +68,14 @@ const Achievement = () => {
 
   return (
     <>
-      <p className='mt-2'>
+      <p className="mt-2">
         <Sticker dataText={'Achievements'} />
       </p>
-      <p className='text-center'> {login} </p>
-      <div className='flex flex-wrap justify-center bg-inherit'>
-        {
-          allTrophies.map((trophy) => 
-            <TrophyCard
-              key={trophy.id}
-              trophy={trophy}
-            />,
-          )
-        }
+      <p className="text-center"> {login} </p>
+      <div className="flex flex-wrap justify-center bg-inherit">
+        {allTrophies.map(trophy => (
+          <TrophyCard key={trophy.id} trophy={trophy} />
+        ))}
       </div>
     </>
   );

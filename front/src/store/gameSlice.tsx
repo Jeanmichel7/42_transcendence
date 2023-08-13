@@ -6,10 +6,10 @@ const gameSlice = createSlice({
     isEffectActivated: false,
   },
   reducers: {
-    activateEffect: (state) => {
+    activateEffect: state => {
       state.isEffectActivated = true;
     },
-    desactivateEffect: (state) => {
+    desactivateEffect: state => {
       state.isEffectActivated = false;
     },
   },
