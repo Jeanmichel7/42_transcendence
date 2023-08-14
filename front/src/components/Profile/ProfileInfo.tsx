@@ -81,11 +81,13 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               <p className="md:text-xl">{user.email}</p>
               <p className="md:text-xl">{user.status}</p>
               <p className="md:text-xl">{Math.floor(user.score)}</p>
-              <ExperienceBar
-                currentExp={user.experience}
-                currentLevel={user.level}
-              />
-              {/* <p className="md:text-xl">{Math.floor(user.level)}</p> */}
+              <div className="flex justify-between items-center mr-2 lg:mr-24">
+                <p>{user.level}</p>
+                <ExperienceBar
+                  currentExp={user.experience}
+                  currentLevel={user.level}
+                />
+              </div>
             </div>
             <img
               src={cuteBallsClimbingVines}

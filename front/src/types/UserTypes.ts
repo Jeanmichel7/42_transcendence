@@ -19,8 +19,7 @@ export interface UserInterface {
   waitingFriendsRequestSent?: UserInterface[];
   trophies?: TrophyInterface[];
   trophiesProgress?: TrophyProgressInterface[];
-  // level?: number;
-  experience?: number;
+  experience: number;
   rank?: string;
 }
 
