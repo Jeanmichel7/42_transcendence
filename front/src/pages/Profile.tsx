@@ -68,7 +68,7 @@ function Profile() {
   if (!userProfile) return loader;
   return (
     <div className="bg-[var(--background-color)] relative z-10 ">
-      <Box className="w-full ">
+      <Box className="w-full">
         <ProfileInfo user={userProfile} />
         <ProfileFriends user={userProfile} />
         {isLoadingFriends ? loader : <ProfileTrophies user={userProfile} />}

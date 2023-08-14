@@ -149,8 +149,7 @@ export default function FriendsSearch({ setHeight }: { setHeight: boolean }) {
                 : 'visible',
           }}
         >
-          {' '}
-          Add{' '}
+          Add
         </Button>
       </div>
       {isLoading && (

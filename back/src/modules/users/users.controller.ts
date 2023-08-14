@@ -155,7 +155,7 @@ export class UsersController {
     @Query('page', ParseIntPipe) page: number,
     @Query('offset', ParseIntPipe) offset: number,
   ): Promise<UserInterface[]> {
-    return await this.usersService.getLeaderboard(req.user.id, page, offset);
+    return await this.usersService.getLeaderboard(page, offset);
   }
 
   /* ************************************************ */

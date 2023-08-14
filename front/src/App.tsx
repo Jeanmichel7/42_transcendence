@@ -133,7 +133,7 @@ function App() {
         navigate('/');
       setUserId(-1);
     }
-  }, [dispatch, fetchData, navigate, userId]);
+  }, [dispatch, fetchData, location, navigate, userId]);
 
   useEffect(() => {
     if (
@@ -145,22 +145,24 @@ function App() {
     ) {
       checkAuth();
     }
-  }, [dispatch, navigate, fetchData, checkAuth]);
+  }, [dispatch, navigate, fetchData, checkAuth, location]);
 
   return (
     <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
-      {location?.pathname !== '/' &&
-        location?.pathname != '/connection' &&
-        location?.pathname != '/fakeconnection' && <Header />}
-      {(location?.pathname == '/' || location?.pathname == '/game') && (
+      {location &&
+        location.pathname !== '/' &&
+        location.pathname != '/connection' &&
+        location.pathname != '/fakeconnection' && <Header />}
+      {(location.pathname == '/' || location?.pathname == '/game') && (
         <CircleBackground />
       )}
 
       <AppRoutes />
 
-      {location?.pathname !== '/' &&
-        location?.pathname != '/connection' &&
-        location?.pathname != '/fakeconnection' && <Footer />}
+      {location &&
+        location.pathname !== '/' &&
+        location.pathname != '/connection' &&
+        location.pathname != '/fakeconnection' && <Footer />}
 
       <SnackBarApp />
     </div>

@@ -20,7 +20,7 @@ export interface UserInterface {
   trophies?: TrophyInterface[];
   trophiesProgress?: TrophyProgressInterface[];
   experience: number;
-  rank?: string;
+  rank: string;
 }
 
 export interface UserRelation {

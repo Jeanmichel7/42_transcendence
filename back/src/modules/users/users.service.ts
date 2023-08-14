@@ -500,19 +500,15 @@ export class UsersService {
   /* ************************************************ */
   /*                    LEADERBOARD                   */
   /* ************************************************ */
-  async getLeaderboard(
-    userId: bigint,
-    page: number,
-    offset: number,
-  ): Promise<UserInterface[]> {
-    if (page < 1) page = 1;
-    if (offset < 0) offset = 0;
-    if (offset > this.leaderBoardLimitPerPage) {
-      page = page + Math.floor(offset / this.leaderBoardLimitPerPage);
-      offset = offset % this.leaderBoardLimitPerPage;
-    }
-    let skip = (page - 1) * this.leaderBoardLimitPerPage - offset;
-    if (skip < 0) skip = 0;
+  async getLeaderboard(page: number, limit: number): Promise<UserInterface[]> {
+    // if (page < 1) page = 1;
+    // if (offset < 0) offset = 0;
+    // if (offset > this.leaderBoardLimitPerPage) {
+    //   page = page + Math.floor(offset / this.leaderBoardLimitPerPage);
+    //   offset = offset % this.leaderBoardLimitPerPage;
+    // }
+    // let skip = (page - 1) * this.leaderBoardLimitPerPage - offset;
+    // if (skip < 0) skip = 0;
 
     const users: UserEntity[] = await this.userRepository
       .createQueryBuilder('users')
@@ -526,10 +522,11 @@ export class UsersService {
         'users.score',
         'users.level',
         'users.rank',
+        'users.experience',
       ])
       .orderBy('users.score', 'DESC')
-      .skip(skip)
-      .take(this.leaderBoardLimitPerPage)
+      .skip((page - 1) * limit)
+      .take(limit)
       .getMany();
 
     // if (!users) throw new NotFoundException(`No users found`);

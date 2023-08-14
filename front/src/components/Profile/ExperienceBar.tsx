@@ -67,9 +67,14 @@ const LevelLabel = styled.div<{ bottom?: boolean }>`
 interface Props {
   currentExp: number;
   currentLevel: number;
+  displayGraduation?: boolean;
 }
 
-const ExperienceBar: React.FC<Props> = ({ currentExp, currentLevel }) => {
+const ExperienceBar: React.FC<Props> = ({
+  currentExp,
+  currentLevel,
+  displayGraduation,
+}) => {
   const BASE_XP = 20;
   const expForNextLevel = BASE_XP * currentLevel;
 
@@ -91,15 +96,26 @@ const ExperienceBar: React.FC<Props> = ({ currentExp, currentLevel }) => {
       <LevelLabel style={{ right: '10px' }}>{currentLevel + 1}</LevelLabel> */}
       <ExperienceBarWrapper>
         <ProgressBar progress={progress} />
-        <div className="flex justify-between text-red ">
-          <LevelLabel bottom>{xpInLevel} XP</LevelLabel>
-          <LevelLabel bottom>{expForNextLevel} XP</LevelLabel>
-        </div>
 
         {/* Graduations every 10% */}
-        {[...Array(10)].map((_, index) => (
-          <Graduation key={index} style={{ left: `${(index + 1) * 10}%` }} />
-        ))}
+
+        {displayGraduation != false && (
+          <>
+            <div className="flex justify-between text-red ">
+              <LevelLabel bottom>{xpInLevel} XP</LevelLabel>
+              <LevelLabel bottom>{expForNextLevel} XP</LevelLabel>
+            </div>
+            {[...Array(10)].map(
+              (_, index) =>
+                index != 9 && (
+                  <Graduation
+                    key={index}
+                    style={{ left: `${(index + 1) * 10}%` }}
+                  />
+                ),
+            )}
+          </>
+        )}
       </ExperienceBarWrapper>
     </ExperienceWrapper>
   );

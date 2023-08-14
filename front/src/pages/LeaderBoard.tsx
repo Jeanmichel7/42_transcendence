@@ -1,241 +1,130 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getLeaderboard } from '../api/leaderBoard';
-import { UserInterface } from '../types';
+import { ApiErrorResponse, UserInterface } from '../types';
 import { Sticker } from '../utils/StyledTitle';
-import { ranksImages } from '../utils/rankImages';
+import { getAllUsersCount } from '../api/user';
+import { setErrorSnackbar } from '../store/snackbarSlice';
+import { useDispatch } from 'react-redux';
+import {
+  Stack,
+  Pagination,
+  Select,
+  MenuItem,
+  CircularProgress,
+} from '@mui/material';
+import LeaderboardCard from '../components/Leaderboard/LeaderBoardCard';
 
 const LeaderBoard = () => {
+  const topRef = useRef<HTMLDivElement>(null);
+
   const [leaderBoard, setLeaderBoard] = useState<UserInterface[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [offset, setOffset] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [userPerPage, setUserPerPage] = useState(20);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    async function fetchTotalUsers() {
+      const res: number | ApiErrorResponse = await getAllUsersCount();
+      if (typeof res != 'number' && 'error' in res)
+        dispatch(setErrorSnackbar(res));
+      else setTotalPages(Math.ceil(res / userPerPage));
+    }
+
     const fetchLeaderBoard = async () => {
-      const resFatchLeaderBoard = await getLeaderboard(page, offset);
+      setIsLoading(true);
+      const resFatchLeaderBoard: UserInterface[] | ApiErrorResponse =
+        await getLeaderboard(currentPage, userPerPage);
+      setIsLoading(false);
+
       if ('error' in resFatchLeaderBoard)
         return console.warn(resFatchLeaderBoard.error);
-      setLeaderBoard(prev => [...prev, ...resFatchLeaderBoard]);
+      setLeaderBoard(resFatchLeaderBoard);
+      topRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    fetchTotalUsers();
     fetchLeaderBoard();
-  }, []);
+  }, [dispatch, currentPage, userPerPage]);
+
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown> | null,
+    value: number,
+  ) => {
+    setCurrentPage(value);
+  };
+
+  const handleChangeUserPerPage = (event: any) => {
+    setUserPerPage(event.target.value);
+    setCurrentPage(1);
+  };
 
   return (
-    <div className="bg-[var(--background-color)] -z-10">
-      <div className="flex items-center justify-around z-10">
-        <svg
-          version="1.1"
-          id="Layer_1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 490 490"
-          xmlSpace="preserve"
-          className="relative w-1/6 top-0 left-20  pt-8"
+    <div className="p-5 bg-inherit">
+      <div className="flex flex-col w-full">
+        <div ref={topRef} />
+
+        <p className="">
+          <Sticker dataText={'LeaderBoard'} />
+        </p>
+        {isLoading && (
+          <CircularProgress
+            size={100}
+            color="primary"
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+            }}
+          />
+        )}
+        <div
+          className="w-full flex justify-between items-center
+          border-b-2 border-blue-500
+          font-bold"
         >
-          <g>
-            <g id="XMLID_47_">
-              <g>
-                <rect
-                  x="220"
-                  y="200"
-                  style={{ fill: '#F9A845' }}
-                  width="50"
-                  height="180"
-                />
-                <rect
-                  x="160"
-                  y="415"
-                  style={{ fill: '#E7ECED' }}
-                  width="170"
-                  height="65"
-                />
-                <path
-                  style={{ fill: '#AFB6BB' }}
-                  d="M365,400v80h-35v-65H160v65h-35v-80c0-10.996,9.004-20,20-20h75h50h75
-				C355.996,380,365,389.004,365,400z"
-                />
-                <path
-                  style={{ fill: '#FFD248' }}
-                  d="M380,180c0,10.996-9.004,20-20,20h-90h-50h-90c-10.996,0-20-9.004-20-20V10h270V180z"
-                />
-              </g>
-              <g>
-                <rect
-                  x="205"
-                  y="440"
-                  style={{ fill: '#231F20' }}
-                  width="80"
-                  height="20"
-                />
-                <path
-                  style={{ fill: '#231F20' }}
-                  d="M155,55h20V35h-30c-5.523,0-10,4.478-10,10v35h20V55z"
-                />
-                <rect
-                  x="135"
-                  y="95"
-                  style={{ fill: '#231F20' }}
-                  width="20"
-                  height="20"
-                />
-                <path
-                  style={{ fill: '#231F20' }}
-                  d="M440,0H50c-5.522,0-10,4.477-10,10v105c0,0.474,0.033,0.945,0.101,1.414
-				c0.173,1.213,1.98,12.157,11.946,22.891c13.055,14.058,31.857,18.984,47.953,20.294V180c0,16.542,13.458,30,30,30h80v160h-65
-				c-16.542,0-30,13.458-30,30v70H90v20h310v-20h-25v-70c0-16.542-13.458-30-30-30h-65V210h80c16.542,0,30-13.458,30-30v-20.401
-				c16.096-1.31,34.898-6.236,47.953-20.294c9.966-10.733,11.773-21.678,11.946-22.891c0.067-0.469,0.101-0.94,0.101-1.414V10
-				C450,4.477,445.522,0,440,0z M67.484,126.509c-5.367-5.396-7.056-10.783-7.484-12.512V20h40v119.531
-				C85.788,138.149,74.658,133.72,67.484,126.509z M320,470H170v-45h150V470z M355,400v70h-15v-55c0-5.522-4.478-10-10-10H160
-				c-5.523,0-10,4.478-10,10v55h-15v-70c0-5.514,4.486-10,10-10h200C350.514,390,355,394.486,355,400z M230,370V210h30v160H230z
-				 M370,180c0,5.514-4.486,10-10,10H130c-5.514,0-10-4.486-10-10V20h250V180z M430,113.997c-0.429,1.729-2.117,7.116-7.484,12.512
-				c-7.174,7.211-18.304,11.641-32.516,13.022V20h40V113.997z"
-                />
-              </g>
-            </g>
-          </g>
-        </svg>
-        <Sticker dataText={'Leaderboard'} />
+          <div className="text-center w-[24px]">Rank</div>
+          <div className="text-center w-3/12">Player</div>
+          <div className="text-center w-1/12">Elo score</div>
+          <div className="text-center w-2/12">Grade</div>
+          <div className="text-center w-1/12">Level</div>
+          <div className="text-center w-2/12">Progress</div>
+          <div className="text-center w-2/12">Play count</div>
+        </div>
 
-        <svg
-          version="1.1"
-          id="Layer_1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 490 490"
-          xmlSpace="preserve"
-          className=" relative w-1/6 top-0 -left-20  pt-8"
-        >
-          <g>
-            <g id="XMLID_47_">
-              <g>
-                <rect
-                  x="220"
-                  y="200"
-                  style={{ fill: '#F9A845' }}
-                  width="50"
-                  height="180"
-                />
-                <rect
-                  x="160"
-                  y="415"
-                  style={{ fill: '#E7ECED' }}
-                  width="170"
-                  height="65"
-                />
-                <path
-                  style={{ fill: '#AFB6BB' }}
-                  d="M365,400v80h-35v-65H160v65h-35v-80c0-10.996,9.004-20,20-20h75h50h75
-				C355.996,380,365,389.004,365,400z"
-                />
-                <path
-                  style={{ fill: '#FFD248' }}
-                  d="M380,180c0,10.996-9.004,20-20,20h-90h-50h-90c-10.996,0-20-9.004-20-20V10h270V180z"
-                />
-              </g>
-              <g>
-                <rect
-                  x="205"
-                  y="440"
-                  style={{ fill: '#231F20' }}
-                  width="80"
-                  height="20"
-                />
-                <path
-                  style={{ fill: '#231F20' }}
-                  d="M155,55h20V35h-30c-5.523,0-10,4.478-10,10v35h20V55z"
-                />
-                <rect
-                  x="135"
-                  y="95"
-                  style={{ fill: '#231F20' }}
-                  width="20"
-                  height="20"
-                />
-                <path
-                  style={{ fill: '#231F20' }}
-                  d="M440,0H50c-5.522,0-10,4.477-10,10v105c0,0.474,0.033,0.945,0.101,1.414
-				c0.173,1.213,1.98,12.157,11.946,22.891c13.055,14.058,31.857,18.984,47.953,20.294V180c0,16.542,13.458,30,30,30h80v160h-65
-				c-16.542,0-30,13.458-30,30v70H90v20h310v-20h-25v-70c0-16.542-13.458-30-30-30h-65V210h80c16.542,0,30-13.458,30-30v-20.401
-				c16.096-1.31,34.898-6.236,47.953-20.294c9.966-10.733,11.773-21.678,11.946-22.891c0.067-0.469,0.101-0.94,0.101-1.414V10
-				C450,4.477,445.522,0,440,0z M67.484,126.509c-5.367-5.396-7.056-10.783-7.484-12.512V20h40v119.531
-				C85.788,138.149,74.658,133.72,67.484,126.509z M320,470H170v-45h150V470z M355,400v70h-15v-55c0-5.522-4.478-10-10-10H160
-				c-5.523,0-10,4.478-10,10v55h-15v-70c0-5.514,4.486-10,10-10h200C350.514,390,355,394.486,355,400z M230,370V210h30v160H230z
-				 M370,180c0,5.514-4.486,10-10,10H130c-5.514,0-10-4.486-10-10V20h250V180z M430,113.997c-0.429,1.729-2.117,7.116-7.484,12.512
-				c-7.174,7.211-18.304,11.641-32.516,13.022V20h40V113.997z"
-                />
-              </g>
-            </g>
-          </g>
-        </svg>
-      </div>
+        <div>
+          {leaderBoard.map((user: UserInterface, index: number) => (
+            <LeaderboardCard
+              key={user.id}
+              user={user}
+              indexUser={index}
+              classement={index + 1 + (currentPage - 1) * userPerPage}
+            />
+          ))}
+        </div>
 
-      <div className=" bg-gray-100 shadow-xl rounded-xl p-3 ml-10 mr-10">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ranking
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Score
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Level
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rank
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200 bg-gradient-to-b  from-white to-[var(--color-primary)] ">
-            {leaderBoard.map((user, index) => {
-              let colorClass;
-              if (index === 0) {
-                colorClass = 'bg-yellow-400 text-black'; // Or
-              } else if (index === 1) {
-                colorClass = 'bg-gray-300 text-black'; // Argent
-              } else if (index === 2) {
-                colorClass = 'bg-orange-500 text-white'; // Bronze
-              } else {
-                colorClass = 'bg-yellow-900 text-white'; // Cuivre
-              }
+        <div className="flex-grow"></div>
 
-              return (
-                <tr
-                  key={user.id}
-                  className={
-                    'transform hover:scale-110 hover:bg-white transition-transform duration-200'
-                  }
-                >
-                  <td
-                    className={
-                      ' px-6 py-4 whitespace-nowrap text-2xl font-bold'
-                    }
-                  >
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {user.firstName + ' ' + user.lastName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {user.score.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.level}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img
-                      src={ranksImages[user.rank!]}
-                      alt={user.rank}
-                      className="h-16"
-                      title={user.rank}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {/* Pagination  */}
+        <div className="flex relative justify-center py-2">
+          <Stack spacing={2}>
+            <Pagination count={totalPages} onChange={handleChangePage} />
+          </Stack>
+          <div className="absolute right-2">
+            <Select
+              value={userPerPage}
+              onChange={handleChangeUserPerPage}
+              label="Cards per page"
+              sx={{ height: '35px' }}
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={30}>30</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+            </Select>
+          </div>
+        </div>
       </div>
     </div>
   );
