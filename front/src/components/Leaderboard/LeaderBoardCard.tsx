@@ -59,7 +59,7 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
 
         <p className="text-center w-1/12">{user.level}</p>
 
-        <div className="w-2/12 flex justify-center">
+        <div className="w-[100px] md:w-[150px] flex justify-center">
           <ExperienceBar
             currentExp={user.experience}
             currentLevel={user.level}

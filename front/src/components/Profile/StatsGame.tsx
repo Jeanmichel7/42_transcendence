@@ -230,7 +230,7 @@ export default function StatsGame({ user, games }: PropsGames) {
                       text: 'Experience',
                     },
                     grid: {
-                      color: 'rgba(231, 76, 60, 0.4)',
+                      display: false,
                     },
                     ticks: {
                       stepSize: 10,

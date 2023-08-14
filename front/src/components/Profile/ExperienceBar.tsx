@@ -50,18 +50,19 @@ const Graduation = styled.div`
     transform: translate(-50%, -50%);
     position: absolute;
     height: 3px;
-    width: 3px;
+    width: 1px;
     background-color: black;
   }
 `;
 
-const LevelLabel = styled.div<{ bottom?: boolean }>`
+const LevelLabel = styled.p<{ bottom?: boolean }>`
   font-weight: bold;
   font-size: 0.8rem;
   z-index: 3;
   color: gray;
   left: 10px;
   ${({ bottom }) => (bottom ? 'top: 110% ' : 'bottom: 10%; color: black')};
+  overflow: hidden;
 `;
 
 interface Props {
@@ -91,19 +92,23 @@ const ExperienceBar: React.FC<Props> = ({
 
   return (
     <ExperienceWrapper>
-      {/* <LevelLabel style={{ left: '10px' }}>{currentLevel}</LevelLabel>
-      <LevelLabel style={{ right: '10px' }}>{currentLevel + 1}</LevelLabel> */}
       <ExperienceBarWrapper>
         <ProgressBar progress={progress} />
 
-        {/* Graduations every 10% */}
+        <div className="flex justify-between">
+          <LevelLabel bottom>
+            {xpInLevel}
+            <span className="hidden md:inline">XP</span>
+          </LevelLabel>
+          <LevelLabel bottom>
+            {expForNextLevel}
+            <span className="hidden md:inline">XP</span>
+          </LevelLabel>
+        </div>
 
+        {/* Graduations every 10% */}
         {displayGraduation != false && (
           <>
-            <div className="flex justify-between text-red ">
-              <LevelLabel bottom>{xpInLevel} XP</LevelLabel>
-              <LevelLabel bottom>{expForNextLevel} XP</LevelLabel>
-            </div>
             {[...Array(10)].map(
               (_, index) =>
                 index != 9 && (

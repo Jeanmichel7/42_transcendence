@@ -50,6 +50,7 @@ const MessageItem: FC<MessageItemProps> = ({
   const [inputMessage, setInputMessage] = useState<string>(message.text);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
   const [isDefi, setIsDefi] = useState<boolean>(false);
   const [messageTime, setMessageTime] = useState<string>(
     getTimeSince(message.createdAt),
@@ -105,11 +106,15 @@ const MessageItem: FC<MessageItemProps> = ({
   };
 
   const handleDefi = async () => {
+    setIsLoadingDefi(true);
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(message.ownerUser.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
+    setTimeout(() => {
+      setIsLoadingDefi(false);
+    }, 3 * 1000);
   };
 
   const handleOnChange = useCallback(
@@ -274,7 +279,7 @@ const MessageItem: FC<MessageItemProps> = ({
                   <IconButton
                     onClick={handleDefi}
                     color="success"
-                    disabled={isLoadingDeleteMsg}
+                    disabled={isLoadingDefi}
                   >
                     <SportsEsportsIcon />
                   </IconButton>

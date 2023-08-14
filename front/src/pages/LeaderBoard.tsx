@@ -89,7 +89,9 @@ const LeaderBoard = () => {
           <div className="text-center overflow-hidden w-1/12">Elo score</div>
           <div className="text-center overflow-hidden w-1/12">Grade</div>
           <div className="text-center overflow-hidden w-1/12">Level</div>
-          <div className="text-center overflow-hidden w-2/12">Progress</div>
+          <div className="text-center overflow-hidden w-[100px] md:w-[150px]">
+            Experience
+          </div>
           <div className="text-center overflow-hidden w-2/12">Progress</div>
         </div>
 

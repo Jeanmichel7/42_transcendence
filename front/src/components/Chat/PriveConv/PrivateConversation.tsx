@@ -78,6 +78,7 @@ const PrivateConversation: React.FC = () => {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -313,11 +314,15 @@ const PrivateConversation: React.FC = () => {
   };
 
   const handleDefi = async () => {
+    setIsLoadingDefi(true);
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
+    setTimeout(() => {
+      setIsLoadingDefi(false);
+    }, 3 * 1000);
   };
 
   return (
@@ -332,7 +337,11 @@ const PrivateConversation: React.FC = () => {
               TransitionProps={{ timeout: 600 }}
               sx={{ p: 0, paddingX: 1, m: 0 }}
             >
-              <IconButton onClick={handleDefi} color="success">
+              <IconButton
+                onClick={handleDefi}
+                color="success"
+                disabled={isLoadingDefi}
+              >
                 <SportsEsportsIcon />
               </IconButton>
             </Tooltip>

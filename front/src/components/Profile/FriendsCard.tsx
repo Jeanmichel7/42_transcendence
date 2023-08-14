@@ -40,6 +40,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from 'react';
 import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
+import { reduxAddConversationList } from '../../store/convListSlice';
+import { getConvIdFromUserOrRoom } from '../../utils/utils';
 
 interface FriendCardProps {
   actualUserLogin?: string;
@@ -53,8 +55,10 @@ const FriendCard: React.FC<FriendCardProps> = ({
   setFriends,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDefi, setIsLoadingDefi] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData, userFriends, waitingFriendsRequestSent } = useSelector(
     (state: RootState) => state.user,
   );
@@ -71,11 +75,15 @@ const FriendCard: React.FC<FriendCardProps> = ({
       : 'error';
 
   const handleDefi = async () => {
+    setIsLoadingDefi(true);
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(friend.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
+    setTimeout(() => {
+      setIsLoadingDefi(false);
+    }, 3 * 1000);
   };
 
   function isRequestFriendSent() {
@@ -131,6 +139,17 @@ const FriendCard: React.FC<FriendCardProps> = ({
         );
     }
     setIsLoading(false);
+  };
+
+  const handleNavigateToChat = () => {
+    dispatch(reduxAddConversationList({ item: friend, userId: userData.id }));
+    let convId = getConvIdFromUserOrRoom(friend, conversationsList);
+    if (convId === -1)
+      convId =
+        conversationsList.length === 0
+          ? 0
+          : conversationsList[conversationsList.length - 1].id + 1;
+    navigate(`/chat/conv/${convId}/${friend.id}/${friend.login}`);
   };
 
   useEffect(() => {
@@ -228,7 +247,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
        **/}
       <CardActions className="flex flex-wrap items-center justify-between w-full">
         <Tooltip
-          title="Defier"
+          title={isLoadingDefi ? 'Loading...' : 'Defi'}
           arrow
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
@@ -241,6 +260,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
               padding: 0,
               visibility: userData.id == friend.id ? 'hidden' : 'visible',
             }}
+            disabled={isLoadingDefi}
           >
             <SportsEsportsIcon color="success" />
           </IconButton>
@@ -279,9 +299,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
                   <IconButton
                     aria-label="chat friend"
                     sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
-                    onClick={() =>
-                      navigate(`/chat/conv/x/${friend.id}/${friend.login}`)
-                    }
+                    onClick={handleNavigateToChat}
                   >
                     <ChatIcon color="primary" />
                   </IconButton>

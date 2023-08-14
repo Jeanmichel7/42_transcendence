@@ -45,11 +45,15 @@ const OnLineFriends = ({ userDataId }: OnLineFriendsProps) => {
   };
 
   const handleDefi = async (userToDefie: UserInterface) => {
+    setIsLoading(true);
     const resInvitGameUser: GameInterface | ApiErrorResponse =
       await inviteGameUser(userToDefie.id);
     if ('error' in resInvitGameUser)
       return dispatch(setErrorSnackbar(resInvitGameUser));
     dispatch(setMsgSnackbar('Invitation sent'));
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3 * 1000);
   };
 
   const handleDeleteFriend = async (userToDelete: UserInterface) => {
