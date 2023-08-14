@@ -29,7 +29,7 @@ export const GameWrapper = styled.div`
 `;
 
 export interface GameCard {
-  id: bigint;
+  id: number;
   player1Username: string;
   player2Username: string;
   player1Avatar: string;

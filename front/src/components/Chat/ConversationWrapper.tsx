@@ -6,7 +6,7 @@ import { Socket, io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useConnectionSocketChat } from './useSocketChat';
-import Loaderperosnalized from '../../utils/Loaderperosnalized'
+import Loaderperosnalized from '../../utils/LoaderPerosnalized';
 
 const ConversationWrapper = () => {
   const { convId, login, name } = useParams();

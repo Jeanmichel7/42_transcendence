@@ -103,7 +103,7 @@ interface LobbyProps {
   socket: any;
   setBonus: React.Dispatch<React.SetStateAction<boolean>>;
   lobbyData: GameCard[];
-  setGameIdSpectate: React.Dispatch<React.SetStateAction<bigint | undefined>>;
+  setGameIdSpectate: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
 
 function Lobby({
@@ -145,7 +145,7 @@ function Lobby({
   const COLUMNS = 3;
   const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
   const fakeCards = Array.from({ length: fakeCardsCount });
-  const handleCardClick = (gameId: bigint) => {
+  const handleCardClick = (gameId: number) => {
     setGameIdSpectate(gameId);
     setCurrentPage('spectate');
   };
@@ -203,8 +203,8 @@ function Lobby({
         {lobbyData.map(card => {
           return (
             <div
-              key={card.id.toString()}
-              onClick={() => handleCardClick(card.id)} // Ajoutez ceci
+              key={card.id}
+              onClick={() => handleCardClick(card.id)}
               className=" animate-vibration bg-white rounded-lg p-6 m-4 w-72 transition-transform transform scale-100 hover:scale-105 shadow-custom hover:bg-gray-200 cursor-pointer"
             >
               <div className="flex justify-between items-center mb-4">
