@@ -12,9 +12,11 @@ import {
   Title,
   CategoryScale,
   ArcElement,
+  Filler,
 } from 'chart.js';
 
 Chart.register(
+  Filler,
   LineElement,
   PointElement,
   LinearScale,
@@ -29,31 +31,18 @@ interface PropsGames {
 }
 
 export default function StatsGame({ user, games }: PropsGames) {
-  const [gamesFinished, setGamesFinished] = useState<GameInterface[]>([]);
   const [scorePlayer, setScorePlayer] = useState<number[]>([]);
   const [gamesWin, setGamesWin] = useState<number>(0);
-  const ratio = ((gamesWin / gamesFinished.length) * 100).toFixed(1);
-  const niveau = [
-    1,
-    ...gamesFinished
-      .map(g => (g.player1.id === user.id ? g.levelPlayer1 : g.levelPlayer2))
-      .reverse(),
-  ];
-  const exp = [
-    0,
-    ...gamesFinished
-      .map(g => (g.player1.id === user.id ? g.expPlayer1 : g.expPlayer2))
-      .reverse(),
-  ];
+  const [ratio, setRatio] = useState<string>('0');
+  const [niveau, setNiveau] = useState<number[]>([]);
+  const [exp, setExp] = useState<number[]>([]);
 
   useEffect(() => {
-    setGamesFinished(games.filter(g => g.status === 'finished'));
-  }, [games]);
+    if (!user.id || !games) return;
 
-  useEffect(() => {
     setScorePlayer([
       1500,
-      ...gamesFinished
+      ...games
         .map(game =>
           game.player1.id === user.id
             ? game.eloScorePlayer1
@@ -61,8 +50,21 @@ export default function StatsGame({ user, games }: PropsGames) {
         )
         .reverse(),
     ]);
-    setGamesWin(gamesFinished.filter(g => g.winner?.id === user.id).length);
-  }, [gamesFinished, user.id]);
+    setGamesWin(games.filter(g => g.winner?.id === user.id).length);
+    setRatio(((gamesWin / games.length) * 100).toFixed(1));
+    setNiveau([
+      1,
+      ...games
+        .map(g => (g.player1.id === user.id ? g.levelPlayer1 : g.levelPlayer2))
+        .reverse(),
+    ]);
+    setExp([
+      0,
+      ...games
+        .map(g => (g.player1.id === user.id ? g.expPlayer1 : g.expPlayer2))
+        .reverse(),
+    ]);
+  }, [user.id, games, gamesWin]);
 
   const pieData = {
     labels: ['Wins', 'Losses'],
@@ -82,13 +84,13 @@ export default function StatsGame({ user, games }: PropsGames) {
   return (
     <>
       <p className="mt-6">
-        {' '}
-        <Sticker dataText="Stats" />{' '}
+        <Sticker dataText="Stats" />
       </p>
       {games && games.length > 0 && (
         <div className="flex flex-col md:flex-row justify-between items-center">
+          {/* ELO SCORE CHART */}
           <div className="relative w-full md:w-[35vw] px-16 py-8 md:p-2">
-            <p className="text-center">Elo score</p>
+            <p className="text-center text-xl font-semibold mb-4">Elo score</p>
             <Line
               datasetIdKey="id"
               data={{
@@ -97,19 +99,42 @@ export default function StatsGame({ user, games }: PropsGames) {
                   {
                     data: scorePlayer,
                     label: 'Elo score',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 1,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                    pointBorderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 2,
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: '#3498db',
+                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    fill: true,
+                    tension: 0.3,
                   },
                 ],
               }}
               options={{
                 responsive: true,
                 interaction: {
-                  mode: 'index',
+                  mode: 'nearest',
                 },
-                scales: {},
+                scales: {
+                  x: {
+                    grid: {
+                      drawOnChartArea: false,
+                    },
+                  },
+                },
                 plugins: {
+                  title: {
+                    // display: true,
+                    text: 'Elo Score',
+                    font: {
+                      size: 20,
+                    },
+                  },
                   legend: {
                     display: true,
                     position: 'left',
@@ -121,13 +146,19 @@ export default function StatsGame({ user, games }: PropsGames) {
                       boxWidth: 20,
                     },
                   },
+                  tooltip: {
+                    enabled: true,
+                  },
                 },
               }}
             />
           </div>
 
+          {/* LEVEL - EXPERIENCE CHART */}
           <div className="relative w-full md:w-[35vw] px-16 py-8 md:p-2">
-            <p className="text-center">Level - Experience</p>
+            <p className="text-center text-xl font-semibold mb-4">
+              Level - Experience
+            </p>
             <Line
               datasetIdKey="id2"
               data={{
@@ -137,17 +168,36 @@ export default function StatsGame({ user, games }: PropsGames) {
                     label: 'Level',
                     data: niveau,
                     yAxisID: 'y-axis-xp',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 1,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                    pointBorderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 2,
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: '#3498db',
+                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    tension: 0.2,
                   },
                   {
                     label: 'Experience',
                     data: exp,
                     yAxisID: 'y-axis-level',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderWidth: 1,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    pointBackgroundColor: 'rgba(231, 76, 60, 1)',
+                    pointBorderColor: 'rgba(231, 76, 60, 1)',
+                    borderWidth: 2,
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: '#e74c3c',
+                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    fill: true,
+                    tension: 0.05,
                   },
                 ],
               }}
@@ -160,10 +210,37 @@ export default function StatsGame({ user, games }: PropsGames) {
                   'y-axis-xp': {
                     type: 'linear',
                     position: 'left',
+                    title: {
+                      display: true,
+                      text: 'Level',
+                    },
+                    grid: {
+                      color: 'rgba(52, 152, 219, 0.4)',
+                    },
+                    ticks: {
+                      stepSize: 1,
+                      precision: 0,
+                    },
                   },
                   'y-axis-level': {
                     type: 'linear',
                     position: 'right',
+                    title: {
+                      display: true,
+                      text: 'Experience',
+                    },
+                    grid: {
+                      color: 'rgba(231, 76, 60, 0.4)',
+                    },
+                    ticks: {
+                      stepSize: 10,
+                      precision: 0,
+                    },
+                  },
+                  x: {
+                    grid: {
+                      drawOnChartArea: false,
+                    },
                   },
                 },
                 plugins: {
@@ -178,13 +255,21 @@ export default function StatsGame({ user, games }: PropsGames) {
                       boxWidth: 20,
                     },
                   },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                  },
                 },
               }}
             />
           </div>
 
+          {/* VICTORY RATIO PIE CHART */}
           <div className="relative w-full md:w-[20vw] px-48 py-8 md:p-2">
-            <p className="text-center">{ratio} % Victory</p>
+            <p className="text-center text-xl font-semibold mb-4">
+              {ratio} % Victory
+            </p>
             <Pie
               data={pieData}
               options={{
@@ -201,9 +286,14 @@ export default function StatsGame({ user, games }: PropsGames) {
                       font: {
                         size: 12,
                       },
-                      boxWidth: 200,
-                      boxHeight: 20,
+                      boxWidth: 40,
+                      boxHeight: 600,
                     },
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
                   },
                 },
               }}

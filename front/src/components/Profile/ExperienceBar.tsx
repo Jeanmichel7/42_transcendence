@@ -82,7 +82,6 @@ const ExperienceBar: React.FC<Props> = ({
     let level = 1;
     while (xp >= BASE_XP * level) {
       xp -= BASE_XP * level;
-      console.log('xp : ', xp);
       level++;
     }
     return xp;

@@ -525,6 +525,7 @@ export class UsersService {
         'users.experience',
       ])
       .orderBy('users.score', 'DESC')
+      .where('users.login != :login', { login: 'Bot' })
       .skip((page - 1) * limit)
       .take(limit)
       .getMany();

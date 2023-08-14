@@ -65,7 +65,7 @@ const LeaderBoard = () => {
       <div className="flex flex-col w-full">
         <div ref={topRef} />
 
-        <p className="">
+        <p className="mb-3">
           <Sticker dataText={'LeaderBoard'} />
         </p>
         {isLoading && (
@@ -81,16 +81,16 @@ const LeaderBoard = () => {
         )}
         <div
           className="w-full flex justify-between items-center
-          border-b-2 border-blue-500
-          font-bold"
+          border-b-[1px] border-blue-500
+          font-bold py-2"
         >
-          <div className="text-center w-[24px]">Rank</div>
-          <div className="text-center w-3/12">Player</div>
-          <div className="text-center w-1/12">Elo score</div>
-          <div className="text-center w-2/12">Grade</div>
-          <div className="text-center w-1/12">Level</div>
-          <div className="text-center w-2/12">Progress</div>
-          <div className="text-center w-2/12">Play count</div>
+          <div className="text-center overflow-hidden w-[24px]">Rank</div>
+          <div className="text-center overflow-hidden w-4/12">Player</div>
+          <div className="text-center overflow-hidden w-1/12">Elo score</div>
+          <div className="text-center overflow-hidden w-1/12">Grade</div>
+          <div className="text-center overflow-hidden w-1/12">Level</div>
+          <div className="text-center overflow-hidden w-2/12">Progress</div>
+          <div className="text-center overflow-hidden w-2/12">Progress</div>
         </div>
 
         <div>
@@ -107,7 +107,7 @@ const LeaderBoard = () => {
         <div className="flex-grow"></div>
 
         {/* Pagination  */}
-        <div className="flex relative justify-center py-2">
+        <div className="flex relative justify-center pt-5">
           <Stack spacing={2}>
             <Pagination count={totalPages} onChange={handleChangePage} />
           </Stack>

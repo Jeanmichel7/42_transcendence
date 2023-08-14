@@ -768,7 +768,8 @@ export class GameService {
       ])
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
       .andWhere('games.status IN (:...statuses)', {
-        statuses: ['finished', 'playing'],
+        statuses: ['finished'],
+        // statuses: ['finished', 'playing'],
       })
       .orderBy('games.createdAt', 'DESC')
       .getMany();
