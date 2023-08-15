@@ -34,7 +34,7 @@ export class GameEvents {
     private gameService: GameService,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2
   ) {
     eventEmitter.on('updateLobbyRoomRequire', () => {
       this.server
@@ -44,7 +44,7 @@ export class GameEvents {
     });
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
-      games.forEach(async (game) => {
+      games.forEach(async game => {
         if (game.isBeingProcessed) return; // Skip si le jeu est en cours de traitement
         game.isBeingProcessed = true;
         const update = await this.gameService.updateGame(game);
@@ -62,7 +62,7 @@ export class GameEvents {
     if (client.handshake.headers.cookie === undefined) return;
     const cookieArray = client.handshake.headers.cookie.split(';');
     let jwtToken = '';
-    cookieArray.forEach((cookie) => {
+    cookieArray.forEach(cookie => {
       const cookieParts = cookie.split('=');
       if (cookieParts[0] === 'jwt' || cookieParts[0] === ' jwt') {
         jwtToken = cookieParts[1];
@@ -105,10 +105,10 @@ export class GameEvents {
   @SubscribeMessage('spectateGame')
   handleSpectateGame(
     @MessageBody() gameId: bigint,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     console.log('VALEUR DE GAME ID', gameId);
-    Object.keys(client.rooms).forEach((roomId) => {
+    Object.keys(client.rooms).forEach(roomId => {
       if (roomId !== client.id) {
         client.leave(roomId);
       }
@@ -121,18 +121,22 @@ export class GameEvents {
   handleJoinLobbyRoom(client: Socket) {
     client.join('LobbyRoom');
     client.emit('lobbyRoomUpdate', this.gameService.getAllGamesInfo());
+    // client.join('LobbyRoomChat');
+    // console.log('join lobby room');
   }
 
   @SubscribeMessage('leaveLobbyRoom')
   handleLeaveLobbyRoom(client: Socket) {
     client.leave('LobbyRoom');
+    // client.leave('LobbyRoomChat');
+    // console.log('leave lobby room');
   }
 
   @SubscribeMessage('privateLobby')
   async handlePrivateLobby(
     @MessageBody()
     update: { gameId: bigint; mode: string; ready: boolean; player1: boolean },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     if (
       !client.data.userId ||
@@ -148,11 +152,11 @@ export class GameEvents {
     };
     const gameStarted = this.gameService.updatePrivateLobby(
       update.player1,
-      data,
+      data
     );
     const socket = this.gameService.getOtherPlayerSockerId(
       update.gameId,
-      update.player1,
+      update.player1
     );
     if (gameStarted) {
       this.server.to(socket).emit('userGameStatus', 'alreadyInGame');
@@ -168,7 +172,7 @@ export class GameEvents {
   @SubscribeMessage('userGameStatus')
   async handleSearchOpponent(
     @MessageBody() message: string,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     if (!client.data.userId) {
       return 'error';
@@ -180,7 +184,7 @@ export class GameEvents {
       const opponent = await this.gameService.addToQueue(
         client.id,
         client.data.userId,
-        message === 'searchBonus',
+        message === 'searchBonus'
       );
       if (opponent) {
         if (message === 'searchBonus') {
@@ -197,7 +201,7 @@ export class GameEvents {
   @SubscribeMessage('clientUpdate')
   handlePaddlePosition(
     @MessageBody() data: clientUpdate,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     this.gameService.updateClientData(data, client.id);
   }
@@ -224,4 +228,69 @@ export class GameEvents {
   //   return rt_data;
   //   // recevoir un event (s'abonner a` un message)
   // }
+
+  /* CHAT */
+
+  @SubscribeMessage('joinChatGame')
+  handleJoinChatRoomLobby(
+    @MessageBody() data: { gameId: string; type: string },
+    @ConnectedSocket() client: Socket
+  ) {
+    console.log(
+      'JOIN chat room : ',
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+    );
+    client.join(
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+    );
+  }
+
+  @SubscribeMessage('leaveChatGame')
+  handleLeaveChatRoomLobby(
+    @MessageBody() data: { gameId: string; type: string },
+    @ConnectedSocket() client: Socket
+  ) {
+    console.log(
+      'LEAVE chat room : ',
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+    );
+    client.leave(
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+    );
+  }
+
+  @SubscribeMessage('sendMessage')
+  handlePrivateMessage(
+    @MessageBody()
+    data: { gameId: string; type: string; message: string; avatar: string },
+    @ConnectedSocket() client: Socket
+  ) {
+    console.log('send private message ', data);
+    console.log(
+      'roomName',
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+    );
+
+    // if (client.rooms.has('chatRoom_' + data.gameId)) {
+    client.emit('message', {
+      message: data.message,
+      username: client.data.userId,
+      avatar: data.avatar,
+    });
+
+    client
+      .to(
+        'chatRoom_' +
+          data.type +
+          (data.type == 'lobby' ? '' : '_' + data.gameId)
+      )
+      .emit('message', {
+        message: data.message,
+        username: client.data.userId,
+        avatar: data.avatar,
+      });
+    // } else {
+    //   console.error('Client is not in the desired room.');
+    // }
+  }
 }

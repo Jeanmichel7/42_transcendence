@@ -6,6 +6,7 @@ import { Smiley } from './SmileyWrapper';
 import './font.css';
 import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { Socket } from 'socket.io-client';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const fadeIn = keyframes`
 0% {
@@ -276,7 +277,17 @@ interface LooseProps {
   lastGameInfo: React.RefObject<LastGameInfo>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
+
 function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const handleReturnLobby = () => {
+    searchParams.delete('gameId');
+    setCurrentPage('lobby');
+    navigate('?' + searchParams.toString(), { replace: true });
+  };
+
   useEffect(() => {
     if (lastGameInfo.current && lastGameInfo.current.win) {
       setTimeout(() => {
@@ -320,13 +331,7 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
           </>
         )}
         <StyledNeonH2>Looser: {lastGameInfo.current.looserName}</StyledNeonH2>
-        <StyledButton
-          onClick={() => {
-            setCurrentPage('lobby');
-          }}
-        >
-          Return to Lobby
-        </StyledButton>
+        <StyledButton onClick={handleReturnLobby}>Return to Lobby</StyledButton>
       </LooseWrapper>
     </Smiley>
   );

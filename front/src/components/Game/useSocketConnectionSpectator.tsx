@@ -5,7 +5,7 @@ import { GameData } from './Interface';
 
 const useSocketConnectionSpectator = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
-  gameId: bigint,
+  gameId: number,
 ) => {
   const [data, setData] = useState<GameData | undefined>();
 

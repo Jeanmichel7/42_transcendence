@@ -14,18 +14,23 @@ import { StyledButton } from './EndGame';
 function GameSpectator({
   socket,
   setCurrentPage,
-  gameId,
+  gameIdInvit,
 }: {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   setCurrentPage: Dispatch<SetStateAction<string>>;
-  gameId: bigint;
+  gameIdInvit: number;
 }) {
   const gameDimensions = useRef({ width: 0, height: 0 });
   const { gameData }: { gameData: GameData | undefined } =
-    useSocketConnectionSpectator(socket, gameId);
+    useSocketConnectionSpectator(socket, gameIdInvit);
   if (gameData?.winner) {
     setCurrentPage('lobby');
   }
+
+  // useEffect(() => {
+  //   console.log('spectateGameId', gameIdInvit);
+  //   console.log('game data : ', gameData);
+  // }, [gameIdInvit, gameData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,7 +48,7 @@ function GameSpectator({
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  console.log(gameData);
+  // console.log('gameData, ', gameData);
 
   return (
     <GameWrapper>
@@ -64,7 +69,6 @@ function GameSpectator({
             spectateMode={true}
             bonusIsLoadingPlayerRight={gameData.bonusPlayer2Loading}
             bonusNamePlayerRight={gameData.bonusPlayer2}
-            //... passez les autres props ici
           />
           <Playground id="playground">
             <Racket

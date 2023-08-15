@@ -32,8 +32,8 @@ import { inviteGameUser } from '../../api/game';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
-  isLoadingDeleteMsg: boolean;
-  handleDeleteMessage: (id: number) => void;
+  isLoadingDeleteMsg?: boolean;
+  handleDeleteMessage?: (id: number) => void;
   // isAdminMenuOpen?: boolean;
 }
 
@@ -102,6 +102,7 @@ const MessageItem: FC<MessageItemProps> = ({
     };
 
   const handleDelete = () => {
+    if (!handleDeleteMessage) return;
     handleDeleteMessage(message.id);
   };
 

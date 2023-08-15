@@ -23,6 +23,10 @@ import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
 
+// type GameWrapperProps = {
+//   isChatOpen: boolean;
+// };
+
 export const Playground = styled.div`
   width: 100%;
   top: 20%;
@@ -37,9 +41,9 @@ export const Playground = styled.div`
             0 0 0.8rem #bc13fe,
             0 0 2.8rem #bc13fe,
             inset 0 0 1.3rem #bc13fe; 
-             color: #fff;
-
+            color: #fff;
 `;
+
 const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
@@ -293,11 +297,13 @@ function Game({
   lastGameInfo,
   setCurrentPage,
   bonus,
+  isChatOpen,
 }: {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   lastGameInfo: any;
   setCurrentPage: Dispatch<SetStateAction<string>>;
   bonus: boolean;
+  isChatOpen: boolean;
 }) {
   const posRacket = useRef({
     left: 500 - RACKET_HEIGHT_10 / 2,
@@ -314,6 +320,7 @@ function Game({
   const scorePlayers = useRef({ left: 0, right: 0 });
   const gameDimensions = useRef({ width: 0, height: 0 });
   const gameId = useRef(0);
+
   const [gameStarted, setGameStarted] = useState(false);
   const bonusPositionRef = useRef<BonusPosition | undefined>();
   const [playerInfo, setPlayerInfo] = useState<PlayersInfo | undefined>();
@@ -340,6 +347,7 @@ function Game({
       playerInfo,
       setPlayerInfo,
     );
+
   const fail = useRef(false);
   const [ShowEndGame, setShowEndGame] = useState(false);
 
@@ -358,7 +366,7 @@ function Game({
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isChatOpen]);
 
   let lastTime = performance.now();
 
@@ -538,7 +546,6 @@ function Game({
         bonusActive={bonus || (gameStarted && gameData?.current!.bonusMode)}
         bonusIsLoading={bonusIsLoading.current}
         bonusName={bonusValueRef.current}
-        //... passez les autres props ici
       />
       <Playground id="playground">
         <Racket

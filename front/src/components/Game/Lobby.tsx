@@ -119,6 +119,7 @@ function Lobby({
     bottom: false,
   });
   const circleRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const circle = circleRef.current;
 
@@ -142,9 +143,11 @@ function Lobby({
       }
     };
   }, []);
+
   const COLUMNS = 3;
   const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
   const fakeCards = Array.from({ length: fakeCardsCount });
+
   const handleCardClick = (gameId: number) => {
     setGameIdSpectate(gameId);
     setCurrentPage('spectate');

@@ -80,7 +80,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
        font-bold rounded-t-lg box-border shadow-custom"
       >
         <span className="min-w-[300px]"></span>
-        <p></p>
+        <p className="ml-2"></p>
         <h2 className="text-3xl"> {user.firstName + ' ' + user.lastName} </h2>
         <div className="flex flex-row justify-center items-center mr-2">
           {userData.id &&

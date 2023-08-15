@@ -37,8 +37,7 @@ export function StatutBar({
   spectateMode,
   bonusIsLoadingPlayerRight,
   bonusNamePlayerRight,
-}: //... les autres props
-StatutBarProps) {
+}: StatutBarProps) {
   return (
     <StatutWrapper>
       {bonusActive && (
@@ -75,7 +74,6 @@ StatutBarProps) {
           left={false}
         />
       )}
-      {/* Ajoutez ici les autres composants que vous souhaitez inclure */}
     </StatutWrapper>
   );
 }

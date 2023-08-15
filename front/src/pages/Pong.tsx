@@ -18,8 +18,17 @@ import PrivateLobby from '../components/Game/PrivateLobby';
 import { activateEffect, desactivateEffect } from '../store/gameSlice';
 import GameSpectator from '../components/Game/Spectator';
 
-export const GameWrapper = styled.div`
-  width: 100%;
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { IconButton } from '@mui/material';
+import ChatWrapper from '../components/Game/Chat/ChatWrapper';
+
+type GameWrapperProps = {
+  chatOpen: boolean;
+};
+
+export const GameWrapper = styled.div<GameWrapperProps>`
+  width: ${props => (props.chatOpen ? '75%' : '100%')};
   height: 100%;
   display: flex;
   flex-direction: row;
@@ -48,21 +57,30 @@ function Pong() {
   const { userData } = useSelector((state: RootState) => state.user);
   const lastGameInfo = useRef({} as any);
   const [isPlayer1, setIsPlayer1] = useState(true);
+  const [isSpectator, setIsSpectator] = useState(false);
   const [bonus, setBonus] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const gameId = searchParams.get('id');
-  const [gameIdSpectate, setGameIdSpectate] = useState<undefined | bigint>();
+  const gameIdInvit = searchParams.get('id');
+  const [gameIdInvitSpectate, setGameIdSpectate] = useState<
+    undefined | number
+  >();
   const [showOverlay, setShowOverlay] = useState(false);
   const [lobbyData, setLobbyData] = useState<GameCard[]>([{} as GameCard]);
 
+  const [chatOpen, setChatOpen] = useState(true);
+
+  const toggleChat = () => {
+    setChatOpen(prevState => !prevState);
+  };
+
   useEffect(() => {
-    if (!gameId || !userData.id || userData.id == -1) return;
+    if (!gameIdInvit || !userData.id || userData.id == -1) return;
 
     const fetchGame = async () => {
       const retFetchGame: GameInterface | ApiErrorResponse = await getGame(
-        parseInt(gameId),
+        parseInt(gameIdInvit),
       );
       if ('error' in retFetchGame) {
         dispatch(setErrorSnackbar(retFetchGame));
@@ -71,17 +89,19 @@ function Pong() {
       if (
         retFetchGame.player1.id != userData.id &&
         retFetchGame.player2.id != userData.id
-      )
+      ) {
+        setIsSpectator(true);
         return dispatch(
           setPersonalizedErrorSnackbar('You are not in this game'),
         );
-      console.log('retFetchGame : ', retFetchGame);
+      }
+      // console.log('retFetchGame : ', retFetchGame);
 
       setIsPlayer1(retFetchGame.player1.id == userData.id);
       setCurrentPage('privateLobby');
     };
     fetchGame();
-  }, [socket, userData.id, dispatch, navigate]);
+  }, [socket, userData.id, dispatch, navigate, gameIdInvit]);
 
   useEffect(() => {
     let timeoutId: any;
@@ -103,11 +123,11 @@ function Pong() {
       socket.emit('leaveLobbyRoom');
     }
     socket.on('lobbyRoomUpdate', data => {
+      // console.log('recu du socket,', data);
       setLobbyData(data);
     });
 
     return () => {
-      // N'oubliez pas de nettoyer l'écouteur pour éviter des écouteurs multiples
       socket.off('lobbyRoomUpdate');
     };
   }, [currentPage, socket]);
@@ -151,12 +171,12 @@ function Pong() {
   }, []);
 
   useEffect(() => {
-    if (currentPage === 'lobby' && !gameId) {
+    if (currentPage === 'lobby' && !gameIdInvit) {
       dispatch(desactivateEffect());
     } else if (currentPage === 'privateLobby') {
       dispatch(desactivateEffect());
     }
-  }, [currentPage, gameId, dispatch]);
+  }, [currentPage, gameIdInvit, dispatch]);
 
   let statusComponent;
   if (connectStatus === 'connecting') {
@@ -165,7 +185,7 @@ function Pong() {
     statusComponent = undefined;
   }
   let pageContent: ReactNode;
-  if (currentPage === 'lobby' && !gameId) {
+  if (currentPage === 'lobby' && !gameIdInvit) {
     dispatch(desactivateEffect());
     pageContent = (
       <Lobby
@@ -184,6 +204,7 @@ function Pong() {
         lastGameInfo={lastGameInfo}
         setCurrentPage={setCurrentPage}
         bonus={bonus}
+        isChatOpen={chatOpen}
       />
     );
   } else if (currentPage === 'searchOpponent') {
@@ -194,33 +215,60 @@ function Pong() {
         bonus={bonus}
       />
     );
-  } else if (currentPage === 'privateLobby' && gameId) {
+  } else if (currentPage === 'privateLobby' && gameIdInvit) {
     dispatch(desactivateEffect());
     pageContent = (
       <PrivateLobby
         setCurrentPage={setCurrentPage}
         socket={socket}
-        gameId={gameId as string}
+        gameId={gameIdInvit as string}
         isPlayer1={isPlayer1}
       />
     );
-  } else if (currentPage === 'spectate' && gameIdSpectate) {
-    console.log('spectate', gameIdSpectate);
+  } else if (currentPage === 'spectate' && gameIdInvitSpectate) {
     pageContent = (
       <GameSpectator
         setCurrentPage={setCurrentPage}
         socket={socket}
-        gameId={gameIdSpectate}
+        gameIdInvit={gameIdInvitSpectate}
       />
     );
+  } else {
+    console.warn('current page not found', currentPage);
   }
 
   return (
-    <GameWrapper>
-      {showOverlay && <Overlay />}
-      {statusComponent}
-      {pageContent}
-    </GameWrapper>
+    <div className="flex h-screen min-h-md relative w-full">
+      <GameWrapper chatOpen={chatOpen}>
+        {showOverlay && <Overlay />}
+        {statusComponent}
+        {pageContent}
+      </GameWrapper>
+
+      <div className="flex justify-center items-center border-l-[1px] border-blue-800">
+        <IconButton
+          size="small"
+          aria-label="close"
+          color="warning"
+          onClick={toggleChat}
+        >
+          {chatOpen ? (
+            <KeyboardArrowRightIcon fontSize="small" />
+          ) : (
+            <KeyboardArrowLeftIcon fontSize="small" />
+          )}
+        </IconButton>
+      </div>
+
+      <div className={`h-full ${chatOpen ? 'w-1/4' : 'hidden'} bg-[#e5e5f2]`}>
+        <ChatWrapper
+          socket={socket}
+          isSpectator={isSpectator}
+          gameIdSpectator={gameIdInvitSpectate?.toString()}
+          currentPage={currentPage}
+        />
+      </div>
+    </div>
   );
 }
 

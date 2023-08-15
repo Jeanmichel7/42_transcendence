@@ -8,7 +8,7 @@ export const useImage = (fileName: string) => {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        console.log(`../assets/trophies/${fileName}`);
+        // console.log(`../assets/trophies/${fileName}`);
         const response = await import(`../assets/trophies/${fileName}`); // change relative path to suit your needs
         setImage(response.default);
       } catch (err) {

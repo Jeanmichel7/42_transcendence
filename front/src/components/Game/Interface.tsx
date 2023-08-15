@@ -9,7 +9,7 @@ export interface ServerToClientEvents {
 }
 
 export interface PlayerStatus {
-  gameId: bigint;
+  gameId: number;
   mode: string;
   ready: boolean;
   isPlayer1: boolean;
@@ -30,7 +30,7 @@ export interface ClientToServerEvents {
     ready: boolean;
     player1: boolean;
   }) => void;
-  spectateGame: (gameId: bigint) => void;
+  spectateGame: (gameId: number) => void;
 }
 export interface SocketInterface {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;

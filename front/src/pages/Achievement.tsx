@@ -22,7 +22,6 @@ const Achievement = () => {
         await getUserIdTrophies(login ? login : null);
       if ('error' in fetchUserTrophies)
         return dispatch(setErrorSnackbar(fetchUserTrophies));
-      console.log('la : ', fetchUserTrophies);
 
       const fetchAllTrophies: TrophyInterface[] | ApiErrorResponse =
         await getAllTrophies();

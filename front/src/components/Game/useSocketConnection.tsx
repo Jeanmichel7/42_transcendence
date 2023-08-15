@@ -7,10 +7,14 @@ import {
   useRef,
 } from 'react';
 import { Socket } from 'socket.io-client';
-import { ClientToServerEvents, ServerToClientEvents } from './Interface';
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  GameData,
+  BonusPosition,
+} from './Interface';
 import { GROUND_MAX_SIZE, PlayersInfo } from './Game';
-import { GameData } from './Interface';
-import { BonusPosition } from './Interface';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const useSocketConnection = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,
@@ -32,6 +36,8 @@ const useSocketConnection = (
   setPlayerInfo: Dispatch<SetStateAction<PlayersInfo | undefined>>,
 ) => {
   const data = useRef<GameData | undefined>();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   function normalizeGameData(serverData: GameData) {
     data.current = serverData;
@@ -106,6 +112,21 @@ const useSocketConnection = (
       socket.off('gameUpdate');
     };
   }, []);
+
+  useEffect(() => {
+    if (gameId && gameId.current) {
+      const searchParams = new URLSearchParams(location.search);
+      const gameIdInParams = searchParams.get('gameId');
+
+      if (!gameIdInParams) {
+        searchParams.set('gameId', gameId.current.toString());
+        navigate(`.?gameId=${gameId.current}`, {
+          replace: true,
+          state: location.state,
+        });
+      }
+    }
+  }, [gameId, gameId.current]);
 
   return { gameData: data, gameId };
 };

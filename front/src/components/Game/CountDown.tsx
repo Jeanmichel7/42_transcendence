@@ -42,7 +42,7 @@ const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
   useEffect(() => {
-    console.log('GameStarder value : ', gameStarted);
+    // console.log('GameStarder value : ', gameStarted);
     if (gameStarted) {
       setVisible(false);
     } else {
