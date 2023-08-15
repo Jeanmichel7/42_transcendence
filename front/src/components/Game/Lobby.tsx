@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { GameCard } from '../../pages/Pong';
 import { ranksImages } from '../../utils/rankImages';
 import '../../utils/animation.css';
+import { ClientToServerEvents, ServerToClientEvents } from './Interface';
+import { Socket } from 'socket.io-client';
 
 export const fadeIn = keyframes`
   from {
@@ -60,9 +62,9 @@ interface ButtonWrapperProps {
   animation: boolean;
 }
 export const ButtonWrapper = styled.div<ButtonWrapperProps>`
-  height: 45%;
+  height: 35%;
   width: 30%;
-  margin-top: 5%;
+  margin-top: 15%;
   display: flex;
   position: relative;
   align-items: flex-start;
@@ -100,7 +102,7 @@ const StyledCircle = styled.div<StyledCircleProps>`
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  socket: any;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   setBonus: React.Dispatch<React.SetStateAction<boolean>>;
   lobbyData: GameCard[];
   setGameIdSpectate: React.Dispatch<React.SetStateAction<number | undefined>>;
@@ -147,7 +149,6 @@ function Lobby({
   const COLUMNS = 3;
   const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
   const fakeCards = Array.from({ length: fakeCardsCount });
-
   const handleCardClick = (gameId: number) => {
     setGameIdSpectate(gameId);
     setCurrentPage('spectate');
@@ -202,7 +203,8 @@ function Lobby({
           Bonus Mode
         </StyledButton>
       </ButtonWrapper>
-      <div className="grid md:grid-cols-3  items-center h-1/2 justify-items-center relative   w-full">
+
+      <div className="grid md:grid-cols-3 items-center h-1/2 justify-items-center relative w-full">
         {lobbyData.map(card => {
           return (
             <div
@@ -252,8 +254,7 @@ function Lobby({
         })}
         {fakeCards.map((_, index) => (
           <div
-            key={`fake-card-${index}`}
-            // Masquez les deux dernières "fake cards" sur les petits écrans
+            key={index}
             className={`border border-dashed rounded-lg h-44 m-4 w-72 bg-transparent ${
               index > 0 ? 'hidden md:block' : ''
             }`}

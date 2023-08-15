@@ -42,7 +42,7 @@ const ConversationGame = ({
         setMessages(prev => [...prev, data]);
       });
     } catch (e) {
-      console.warn('error: ', e);
+      // console.warn('error: ', e);
     }
     return () => {
       try {
@@ -54,7 +54,7 @@ const ConversationGame = ({
           type: type,
         });
       } catch (e) {
-        console.warn('error: ', e);
+        // console.warn('error: ', e);
       }
     };
   }, [socket, gameId, type, isSpectator, location]);

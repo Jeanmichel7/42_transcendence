@@ -25,7 +25,7 @@ export interface UserInterface {
 
 export interface UserRelation {
   id: number;
-  // userId: bigint,
+  // userId: number,
   relationType: string;
   createdAt: Date;
   updatedAt: Date;

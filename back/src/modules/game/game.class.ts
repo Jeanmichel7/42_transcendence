@@ -5,9 +5,9 @@ const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
-const BALL_DIAMETER = 10;
+const BALL_DIAMETER = 20;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 0;
+const SCORE_FOR_WIN = 6;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
@@ -85,17 +85,18 @@ export class Game {
     player2Info: UserEntity,
     gameId: bigint,
     bonusMode = false,
-    EmitEvent: (eventName: string, data?: any) => void,
+    EmitEvent: (eventName: string, data?: any) => void
   ) {
     this.emitEvent = EmitEvent;
     this.isOver = false;
     this.ball = {
       x: 500,
       y: 500,
-      vx: INITIAL_BALL_SPEED,
+      vx: 0,
       vy: 0,
       speed: INITIAL_BALL_SPEED,
     };
+    this.initBall();
     this.socketPlayer1Id = socketPlayer1Id;
     this.socketPlayer2Id = socketPlayer2Id;
     this.player1Username = player1Username;
@@ -150,6 +151,15 @@ export class Game {
   //   this.id = res.id.toString();
   //   console.log('id game " ', this.id);
   // }
+
+  initBall() {
+    this.ball.x = 500;
+    this.ball.y = 500;
+    const angle = (Math.random() * 90 - 45) * (Math.PI / 180);
+    this.ball.vx = INITIAL_BALL_SPEED * Math.cos(angle);
+    this.ball.vy = INITIAL_BALL_SPEED * Math.sin(angle);
+    this.ball.speed = INITIAL_BALL_SPEED;
+  }
 
   generateBonus() {
     if (this.bonus === null) {
@@ -232,7 +242,7 @@ export class Game {
     } else {
       this.bonusPlayer2Loading = true;
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
     const bonus = {
       ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
@@ -324,11 +334,7 @@ export class Game {
   }
 
   resetBallAndRackets(vx: number) {
-    this.ball.x = 500;
-    this.ball.y = 500;
-    this.ball.vx = vx;
-    this.ball.vy = 0;
-    this.ball.speed = INITIAL_BALL_SPEED;
+    this.initBall();
     this.fail = false;
     this.racketLeftHeight = RACKET_HEIGHT_10;
     this.racketRightHeight = RACKET_HEIGHT_10;

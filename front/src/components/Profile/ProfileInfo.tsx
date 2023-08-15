@@ -142,7 +142,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
           </Tooltip>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white p-3 ">
+      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom  p-3 ">
         <div className="">
           <div className="md:absolute top-10 left-9">
             {user.avatar && (

@@ -67,8 +67,7 @@ function Pong() {
     undefined | number
   >();
   const [showOverlay, setShowOverlay] = useState(false);
-  const [lobbyData, setLobbyData] = useState<GameCard[]>([{} as GameCard]);
-
+  const [lobbyData, setLobbyData] = useState<GameCard[]>([]);
   const [chatOpen, setChatOpen] = useState(true);
 
   const toggleChat = () => {
@@ -175,6 +174,12 @@ function Pong() {
       dispatch(desactivateEffect());
     } else if (currentPage === 'privateLobby') {
       dispatch(desactivateEffect());
+    } else if (currentPage === 'searchOpponent') {
+      dispatch(desactivateEffect());
+    } else if (currentPage === 'game') {
+      dispatch(activateEffect());
+    } else if (currentPage === 'spectate') {
+      dispatch(activateEffect());
     }
   }, [currentPage, gameIdInvit, dispatch]);
 
@@ -184,9 +189,9 @@ function Pong() {
   } else {
     statusComponent = undefined;
   }
+
   let pageContent: ReactNode;
   if (currentPage === 'lobby' && !gameIdInvit) {
-    dispatch(desactivateEffect());
     pageContent = (
       <Lobby
         setCurrentPage={setCurrentPage}
@@ -197,7 +202,6 @@ function Pong() {
       />
     );
   } else if (currentPage === 'game') {
-    dispatch(activateEffect());
     pageContent = (
       <Game
         socket={socket}
@@ -216,7 +220,6 @@ function Pong() {
       />
     );
   } else if (currentPage === 'privateLobby' && gameIdInvit) {
-    dispatch(desactivateEffect());
     pageContent = (
       <PrivateLobby
         setCurrentPage={setCurrentPage}

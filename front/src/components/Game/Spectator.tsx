@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import { Socket } from 'socket.io-client';
 import {
   ClientToServerEvents,
@@ -33,9 +39,17 @@ function GameSpectator({
   // }, [gameIdInvit, gameData]);
 
   useEffect(() => {
+    if (gameData?.winner) {
+      setCurrentPage('lobby');
+    }
+  }, [gameData]);
+
+  useLayoutEffect(() => {
     const handleResize = () => {
       const gameWrapper = document.querySelector('#playground') as HTMLElement;
+      console.log('gameWrapper', gameWrapper);
       if (gameWrapper) {
+        console.log('gameWrapper.offsetWidth', gameWrapper.offsetWidth);
         gameDimensions.current.width = gameWrapper.offsetWidth;
         gameDimensions.current.height = gameWrapper.offsetHeight;
       }
@@ -48,7 +62,6 @@ function GameSpectator({
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  // console.log('gameData, ', gameData);
 
   return (
     <GameWrapper>
@@ -70,7 +83,11 @@ function GameSpectator({
             bonusIsLoadingPlayerRight={gameData.bonusPlayer2Loading}
             bonusNamePlayerRight={gameData.bonusPlayer2}
           />
-          <Playground id="playground">
+        </>
+      )}
+      <Playground id="playground">
+        {gameData && (
+          <>
             <Racket
               posY={gameData.racketLeft}
               height={gameData.racketLeftHeight}
@@ -109,9 +126,9 @@ function GameSpectator({
                 Return to Lobby
               </StyledButton>
             </div>
-          </Playground>
-        </>
-      )}
+          </>
+        )}
+      </Playground>
     </GameWrapper>
   );
 }

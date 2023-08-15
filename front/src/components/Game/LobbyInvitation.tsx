@@ -2,6 +2,8 @@ import styled from 'styled-components';
 // import { Socket } from 'socket.io-client';
 import { useEffect } from 'react';
 import { GameInterface } from '../../types';
+import { Socket } from 'socket.io-client';
+import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 
 export const StyledButton = styled.button`
   border: 0.2rem solid #fff;
@@ -34,8 +36,7 @@ const ButtonWrapper = styled.div`
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   game: GameInterface;
-  // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  socket: any;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
 function LobbyInvitation({ setCurrentPage, game, socket }: LobbyProps) {
