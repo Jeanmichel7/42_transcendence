@@ -32,7 +32,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
         <span className="min-w-[300px]"></span>
         <h2 className="text-3xl"> {user.firstName + ' ' + user.lastName} </h2>
       </div>
-      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white p-3 ">
+      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom  p-3 ">
         <div className="">
           <div className="md:absolute top-10 left-9">
             {user.avatar && (

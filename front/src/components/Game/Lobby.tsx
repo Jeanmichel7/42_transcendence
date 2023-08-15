@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { GameCard } from '../../pages/Pong';
 import { ranksImages } from '../../utils/rankImages';
 import '../../utils/animation.css';
+import { ClientToServerEvents, ServerToClientEvents } from './Interface';
+import { Socket } from 'socket.io-client';
 
 export const fadeIn = keyframes`
   from {
@@ -60,9 +62,9 @@ interface ButtonWrapperProps {
   animation: boolean;
 }
 export const ButtonWrapper = styled.div<ButtonWrapperProps>`
-  height: 45%;
+  height: 35%;
   width: 30%;
-  margin-top: 5%;
+  margin-top: 15%;
   display: flex;
   position: relative;
   align-items: flex-start;
@@ -100,10 +102,10 @@ const StyledCircle = styled.div<StyledCircleProps>`
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  socket: any;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   setBonus: React.Dispatch<React.SetStateAction<boolean>>;
   lobbyData: GameCard[];
-  setGameIdSpectate: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setGameIdSpectate: React.Dispatch<React.SetStateAction<bigint | undefined>>;
 }
 
 function Lobby({
@@ -145,7 +147,7 @@ function Lobby({
   const COLUMNS = 3;
   const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
   const fakeCards = Array.from({ length: fakeCardsCount });
-  const handleCardClick = (gameId: number) => {
+  const handleCardClick = (gameId: bigint) => {
     setGameIdSpectate(gameId);
     setCurrentPage('spectate');
   };
@@ -199,11 +201,12 @@ function Lobby({
           Bonus Mode
         </StyledButton>
       </ButtonWrapper>
+
       <div className="grid md:grid-cols-3  items-center h-1/2 justify-items-center relative   w-full">
         {lobbyData.map(card => {
           return (
             <div
-              key={card.id}
+              key={card.id.toString()}
               onClick={() => handleCardClick(card.id)}
               className=" animate-vibration bg-white rounded-lg p-6 m-4 w-72 transition-transform transform scale-100 hover:scale-105 shadow-custom hover:bg-gray-200 cursor-pointer"
             >

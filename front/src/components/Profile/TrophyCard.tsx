@@ -27,7 +27,7 @@ export const TrophyCard = ({ trophy }: TrophyProps) => {
         className={`text-center rounded-t-lg rounded-b-md
       bg-white border-blue-200
       m-2 mx-[10%] md:mx-2
-      w-full md:w-[40vw] lg:w-[30vw] xl:w-[18vw] 
+      w-full md:w-[40vw] lg:w-[30vw] xl:w-[18vw] shadow-custom 
       ${trophy.isHeld ? 'border-blue-400' : 'opacity-60'}
       flex flex-col justify-between 
     `}

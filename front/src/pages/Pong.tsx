@@ -29,7 +29,7 @@ export const GameWrapper = styled.div`
 `;
 
 export interface GameCard {
-  id: number;
+  id: bigint;
   player1Username: string;
   player2Username: string;
   player1Avatar: string;
@@ -55,7 +55,7 @@ function Pong() {
   const gameId = searchParams.get('id');
   const [gameIdSpectate, setGameIdSpectate] = useState<undefined | bigint>();
   const [showOverlay, setShowOverlay] = useState(false);
-  const [lobbyData, setLobbyData] = useState<GameCard[]>([{} as GameCard]);
+  const [lobbyData, setLobbyData] = useState<GameCard[]>([]);
 
   useEffect(() => {
     if (!gameId || !userData.id || userData.id == -1) return;
@@ -205,6 +205,7 @@ function Pong() {
       />
     );
   } else if (currentPage === 'spectate' && gameIdSpectate) {
+    dispatch(activateEffect());
     console.log('spectate', gameIdSpectate);
     pageContent = (
       <GameSpectator

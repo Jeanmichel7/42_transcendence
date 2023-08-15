@@ -21,6 +21,16 @@ import {
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 
+const PingPongText = styled.span`
+  position: absolute;
+  right: 30%; // Ajustez ces valeurs en fonction de votre besoin
+  bottom: 30%;
+  font-size: 1.5rem; // Taille du texte
+  color: #ffffff; // Couleur du texte
+  padding: 8px 16px;
+  border-radius: 8px; // Arrondi du fond
+  z-index: 10; // Assurez-vous qu'il apparaît au-dessus d'autres éléments
+`;
 const slideInFromBottom = keyframes`{
   0% {
     transform: translateY(200%);
@@ -262,6 +272,7 @@ export default function Login() {
           </Button>
         </Link> */}
       </TitleWrapper>
+      <PingPongText>Pong! le jeu qui fait ping</PingPongText>
     </LoginWrapper>
   );
 }

@@ -3,9 +3,32 @@ import { Socket } from 'socket.io-client';
 export interface ServerToClientEvents {
   connect: () => void;
   disconnect: () => void;
-  userGameStatus: (message: string) => void;
   gameUpdate: (data: GameData) => void;
   privateLobby: (opponentStatus: PlayerStatus) => void;
+}
+
+export interface ClientToServerEvents {
+  userGameStatus: (
+    message: string,
+    callback?: (response: string) => void,
+  ) => void;
+  clientUpdate: (data: {
+    posRacket: number;
+    ArrowDown: boolean;
+    ArrowUp: boolean;
+    gameId: number | bigint;
+    useBonus: boolean;
+  }) => void;
+  hello: () => void;
+  privateLobby: (data: {
+    gameId: bigint;
+    mode: string;
+    ready: boolean;
+    player1: boolean;
+  }) => void;
+  spectateGame: (gameId: bigint) => void;
+  joinInvitationGame: (data: { gameId: string | bigint }) => void;
+  leaveInvitationGame: (data: { gameId: string | bigint }) => void;
 }
 
 export interface PlayerStatus {
@@ -15,23 +38,6 @@ export interface PlayerStatus {
   isPlayer1: boolean;
 }
 
-export interface ClientToServerEvents {
-  clientUpdate: (data: {
-    posRacket: number;
-    ArrowDown: boolean;
-    ArrowUp: boolean;
-    gameId: number;
-    useBonus: boolean;
-  }) => void;
-  hello: () => void;
-  privateLobby: (data: {
-    gameId: string;
-    mode: string;
-    ready: boolean;
-    player1: boolean;
-  }) => void;
-  spectateGame: (gameId: bigint) => void;
-}
 export interface SocketInterface {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }

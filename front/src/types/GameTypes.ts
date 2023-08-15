@@ -1,7 +1,7 @@
 import { UserInterface } from './UserTypes';
 
 export interface GameInterface {
-  id: number;
+  id: bigint;
   status: 'waiting' | 'waiting_start' | 'playing' | 'finished' | 'aborted';
   player1: UserInterface;
   player2: UserInterface;

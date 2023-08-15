@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 // import { StyledButton } from './Lobby';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
@@ -119,11 +119,11 @@ export const StyledButton = styled.button`
         rgba(0, 0, 0, 0.2),
         rgba(0, 0, 0, 0.2)
       ),
-      linear-gradient(92.83deg, #ff7426 0, #f93a13 100%);
+      linear-gradient(92.83deg, #007bff 0%, #0056b3 100%);
   }
 
   &:active:not(:disabled):after {
-    background-image: linear-gradient(#541a0f 0, #0c0d0d 100%);
+    background-image: linear-gradient(#20acd6 0, #0c0d0d 100%);
     bottom: 4px;
     left: 4px;
     right: 4px;
@@ -178,6 +178,7 @@ const StyledNeonH1 = styled.h1`
   color: #fff;
   -webkit-animation: ${buzz} 0.1s infinite alternate;
   font-size: 3rem;
+  position: relative;
   text-shadow: 0 0 0 transparent, 0 0 10px #2695ff,
     0 0 20px rgba(38, 149, 255, 0.5), 0 0 40px #2695ff, 0 0 100px #2695ff,
     0 0 200px #2695ff, 0 0 300px #2695ff, 0 0 500px #2695ff;
@@ -210,9 +211,10 @@ const neonAnimationStartUp = keyframes`
 const NeonSign = styled.div`
   font-size: 1em;
   position: absolute;
-  left: 63%;
-  top: 25%;
+  left: 120%;
+  top: -125%;
   rotate: 30deg;
+  font-size: 1rem;
   text-align: center;
   animation: ${neonAnimationStartUp} steps(1) 1s forwards;
   animation-delay: 1s; // The sign will start glowing after 1 second
@@ -241,10 +243,16 @@ const detachAndFall = keyframes`
   }
 `;
 
-const StyledNeonH2 = styled.h2`
+interface StyledNeonH2Props {
+  activeAnimation: boolean;
+}
+const StyledNeonH2 = styled.h2<StyledNeonH2Props>`
   color: #fff;
-  animation: ${flicker} 4s infinite alternate,
-    ${detachAndFall} 7s ease-in-out forwards;
+  animation: ${flicker} 4s infinite alternate
+    ${props =>
+      props.activeAnimation
+        ? css`, ${detachAndFall} 7s ease-in-out forwards`
+        : ''};
   animation-delay: 9s;
   font-size: 2rem;
   text-shadow: -1px 0px 7px #fff, -1px 0px 10px #fff, -1px 0px 21px #fff,
@@ -301,25 +309,22 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
         {lastGameInfo.current.win ? (
           <>
             <StyledNeonH1>
-              Victory !
-              <br />
-              Winner: <br />
-              {lastGameInfo.current.winnerName}{' '}
+              Victory !<NeonSign>Good Game</NeonSign>
             </StyledNeonH1>
-            <NeonSign>Good Game</NeonSign>
             <FullScreenCanvas id="myCanvas"></FullScreenCanvas>
           </>
         ) : (
           <>
-            <StyledNeonH1>
-              Defeate
-              <br />
-              Winner: <br /> {lastGameInfo.current.winnerName}{' '}
-            </StyledNeonH1>
+            <StyledNeonH1>Defeate !</StyledNeonH1>
             <NeonSign>Nice Try</NeonSign>
           </>
         )}
-        <StyledNeonH2>Looser: {lastGameInfo.current.looserName}</StyledNeonH2>
+        <StyledNeonH2 activeAnimation={false}>
+          Winner: {lastGameInfo.current.winnerName}
+        </StyledNeonH2>
+        <StyledNeonH2 activeAnimation={true}>
+          Looser: {lastGameInfo.current.looserName}
+        </StyledNeonH2>
         <StyledButton
           onClick={() => {
             setCurrentPage('lobby');

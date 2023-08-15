@@ -44,7 +44,7 @@ const RACKET_WIDTH = 2;
 const RACKET_HEIGHT = 16;
 const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
-const BALL_DIAMETER = 10;
+const BALL_DIAMETER = 20;
 const BALL_RADIUS = BALL_DIAMETER / 2;
 // max position of ball on X axis for compensate ball radius
 export const GROUND_MAX_SIZE = 1000;
