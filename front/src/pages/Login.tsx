@@ -65,7 +65,7 @@ const TitleWrapper = styled.div`
   overflow: hidden;
   align-items: baseline;
   display: flex;
-  flex-direction: line;
+  flex-direction: line; 
   @media (max-width: 768px) {
     flex-direction: column;
     height: 400px;
@@ -217,8 +217,8 @@ export default function Login() {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    const width = 600;
-    const height = 688;
+    const width = 800;
+    const height = 600;
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
 

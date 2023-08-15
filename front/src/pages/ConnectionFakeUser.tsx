@@ -30,6 +30,17 @@ import SendIcon from '@mui/icons-material/Send';
 import { faker } from '@faker-js/faker';
 import { Link } from 'react-router-dom';
 
+interface FormDataUser {
+  login: string;
+  password: string;
+  passwordConfirm?: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  description?: string;
+  avatar?: string;
+}
+
 export default function FakeConnection() {
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('Password1!');
@@ -40,7 +51,20 @@ export default function FakeConnection() {
   const [userId, setUserId] = useState(0);
   const [error, setError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('Wrong code');
+  const [errorSignin, setErrorSignin] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [succesCreated, setSuccesCreated] = useState<boolean>(false);
+
+  const [formData, setFormData] = useState({
+    login: '',
+    password: '',
+    passwordConfirm: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    description: '',
+    avatar: 'http://localhost:3000/avatars/defaultAvatar.png',
+  } as FormDataUser);
 
   const dispatch = useDispatch();
 
@@ -116,8 +140,8 @@ export default function FakeConnection() {
   }
 
   // fack user generator
-  async function createUser(): Promise<UserInterface | null> {
-    const data = {
+  async function createFakeUser(): Promise<UserInterface | null> {
+    const data: FormDataUser = {
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       login: faker.internet.userName(),
@@ -126,7 +150,6 @@ export default function FakeConnection() {
       description: faker.lorem.sentence(),
       avatar: faker.image.avatar(),
     };
-
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
@@ -135,15 +158,79 @@ export default function FakeConnection() {
   }
 
   async function createUsers() {
-    for (let i = 0; i < 1; i++) {
-      const res = await createUser();
+    for (let i = 0; i < 10; i++) {
+      const res = await createFakeUser();
       if (!res) return;
       setUsersCreated(prev => [...prev, res]);
     }
   }
 
+  const handleFormCreateAccountChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  // useEffect(() => {
+  //   console.log(formData);
+  // }, [formData]);
+
+  const handleSubmitCreateAccount = async (
+    e?:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (e) e.preventDefault();
+    console.log(formData);
+
+    if (formData.password !== formData.passwordConfirm) {
+      setErrorSignin(prev => [...prev, 'password confirm not match']);
+      return;
+    }
+
+    const res: UserInterface | ApiErrorResponse = await registerFakeUser(
+      formData,
+    );
+    console.log('res register', res);
+    if ('error' in res) {
+      // dispatch(setErrorSnackbar(res));
+      setErrorSignin(res.message as string[]);
+      return null;
+    } else {
+      setUsersCreated(prev => [...prev, res]);
+      setFormData({
+        login: '',
+        password: '',
+        passwordConfirm: '',
+        email: '',
+        firstName: '',
+        lastName: '',
+        description: '',
+      });
+      setErrorSignin([]);
+      setSuccesCreated(true);
+      return res;
+    }
+  };
+
+  function getErrorForField(field: string) {
+    if (!errorSignin || errorSignin.length === 0) return '';
+
+    for (const err of errorSignin) {
+      if (err.toLowerCase().includes(field.toLowerCase())) {
+        // setErrorSignin(prev => prev.filter(e => e !== err));
+        return err;
+      }
+    }
+
+    return '';
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="bg-inherit">
       {/* link prev page */}
       <div className="absolute top-0 right-0 m-5">
         <Link to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
@@ -151,59 +238,223 @@ export default function FakeConnection() {
         </Link>
       </div>
 
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold mb-5">Fake Connection</h1>
+      <div className="absolute top-0 left-0 m-5">
+        <Link to="/connection">Retour</Link>
       </div>
 
-      <h2 className="text-2xl font-bold text-center">Generate a fake users</h2>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={createUsers}
-        sx={{ my: 1 }}
-      >
-        Generate
-      </Button>
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-5">Account connection</h1>
+      </div>
 
-      <div className="w-full text-center">
-        <Box
-          component="form"
-          onSubmit={handleConnection}
-          sx={{
-            '& > :not(style)': { m: 1, width: '25ch' },
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField
-            id="outlined-basic"
-            label="Login"
-            defaultValue={
-              usersCreated.length > 0 ? usersCreated[0].login : 'user1'
-            }
-            variant="outlined"
-            onChange={handleLoginChange}
-          />
-          <TextField
-            id="outlined-basic"
-            label="Password"
-            defaultValue={'Password1!'}
-            variant="outlined"
-            onChange={handlePasswordChange}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleConnection(e);
-            }}
-            helperText="keep the default password"
-          />
+      <div className="flex justify-around">
+        <div className="w-7/12 flex flex-col justify-center items-center">
+          <h2 className="text-2xl font-bold text-center">Sign in</h2>
+
           <Button
             variant="contained"
             color="primary"
-            type="submit"
-            // onClick={handleConnection}
+            onClick={createUsers}
+            sx={{ my: 1 }}
           >
-            Connection
+            Auto Generate
           </Button>
-        </Box>
+
+          <p>or</p>
+
+          {usersCreated.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-bold">Users created</h2>
+              <ul>
+                {usersCreated.map(u => (
+                  <li key={u.id}>{u.login}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <Box
+            component="form"
+            onSubmit={handleSubmitCreateAccount}
+            sx={{
+              '& .MuiTextField-root': { m: 1 },
+            }}
+            // noValidate
+            autoComplete="off"
+          >
+            <div>
+              <TextField
+                id="field-login"
+                type="text"
+                name="login"
+                value={formData.login}
+                label="Login"
+                placeholder="Login"
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                autoComplete="Login"
+                helperText={getErrorForField('login')}
+                error={!!getErrorForField('login')}
+              />
+              <TextField
+                id="field-email"
+                type="email"
+                name="email"
+                value={formData.email}
+                label="Email"
+                placeholder="exemple@mail.com"
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                helperText={getErrorForField('email')}
+                error={!!getErrorForField('email')}
+              />
+            </div>
+            <div>
+              <TextField
+                id="field-firstName"
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                label="First name"
+                placeholder="First name"
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                helperText={getErrorForField('first name')}
+                error={!!getErrorForField('first name')}
+              />
+              <TextField
+                id="field-lastName"
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                label="Last name"
+                placeholder="Last name"
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                helperText={getErrorForField('last name')}
+                error={!!getErrorForField('last name')}
+              />
+            </div>
+            <div className="mr-4">
+              <TextField
+                fullWidth
+                id="field-pwd"
+                label="Password"
+                type="password"
+                name="password"
+                placeholder="Password1!"
+                value={formData.password}
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                autoComplete="Password1!"
+                helperText={getErrorForField('password')}
+                error={!!getErrorForField('password')}
+              />
+            </div>
+            <div className="mr-4">
+              <TextField
+                fullWidth
+                id="field-pwdConfirm"
+                label="Password"
+                type="password"
+                name="passwordConfirm"
+                value={formData.passwordConfirm}
+                variant="outlined"
+                onChange={handleFormCreateAccountChange}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleSubmitCreateAccount(e);
+                }}
+                helperText={getErrorForField('password confirm')}
+                error={!!getErrorForField('password confirm')}
+              />
+            </div>
+            <div className="text-center">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  setFormData({
+                    login: '',
+                    password: '',
+                    passwordConfirm: '',
+                    email: '',
+                    firstName: '',
+                    lastName: '',
+                    description: '',
+                  });
+                }}
+                sx={{ mx: 1 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                sx={{ mx: 1 }}
+              >
+                Create
+              </Button>
+              {succesCreated && (
+                <p className="text-green-500">User created with success</p>
+              )}
+            </div>
+            {
+              <ul>
+                {errorSignin.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            }
+          </Box>
+        </div>
+
+        <div className="border-l-2"></div>
+
+        <div className="w-4/12">
+          <h2 className="text-2xl font-bold text-center">Log in</h2>
+          <div className="w-full text-center">
+            <Box
+              component="form"
+              onSubmit={handleConnection}
+              sx={{
+                '& > :not(style)': { m: 1 },
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                id="field-login_login"
+                label="Login"
+                defaultValue={
+                  usersCreated.length > 0 ? usersCreated[0].login : 'user1'
+                }
+                variant="outlined"
+                onChange={handleLoginChange}
+              />
+              <TextField
+                id="field-login_pwd"
+                label="Password"
+                defaultValue={'Password1!'}
+                variant="outlined"
+                onChange={handlePasswordChange}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleConnection(e);
+                }}
+                helperText="keep the password for autogen users"
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                // onClick={handleConnection}
+              >
+                Connection
+              </Button>
+            </Box>
+          </div>
+        </div>
       </div>
 
       {is2FAactiv && (
@@ -258,17 +509,6 @@ export default function FakeConnection() {
             </Box>
           </div>
         </section>
-      )}
-
-      {usersCreated.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-bold">Users created</h2>
-          <ul>
-            {usersCreated.map(u => (
-              <li key={u.id}>{u.login}</li>
-            ))}
-          </ul>
-        </div>
       )}
     </div>
   );

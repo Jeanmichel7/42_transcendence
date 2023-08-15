@@ -120,8 +120,8 @@ function ConnectPage() {
         alignItems="center"
         justifyContent="center"
         padding={3}
-        height="100vh" // Prend toute la hauteur de la vue
-        bgcolor="background.default" // Couleur de fond par défaut
+        height="100vh"
+        bgcolor="background.default"
       >
         <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px' }}>
           <Typography
@@ -139,7 +139,7 @@ function ConnectPage() {
             fullWidth
             style={{ marginBottom: '15px' }}
           >
-            Login as a 42 student
+            Intra
           </Button>
 
           <Button
@@ -148,7 +148,7 @@ function ConnectPage() {
             onClick={handleFakeConnection}
             fullWidth
           >
-            Login as fake user
+            Account
           </Button>
         </Paper>
       </Box>
@@ -186,8 +186,7 @@ function ConnectPage() {
                 disabled={isLoading}
                 endIcon={<SendIcon />}
               >
-                {' '}
-                Send{' '}
+                Send
               </Button>
               {isLoading && (
                 <CircularProgress
