@@ -107,7 +107,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
       {user && (
         <Box className="flex flex-col md:flex-row justify-center">
           <div className="md:w-1/3 m-5 ">
-            <Box className="flex flex-col items-center w-full p-4 relative bg-white shadow-lg rounded-lg">
+            <Box className="flex flex-col items-center w-full h-full p-4 relative bg-white shadow-lg rounded-lg">
               <svg
                 className="absolute top-0  -translate-y-2/4 -translate-x-2/4 left-0 w-1/3"
                 viewBox="0 0 30 30 "
@@ -171,9 +171,9 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 )}
               </div>
 
-              <div className="mt-5">
-                <p className="font-bold text-gray-700 mb-2"> Description : </p>
-                <p className="text-gray-600 text-center">
+              <div className="mt-5 w-full px-3">
+                <p className="font-bold text-gray-700">Description :</p>
+                <p className="text-gray-600">
                   {user.description ? user.description : 'No description'}
                 </p>
               </div>
