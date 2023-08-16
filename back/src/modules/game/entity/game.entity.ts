@@ -81,19 +81,19 @@ export class GameEntity extends BaseEntity {
   expPlayer2: number;
 
   /* users */
-  @ManyToOne(() => UserEntity, (user) => user.gamesAsPlayer1, {
+  @ManyToOne(() => UserEntity, user => user.gamesAsPlayer1, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   player1: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.gamesAsPlayer2, {
+  @ManyToOne(() => UserEntity, user => user.gamesAsPlayer2, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   player2: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.wonGames, {
+  @ManyToOne(() => UserEntity, user => user.wonGames, {
     onDelete: 'CASCADE',
     nullable: true,
     cascade: true,

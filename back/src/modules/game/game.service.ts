@@ -84,7 +84,7 @@ export class GameService {
     // private readonly messageRepository: Repository<MessageEntity>,
     private readonly messageService: MessageService,
     private readonly notificationService: NotificationService,
-    private readonly trophiesService: TrophiesService,
+    private readonly trophiesService: TrophiesService
   ) {
     this.games = new Map<bigint, Game>();
     this.privatesLobby = new Map<bigint, PrivateLobby>();
@@ -97,7 +97,7 @@ export class GameService {
   updatePrivateLobby(player1: boolean, playerInfo: PlayerInfoPrivateLobby) {
     if (!playerInfo.gameId) {
       console.error(
-        'error when receiving client update: gameId is not defined',
+        'error when receiving client update: gameId is not defined'
       );
     }
     if (!this.privatesLobby.has(playerInfo.gameId)) {
@@ -113,10 +113,10 @@ export class GameService {
       this.privatesLobby.get(playerInfo.gameId).player1?.ready &&
       this.privatesLobby.get(playerInfo.gameId).player2?.ready &&
       !this.checkAlreadyInGame(
-        this.privatesLobby.get(playerInfo.gameId).player1.username,
+        this.privatesLobby.get(playerInfo.gameId).player1.username
       ) &&
       !this.checkAlreadyInGame(
-        this.privatesLobby.get(playerInfo.gameId).player2.username,
+        this.privatesLobby.get(playerInfo.gameId).player2.username
       ) &&
       this.privatesLobby.get(playerInfo.gameId).player1?.mode ===
         this.privatesLobby.get(playerInfo.gameId).player2?.mode
@@ -127,7 +127,7 @@ export class GameService {
         this.privatesLobby.get(playerInfo.gameId).player2.socketId,
         this.privatesLobby.get(playerInfo.gameId).player2.username,
         this.privatesLobby.get(playerInfo.gameId).player1.mode === 'bonus',
-        this.privatesLobby.get(playerInfo.gameId).player1.gameId,
+        this.privatesLobby.get(playerInfo.gameId).player1.gameId
       );
       return true;
     }
@@ -156,7 +156,7 @@ export class GameService {
         game.player1Stats,
         game.player2Stats,
         game.consecutiveExchangesWithoutBounce,
-        game.bonusMode,
+        game.bonusMode
       );
       this.games.delete(game.id);
       this.eventEmitter.emit('updateLobbyRoomRequire');
@@ -165,7 +165,7 @@ export class GameService {
   }
   checkAlreadyInGame(username: string): boolean {
     try {
-      this.games.forEach((game) => {
+      this.games.forEach(game => {
         if (
           game.player1Username === username ||
           game.player2Username === username
@@ -180,7 +180,7 @@ export class GameService {
   }
 
   updateClientSocketId(newSocketId: string, username: string) {
-    this.games.forEach((game) => {
+    this.games.forEach(game => {
       if (game.player1Username === username) {
         game.socketPlayer1Id = newSocketId;
       } else if (game.player2Username === username) {
@@ -195,14 +195,14 @@ export class GameService {
     socketId2: string,
     username2: string,
     bonusMode: boolean,
-    gameId?: bigint,
+    gameId?: bigint
   ): Promise<Game> {
     if (!gameId) {
       let res: GameInterface;
       if (bonusMode) {
         res = await this.saveStartGame(
           username2,
-          this.createdWaitingGameBonus.id,
+          this.createdWaitingGameBonus.id
         );
       } else {
         res = await this.saveStartGame(username2, this.createdWaitingGame.id);
@@ -252,7 +252,7 @@ export class GameService {
       user2,
       gameId,
       bonusMode,
-      (eventName, data) => this.eventEmitter.emit(eventName, data),
+      (eventName, data) => this.eventEmitter.emit(eventName, data)
     );
     this.games.set(game.id, game);
     this.eventEmitter.emit('updateLobbyRoomRequire');
@@ -260,7 +260,7 @@ export class GameService {
   }
   getAllGamesInfo(): GameInfo[] {
     const gamesInfo: GameInfo[] = [];
-    this.games.forEach((game) => {
+    this.games.forEach(game => {
       gamesInfo.push(game.getInfo());
     });
     return gamesInfo;
@@ -274,7 +274,7 @@ export class GameService {
           username: username,
         };
         this.createdWaitingGameBonus = await this.saveCreateWaitingGame(
-          this.playerWaiting1Bonus.username,
+          this.playerWaiting1Bonus.username
         );
       } else if (
         this.playerWaiting2Bonus === undefined &&
@@ -290,7 +290,7 @@ export class GameService {
           this.playerWaiting1Bonus.username,
           this.playerWaiting2Bonus.socketId,
           this.playerWaiting2Bonus.username,
-          true,
+          true
         );
         this.playerWaiting1Bonus = undefined;
         this.playerWaiting2Bonus = undefined;
@@ -306,7 +306,7 @@ export class GameService {
         };
         // createdWaitingGame
         this.createdWaitingGame = await this.saveCreateWaitingGame(
-          this.playerWaiting1Normal.username,
+          this.playerWaiting1Normal.username
         );
       } else if (
         this.playerWaiting2Normal === undefined &&
@@ -322,7 +322,7 @@ export class GameService {
           this.playerWaiting1Normal.username,
           this.playerWaiting2Normal.socketId,
           this.playerWaiting2Normal.username,
-          false,
+          false
         );
 
         this.playerWaiting1Normal = undefined;
@@ -378,7 +378,7 @@ export class GameService {
 
   async saveInviteGame(
     userId: bigint,
-    userIdToInvite: bigint,
+    userIdToInvite: bigint
   ): Promise<GameInterface> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
@@ -406,7 +406,7 @@ export class GameService {
     const res = await this.messageService.createInvitationBotMessage(
       newBotMessage,
       userId,
-      userIdToInvite,
+      userIdToInvite
     );
     if (!res) throw new Error('Invitation game message not created');
 
@@ -524,7 +524,7 @@ export class GameService {
 
   async saveStartGame(
     userlogin2: string,
-    gameId: bigint,
+    gameId: bigint
   ): Promise<GameInterface> {
     const findWaitingGame = await this.gameRepository.findOne({
       where: { id: gameId },
@@ -547,7 +547,7 @@ export class GameService {
     findWaitingGame.updatedAt = new Date();
 
     const gameSaved: GameEntity = await this.gameRepository.save(
-      findWaitingGame,
+      findWaitingGame
     );
 
     player1.status = 'in game';
@@ -564,7 +564,7 @@ export class GameService {
         id: player1.id,
         status: player1.status,
         login: player1.login,
-      }),
+      })
     );
 
     this.eventEmitter.emit(
@@ -573,7 +573,7 @@ export class GameService {
         id: player2.id,
         status: player2.status,
         login: player2.login,
-      }),
+      })
     );
 
     const result: GameInterface = gameSaved;
@@ -593,7 +593,7 @@ export class GameService {
     gameId: bigint,
     winnerId: string,
     scorePlayer1: number,
-    scorePlayer2: number,
+    scorePlayer2: number
   ) {
     const game = await this.gameRepository.findOne({
       where: { id: gameId },
@@ -611,7 +611,7 @@ export class GameService {
     const { scoreEloP1, scoreEloP2 } = this.updateEloScore(
       game.player1,
       game.player2,
-      game.winner,
+      game.winner
     );
     game.eloScorePlayer1 = scoreEloP1 | 0;
     game.eloScorePlayer2 = scoreEloP2 | 0;
@@ -645,7 +645,7 @@ export class GameService {
     winnerId: string,
     scoreElo: number,
     playerStats: PlayerStats,
-    winWihoutLoseAPoint: boolean,
+    winWihoutLoseAPoint: boolean
   ) {
     if (player.login == winnerId) {
       // do not update exp here
@@ -674,13 +674,13 @@ export class GameService {
     player1Stats: PlayerStats,
     player2Stats: PlayerStats,
     consecutiveExchangesWithoutBounce: number,
-    bonusMode: boolean,
+    bonusMode: boolean
   ): Promise<GameInterface> {
     const game = await this.updateGameStatus(
       gameId,
       winnerId,
       scorePlayer1,
-      scorePlayer2,
+      scorePlayer2
     );
 
     await this.updatePlayerStats(
@@ -688,14 +688,14 @@ export class GameService {
       winnerId,
       game.eloScorePlayer1 | 0,
       player1Stats,
-      scorePlayer2 === 0,
+      scorePlayer2 === 0
     );
     await this.updatePlayerStats(
       game.player2,
       winnerId,
       game.eloScorePlayer2 | 0,
       player2Stats,
-      scorePlayer1 === 0,
+      scorePlayer1 === 0
     );
 
     await this.trophiesService.updateTrophiesPlayer(
@@ -705,7 +705,7 @@ export class GameService {
       game,
       player1Stats,
       consecutiveExchangesWithoutBounce,
-      bonusMode,
+      bonusMode
     );
     await this.trophiesService.updateTrophiesPlayer(
       scorePlayer1,
@@ -714,7 +714,7 @@ export class GameService {
       game,
       player2Stats,
       consecutiveExchangesWithoutBounce,
-      bonusMode,
+      bonusMode
     );
 
     this.eventEmitter.emit(
@@ -723,7 +723,7 @@ export class GameService {
         id: game.player1.id,
         status: game.player1.status,
         login: game.player1.login,
-      }),
+      })
     );
 
     this.eventEmitter.emit(
@@ -732,14 +732,18 @@ export class GameService {
         id: game.player2.id,
         status: game.player2.status,
         login: game.player2.login,
-      }),
+      })
     );
     const result: GameInterface = game;
     // console.log('result end game : ', result);
     return result;
   }
 
-  async getAllUserGames(userId: bigint): Promise<GameInterface[]> {
+  async getAllUserGames(
+    userId: bigint,
+    page: number,
+    limit: number,
+  ): Promise<GameInterface[]> {
     const games: GameEntity[] = await this.gameRepository
       .createQueryBuilder('games')
       .leftJoinAndSelect('games.player1', 'player1')
@@ -769,13 +773,60 @@ export class GameService {
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
       .andWhere('games.status IN (:...statuses)', {
         statuses: ['finished'],
-        // statuses: ['finished', 'playing'],
       })
       .orderBy('games.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
       .getMany();
 
     const result: GameInterface[] = games;
     return result;
+  }
+
+  // get eloscore of player userId, total game, total win, game.levelPlayerId, game.expPlayerId
+  async getStatsUser(userId: bigint): Promise<any> {
+    const games: GameEntity[] = await this.gameRepository
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.player1', 'player1')
+      .leftJoinAndSelect('games.player2', 'player2')
+      .where(
+        '(games.player1.id = :userId OR games.player2.id = :userId) AND games.status = :status',
+        {
+          userId,
+          status: 'finished',
+        }
+      )
+      .orderBy('games.createdAt', 'ASC')
+      .getMany();
+    const stats = games.map(game => {
+      const isPlayer1 = game.player1.id == userId;
+      return {
+        score: isPlayer1 ? game.scorePlayer1 : game.scorePlayer2,
+        eloscore: isPlayer1 ? game.eloScorePlayer1 : game.eloScorePlayer2,
+        exp: isPlayer1 ? game.expPlayer1 : game.expPlayer2,
+        level: isPlayer1 ? game.levelPlayer1 : game.levelPlayer2,
+        win: isPlayer1 ? game.scorePlayer1 > game.scorePlayer2 : false,
+      };
+    });
+
+    return stats;
+  }
+
+  async countAllGames(userId: bigint): Promise<number> {
+    const count = await this.gameRepository
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.player1', 'player1')
+      .leftJoinAndSelect('games.player2', 'player2')
+      .where(
+        '(games.player1.id = :userId OR games.player2.id = :userId) AND games.status = :status',
+        {
+          userId,
+          status: 'finished',
+        }
+      )
+      .getCount();
+    console.log('count', count)
+    return count;
   }
 
   /** **********************
@@ -803,7 +854,7 @@ export class GameService {
   updateEloScore(
     player1: UserEntity,
     player2: UserEntity,
-    winner: UserEntity,
+    winner: UserEntity
   ): { scoreEloP1: number; scoreEloP2: number } {
     const k = 32;
     const scoreEloP1 = player1.score;

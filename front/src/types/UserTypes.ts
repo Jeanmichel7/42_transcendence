@@ -25,9 +25,16 @@ export interface UserInterface {
 
 export interface UserRelation {
   id: number;
-  // userId: number,
   relationType: string;
   createdAt: Date;
   updatedAt: Date;
   userRelation: UserInterface;
+}
+
+export interface UserStatGamesInterface {
+  eloscore: number;
+  exp: number;
+  level: number;
+  score: number;
+  win: boolean;
 }

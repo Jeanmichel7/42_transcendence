@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Sticker } from '../../utils/StyledTitle';
-import { UserInterface } from '../../types';
-import { GameInterface } from '../../types/GameTypes';
+import {
+  ApiErrorResponse,
+  UserInterface,
+  UserStatGamesInterface,
+} from '../../types';
 
 import { Line, Pie } from 'react-chartjs-2';
 import {
@@ -14,6 +17,7 @@ import {
   ArcElement,
   Filler,
 } from 'chart.js';
+import { statsUserGames } from '../../api/game';
 
 Chart.register(
   Filler,
@@ -27,59 +31,37 @@ Chart.register(
 
 interface PropsGames {
   user: UserInterface;
-  games: GameInterface[];
 }
 
-export default function StatsGame({ user, games }: PropsGames) {
+export default function StatsGame({ user }: PropsGames) {
+  const [games, setGames] = useState<UserStatGamesInterface[]>([]);
   const [scorePlayer, setScorePlayer] = useState<number[]>([]);
-  const [gamesWin, setGamesWin] = useState<number>(0);
   const [ratio, setRatio] = useState<string>('0');
   const [niveau, setNiveau] = useState<number[]>([]);
   const [exp, setExp] = useState<number[]>([]);
+  const [pieData, setPieData] = useState<[number, number]>([0, 0]);
+
+  useEffect(() => {
+    if (!user.id) return;
+
+    const fetchStats = async () => {
+      const statsGamesUser: UserStatGamesInterface[] | ApiErrorResponse =
+        await statsUserGames(user.id);
+      if ('error' in statsGamesUser) return;
+      setGames(statsGamesUser);
+    };
+    fetchStats();
+  }, [user.id]);
 
   useEffect(() => {
     if (!user.id || !games) return;
-
-    setScorePlayer([
-      1500,
-      ...games
-        .map(game =>
-          game.player1.id === user.id
-            ? game.eloScorePlayer1
-            : game.eloScorePlayer2,
-        )
-        .reverse(),
-    ]);
-    setGamesWin(games.filter(g => g.winner?.id === user.id).length);
-    setRatio(((gamesWin / games.length) * 100).toFixed(1));
-    setNiveau([
-      1,
-      ...games
-        .map(g => (g.player1.id === user.id ? g.levelPlayer1 : g.levelPlayer2))
-        .reverse(),
-    ]);
-    setExp([
-      0,
-      ...games
-        .map(g => (g.player1.id === user.id ? g.expPlayer1 : g.expPlayer2))
-        .reverse(),
-    ]);
-  }, [user.id, games, gamesWin]);
-
-  const pieData = {
-    labels: ['Wins', 'Losses'],
-    datasets: [
-      {
-        data: [
-          gamesWin,
-          games.filter(g => g.status === 'finished').length - gamesWin,
-        ],
-        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
-      },
-    ],
-  };
+    const gamesWinCount = games.filter(g => g.win).length;
+    setScorePlayer([1500, ...games.map(game => game.eloscore)]);
+    setRatio(((gamesWinCount / games.length) * 100).toFixed(1));
+    setNiveau([1, ...games.map(g => g.level)]);
+    setExp([0, ...games.map(g => g.exp)]);
+    setPieData([gamesWinCount, games.length - gamesWinCount]);
+  }, [games, user.id]);
 
   return (
     <>
@@ -268,10 +250,26 @@ export default function StatsGame({ user, games }: PropsGames) {
           {/* VICTORY RATIO PIE CHART */}
           <div className="relative w-full md:w-[20vw] px-48 py-8 md:p-2">
             <p className="text-center text-xl font-semibold mb-4">
-              {ratio} % Victory
+              {ratio}% Victory
             </p>
             <Pie
-              data={pieData}
+              data={{
+                labels: ['Wins', 'Losses'],
+                datasets: [
+                  {
+                    data: pieData,
+                    backgroundColor: [
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1,
+                  },
+                ],
+              }}
               options={{
                 responsive: true,
                 interaction: {

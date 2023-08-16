@@ -245,10 +245,11 @@ export default function Login() {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    const width = 800;
+    const width = 450;
     const height = 600;
-    const left = window.innerWidth / 2 - width / 2;
-    const top = window.innerHeight / 2 - height / 2;
+    const left = Math.floor(window.innerWidth / 2 - width / 2) + window.screenX;
+    const top =
+      Math.floor(window.innerHeight / 2 - height / 2) + window.screenY;
 
     const newWindow = window.open(
       'http://localhost:3006/connection',
@@ -260,6 +261,16 @@ export default function Login() {
 
     window.addEventListener('message', async event => {
       if (event.source !== newWindow) return;
+
+      if (event.data.msg === 'resize') {
+        const newX =
+          Math.floor(window.innerWidth / 2 - event.data.width / 2) +
+          window.screenX;
+        newWindow.resizeTo(event.data.width, event.data.height);
+        newWindow.moveTo(newX, top);
+        return;
+      }
+
       if (event.data.msg === 'user connected') {
         setExpand(true);
         if (event.data.id != -1) await saveUserData(event.data.id);

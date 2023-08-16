@@ -10,7 +10,7 @@ import {
   OutlinedInput,
   TextField,
 } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   check2FACode,
   check2FACookie,
@@ -77,10 +77,6 @@ export default function FakeConnection() {
     avatar: 'http://localhost:3000/avatars/defaultAvatar.png',
   } as FormDataUser);
 
-  useEffect(() => {
-    console.log('usersCreated', usersCreated);
-  }, [usersCreated]);
-
   const handleChangeFormLogin = (e: any) => {
     const { name, value } = e.target;
     setFormDataLogin(prevState => ({
@@ -135,7 +131,6 @@ export default function FakeConnection() {
       description: faker.lorem.sentence(),
       avatar: avatarG,
     };
-    console.log('data', data);
     return data;
   };
 
@@ -198,17 +193,13 @@ export default function FakeConnection() {
       | React.KeyboardEvent<HTMLDivElement>,
   ) => {
     if (e) e.preventDefault();
-    console.log(formData);
-
     if (formData.password !== formData.pwdConfirm) {
       setErrorSignin(['password confirm not match']);
       return;
     }
-
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(
       formData,
     );
-    console.log('res register', res);
     if ('error' in res) {
       // dispatch(setErrorSnackbar(res));
       setErrorSignin(res.message as string[]);
@@ -237,15 +228,11 @@ export default function FakeConnection() {
     if (!errorLogin || errorLogin.length === 0) return '';
 
     const allError: string[] = [];
-    console.log('errorLogin', errorLogin);
     for (const err of errorLogin) {
-      console.log('err', err);
-      console.log('field', field.toLowerCase());
       if (err.toLowerCase().includes(field.toLowerCase())) {
         allError.push(err);
       }
     }
-    console.log('allErrorLogin', allError);
     return allError.join('\n');
   }
 
@@ -253,9 +240,7 @@ export default function FakeConnection() {
     if (!errorSignin || errorSignin.length === 0) return '';
 
     const allError: string[] = [];
-    console.log('errorSignin', errorSignin);
     for (const err of errorSignin) {
-      console.log('err', err);
       if (err.toLowerCase().includes(field.toLowerCase())) {
         allError.push(err);
       }
@@ -283,11 +268,9 @@ export default function FakeConnection() {
       | React.KeyboardEvent<HTMLDivElement>,
   ) => {
     e.preventDefault();
-    console.log('formDataLogin', formDataLogin);
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(
       formDataLogin,
     );
-    console.log('res login', res);
     if ('error' in res) {
       // if (typeof res.message === 'string' && res.message.includes('2FA')) {
       //   setIs2FAactiv(true);
@@ -332,6 +315,8 @@ export default function FakeConnection() {
     }
     setIsLoading(false);
   }
+
+  window.opener.postMessage({ msg: 'resize', width: 900, height: 600 }, '*');
 
   return (
     <div className="bg-inherit">
