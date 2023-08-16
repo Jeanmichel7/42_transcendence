@@ -18,6 +18,7 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
+import cuteBallsClimbingVines from '../assets/cuteBallsClimbingVines.png';
 
 function ConnectPage() {
   const [is2FAactiv, setIs2FAactiv] = useState(false);
@@ -122,8 +123,11 @@ function ConnectPage() {
         padding={3}
         height="100vh"
         bgcolor="background.default"
+        style={{ backgroundColor: 'var(--background-color)',
+      zIndex: 10 }}
       >
-        <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px' }}>
+        <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px', zIndex: 10, backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
+
           <Typography
             variant="h4"
             align="center"
@@ -151,6 +155,12 @@ function ConnectPage() {
             Account
           </Button>
         </Paper>
+        <img
+          src={cuteBallsClimbingVines}
+          alt="illustration"
+          className="absolute h-72 h-2/3 l-2/3"
+        />
+    
       </Box>
 
       {is2FAactiv && (

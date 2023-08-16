@@ -74,10 +74,10 @@ export const ButtonWrapper = styled.div<ButtonWrapperProps>`
   animation: ${props => (props.animation ? fadeIn : '')} 1s ease-out;
   left: 50%;
   z-index: 10;
-  @media (max-width: 768px) {
+  @media (max-width: 1280px) {
     width: 50%;
   }
-  @media (max-width: 420px) {
+  @media (max-width: 768px) {
     width: 80%;
   }
 `;
@@ -204,7 +204,7 @@ function Lobby({
         </StyledButton>
       </ButtonWrapper>
 
-      <div className="grid md:grid-cols-3 items-center h-1/2 justify-items-center relative w-full">
+      <div className="grid xl:grid-cols-3 items-center h-1/2 justify-items-center relative w-full">
         {lobbyData.map(card => {
           return (
             <div
@@ -256,7 +256,7 @@ function Lobby({
           <div
             key={index}
             className={`border border-dashed rounded-lg h-44 m-4 w-72 bg-transparent ${
-              index > 0 ? 'hidden md:block' : ''
+              index > 0 ? 'hidden xl:block' : ''
             }`}
           ></div>
         ))}

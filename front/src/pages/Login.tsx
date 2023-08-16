@@ -61,10 +61,6 @@ const slideInFromBottomLink = keyframes`{
   }
 }`;
 
-const particleContainer = styled.div`
-  background-color: #f9ecd0;
-  height: 100vh;
-`;
 
 const TitleWrapper = styled.div`
   height: 200px;
@@ -75,7 +71,7 @@ const TitleWrapper = styled.div`
   overflow: hidden;
   align-items: baseline;
   display: flex;
-  flex-direction: line; 
+  flex-direction: line;
   @media (max-width: 768px) {
     flex-direction: column;
     height: 400px;
@@ -88,21 +84,6 @@ const Title = styled.h1`
   color: #f4def8;
 `;
 
-const BigCircle = styled.span`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%)
-    scale(${props => (props.expand ? 2.5 : props.hovered ? 0.3 : 0.2)});
-  opacity: ${props => (props.expand ? 1 : props.hovered ? 0.5 : 0.02)};
-  width: 100vh;
-  height: 100vh;
-  border-radius: 50%;
-  background-color: white;
-  z-index: 2;
-  transition: transform 1s ease-out, opacity 1s ease-out;
-`;
-
 export const animationCircle = keyframes`
   0% {
     transform: translate(-50%, -50%);
@@ -112,7 +93,7 @@ export const animationCircle = keyframes`
   }
 `;
 
-export const TransitionCircle = styled.span`
+export const TransitionCircle = styled.span<{ expand: boolean }>`
   position: absolute;
   left: 50%;
   top: 50%;
@@ -176,7 +157,6 @@ const LoginWrapper = styled.div`
 `;
 
 export default function Login() {
-  const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
