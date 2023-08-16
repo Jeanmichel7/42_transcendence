@@ -123,11 +123,17 @@ function ConnectPage() {
         padding={3}
         height="100vh"
         bgcolor="background.default"
-        style={{ backgroundColor: 'var(--background-color)',
-      zIndex: 10 }}
+        style={{ backgroundColor: 'var(--background-color)', zIndex: 10 }}
       >
-        <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px', zIndex: 10, backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
-
+        <Paper
+          elevation={3}
+          style={{
+            padding: '20px',
+            borderRadius: '15px',
+            zIndex: 10,
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          }}
+        >
           <Typography
             variant="h4"
             align="center"
@@ -158,9 +164,8 @@ function ConnectPage() {
         <img
           src={cuteBallsClimbingVines}
           alt="illustration"
-          className="absolute h-72 h-2/3 l-2/3"
+          className="absolute h-2/3 l-2/3"
         />
-    
       </Box>
 
       {is2FAactiv && (
