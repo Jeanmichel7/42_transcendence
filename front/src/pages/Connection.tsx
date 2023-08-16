@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { check2FACookie, check2FACode } from '../api/auth';
 
@@ -77,7 +77,7 @@ function ConnectPage() {
 
     if ('error' in res) {
       setError(true);
-      dispatch(setErrorSnackbar(res));
+      // dispatch(setErrorSnackbar(res));
     } else {
       setError(false);
       window.opener.postMessage(
@@ -88,99 +88,33 @@ function ConnectPage() {
     setIsLoading(false);
   }
 
-  const handleOAuthConnection = () => {
-    window.location.href =
-      'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code';
-  };
-
-  const handleFakeConnection = () => {
-    window.location.href = 'http://localhost:3006/fakeconnection';
-  };
-
-  // const TitleWrapper = styled.div`
-  //   height: 200px;
-  //   width: 80%;
-  //   position: absolute;
-  //   left: 20%;
-  //   top: 20%;
-  //   overflow: hidden;
-  //   align-items: baseline;
-  //   display: flex;
-  //   flex-direction: line;
-  //   @media (max-width: 768px) {
-  //     flex-direction: column;
-  //     height: 400px;
-  //   }
-  // `;
+  const urlOAuth =
+    'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code';
 
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        padding={3}
-        height="100vh"
-        bgcolor="background.default"
-        style={{ backgroundColor: 'var(--background-color)', zIndex: 10 }}
-      >
-        <Paper
-          elevation={3}
-          style={{
-            padding: '20px',
-            borderRadius: '15px',
-            zIndex: 10,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          }}
-        >
-          <Typography
-            variant="h4"
-            align="center"
-            style={{ marginBottom: '20px' }}
-          >
-            Choose your account
-          </Typography>
+      {is2FAactiv ? (
+        <>
+          <div className="absolute top-0 right-0 text-blue-500 m-5">
+            <Link to="/fakeconnection">Login Account</Link>
+          </div>
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOAuthConnection}
-            fullWidth
-            style={{ marginBottom: '15px' }}
-          >
-            Intra
-          </Button>
+          <div className="absolute top-0 text-blue-500 left-0 m-5">
+            <Link to="/connection" onClick={() => setIs2FAactiv(false)}>
+              Retour
+            </Link>
+          </div>
 
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleFakeConnection}
-            fullWidth
-          >
-            Account
-          </Button>
-        </Paper>
-        <img
-          src={cuteBallsClimbingVines}
-          alt="illustration"
-          className="absolute h-2/3 l-2/3"
-        />
-      </Box>
-
-      {is2FAactiv && (
-        <section className="w-full flex flex-col">
-          <h1 className="font-mono font-bold text-xl text-center mb-5">
-            2FA Authentification
-          </h1>
-          <div className="mx-auto ">
+          <section className="w-full flex flex-col justify-center items-center">
+            <h1 className="font-mono font-bold text-xl text-center m-5">
+              2FA Authentification
+            </h1>
             <FormControl error={error}>
-              <InputLabel htmlFor="component-outlined">Code</InputLabel>
+              <InputLabel htmlFor="component-outlined">Code 2FA</InputLabel>
               <OutlinedInput
-                className=""
                 id="component-outlined"
                 placeholder="123456"
-                label="Name"
+                label="code 2FA"
                 onChange={e => setCode2FA(e.target.value)}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
@@ -192,33 +126,80 @@ function ConnectPage() {
                 {error && errorMsg}
               </FormHelperText>
             </FormControl>
-          </div>
-          <div className="m-auto mt-1">
-            <Box sx={{ m: 1, position: 'relative' }}>
+            <Button
+              variant="contained"
+              onClick={handleSendCode}
+              disabled={isLoading}
+              endIcon={<SendIcon />}
+            >
+              Send
+            </Button>
+            {isLoading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: 'blue',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
+          </section>
+        </>
+      ) : (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          height="100vh"
+          bgcolor="background.default"
+          style={{ backgroundColor: 'var(--background-color)', zIndex: 10 }}
+        >
+          <Paper
+            elevation={3}
+            style={{
+              padding: '50px',
+              borderRadius: '5px',
+              zIndex: 10,
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            }}
+          >
+            <Typography
+              variant="h4"
+              align="center"
+              style={{ marginBottom: '40px' }}
+            >
+              Connection via
+            </Typography>
+
+            <Link to={urlOAuth}>
               <Button
                 variant="contained"
-                onClick={handleSendCode}
-                disabled={isLoading}
-                endIcon={<SendIcon />}
+                color="primary"
+                // onClick={handleOAuthConnection}
+                fullWidth
+                style={{ marginBottom: '15px' }}
               >
-                Send
+                Intra
               </Button>
-              {isLoading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    color: 'blue',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
-                  }}
-                />
-              )}
-            </Box>
-          </div>
-        </section>
+            </Link>
+
+            <Link to="/fakeconnection">
+              <Button variant="contained" color="secondary" fullWidth>
+                Account
+              </Button>
+            </Link>
+          </Paper>
+          <img
+            src={cuteBallsClimbingVines}
+            alt="illustration"
+            className="absolute h-2/3 l-2/3"
+          />
+        </Box>
       )}
     </>
   );

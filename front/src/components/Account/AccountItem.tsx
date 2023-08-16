@@ -30,7 +30,7 @@ import DoneIcon from '@mui/icons-material/Done';
 
 interface ItemProps {
   keyName: string;
-  value: string | number | boolean;
+  value: string | number | boolean | undefined;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -46,9 +46,9 @@ export default function AccountItem({ keyName, value }: ItemProps) {
   const dispatch = useDispatch();
   const [edit, setEdit] = useState<boolean>(false);
   const [editPwd, setEditPwd] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string | number | boolean>(
-    value,
-  );
+  const [inputValue, setInputValue] = useState<
+    string | number | boolean | undefined
+  >(value);
   const [inputOldPwd, setInputOldPwd] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
@@ -77,7 +77,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setUserCode('');
       setMsgSnackbar('2FA actived!');
       // setValidCode(false);
-      localStorage.removeItem('2FA');
+      localStorage.removeItem('2FA'); // pas safe ? oui surement...
     }
   }
 
@@ -94,7 +94,7 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     setLoading(false);
 
     if ('error' in updatedUser) {
-      setError(updatedUser.message);
+      setError(updatedUser.message as string);
       dispatch(setErrorSnackbar(updatedUser));
       setInputValue(value);
     } else {
@@ -136,6 +136,8 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       } else {
         setInputValue(false);
         setQRCode('');
+        setUserCode('');
+        setError2FA(false);
       }
     } else {
       // enable 2FA
@@ -149,11 +151,6 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       }
     }
   }
-
-  // useEffect(() => {
-  //   setInputValue(value);
-  //   console.log('here value', value);
-  // }, [value]);
 
   useEffect(() => {
     if (keyName === 'Active 2FA') {
@@ -310,40 +307,47 @@ export default function AccountItem({ keyName, value }: ItemProps) {
         TransitionComponent={Transition}
         keepMounted
         open={QRCode ? true : false}
-        // onClose={() => { handleClose2FA }}
+        onClose={handleChange2FA}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {'Scan GoogleAuthentificator'}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <img src={QRCode} alt="QRCode" />
-          </DialogContentText>
-          <TextField
-            label="Enter the code"
-            value={userCode}
-            onChange={e => setUserCode(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleClose2FA();
-            }}
-          />
-          <FormHelperText
-            id="component-helper-text"
-            color="error"
-            sx={{ color: 'red' }}
-            error={error2FA ? true : false}
-          >
-            {error2FA ? 'Code invalide' : null}
-          </FormHelperText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleChange2FA}>Cancel</Button>
-          <Button onClick={handleClose2FA} autoFocus>
-            Activate
-          </Button>
-        </DialogActions>
+        <div className="flex flex-col justify-center items-center">
+          <DialogTitle id="alert-dialog-title">
+            {'Scan QRCode with your 2FA app'}
+          </DialogTitle>
+          <DialogContent sx={{ p: 0, m: 0 }}>
+            <DialogContentText id="alert-dialog-description">
+              <div className="border-2 border-blue-100 rounded-md mb-2">
+                <img src={QRCode} alt="QRCode" />
+              </div>
+            </DialogContentText>
+            <TextField
+              fullWidth
+              label="Enter the code"
+              value={userCode}
+              onChange={e => setUserCode(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleClose2FA();
+              }}
+            />
+            <FormHelperText
+              id="component-helper-text"
+              color="error"
+              sx={{ color: 'red' }}
+              error={error2FA ? true : false}
+            >
+              {error2FA ? 'Code invalide' : null}
+            </FormHelperText>
+          </DialogContent>
+          <DialogActions sx={{ pb: 3, m: 0 }}>
+            <Button onClick={handleClose2FA} autoFocus variant="outlined">
+              Activate
+            </Button>
+            <Button variant="outlined" onClick={handleChange2FA} color="error">
+              Cancel
+            </Button>
+          </DialogActions>
+        </div>
       </Dialog>
     </div>
   );

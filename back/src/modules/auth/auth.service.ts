@@ -40,7 +40,7 @@ export class AuthService {
     const user: UserEntity = await this.userRepository.findOneBy({
       login: data.login,
     });
-    if (!user) throw new NotFoundException(`User ${data.login} not found`);
+    if (!user) throw new NotFoundException(`User login ${data.login} not found`);
 
     const isMatch = await bcrypt.compare(data.password, user.password);
     if (!isMatch) throw new BadRequestException(`Wrong password`);

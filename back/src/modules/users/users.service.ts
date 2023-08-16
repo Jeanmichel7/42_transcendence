@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -230,8 +231,7 @@ export class UsersService {
       login: newUser.login,
     });
     if (result)
-      throw new NotFoundException(`User ${newUser.login} already exist`);
-
+      throw new ConflictException(`Login ${newUser.login} already exists`);
     try {
       const salt: string = await bcrypt.genSalt();
       const hash: string = await bcrypt.hash(newUser.password, salt);

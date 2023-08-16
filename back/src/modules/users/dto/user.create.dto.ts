@@ -10,19 +10,19 @@ import {
 
 export class UserCreateDTO {
   @IsNotEmpty({ message: 'The first name is required' })
-  @Length(3, 20, {
-    message: 'The first name must be between 3 and 20 characters',
+  @Length(2, 22, {
+    message: 'The first name must be between 2 and 22 characters',
   })
   readonly firstName: string;
 
   @IsNotEmpty({ message: 'The last name is required' })
-  @Length(3, 20, {
-    message: 'The last name must be between 3 and 20 characters',
+  @Length(2, 22, {
+    message: 'The last name must be between 2 and 22 characters',
   })
   readonly lastName: string;
 
   @IsNotEmpty({ message: 'The login is required' })
-  @Length(3, 20, { message: 'The login must be between 3 and 20 characters' })
+  @Length(2, 22, { message: 'The login must be between 2 and 22 characters' })
   // @Unique("", [],{message: "The login is already taken"})
   readonly login: string;
 

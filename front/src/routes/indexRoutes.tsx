@@ -18,14 +18,7 @@ import ConversationWrapper from '../components/Chat/ConversationWrapper';
 import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 import LeaderBoard from '../pages/LeaderBoard';
 import Achievement from '../pages/Achievement';
-
-const HomeChat = () => {
-  return (
-    <div className="w-full h-full flex justify-center items-center text-2xl text-gray-500">
-      Select a user or a room to start a conversation
-    </div>
-  );
-};
+import HomeChat from '../components/Chat/HomeChat';
 
 const AppRoutes: React.FC = () => (
   <>

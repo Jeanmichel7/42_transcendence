@@ -82,6 +82,8 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
           is2FAEnabled: false,
           score: 1500,
           level: 0,
+          experience: 0,
+          rank: 'cooper_3',
         }),
       );
       dispatch(setLogged(false));
@@ -185,9 +187,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
             <AccountItem keyName="lastName" value={user.lastName} />
             <AccountItem keyName="password" value="********" />
 
-            {user.description && (
-              <AccountItem keyName="description" value={user.description} />
-            )}
+            <AccountItem keyName="description" value={user.description} />
 
             {user.is2FAEnabled != null && user.is2FAEnabled != undefined && (
               <AccountItem keyName="Active 2FA" value={user.is2FAEnabled} />
@@ -205,6 +205,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
           </div>
         </Box>
       )}
+
       <Dialog open={openDialog} keepMounted onClose={handleCloseDialog}>
         <DialogTitle>
           {'Are you sure you want to delete your account?'}

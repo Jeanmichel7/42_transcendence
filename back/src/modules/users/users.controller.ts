@@ -94,7 +94,6 @@ export class UsersController {
     return result;
   }
 
-  /* probably useless but I keep it for now */
   @Post('registerFakeUser')
   @Public()
   @UsePipes(ValidationPipe)
