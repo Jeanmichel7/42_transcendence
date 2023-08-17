@@ -13,7 +13,7 @@ const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
   { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
   { id: 'slow', duration: 0, timeStart: 0, activate: false },
-  { id: 'laser', duration: 10000, timeStart: 0, activate: false },
+  { id: 'laser', duration: 10000, timeStart: 0, activate: false }
 ];
 
 // Variable constante for optimisation, don't change
@@ -77,6 +77,11 @@ export class Game {
   player2Stats: PlayerStats;
   consecutiveExchangesWithoutBounce: number;
   emitEvent: (eventName: string, data?: any) => void;
+  isPaused: any;
+  player2Connected: boolean;
+  player1Connected: boolean;
+  player1TimeoutId: any;
+  player2TimeoutId: any;
   //Stats
 
   constructor(
@@ -97,7 +102,7 @@ export class Game {
       y: 500,
       vx: 0,
       vy: 0,
-      speed: INITIAL_BALL_SPEED,
+      speed: INITIAL_BALL_SPEED
     };
     this.initBall(true);
     this.socketPlayer1Id = socketPlayer1Id;
@@ -122,13 +127,13 @@ export class Game {
     this.player1Stats = {
       numberOfBonusesUsed: 0,
       numberOfLaserKills: 0,
-      maxSpeedScoring: 0,
+      maxSpeedScoring: 0
     };
 
     this.player2Stats = {
       numberOfBonusesUsed: 0,
       numberOfLaserKills: 0,
-      maxSpeedScoring: 0,
+      maxSpeedScoring: 0
     };
     this.consecutiveExchangesWithoutBounce = 0;
     this.racketLeftDamage = 0;
@@ -146,6 +151,9 @@ export class Game {
     // this.initIdGame();
     this.id = gameId;
     this.isBeingProcessed = false;
+    this.isPaused = false;
+    this.player1Connected = true;
+    this.player2Connected = true;
   }
 
   // async initIdGame() {
@@ -179,7 +187,7 @@ export class Game {
         x: x,
         y: Math.random() * GROUND_MAX_SIZE,
         //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
-        boxSize: 50,
+        boxSize: 50
       };
     }
   }
@@ -251,7 +259,7 @@ export class Game {
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     const bonus = {
-      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)]
     };
 
     // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
@@ -350,6 +358,10 @@ export class Game {
 
   updateBallPosition() {
     const currentTime = performance.now();
+    if (this.isPaused) {
+      this.lastTime = currentTime;
+      return;
+    }
     const deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
     if (!this.gameStart) {
@@ -521,7 +533,9 @@ export class Game {
       player2Laser: this.player2Laser,
       bonusMode: this.bonusMode,
       player1Avatar: this.player1Info.avatar,
-      player2Avatar: this.player2Info.avatar,
+      player1Connected: this.player1Connected,
+      player2Connected: this.player2Connected,
+      isPaused: this.isPaused
     };
   }
 
@@ -535,7 +549,7 @@ export class Game {
       player1Rank: this.player1Info.rank,
       player2Rank: this.player2Info.rank,
       player1Score: this.player1Score,
-      player2Score: this.player2Score,
+      player2Score: this.player2Score
     };
   }
 

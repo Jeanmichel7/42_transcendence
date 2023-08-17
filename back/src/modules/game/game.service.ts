@@ -132,7 +132,6 @@ export class GameService {
       return true;
     }
   }
-
   getOtherPlayerSockerId(gameId: bigint, player1: boolean): string {
     if (this.privatesLobby.has(gameId)) {
       if (player1 === true) {
@@ -163,13 +162,24 @@ export class GameService {
     }
     return game.getState();
   }
+
   checkAlreadyInGame(username: string): boolean {
     try {
       this.games.forEach(game => {
-        if (
-          game.player1Username === username ||
-          game.player2Username === username
-        ) {
+        if (game.player1Username === username) {
+          if (!game.player1Connected) {
+            game.player1Connected = true;
+            clearTimeout(game.player1TimeoutId);
+            if (game.player2Connected) game.isPaused = false;
+          }
+
+          throw new Error('Already in game');
+        } else if (game.player2Username === username) {
+          if (!game.player2Connected) {
+            game.player2Connected = true;
+            clearTimeout(game.player2TimeoutId);
+            if (game.player1Connected) game.isPaused = false;
+          }
           throw new Error('Already in game');
         }
       });
@@ -185,6 +195,45 @@ export class GameService {
         game.socketPlayer1Id = newSocketId;
       } else if (game.player2Username === username) {
         game.socketPlayer2Id = newSocketId;
+      }
+    });
+  }
+
+  breakGame(username: string) {
+    this.games.forEach(game => {
+      if (
+        game.player1Username === username ||
+        game.player2Username === username
+      ) {
+        if (game.isPaused) {
+          if (game.player1Username === username) {
+            game.player1Connected = false;
+          } else if (game.player2Username === username) {
+            game.player2Connected = false;
+          }
+        } else {
+          game.isPaused = true;
+
+          if (game.player1Username === username) {
+            game.player1Connected = false;
+            game.player1TimeoutId = setTimeout(() => {
+              if (!game.player1Connected) {
+                game.isOver = true;
+                game.winner = game.player2Username;
+                game.isPaused = false;
+              }
+            }, 30000);
+          } else {
+            game.player2Connected = false;
+            game.player2TimeoutId = setTimeout(() => {
+              if (!game.player2Connected) {
+                game.isOver = true;
+                game.winner = game.player1Username;
+                game.isPaused = false;
+              }
+            }, 30000);
+          }
+        }
       }
     });
   }

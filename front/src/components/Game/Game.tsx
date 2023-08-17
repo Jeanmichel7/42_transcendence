@@ -22,6 +22,7 @@ import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
 import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
+import { DisconnectCountDown } from './DisconnectCountDown';
 
 // type GameWrapperProps = {
 //   isChatOpen: boolean;
@@ -62,10 +63,9 @@ const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
-const RACKET_LEFT_HITBOX_BOUNDARY = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
+const RACKET_LEFT_HITBOX_BOUNDARY =
+  RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
 const RACKET_RIGHT_HITBOX_BOUNDARY = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
-
-
 
 const animationBonus = keyframes`
   0% { background-position: 0px; }
@@ -391,6 +391,10 @@ function Game({
       const currentTime = performance.now();
       const deltaTime = currentTime - lastTime;
       lastTime = currentTime;
+      if (gameData.current?.isPaused) {
+        animationFrameId = requestAnimationFrame(upLoop);
+        return;
+      }
       if (keyStateRef.current.ArrowDown) {
         posRacket.current.left =
           posRacket.current.left < 1000 - racketHeightRef.current.left
@@ -587,6 +591,7 @@ function Game({
         >
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
+        {gameData.current?.isPaused && <DisconnectCountDown />}
       </Playground>
     </GameWrapper>
   );
