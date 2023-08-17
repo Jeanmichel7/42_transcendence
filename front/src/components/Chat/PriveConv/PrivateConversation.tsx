@@ -309,7 +309,6 @@ const PrivateConversation: React.FC = () => {
       dispatch(setErrorSnackbar(res));
     else {
       setMessages(prev => prev.filter(message => message.id !== msgId));
-      dispatch(setPersonalizedErrorSnackbar('Message deleted'));
     }
   };
 
