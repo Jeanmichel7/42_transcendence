@@ -68,7 +68,6 @@ const NotificationItem = ({
       dispatch(
         reduxAddConversationList({ item: userToAccept, userId: userData.id }),
       );
-      // dispatch(setMsgSnackbar('Friend request accepted'));
     }
   };
 
@@ -81,13 +80,9 @@ const NotificationItem = ({
 
     setIsLoading(false);
 
-    // if (notifications.length == 0) setAnchorElNotification(null);
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
       dispatch(setErrorSnackbar(resDeclineRequest));
-    else {
-      dispatch(reduxRemoveWaitingFriends(userToDecline));
-      // dispatch(setMsgSnackbar('Friend request declined'));
-    }
+    else dispatch(reduxRemoveWaitingFriends(userToDecline));
   };
 
   const handleDeclineJoinRoom = async (notif: NotificationInterface) => {
@@ -126,7 +121,6 @@ const NotificationItem = ({
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest));
     else {
-      // dispatch(setMsgSnackbar('Game invitation accepted'));
       navigate(notif.invitationLink ? notif.invitationLink : '/chat');
     }
     setIsLoading(false);
@@ -170,16 +164,7 @@ const NotificationItem = ({
 
   const handleDeleteNotification = (notif: NotificationInterface) => {
     if (notifications.length == 1) setNotifOpen(false);
-
     dispatch(reduxRemoveNotification(notif));
-    // localStorage.setItem(
-    //   'notifications' + userData.id,
-    //   JSON.stringify(
-    //     JSON.parse(
-    //       localStorage.getItem('notifications' + userData.id) as string,
-    //     ).filter((n: NotificationInterface) => n.id !== notif.id),
-    //   ),
-    // );
   };
 
   const handleAcceptActionNotification = async (

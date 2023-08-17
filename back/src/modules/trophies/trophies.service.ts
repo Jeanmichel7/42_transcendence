@@ -18,11 +18,9 @@ export class TrophiesService {
     private readonly trophyRepository: Repository<TrophiesEntity>,
     @InjectRepository(UserTrophiesEntity)
     private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
-    // @InjectRepository(GameEntity)
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    // private readonly eventEmitter: EventEmitter2,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     this.initializeTrophies();
     this.initializeTrophiesProgress();
@@ -32,7 +30,7 @@ export class TrophiesService {
     name: string,
     description: string,
     path: string,
-    total: number
+    total: number,
   ): Promise<TrophiesEntity> {
     const newTrophy = new TrophiesEntity();
     newTrophy.name = name;
@@ -51,7 +49,7 @@ export class TrophiesService {
           trophy.name,
           trophy.description,
           trophy.imagePath,
-          trophy.total
+          trophy.total,
         );
       }
     }
@@ -93,7 +91,7 @@ export class TrophiesService {
     game: GameEntity,
     playerStats: PlayerStats,
     consecutiveExchangesWithoutBounce: number,
-    bonusMode: boolean
+    bonusMode: boolean,
   ): Promise<void> {
     const trophyNamesToAssign: string[] = [];
     if (playerStats.numberOfBonusesUsed >= 3) {
@@ -167,13 +165,13 @@ export class TrophiesService {
       trophyNamesToAssign.map(async name => {
         const trophy = await this.getTrophyByName(name);
         return trophy;
-      })
+      }),
     );
 
     trophiesToAssign = trophiesToAssign.filter(trophy => trophy !== null);
     const trophiesToAdd = trophiesToAssign?.filter(trophy => {
       return !player.trophies?.some(
-        playerTrophy => playerTrophy.id === trophy.id
+        playerTrophy => playerTrophy.id === trophy.id,
       );
     });
 
@@ -314,7 +312,7 @@ export class TrophiesService {
 
         if (!newNotif)
           throw new InternalServerErrorException(
-            `Can't create notification for user ${player.login}`
+            `Can't create notification for user ${player.login}`,
           );
       }
     }

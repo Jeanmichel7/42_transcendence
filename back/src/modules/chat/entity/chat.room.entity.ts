@@ -58,44 +58,44 @@ export class ChatRoomEntity extends BaseEntity {
   updatedAt: Date;
 
   // relation chat message
-  @OneToMany(() => ChatMessageEntity, (message) => message.room, {
+  @OneToMany(() => ChatMessageEntity, message => message.room, {
     onDelete: 'CASCADE',
     //  cascade: true,
   })
   messages: ChatMessageEntity[];
 
   // relation user
-  @ManyToOne(() => UserEntity, (user) => user.roomOwner, {
+  @ManyToOne(() => UserEntity, user => user.roomOwner, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   ownerUser: UserEntity;
 
-  @ManyToMany(() => UserEntity, (user) => user.roomUsers, {
+  @ManyToMany(() => UserEntity, user => user.roomUsers, {
     onDelete: 'CASCADE',
   })
   @JoinTable()
   users: UserEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.roomAccepted, {
+  @ManyToMany(() => UserEntity, user => user.roomAccepted, {
     onDelete: 'CASCADE',
   })
   @JoinTable()
   acceptedUsers: UserEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.roomAdmins, {
+  @ManyToMany(() => UserEntity, user => user.roomAdmins, {
     onDelete: 'CASCADE',
   })
   @JoinTable()
   admins: UserEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.roomBannedUsers, {
+  @ManyToMany(() => UserEntity, user => user.roomBannedUsers, {
     onDelete: 'CASCADE',
   })
   @JoinTable()
   bannedUsers: UserEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.roomMutedUsers, {
+  @ManyToMany(() => UserEntity, user => user.roomMutedUsers, {
     onDelete: 'CASCADE',
   })
   @JoinTable()

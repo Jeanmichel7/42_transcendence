@@ -52,12 +52,9 @@ export class ChatService {
     userId: bigint,
     roomToCreate: ChatCreateRoomDTO,
   ): Promise<ChatRoomInterface> {
-    // console.log('data room creation : ', roomToCreate);
-
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'login', 'avatar'],
-      // relations: ['roomUsers'],
     });
 
     let hashPassword: string = null;
@@ -70,7 +67,7 @@ export class ChatService {
     let allUsersAccepted: UserEntity[] = [];
     if (roomToCreate.type === 'private' && roomToCreate.acceptedUsers) {
       allUsersAccepted = await Promise.all(
-        roomToCreate.acceptedUsers.map(async (userId) => {
+        roomToCreate.acceptedUsers.map(async userId => {
           const userAccepted: UserEntity = await this.userRepository.findOne({
             where: { id: userId },
             select: ['id'],
@@ -165,12 +162,6 @@ export class ChatService {
     roomId: bigint,
     roomToUpdate: ChatUpdateRoomDTO,
   ): Promise<ChatRoomInterface> {
-    // const user: UserEntity = await this.userRepository.findOne({
-    //   where: { id: userId },
-    //   select: ['id'],
-    //   relations: ['roomUsers'],
-    // });
-
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
       select: ['id', 'name', 'type', 'password', 'isProtected'],
@@ -202,7 +193,7 @@ export class ChatService {
     if (roomToUpdate.name) room.name = roomToUpdate.name;
     if (roomToUpdate.acceptedUsers) {
       const allUsersAccepted: UserEntity[] = await Promise.all(
-        roomToUpdate.acceptedUsers.map(async (userLogin) => {
+        roomToUpdate.acceptedUsers.map(async userLogin => {
           const userAccepted: UserEntity = await this.userRepository.findOne({
             where: { login: userLogin },
             select: ['id'],
@@ -277,7 +268,7 @@ export class ChatService {
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     //check if user is admin of private room
-    if (room.type === 'private' && !room.admins.some((u) => u.id === user.id))
+    if (room.type === 'private' && !room.admins.some(u => u.id === user.id))
       throw new ForbiddenException(`User ${userId} is not admin of room`);
 
     const userToInvite: UserEntity = await this.userRepository.findOne({
@@ -288,7 +279,7 @@ export class ChatService {
     if (!userToInvite)
       throw new NotFoundException(`User ${userIdToInvite} not found`);
 
-    if (room.acceptedUsers.some((u) => u.id === userIdToInvite))
+    if (room.acceptedUsers.some(u => u.id === userIdToInvite))
       throw new ConflictException(
         `User ${userToInvite.login} is already accepted in room`,
       );
@@ -382,9 +373,6 @@ export class ChatService {
     return resultRoom;
   }
 
-  // del room
-  //retour room delete or all rooms ?
-  // cascade ?
   async deleteRoom(roomId: bigint): Promise<ChatRoomInterface> {
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
@@ -403,7 +391,6 @@ export class ChatService {
     roomId: bigint,
     data: ChatJoinRoomDTO,
   ): Promise<ChatRoomInterface> {
-    // console.log('data join room : ', data);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'], // a verifier
@@ -424,18 +411,18 @@ export class ChatService {
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     // check si user est deja dans la room
-    if (room.users.some((u) => u.id === user.id))
+    if (room.users.some(u => u.id === user.id))
       throw new ConflictException(
         `User ${userId} is already in room ${roomId}`,
       );
 
     //verifie si user est banned
-    if (room.bannedUsers.some((u) => u.id === user.id))
+    if (room.bannedUsers.some(u => u.id === user.id))
       throw new ForbiddenException(`User ${userId} is banned from room`);
 
     //verifie sur room est private et si accepte user
     if (room.type === 'private' && room.acceptedUsers.length > 0) {
-      if (!room.acceptedUsers.some((u) => u.id === user.id))
+      if (!room.acceptedUsers.some(u => u.id === user.id))
         throw new ForbiddenException(`User ${userId} is not accepted in room`);
     }
 
@@ -451,17 +438,11 @@ export class ChatService {
     }
 
     room.users = [...room.users, user];
-    room.acceptedUsers = room.acceptedUsers.filter((u) => u.id !== user.id);
+    room.acceptedUsers = room.acceptedUsers.filter(u => u.id !== user.id);
     await room.save();
 
     user.roomUsers = [...user.roomUsers, room];
     await user.save();
-
-    // const resultRoom: ChatRoomInterface = await this.roomRepository.createQueryBuilder('chat_rooms')
-    //   .leftJoinAndSelect('chat_rooms.ownerUser', 'ownerUser')
-    //   .select(['chat_rooms', 'ownerUser.id', 'ownerUser.firstName', 'ownerUser.lastName', 'ownerUser.login'])
-    //   .where('chat_rooms.id = :roomId', { roomId: room.id })
-    //   .getOne();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
       .createQueryBuilder('chat_rooms')
@@ -579,12 +560,12 @@ export class ChatService {
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
     // check si user est dans acceptedUsers
-    if (!room.acceptedUsers.some((u) => u.id === user.id))
+    if (!room.acceptedUsers.some(u => u.id === user.id))
       throw new ConflictException(
         `User ${userId} is not in acceptedUsers of room ${roomId}`,
       );
 
-    room.acceptedUsers = room.acceptedUsers.filter((u) => u.id !== user.id);
+    room.acceptedUsers = room.acceptedUsers.filter(u => u.id !== user.id);
     await room.save();
   }
 
@@ -607,13 +588,13 @@ export class ChatService {
       throw new ConflictException(`Owner ${userId} can't leave room ${roomId}`);
 
     // check si user est dans la room
-    if (!room.users.some((u) => u.id === user.id))
+    if (!room.users.some(u => u.id === user.id))
       throw new ConflictException(`User ${userId} is not in room ${roomId}`);
 
-    room.users = room.users.filter((u) => u.id !== user.id);
-    room.admins = room.admins.filter((u) => u.id !== user.id);
+    room.users = room.users.filter(u => u.id !== user.id);
+    room.admins = room.admins.filter(u => u.id !== user.id);
     await room.save();
-    user.roomUsers = user.roomUsers.filter((r) => r.id !== room.id);
+    user.roomUsers = user.roomUsers.filter(r => r.id !== room.id);
     await user.save();
 
     const resultRoom: ChatRoomEntity = await this.roomRepository
@@ -659,16 +640,10 @@ export class ChatService {
   }
 
   async addAdminToRoom(
-    userId: bigint, //owner room guard donc pas besoin ?
+    userId: bigint,
     roomId: bigint,
     userIdToBeAdmin: bigint,
   ): Promise<ChatRoomInterface> {
-    // const user: UserEntity = await this.userRepository.findOne({
-    //   where: { id: userId },
-    //   select: ["id"],
-    //   relations: ["roomUsers"]
-    // });
-
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
       select: ['id', 'type'],
@@ -676,7 +651,7 @@ export class ChatService {
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
-    if (room.admins.find((admin) => admin.id === userIdToBeAdmin))
+    if (room.admins.find(admin => admin.id === userIdToBeAdmin))
       throw new ConflictException(
         `User ${userIdToBeAdmin} is already admin of room`,
       );
@@ -727,12 +702,6 @@ export class ChatService {
     roomId: bigint,
     userIdAdmin: bigint,
   ): Promise<ChatRoomInterface> {
-    // const user: UserEntity = await this.userRepository.findOne({
-    //   where: { id: userId },
-    //   select: ["id"],
-    //   relations: ["roomUsers"]
-    // });
-
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
       select: ['id', 'type'],
@@ -740,7 +709,7 @@ export class ChatService {
     });
     if (!room) throw new NotFoundException(`Room ${roomId} not found`);
 
-    if (!room.admins.find((admin) => admin.id === userIdAdmin))
+    if (!room.admins.find(admin => admin.id === userIdAdmin))
       throw new ConflictException(
         `User ${userIdAdmin} is not admin of room ${roomId}`,
       );
@@ -753,11 +722,9 @@ export class ChatService {
     if (!adminToDel)
       throw new NotFoundException(`User ${userIdAdmin} not found`);
 
-    adminToDel.roomAdmins = adminToDel.roomAdmins.filter(
-      (r) => r.id !== room.id,
-    );
+    adminToDel.roomAdmins = adminToDel.roomAdmins.filter(r => r.id !== room.id);
     await adminToDel.save();
-    room.admins = room.admins.filter((u) => u.id !== adminToDel.id);
+    room.admins = room.admins.filter(u => u.id !== adminToDel.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -801,7 +768,7 @@ export class ChatService {
       relations: ['users', 'mutedUsers'],
     });
 
-    if (room.mutedUsers.find((muted) => muted.id === userIdToBeMuted))
+    if (room.mutedUsers.find(muted => muted.id === userIdToBeMuted))
       throw new ConflictException(
         `User ${userIdToBeMuted} is already muted in room ${roomId}`,
       );
@@ -875,7 +842,7 @@ export class ChatService {
       relations: ['users', 'mutedUsers'],
     });
 
-    if (!room.mutedUsers.find((muted) => muted.id === userIdToBeDemuted))
+    if (!room.mutedUsers.find(muted => muted.id === userIdToBeDemuted))
       throw new ConflictException(
         `User ${userIdToBeDemuted} is not muted in room ${roomId}`,
       );
@@ -890,13 +857,11 @@ export class ChatService {
       throw new NotFoundException(`User ${userIdToBeDemuted} not found`);
 
     userToBeDemuted.roomMutedUsers = userToBeDemuted.roomMutedUsers.filter(
-      (r) => r.id !== room.id,
+      r => r.id !== room.id,
     );
     await userToBeDemuted.save();
 
-    room.mutedUsers = room.mutedUsers.filter(
-      (u) => u.id !== userToBeDemuted.id,
-    );
+    room.mutedUsers = room.mutedUsers.filter(u => u.id !== userToBeDemuted.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -953,7 +918,7 @@ export class ChatService {
       relations: ['users', 'mutedUsers'],
     });
 
-    if (!room.users.find((user) => user.id === userIdToBeKicked))
+    if (!room.users.find(user => user.id === userIdToBeKicked))
       throw new ConflictException(
         `User ${userIdToBeKicked} is not in room ${roomId}`,
       );
@@ -968,11 +933,11 @@ export class ChatService {
       throw new NotFoundException(`User ${userIdToBeKicked} not found`);
 
     userToBeKicked.roomUsers = userToBeKicked.roomUsers.filter(
-      (r) => r.id !== room.id,
+      r => r.id !== room.id,
     );
     await userToBeKicked.save();
 
-    room.users = room.users.filter((u) => u.id !== userToBeKicked.id);
+    room.users = room.users.filter(u => u.id !== userToBeKicked.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -1028,7 +993,7 @@ export class ChatService {
       relations: ['users', 'bannedUsers'],
     });
 
-    if (room.bannedUsers.find((banned) => banned.id === userIdToBeBanned))
+    if (room.bannedUsers.find(banned => banned.id === userIdToBeBanned))
       throw new ConflictException(
         `User ${userIdToBeBanned} is already banned in room ${roomId}`,
       );
@@ -1046,7 +1011,7 @@ export class ChatService {
     await userToBeBanned.save();
 
     room.bannedUsers = [...room.bannedUsers, userToBeBanned];
-    room.users = room.users.filter((u) => u.id !== userToBeBanned.id);
+    room.users = room.users.filter(u => u.id !== userToBeBanned.id);
     await room.save();
 
     const resultRoom: ChatRoomInterface = await this.roomRepository
@@ -1103,7 +1068,7 @@ export class ChatService {
       relations: ['users', 'bannedUsers'],
     });
 
-    if (!room.bannedUsers.find((banned) => banned.id === userIdToBeUnbanned))
+    if (!room.bannedUsers.find(banned => banned.id === userIdToBeUnbanned))
       throw new ConflictException(
         `User ${userIdToBeUnbanned} is not banned in room ${roomId}`,
       );
@@ -1118,12 +1083,12 @@ export class ChatService {
       throw new NotFoundException(`User ${userIdToBeUnbanned} not found`);
 
     userToBeUnbanned.roomBannedUsers = userToBeUnbanned.roomBannedUsers.filter(
-      (r) => r.id !== room.id,
+      r => r.id !== room.id,
     );
     await userToBeUnbanned.save();
 
     room.bannedUsers = room.bannedUsers.filter(
-      (u) => u.id !== userToBeUnbanned.id,
+      u => u.id !== userToBeUnbanned.id,
     );
     await room.save();
 
@@ -1211,7 +1176,7 @@ export class ChatService {
       .getMany();
 
     //check user is in room
-    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+    if (messages[0] && !messages[0].room.users.some(u => u.id === userId))
       throw new ForbiddenException(
         `User ${userId} is not in room ${roomId} and can't see messages`,
       );
@@ -1269,7 +1234,7 @@ export class ChatService {
       .getMany();
 
     //check user is in room
-    if (messages[0] && !messages[0].room.users.some((u) => u.id === userId))
+    if (messages[0] && !messages[0].room.users.some(u => u.id === userId))
       throw new ForbiddenException(
         `User ${userId} is not in room ${roomId} and can't see messages`,
       );
@@ -1285,7 +1250,6 @@ export class ChatService {
     const userSend: UserEntity = await UserEntity.findOne({
       where: { id: userId },
       select: ['id', 'login', 'firstName', 'lastName', 'avatar', 'status'],
-      // relations: ['chatMessages'],
     });
 
     const room: ChatRoomEntity = await ChatRoomEntity.findOne({
@@ -1297,28 +1261,21 @@ export class ChatService {
     //check if userSend is in room or in acceptedUser
     if (
       !userSend.id &&
-      !room.users.some((u) => u.id === userSend.id) &&
-      !room.acceptedUsers.some((u) => u.id === userSend.id)
+      !room.users.some(u => u.id === userSend.id) &&
+      !room.acceptedUsers.some(u => u.id === userSend.id)
     ) {
       throw new ForbiddenException(
         `User ${userId} is not in room ${roomId} and can't send message`,
       );
     }
 
-    const message: ChatMessageEntity = await ChatMessageEntity.save(
-      // ChatMessageEntity,
-      {
-        text: newMessage.text,
-        ownerUser: userSend,
-        room: room,
-      },
-    );
+    const message: ChatMessageEntity = await ChatMessageEntity.save({
+      text: newMessage.text,
+      ownerUser: userSend,
+      room: room,
+    });
     if (!message) throw new Error('Message not created');
 
-    // userSend.chatMessages = [...userSend.chatMessages, message];
-    // await userSend.save();
-    // room.messages = [...room.messages, message];
-    // await room.save();
     const messageToSave: ChatMsgInterface = {
       id: message.id,
       text: message.text,
@@ -1553,8 +1510,8 @@ export class ChatService {
 
     // check user is in room or in waiting list
     if (
-      !room.users.some((u) => u.id == userId) &&
-      !room.acceptedUsers.some((u) => u.id == userId)
+      !room.users.some(u => u.id == userId) &&
+      !room.acceptedUsers.some(u => u.id == userId)
     )
       throw new ForbiddenException(
         `User ${userId} is not in room ${roomId} and can't see room`,

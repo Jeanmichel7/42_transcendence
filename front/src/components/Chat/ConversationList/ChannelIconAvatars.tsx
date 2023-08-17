@@ -58,7 +58,6 @@ const ConversationListRoomItemIcons = ({
     ) {
       const adminSelected: UserInterface | undefined = getRandAdmin();
       if (adminSelected) {
-        // console.log('adminSelected : ', adminSelected);
         setUsersToDisplay([adminSelected]);
         const userSelected: UserInterface | undefined =
           getRandUser(adminSelected);

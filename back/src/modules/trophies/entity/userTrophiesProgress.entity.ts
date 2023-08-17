@@ -7,12 +7,12 @@ export class UserTrophiesEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.trophiesProgress, {
+  @ManyToOne(() => UserEntity, user => user.trophiesProgress, {
     onDelete: 'CASCADE',
   })
   user: UserEntity;
 
-  @ManyToOne(() => TrophiesEntity, (trophy) => trophy.trophiesProgress, {
+  @ManyToOne(() => TrophiesEntity, trophy => trophy.trophiesProgress, {
     onDelete: 'CASCADE',
   })
   trophy: TrophiesEntity;

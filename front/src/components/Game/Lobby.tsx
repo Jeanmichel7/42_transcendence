@@ -101,7 +101,6 @@ const StyledCircle = styled.div<StyledCircleProps>`
 
 interface LobbyProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
-  // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   setBonus: React.Dispatch<React.SetStateAction<boolean>>;
   lobbyData: GameCard[];

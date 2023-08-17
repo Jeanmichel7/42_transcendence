@@ -31,7 +31,7 @@ export class AuthService {
     private jwtService: JwtService,
     private cryptoService: CryptoService,
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity> /* private readonly httpService: HttpService */,
+    private readonly userRepository: Repository<UserEntity>,
   ) {
     // console.log('JWT_SECRET:', configService.get<string>('JWT_SECRET'));
   }
@@ -40,7 +40,8 @@ export class AuthService {
     const user: UserEntity = await this.userRepository.findOneBy({
       login: data.login,
     });
-    if (!user) throw new NotFoundException(`User login ${data.login} not found`);
+    if (!user)
+      throw new NotFoundException(`User login ${data.login} not found`);
 
     const isMatch = await bcrypt.compare(data.password, user.password);
     if (!isMatch) throw new BadRequestException(`Wrong password`);
@@ -282,10 +283,6 @@ export class AuthService {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      // if(data.status != 200) {
-      //     throw new HttpException("Invalid code", data.status);
-      // }
-      // console.log("data : ", data.data);
       return data.data;
     } catch (error) {
       throw new UnauthorizedException(
@@ -309,7 +306,6 @@ export class AuthService {
   private async createJWT(user: UserInterface): Promise<string> {
     const payload = { id: user.id, login: user.login, role: user.role };
     const token = await this.jwtService.signAsync(payload);
-    // console.error('createJWT : ', user, token);
     return token;
   }
 

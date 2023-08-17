@@ -1,3 +1,13 @@
+import { UsersService } from './users.service';
+import { UserInterface } from './interfaces/users.interface';
+import { UserCreateDTO } from './dto/user.create.dto';
+import { Public } from 'src/modules/auth/decorators/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfilInterface } from './interfaces/profil.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
+import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+import { UserPatchDTO } from './dto/user.patch.dto';
+import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 import {
   Controller,
   Get,
@@ -5,30 +15,17 @@ import {
   Body,
   Param,
   Patch,
-  // Put,
   Delete,
   HttpStatus,
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  // UseGuards,
+  UseGuards,
   UseInterceptors,
   UploadedFile,
   Req,
   Query,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-
-import { UserInterface } from './interfaces/users.interface';
-import { UserCreateDTO } from './dto/user.create.dto';
-
-import { Public } from 'src/modules/auth/decorators/public.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ProfilInterface } from './interfaces/profil.interface';
-import { RequestWithUser } from '../auth/interfaces/request.user.interface';
-// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
-import { UserPatchDTO } from './dto/user.patch.dto';
-import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 
 @Controller('users')
 export class UsersController {
@@ -162,7 +159,7 @@ export class UsersController {
   /* ************************************************ */
 
   @Get(':userId/allDatas')
-  // @UseGuards(AuthAdmin)
+  @UseGuards(AuthAdmin)
   async findUserAllData(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface> {
@@ -172,17 +169,17 @@ export class UsersController {
     return result;
   }
 
-  // @Get(':userId')
-  // // @UseGuards(AuthAdmin)
-  // async adminFindOne(
-  //   @Param('userId', ParseIntPipe) params: bigint,
-  // ): Promise<UserInterface> {
-  //   const result: UserInterface = await this.usersService.findUser(params);
-  //   return result;
-  // }
+  @Get(':userId')
+  @UseGuards(AuthAdmin)
+  async adminFindOne(
+    @Param('userId', ParseIntPipe) params: bigint,
+  ): Promise<UserInterface> {
+    const result: UserInterface = await this.usersService.findUser(params);
+    return result;
+  }
 
   @Patch(':userId')
-  // @UseGuards(AuthAdmin)
+  @UseGuards(AuthAdmin)
   @UseInterceptors(FileInterceptor('avatar'))
   @UsePipes(new ValidationPipe({ skipMissingProperties: true }))
   async adminPatchUser(
@@ -198,12 +195,12 @@ export class UsersController {
     return result;
   }
 
-  @Delete(':userId')
+  // @Delete(':userId')
   // @UseGuards(AuthOwnerAdmin)
-  async adminDeleteUser(
-    @Param('userId', ParseIntPipe) id: bigint,
-  ): Promise<HttpStatus> {
-    await this.usersService.deleteUser(id);
-    return HttpStatus.NO_CONTENT; // 204
-  }
+  // async adminDeleteUser(
+  //   @Param('userId', ParseIntPipe) id: bigint,
+  // ): Promise<HttpStatus> {
+  //   await this.usersService.deleteUser(id);
+  //   return HttpStatus.NO_CONTENT; // 204
+  // }
 }

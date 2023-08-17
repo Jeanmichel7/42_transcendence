@@ -43,7 +43,6 @@ export const useConnectionSocketChannel = (
         });
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convId]);
 
   useEffect(() => {
@@ -90,7 +89,6 @@ export const useConnectionSocketChannel = (
         );
 
         if (userId === user.id) {
-          // setIsAdmin(true);
           dispatch(
             setMsgSnackbar('You are now admin of the room ' + room.name),
           );
@@ -108,7 +106,6 @@ export const useConnectionSocketChannel = (
         );
 
         if (userId === userId) {
-          // setIsAdmin(false);
           dispatch(
             setWarningSnackbar(
               'You are no longer admin of the room ' + room.name,
@@ -146,18 +143,6 @@ export const useConnectionSocketChannel = (
         navigate('/chat/channel');
       });
 
-      /* ROOM USER */
-
-      // socket.on('error', (error) => { console.log('erreur socket : ', error); });
-      // socket.on('connect_error', (error) => { console.log('erreur socket : ', error); });
-      // socket.on('disconnect', (reason) => { console.log('socket disconnect : ', reason); });
-      // socket.on('reconnect', (attemptNumber) => { console.log('socket reconnect : ', attemptNumber); });
-      // socket.on('reconnect_attempt', (attemptNumber) => { console.log('socket reconnect_attempt : ', attemptNumber); });
-      // socket.on('reconnecting', (attemptNumber) => { console.log('socket reconnecting : ', attemptNumber); });
-      // socket.on('reconnect_error', (error) => { console.log('socket reconnect_error : ', error); });
-      // socket.on('reconnect_failed', () => { console.log('socket reconnect_failed'); });
-      // socket.on('connect_timeout', (timeout) => { console.log('socket connect_timeout : ', timeout); });
-
       return () => {
         socket.off('chat_message');
         socket.off('chat_message_edit');
@@ -175,6 +160,5 @@ export const useConnectionSocketChannel = (
         socket.off('room_owner_deleted');
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convId, room, socket]);
 };

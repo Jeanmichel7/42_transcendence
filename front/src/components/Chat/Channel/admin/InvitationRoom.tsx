@@ -32,7 +32,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({ room }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  // const channelType = ['public', 'private'];
   const [form, setForm] = useState({
     acceptedUsers: null as UserInterface[] | null,
   });
@@ -131,7 +130,6 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({ room }) => {
   };
 
   const handleOpenEdit = () => {
-    // setIsAdminMenuOpen(!openEdit);
     setOpenEdit(!openEdit);
   };
 

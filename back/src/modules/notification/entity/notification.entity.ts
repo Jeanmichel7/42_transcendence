@@ -64,13 +64,13 @@ export class NotificationEntity extends BaseEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.notificationsSend, {
+  @ManyToOne(() => UserEntity, user => user.notificationsSend, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
   sender: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.notificationsReceived, {
+  @ManyToOne(() => UserEntity, user => user.notificationsReceived, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

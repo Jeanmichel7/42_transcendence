@@ -23,7 +23,6 @@ export class UserCreateDTO {
 
   @IsNotEmpty({ message: 'The login is required' })
   @Length(2, 22, { message: 'The login must be between 2 and 22 characters' })
-  // @Unique("", [],{message: "The login is already taken"})
   readonly login: string;
 
   @IsNotEmpty()

@@ -101,10 +101,6 @@ const useConnection = () => {
     socket.on(
       'notification_friend_request',
       (notification: NotificationInterface) => {
-        // setNotifications((prevNotifications) => [
-        //   ...prevNotifications,
-        //   notification,
-        // ]);
         dispatch(reduxAddNotification(notification));
         dispatch(reduxAddWaitingFriends(notification.sender));
       },
@@ -144,7 +140,6 @@ const useConnection = () => {
       'notification_friend_request_canceled',
       (notification: NotificationInterface) => {
         dispatch(reduxRemoveNotification(notification));
-        // setNotifications(notifications.filter(n => n.sender.id !== notification.sender.id));
         dispatch(
           setMsgSnackbar(
             notification.sender.login + ': Friend request canceled',
@@ -178,7 +173,7 @@ const useConnection = () => {
 
     /* user update status */
     socket.on('update_user_status', (userStatus: UserStatusInterface) => {
-      dispatch(reduxUpdateUserStatus(userStatus)); // modif userData.[].status
+      dispatch(reduxUpdateUserStatus(userStatus));
       dispatch(
         reduxUpdateStatusUserConvList({
           item: [userStatus],
@@ -213,7 +208,6 @@ const useConnection = () => {
         );
       },
     );
-    // // socket.on('notification_game_invite_canceled', (notification: NotificationInterface) => {
 
     /* TROPHY */
     socket.on('notification_trophee', (notif: NotificationInterface) => {

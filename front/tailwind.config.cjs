@@ -25,4 +25,8 @@ module.exports = {
       }),
     },
   },
+<<<<<<< HEAD
+=======
+  plugins: [],
+>>>>>>> main
 };

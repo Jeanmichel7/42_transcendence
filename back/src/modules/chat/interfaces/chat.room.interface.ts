@@ -20,7 +20,7 @@ export interface ChatRoomInterface {
 
 export interface ChatBotInterface {
   roomId: bigint;
-  userId: bigint; // number pour 0 pour bot
+  userId: bigint;
   userLogin: string;
   text: string;
   createdAt?: Date;

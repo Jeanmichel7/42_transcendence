@@ -1,42 +1,34 @@
-import {
-  Body,
-  Get,
-  Controller,
-  Param,
-  // ParseIntPipe,
-  Post,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-  Req,
-  // Put,
-  Patch,
-  Delete,
-  HttpStatus,
-  Query,
-  ParseIntPipe,
-} from '@nestjs/common';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ChatService } from './chat.service';
-
-// import { AuthOwnerAdmin } from '../auth/guard/authAdminOwner.guard';
 import { ChatMsgInterface } from './interfaces/chat.message.interface';
 import { ChatRoomInterface } from './interfaces/chat.room.interface';
 import { RequestWithUser } from '../auth/interfaces/request.user.interface';
-
 import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
 import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';
 import { ChatJoinRoomDTO } from './dto/chat.room.join.dto';
 import { ChatMuteUserDTO } from './dto/chat.room.mute.dto';
 import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
 import { ChatEditMsgDTO } from './dto/chat.message.edit.dto';
-
 import { AdminRoomGuard } from './guard/room.admin.guard';
 import { OwnerRoomGuard } from './guard/room.owner.guard';
 import { UserNotMutedGuard } from './guard/room.isMuted.guard';
 import { UserNotBannedGuard } from './guard/room.isBanned.guard';
-// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+import { AuthAdmin } from '../auth/guard/authAdmin.guard';
+import {
+  Body,
+  Get,
+  Controller,
+  Param,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+  Req,
+  Patch,
+  Delete,
+  HttpStatus,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 
 @Controller('chat')
 export class ChatController {
@@ -67,13 +59,10 @@ export class ChatController {
     @Req() req: RequestWithUser,
     @Param('roomId', ParseIntPipe) roomId: bigint,
   ): Promise<ChatRoomInterface> {
-    // console.log('get room : ', roomId, typeof roomId);
-    // console.log('get room : ', req.user.id, typeof req.user.id);
     const room: ChatRoomInterface = await this.ChatService.getRoom(
       req.user.id,
       roomId,
     );
-    // console.log('return room : ', room);
     return room;
   }
 
@@ -214,11 +203,6 @@ export class ChatController {
       userIdToBeMuted,
     );
 
-    // console.log(
-    //   'user ' + userIdToBeMuted + ' muted : ',
-    //   muteDurationSec,
-    //   'sec',
-    // );
     setTimeout(async () => {
       await this.ChatService.demuteUser(roomId, userIdToBeMuted);
     }, parseInt(muteDurationSec) * 1000);
@@ -356,7 +340,7 @@ export class ChatController {
   /*                      ADMIN                       */
   /* ************************************************ */
 
-  // @UseGuards(AuthAdmin)
+  @UseGuards(AuthAdmin)
   @Get('rooms/all')
   async getAllRooms(): Promise<ChatRoomInterface[]> {
     const rooms: ChatRoomInterface[] = await this.ChatService.getAllRooms();

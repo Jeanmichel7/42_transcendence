@@ -7,7 +7,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 
-// import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/modules/auth/decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
@@ -36,9 +35,7 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest();
-    // const token = this.extractTokenFromHeader(request);
     const token = this.extractTokenFromCookie(request);
-    // console.log('token : ', token);
     if (!token) {
       throw new UnauthorizedException("You're not logged in", 'No token found');
     }
@@ -47,9 +44,7 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtSecret,
       });
-      // console.error('payload : ', payload);
       request.user = payload;
-      // console.log('create request.user : ', request.user);
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
@@ -62,13 +57,6 @@ export class AuthGuard implements CanActivate {
 
     user.lastActivity = new Date();
     if (user.status !== 'online') {
-      // console.log(
-      //   'update user status to ONLINE, ',
-      //   user.id,
-      //   user.login,
-      //   user.status,
-      // );
-
       const userUpdated = new UserUpdateEvent({
         id: user.id,
         status: 'online',
@@ -76,11 +64,6 @@ export class AuthGuard implements CanActivate {
         avatar: user.avatar,
         updatedAt: new Date(),
       });
-      // console.log(
-      //   'userUpdated: ',
-      //   userUpdated.userStatus.id,
-      //   userUpdated.userStatus.login,
-      // );
       this.eventEmitter.emit('user_status.updated', userUpdated);
       user.status = 'online';
     }
@@ -92,13 +75,6 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromCookie(request: Request): string | undefined {
     const jwtCookieName = 'jwt';
     const cookies = request.cookies;
-    // console.log("request.cookies: ", request.cookies)
-
     return cookies[jwtCookieName];
   }
-
-  // private extractTokenFromHeader(request: Request): string | undefined {
-  //   const [type, token] = request.headers.authorization?.split(' ') ?? [];
-  //   return type === 'Bearer' ? token : undefined;
-  // }
 }

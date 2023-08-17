@@ -51,7 +51,6 @@ export interface GameCard {
 
 function Pong() {
   const [socket, setSocket] = useState<Socket>({} as Socket);
-  // const socketRef = useRef<Socket | null>(null);
   const [connectStatus, setConnectStatus] = useState('disconnected');
   const [currentPage, setCurrentPage] = useState<string>('lobby');
   const { userData } = useSelector((state: RootState) => state.user);
@@ -95,8 +94,6 @@ function Pong() {
           setPersonalizedErrorSnackbar('You are not in this game'),
         );
       }
-      // console.log('retFetchGame : ', retFetchGame);
-
       setIsPlayer1(retFetchGame.player1.id == userData.id);
       setCurrentPage('privateLobby');
     };
@@ -110,8 +107,6 @@ function Pong() {
     } else {
       setShowOverlay(false);
     }
-
-    // Cleanup function to clear the timeout when component unmounts or re-renders
     return () => clearTimeout(timeoutId);
   }, [connectStatus]);
 
@@ -123,7 +118,6 @@ function Pong() {
       socket.emit('leaveLobbyRoom');
     }
     socket.on('lobbyRoomUpdate', data => {
-      // console.log('recu du socket,', data);
       setLobbyData(data);
     });
 

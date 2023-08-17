@@ -22,18 +22,9 @@ const ConversationGame = ({
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   console.log('gameId: ', gameId);
-  //   console.log('is sspectator', isSpectator);
-  //   console.log('type', type);
-  //   console.log('is spect', isSpectator);
-  // }, [gameId, isSpectator, type]);
-
   useEffect(() => {
-    // if (!socket || !gameId || !socket.connected) return;
     try {
       socket.emit('joinChatGame', {
-        //     // userId: userData.id,
         gameId: gameId,
         type: type,
       });
@@ -47,9 +38,7 @@ const ConversationGame = ({
     return () => {
       try {
         socket.off('message');
-        // if (!socket.connected) return;
         socket.emit('leaveChatGame', {
-          // userId: userData.id,
           gameId: gameId,
           type: type,
         });

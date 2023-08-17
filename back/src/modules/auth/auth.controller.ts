@@ -9,7 +9,7 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  // UseGuards,
+  UseGuards,
   Req,
   Res,
 } from '@nestjs/common';
@@ -23,7 +23,7 @@ import { AuthInterface } from './interfaces/auth.interface';
 import { RequestWithUser } from './interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { AuthDTO } from './dto/user2fa.auth.dto';
-// import { AuthAdmin } from './guard/authAdmin.guard';
+import { AuthAdmin } from './guard/authAdmin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -154,7 +154,7 @@ export class AuthController {
   /* ************************************************ */
 
   @Put(':userId/active2fa')
-  // @UseGuards(AuthAdmin)
+  @UseGuards(AuthAdmin)
   async adminActive2fa(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<string> {
@@ -163,7 +163,7 @@ export class AuthController {
   }
 
   @Put(':userId/desactive2fa')
-  // @UseGuards(AuthAdmin)
+  @UseGuards(AuthAdmin)
   async adminDesactive2fa(
     @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<UserInterface> {

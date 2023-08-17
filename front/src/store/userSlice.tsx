@@ -149,7 +149,6 @@ export const userSlice = createSlice({
 
   reducers: {
     setUser: (state, action: PayloadAction<UserInterface>) => {
-      // console.log("action.payload : ", action.payload)
       state.userData.id = action.payload.id;
       state.userData.login = action.payload.login;
       state.userData.email = action.payload.email;
@@ -180,6 +179,8 @@ export const userSlice = createSlice({
         is2FAEnabled: false,
         score: 1500,
         level: 0,
+        experience: 0,
+        rank: 'cooper_1',
       };
     },
 

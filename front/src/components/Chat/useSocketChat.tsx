@@ -27,10 +27,8 @@ export const useConnectionSocketChat = (
     if (socket) {
       /* ROOM */
       socket.on('room_join', (roomId, user) => {
-        // console.log('Event room_join : ', roomId, user);
         const roomUpdated: RoomInterface = {
           ...room,
-          // id: roomId,
           acceptedUsers: room.acceptedUsers?.filter(u => u.id !== user.id),
           users: room.users ? [...room.users, user] : [user],
         };
@@ -40,10 +38,8 @@ export const useConnectionSocketChat = (
       });
 
       socket.on('room_leave', (roomId, userIdLeave) => {
-        // console.log('Event room_leave : ', roomId, userIdLeave.id);
         const roomUpdated: RoomInterface = {
           ...room,
-          // id: roomId,
           users: room.users?.filter(u => u.id !== userIdLeave),
           admins: room.admins?.filter(u => u.id !== userIdLeave),
           acceptedUsers: room.acceptedUsers?.filter(u => u.id !== userIdLeave),
@@ -145,18 +141,6 @@ export const useConnectionSocketChat = (
             setMsgSnackbar('You have been unbanned from the room ' + room.name),
           );
       });
-
-      /* ROOM USER */
-
-      // socket.on('error', (error) => { console.log('erreur socket : ', error); });
-      // socket.on('connect_error', (error) => { console.log('erreur socket : ', error); });
-      // socket.on('disconnect', (reason) => { console.log('socket disconnect : ', reason); });
-      // socket.on('reconnect', (attemptNumber) => { console.log('socket reconnect : ', attemptNumber); });
-      // socket.on('reconnect_attempt', (attemptNumber) => { console.log('socket reconnect_attempt : ', attemptNumber); });
-      // socket.on('reconnecting', (attemptNumber) => { console.log('socket reconnecting : ', attemptNumber); });
-      // socket.on('reconnect_error', (error) => { console.log('socket reconnect_error : ', error); });
-      // socket.on('reconnect_failed', () => { console.log('socket reconnect_failed'); });
-      // socket.on('connect_timeout', (timeout) => { console.log('socket connect_timeout : ', timeout); });
 
       return () => {
         socket.off('room_join');

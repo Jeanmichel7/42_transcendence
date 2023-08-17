@@ -21,10 +21,6 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 export class NotificationGateway {
   @WebSocketServer() server: Server;
 
-  // async handleConnection(@ConnectedSocket() client: Socket) {}
-
-  // async handleDisconnect(@ConnectedSocket() client: Socket) {}
-
   @SubscribeMessage('joinNotificationRoom')
   async handleJoinNotificationRoom(
     @MessageBody() data: { userId: string },
@@ -86,11 +82,6 @@ export class NotificationGateway {
       .emit('notification_unblock_user', data);
   }
 
-  // emitJoinRoom(roomId: string, userId: string) {
-  //   this.server.to(roomId).emit('join-room', `${userId} join the room`);
-  //   console.log('user joined room' + roomId);
-  // }
-
   /* ROOM */
   emitNotificationRoomInvite(data: NotificationInterface) {
     this.server
@@ -100,8 +91,7 @@ export class NotificationGateway {
 
   /* UPDATE USER STATUS */
   emitUpdateUserStatus(updateStatusUser: UserStatusInterface) {
-    // console.log('SEND updateStatusUser : ', updateStatusUser);
-    this.server.emit('update_user_status', updateStatusUser, (ack) => {
+    this.server.emit('update_user_status', updateStatusUser, ack => {
       if (ack) {
         // console.log('update status sent to room' + updateStatusUser);
       } else {
@@ -128,9 +118,6 @@ export class NotificationGateway {
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_game_invite_declined', data);
-    // this.server
-    //   .to('notification_room_' + data.sender.id)
-    //   .emit('notification_game_invite_declined', data);
   }
 
   /* Private Message */

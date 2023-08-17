@@ -144,7 +144,6 @@ const CreateGroupInterface = () => {
               label="Name"
               id="channel-name"
               value={form.name}
-              // sx={{ m: 1, width: '25ch' }}
               variant="outlined"
               onChange={handleChangeInput}
             />
@@ -158,7 +157,6 @@ const CreateGroupInterface = () => {
               helperText="Please select your channel type"
               value={form.type}
               onChange={handleChangeInput}
-              // sx={{ m: 1, width: '25ch' }}
             >
               {channelType.map(option => (
                 <MenuItem key={option} value={option}>

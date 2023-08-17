@@ -93,7 +93,7 @@ export class Game {
     player2Info: UserEntity,
     gameId: bigint,
     bonusMode = false,
-    EmitEvent: (eventName: string, data?: any) => void
+    EmitEvent: (eventName: string, data?: any) => void,
   ) {
     this.emitEvent = EmitEvent;
     this.isOver = false;
@@ -347,8 +347,13 @@ export class Game {
     }
   }
 
+<<<<<<< HEAD
   resetBallAndRackets(leftSideLoose: boolean) {
     this.initBall(leftSideLoose ? false : true);
+=======
+  resetBallAndRackets(_vx: number) {
+    this.initBall();
+>>>>>>> main
     this.fail = false;
     this.racketLeftHeight = RACKET_HEIGHT_10;
     this.racketRightHeight = RACKET_HEIGHT_10;

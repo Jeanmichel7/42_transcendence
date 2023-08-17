@@ -32,7 +32,7 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
       setIsSending(false);
       if ('error' in newMessage) {
         if (newMessage.error === 'Forbidden') setIsBlocked(true);
-        setStatusSendMsg(newMessage.message); //display error
+        setStatusSendMsg(newMessage.message as string);
       } else {
         setShouldScrollToBottom(true);
       }

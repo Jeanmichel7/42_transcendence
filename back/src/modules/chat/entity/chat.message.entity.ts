@@ -34,12 +34,12 @@ export class ChatMessageEntity extends BaseEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.chatMessages, {
+  @ManyToOne(() => UserEntity, user => user.chatMessages, {
     onDelete: 'CASCADE',
   })
   ownerUser: UserEntity;
 
-  @ManyToOne(() => ChatRoomEntity, (room) => room.messages, {
+  @ManyToOne(() => ChatRoomEntity, room => room.messages, {
     onDelete: 'CASCADE',
   })
   room: ChatRoomEntity;

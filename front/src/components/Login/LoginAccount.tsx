@@ -148,6 +148,7 @@ export default function LoginAccount({
     const res: AuthInterface | ApiErrorResponse = await loginFakeUser(
       formDataLogin,
     );
+
     if ('error' in res) {
       if (typeof res.message === 'string')
         setErrorLogin([res.message as string]);

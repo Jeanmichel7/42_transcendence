@@ -3,7 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import { ButtonWrapper, StyledButton } from './Lobby';
 import { dotAnimation } from './Utils';
 interface SearchingOpponentProps {
-  // socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   socket: any;
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   bonus: boolean;
@@ -132,16 +131,14 @@ function SearchingOpponent({
 
     function handleAnimationEnd() {
       setLoadingDot(true);
-      // Vous pouvez faire quelque chose ici à la fin de l'animation
     }
 
     if (node) node.addEventListener('animationend', handleAnimationEnd);
 
-    // Assurez-vous de nettoyer l'écouteur d'événement lors du démontage du composant
     return () => {
       if (node) node.removeEventListener('animationend', handleAnimationEnd);
     };
-  }, []); // Cette dépendance vide indique que cet effet ne fonctionne qu'au montage et au démontage
+  }, []);
 
   return (
     <div className="h-full  w-full ">

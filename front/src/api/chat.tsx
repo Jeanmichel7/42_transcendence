@@ -201,7 +201,7 @@ export async function removeAdminFromRoom(
 
 export async function sendChatMessage(
   roomId: string,
-  data: any,
+  data: { text: string },
 ): Promise<ChatMsgInterface | ApiErrorResponse> {
   return apiRequest(
     'post',
@@ -213,7 +213,7 @@ export async function sendChatMessage(
 
 export async function editChatMessage(
   messageId: number,
-  data: any,
+  data: string,
 ): Promise<ChatMsgInterface | ApiErrorResponse> {
   return apiRequest(
     'patch',
