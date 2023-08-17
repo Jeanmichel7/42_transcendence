@@ -10,6 +10,8 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install
 
+# rebuild bcrypt
+RUN npm rebuild bcrypt --update-binary
 # Bundle app source
 COPY . .
 # COPY ./docker/setup.sh docker/setup.sh
