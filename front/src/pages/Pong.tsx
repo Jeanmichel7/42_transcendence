@@ -239,7 +239,7 @@ function Pong() {
       />
     );
   } else {
-    console.warn('current page not found', currentPage);
+    // console.warn('current page not found', currentPage);
   }
 
   return (
