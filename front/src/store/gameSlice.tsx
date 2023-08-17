@@ -3,14 +3,14 @@ import { createSlice } from '@reduxjs/toolkit';
 const gameSlice = createSlice({
   name: 'game',
   initialState: {
-    isEffectActivated: false,
+    effect: undefined,
   },
   reducers: {
-    activateEffect: state => {
-      state.isEffectActivated = true;
+    activateEffect: (state, action) => {
+      state.effect = action.payload;
     },
     desactivateEffect: state => {
-      state.isEffectActivated = false;
+      state.effect = undefined;
     },
   },
 });
