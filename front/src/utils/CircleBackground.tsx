@@ -1,9 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import '../utils/CircleBakcground.scss';
+import { RootState } from '../store';
 
 export function CircleBackground() {
-  const isEffectActivated = useSelector(state => state.game.isEffectActivated);
+  const isEffectActivated = useSelector(
+    (state: RootState) => state.game.isEffectActivated,
+  );
   const colorBackground = isEffectActivated ? 'black' : '';
   const colorCircle = isEffectActivated ? '#330207' : '';
 

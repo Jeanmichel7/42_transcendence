@@ -23,10 +23,6 @@ import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
 
-// type GameWrapperProps = {
-//   isChatOpen: boolean;
-// };
-
 export const Playground = styled.div`
   width: 100%;
   top: 20%;
@@ -208,8 +204,6 @@ export const Racket = ({
   );
 };
 
-// Dans le rendu de votre jeu
-
 interface BallProps {
   posX: number;
   posY: number;
@@ -248,8 +242,6 @@ const laserFlowLeft = keyframes`
   0% { background-position: 50px 0; }
   100% { background-position: 0 0; }
 `;
-
-// Utilisez les animations dans votre composant
 
 export interface LaserProps {
   type: string;

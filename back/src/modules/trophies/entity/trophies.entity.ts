@@ -25,12 +25,12 @@ export class TrophiesEntity {
   @Column({ default: 0 })
   total: number;
 
-  @OneToMany(() => UserTrophiesEntity, (userTrophy) => userTrophy.trophy, {
+  @OneToMany(() => UserTrophiesEntity, userTrophy => userTrophy.trophy, {
     onDelete: 'CASCADE',
   })
   trophiesProgress: UserTrophiesEntity[];
 
-  @ManyToMany(() => UserEntity, (user) => user.trophies, {
+  @ManyToMany(() => UserEntity, user => user.trophies, {
     onDelete: 'CASCADE',
   })
   users: UserEntity[];

@@ -41,14 +41,9 @@ import { useNavigate } from 'react-router-dom';
 interface SideBarProps {
   room: RoomInterface;
   convId: number;
-  // setIsAdminMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SideBarAdmin: React.FC<SideBarProps> = ({
-  room,
-  convId,
-  // setIsAdminMenuOpen,
-}) => {
+const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -159,7 +154,6 @@ const SideBarAdmin: React.FC<SideBarProps> = ({
       dispatch(
         reduxRemoveConversationToList({ convId: convId, userId: userData.id }),
       );
-      // setIsAdminMenuOpen(false);
       navigate('/chat');
     }
   };

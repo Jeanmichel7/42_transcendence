@@ -262,10 +262,6 @@ const StyledNeonH2 = styled.h2<StyledNeonH2Props>`
     -1px 0px 92px #800080, -1px 0px 102px #800080, -1px 0px 151px #800080;
 `;
 
-// interface setCurrentPage {
-//   setLoose: React.Dispatch<React.SetStateAction<string>>;
-// }
-
 const FullScreenCanvas = styled.canvas`
   position: fixed;
   top: 0;

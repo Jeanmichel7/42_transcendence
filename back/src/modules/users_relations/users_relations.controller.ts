@@ -1,3 +1,7 @@
+import { UsersRelationsService } from './users_relations.service';
+import { UserInterface } from 'src/modules/users/interfaces/users.interface';
+import { UserRelationInterface } from './interfaces/users_relations.interface';
+import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 import {
   Controller,
   Delete,
@@ -7,16 +11,7 @@ import {
   ParseIntPipe,
   Put,
   Req,
-  // UseGuards,
 } from '@nestjs/common';
-
-import { UsersRelationsService } from './users_relations.service';
-
-import { UserInterface } from 'src/modules/users/interfaces/users.interface';
-import { UserRelationInterface } from './interfaces/users_relations.interface';
-import { RequestWithUser } from '../auth/interfaces/request.user.interface';
-
-// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 
 @Controller('relations')
 export class UsersRelationsController {
@@ -85,7 +80,6 @@ export class UsersRelationsController {
     @Req() req: RequestWithUser,
     @Param('friendId', ParseIntPipe) friendId: bigint,
   ): Promise<HttpStatus> {
-    // const result: UserRelationInterface =
     await this.usersRelationsService.declineFriendRequest(
       req.user.id,
       friendId,
@@ -98,7 +92,6 @@ export class UsersRelationsController {
     @Req() req: RequestWithUser,
     @Param('friendId', ParseIntPipe) friendId: bigint,
   ): Promise<HttpStatus> {
-    // const result: UserRelationInterface =
     await this.usersRelationsService.cancelFriendRequest(req.user.id, friendId);
     return HttpStatus.NO_CONTENT;
   }
@@ -145,7 +138,6 @@ export class UsersRelationsController {
     @Req() req: RequestWithUser,
     @Param('userBlockedId', ParseIntPipe) userBlockedId: bigint,
   ): Promise<HttpStatus> {
-    // const result: UserRelationInterface =
     await this.usersRelationsService.unblockUser(req.user.id, userBlockedId);
     return HttpStatus.NO_CONTENT;
   }

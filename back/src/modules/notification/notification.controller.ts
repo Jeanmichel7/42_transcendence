@@ -5,15 +5,7 @@ import {
   Body,
   Param,
   Patch,
-  // Put,
-  Delete,
-  HttpStatus,
   ParseIntPipe,
-  UsePipes,
-  ValidationPipe,
-  // UseGuards,
-  UseInterceptors,
-  UploadedFile,
   Req,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
@@ -50,8 +42,6 @@ export class NotificationController {
     @Req() req: RequestWithUser,
     @Param('id', ParseIntPipe) id: bigint,
   ): Promise<void> {
-    // const notification: NotificationInterface =
     await this.notificationService.readNotification(req.user.id, id);
-    // return notification;
   }
 }

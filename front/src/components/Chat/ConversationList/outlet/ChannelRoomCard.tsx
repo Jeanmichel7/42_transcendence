@@ -44,8 +44,6 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
-
   const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

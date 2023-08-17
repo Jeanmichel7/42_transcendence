@@ -2,10 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  // JoinColumn,
-  // ManyToMany,
   ManyToOne,
-  // OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from 'src/modules/users/entity/users.entity';
@@ -41,12 +38,12 @@ export class UserRelationEntity extends BaseEntity {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.initiatedRelations, {
+  @ManyToOne(() => UserEntity, user => user.initiatedRelations, {
     onDelete: 'CASCADE',
   })
   userInitiateur: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.relatedRelations, {
+  @ManyToOne(() => UserEntity, user => user.relatedRelations, {
     onDelete: 'CASCADE',
   })
   userRelation: UserEntity;

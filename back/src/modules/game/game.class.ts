@@ -85,7 +85,7 @@ export class Game {
     player2Info: UserEntity,
     gameId: bigint,
     bonusMode = false,
-    EmitEvent: (eventName: string, data?: any) => void
+    EmitEvent: (eventName: string, data?: any) => void,
   ) {
     this.emitEvent = EmitEvent;
     this.isOver = false;
@@ -333,7 +333,7 @@ export class Game {
     }
   }
 
-  resetBallAndRackets(vx: number) {
+  resetBallAndRackets(_vx: number) {
     this.initBall();
     this.fail = false;
     this.racketLeftHeight = RACKET_HEIGHT_10;

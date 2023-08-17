@@ -18,7 +18,7 @@ export class GameController {
   @Get(':id')
   async getGame(
     @Param('id', ParseIntPipe) gameId: bigint,
-    @Req() req: RequestWithUser
+    @Req() req: RequestWithUser,
   ) {
     return await this.gameService.getGame(req.user.id, gameId);
   }
@@ -35,7 +35,7 @@ export class GameController {
   @Patch('users/:userId/invite')
   async invite(
     @Param('userId', ParseIntPipe) userIdToTinvite: bigint,
-    @Req() req: RequestWithUser
+    @Req() req: RequestWithUser,
   ): Promise<GameInterface> {
     return await this.gameService.saveInviteGame(req.user.id, userIdToTinvite);
   }
@@ -43,7 +43,7 @@ export class GameController {
   @Patch(':gameId/accept')
   async accept(
     @Param('gameId', ParseIntPipe) gameId: bigint,
-    @Req() req: RequestWithUser
+    @Req() req: RequestWithUser,
   ): Promise<GameInterface> {
     return await this.gameService.saveAcceptGame(req.user.id, gameId);
   }
@@ -51,7 +51,7 @@ export class GameController {
   @Patch(':gameId/accept/noNotif')
   async acceptNoNotif(
     @Param('gameId', ParseIntPipe) gameId: bigint,
-    @Req() req: RequestWithUser
+    @Req() req: RequestWithUser,
   ): Promise<GameInterface> {
     return await this.gameService.saveAcceptGameNoNotif(req.user.id, gameId);
   }
@@ -59,7 +59,7 @@ export class GameController {
   @Patch(':gameId/decline')
   async decline(
     @Param('gameId', ParseIntPipe) gameId: bigint,
-    @Req() req: RequestWithUser
+    @Req() req: RequestWithUser,
   ): Promise<void> {
     await this.gameService.saveDeclineGame(req.user.id, gameId);
   }
@@ -71,7 +71,7 @@ export class GameController {
 
   @Get('users/:userId/countAllGames')
   async countAllGames(
-    @Param('userId', ParseIntPipe) userId: bigint
+    @Param('userId', ParseIntPipe) userId: bigint,
   ): Promise<number> {
     return await this.gameService.countAllGames(userId);
   }

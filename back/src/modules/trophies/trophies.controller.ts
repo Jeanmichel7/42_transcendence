@@ -8,7 +8,6 @@ export class TrophiesController {
 
   @Get('all')
   async getAllTrophies() {
-    // console.log('wtf')
     return await this.trophiesService.getAllTrophies();
   }
 

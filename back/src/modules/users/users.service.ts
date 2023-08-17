@@ -44,7 +44,7 @@ export class UsersService {
     private readonly trophyRepository: Repository<TrophiesEntity>,
     @InjectRepository(UserTrophiesEntity)
     private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
@@ -188,7 +188,7 @@ export class UsersService {
 
   async findAllUsersPaginate(
     page: number,
-    limit: number
+    limit: number,
   ): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
@@ -280,7 +280,7 @@ export class UsersService {
   async patchUser(
     id: bigint,
     updateUser: UserPatchDTO,
-    file: Express.Multer.File
+    file: Express.Multer.File,
   ): Promise<UserInterface> {
     const userToUpdate: UserInterface = await this.findUserWithPwd(id);
     if (!userToUpdate) throw new NotFoundException(`User ${id} not found`);
@@ -294,21 +294,21 @@ export class UsersService {
     if (updateUser.lastName) updateData.lastName = updateUser.lastName;
     if (updateUser.login) {
       const isAvailable: boolean = await this.isLoginAvailable(
-        updateUser.login
+        updateUser.login,
       );
       if (!isAvailable)
         throw new BadRequestException(
-          `Login ${updateUser.login} not available`
+          `Login ${updateUser.login} not available`,
         );
       updateData.login = updateUser.login;
     }
     if (updateUser.email) {
       const isAvailable: boolean = await this.isEmailAvailable(
-        updateUser.email
+        updateUser.email,
       );
       if (!isAvailable)
         throw new BadRequestException(
-          `Email ${updateUser.email} not available`
+          `Email ${updateUser.email} not available`,
         );
       updateData.email = updateUser.email;
     }
@@ -316,7 +316,7 @@ export class UsersService {
     if (updateUser.password) {
       const isMatch = await bcrypt.compare(
         updateUser.oldPassword,
-        userToUpdate.password
+        userToUpdate.password,
       );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
@@ -333,7 +333,7 @@ export class UsersService {
         {
           ...updateData,
           updatedAt: new Date(),
-        }
+        },
       );
       if (isUpdated.affected === 0)
         throw new BadRequestException(`User ${id} has not been updated.`);
@@ -342,29 +342,6 @@ export class UsersService {
     const result: UserInterface = await this.findUser(id);
     return result;
   }
-
-  // async updateUser(id: bigint, updateUser: UserCreateDTO): Promise<UserInterface> {
-  // 	let userToUpdate: UserInterface = await this.findUser(id)
-  // 	if (!userToUpdate)
-  // 		throw new NotFoundException(`User ${id} not found`);
-
-  // 	try {
-  // 		const hash: string = await bcrypt.hash(updateUser.password, 10);
-  // 		updateUser.password = hash;
-  // 	} catch(e) {
-  // 		throw new InternalServerErrorException(e);
-  // 	}
-
-  // 	let res = await this.userRepository.update({ id: id }, {
-  // 		...updateUser,
-  // 		updatedAt: new Date()
-  // 	});
-  // 	if(res.affected === 0)
-  // 		throw new BadRequestException(`User ${id} has not been updated.`);
-
-  // 	const result: UserInterface = await this.findUser(id);
-  // 	return result;
-  // }
 
   async deleteUser(id: bigint): Promise<void | string> {
     const userFound = await this.findUser(id);
@@ -428,7 +405,7 @@ export class UsersService {
       '../../../..',
       'uploads',
       'users_avatars',
-      avatarName
+      avatarName,
     );
     // console.log('path : ', localImagePath);
 
@@ -458,7 +435,7 @@ export class UsersService {
   private async deleteAvatar(avatarName: string): Promise<void> {
     const localPath = join(
       __dirname,
-      '../../../uploads/users_avatars/' + avatarName
+      '../../../uploads/users_avatars/' + avatarName,
     );
     try {
       access(localPath, null);
@@ -497,7 +474,7 @@ export class UsersService {
         {
           status: newStatus,
           updatedAt: new Date(),
-        }
+        },
       );
 
       const userUpdated = new UserUpdateEvent({
@@ -525,15 +502,6 @@ export class UsersService {
   /*                    LEADERBOARD                   */
   /* ************************************************ */
   async getLeaderboard(page: number, limit: number): Promise<UserInterface[]> {
-    // if (page < 1) page = 1;
-    // if (offset < 0) offset = 0;
-    // if (offset > this.leaderBoardLimitPerPage) {
-    //   page = page + Math.floor(offset / this.leaderBoardLimitPerPage);
-    //   offset = offset % this.leaderBoardLimitPerPage;
-    // }
-    // let skip = (page - 1) * this.leaderBoardLimitPerPage - offset;
-    // if (skip < 0) skip = 0;
-
     const users: UserEntity[] = await this.userRepository
       .createQueryBuilder('users')
       .select([
@@ -554,7 +522,6 @@ export class UsersService {
       .take(limit)
       .getMany();
 
-    // if (!users) throw new NotFoundException(`No users found`);
     return users;
   }
 

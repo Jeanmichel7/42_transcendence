@@ -30,7 +30,7 @@ const FormChannel = ({ setShouldScrollToBottom }: FormChannelProps) => {
         });
       setIsSending(false);
       if ('error' in newMessage) {
-        setStatusSendMsg(newMessage.message);
+        setStatusSendMsg(newMessage.message as string);
       } else {
         setShouldScrollToBottom(true);
       }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 
-// Définir une animation keyframes pour le fondu et le zoom.
 const fadeAndZoomIn = keyframes`
   0% {
     opacity: 0;
@@ -42,7 +41,6 @@ const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(3);
   useEffect(() => {
-    // console.log('GameStarder value : ', gameStarted);
     if (gameStarted) {
       setVisible(false);
     } else {

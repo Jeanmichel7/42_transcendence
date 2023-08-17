@@ -5,7 +5,6 @@ import entities from 'config';
 export const typeOrmConfig = async (
   configService: ConfigService,
 ): Promise<TypeOrmModuleOptions> => {
-
   return {
     type: 'postgres',
     host: 'postgres',

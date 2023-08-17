@@ -75,13 +75,14 @@ function PrivateLobby({ socket, gameId, isPlayer1 }: LobbyProps) {
 
   useEffect(() => {
     const data = {
-      gameId: gameId,
+      gameId: +gameId,
       mode: mode,
       ready: ready,
       player1: isPlayer1,
     };
     socket.emit('privateLobby', data);
   }, [mode, ready]);
+
   return (
     <ButtonWrapper>
       <StyledButton

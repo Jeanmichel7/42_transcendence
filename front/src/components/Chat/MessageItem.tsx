@@ -40,14 +40,12 @@ interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
   isLoadingDeleteMsg?: boolean;
   handleDeleteMessage?: (id: number) => void;
-  // isAdminMenuOpen?: boolean;
 }
 
 const MessageItem: FC<MessageItemProps> = ({
   message,
   isLoadingDeleteMsg,
   handleDeleteMessage,
-  // isAdminMenuOpen,
 }) => {
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData,
@@ -57,7 +55,6 @@ const MessageItem: FC<MessageItemProps> = ({
   );
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>(message.text);
-  // const [invitIsAccept, setInvitIsAccept] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
@@ -105,7 +102,6 @@ const MessageItem: FC<MessageItemProps> = ({
 
       if ('error' in res) dispatch(setErrorSnackbar(res));
       else {
-        // dispatch(setMsgSnackbar('Message edited'));
         setEditMessage(false);
         setInputMessage(inputMessage);
       }

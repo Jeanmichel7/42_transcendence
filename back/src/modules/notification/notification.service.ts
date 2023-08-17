@@ -2,14 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  // InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { NotificationEntity } from 'src/modules/notification/entity/notification.entity';
 import { NotificationInterface } from './interfaces/notification.interface';
-// import { UserEntity } from '../users/entity/users.entity';
 import { NotificationCreateDTO } from './dto/notification.create.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationCreatedEvent } from './events/notification.event';
@@ -46,8 +44,6 @@ export class NotificationService {
         ])
         .orderBy('notifications.createdAt', 'DESC')
         .getMany();
-    // console.log('notifications : ', notifications);
-
     return notifications;
   }
 
@@ -57,13 +53,10 @@ export class NotificationService {
     const savedNotification = await this.notificationRepository.save(
       newNotification,
     );
-
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,
       new NotificationCreatedEvent(savedNotification),
     );
-
-    // return test;
     return savedNotification;
   }
 
@@ -75,7 +68,6 @@ export class NotificationService {
       ...newNotification,
       read: true,
     });
-
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,
       new NotificationCreatedEvent(savedNotification),

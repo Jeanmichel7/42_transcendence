@@ -3,10 +3,7 @@ import {
   Column,
   Entity,
   JoinTable,
-  // JoinColumn,
-  // JoinTable,
   ManyToMany,
-  // ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -259,13 +256,13 @@ export class UserEntity extends BaseEntity {
   /* users relations */
   @OneToMany(
     () => UserRelationEntity,
-    userRelation => userRelation.userInitiateur
+    userRelation => userRelation.userInitiateur,
   )
   initiatedRelations: UserRelationEntity[];
 
   @OneToMany(
     () => UserRelationEntity,
-    userRelation => userRelation.userRelation
+    userRelation => userRelation.userRelation,
   )
   relatedRelations: UserRelationEntity[];
 
@@ -299,12 +296,13 @@ export class UserEntity extends BaseEntity {
     return [...this.initiatedRelations, ...this.relatedRelations]
       .filter(
         relation =>
-          relation.relationType === 'friend' && relation.mutuelBlocked === false
+          relation.relationType === 'friend' &&
+          relation.mutuelBlocked === false,
       )
       .map(relation =>
         relation.userInitiateur.id === this.id
           ? relation.userRelation
-          : relation.userInitiateur
+          : relation.userInitiateur,
       );
   }
 
@@ -314,7 +312,7 @@ export class UserEntity extends BaseEntity {
       .map(relation =>
         relation.userInitiateur.id === this.id
           ? relation.userRelation
-          : relation.userInitiateur
+          : relation.userInitiateur,
       );
   }
 }

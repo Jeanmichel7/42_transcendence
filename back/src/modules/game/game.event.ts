@@ -34,7 +34,7 @@ export class GameEvents {
     private gameService: GameService,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
   ) {
     eventEmitter.on('updateLobbyRoomRequire', () => {
       this.server
@@ -105,7 +105,7 @@ export class GameEvents {
   @SubscribeMessage('spectateGame')
   handleSpectateGame(
     @MessageBody() gameId: bigint,
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     console.log('VALEUR DE GAME ID', gameId);
     Object.keys(client.rooms).forEach(roomId => {
@@ -136,7 +136,7 @@ export class GameEvents {
   async handlePrivateLobby(
     @MessageBody()
     update: { gameId: bigint; mode: string; ready: boolean; player1: boolean },
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     if (
       !client.data.userId ||
@@ -152,11 +152,11 @@ export class GameEvents {
     };
     const gameStarted = this.gameService.updatePrivateLobby(
       update.player1,
-      data
+      data,
     );
     const socket = this.gameService.getOtherPlayerSockerId(
       update.gameId,
-      update.player1
+      update.player1,
     );
     if (gameStarted) {
       this.server.to(socket).emit('userGameStatus', 'alreadyInGame');
@@ -172,7 +172,7 @@ export class GameEvents {
   @SubscribeMessage('userGameStatus')
   async handleSearchOpponent(
     @MessageBody() message: string,
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     if (!client.data.userId) {
       return 'error';
@@ -184,7 +184,7 @@ export class GameEvents {
       const opponent = await this.gameService.addToQueue(
         client.id,
         client.data.userId,
-        message === 'searchBonus'
+        message === 'searchBonus',
       );
       if (opponent) {
         if (message === 'searchBonus') {
@@ -201,7 +201,7 @@ export class GameEvents {
   @SubscribeMessage('clientUpdate')
   handlePaddlePosition(
     @MessageBody() data: clientUpdate,
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     this.gameService.updateClientData(data, client.id);
   }
@@ -234,28 +234,28 @@ export class GameEvents {
   @SubscribeMessage('joinChatGame')
   handleJoinChatRoomLobby(
     @MessageBody() data: { gameId: string; type: string },
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     console.log(
       'JOIN chat room : ',
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
     client.join(
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
   }
 
   @SubscribeMessage('leaveChatGame')
   handleLeaveChatRoomLobby(
     @MessageBody() data: { gameId: string; type: string },
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     console.log(
       'LEAVE chat room : ',
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
     client.leave(
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
   }
 
@@ -263,12 +263,12 @@ export class GameEvents {
   handlePrivateMessage(
     @MessageBody()
     data: { gameId: string; type: string; message: string; avatar: string },
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
     console.log('send private message ', data);
     console.log(
       'roomName',
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId)
+      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
 
     // if (client.rooms.has('chatRoom_' + data.gameId)) {
@@ -282,7 +282,7 @@ export class GameEvents {
       .to(
         'chatRoom_' +
           data.type +
-          (data.type == 'lobby' ? '' : '_' + data.gameId)
+          (data.type == 'lobby' ? '' : '_' + data.gameId),
       )
       .emit('message', {
         message: data.message,

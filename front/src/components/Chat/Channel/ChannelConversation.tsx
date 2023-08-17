@@ -276,21 +276,17 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                 {/* display messages */}
                 {messages && userBlocked && (
                   <div className="align-end flex-grow text-lg m-1 p-2 ">
-                    {messages.map(
-                      (message: ChatMsgInterface) =>
-                        userBlocked.some(
-                          u => u.id === message.ownerUser.id,
-                        ) ? null : (
-                          // <ErrorBoundary>
-                          <MessageItem
-                            key={message.id}
-                            message={message}
-                            isLoadingDeleteMsg={isLoadingDeleteMsg}
-                            handleDeleteMessage={handleDeleteMessage}
-                            // isAdminMenuOpen={isAdminMenuOpen}
-                          />
-                        ),
-                      // </ErrorBoundary>
+                    {messages.map((message: ChatMsgInterface) =>
+                      userBlocked.some(
+                        u => u.id === message.ownerUser.id,
+                      ) ? null : (
+                        <MessageItem
+                          key={message.id}
+                          message={message}
+                          isLoadingDeleteMsg={isLoadingDeleteMsg}
+                          handleDeleteMessage={handleDeleteMessage}
+                        />
+                      ),
                     )}
                   </div>
                 )}
@@ -311,9 +307,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
   },
   (prevProps, nextProps) => {
     if (prevProps.conv.id !== nextProps.conv.id) return false;
-    // if (prevProps.conv.room.id !== nextProps.conv.room.id) return false;
-    // if (prevProps.conv.room.name !== nextProps.conv.room.name) return false;
-    // if (prevProps.conv.room.users !== nextProps.conv.room.users) return false;
     return true;
   },
 );

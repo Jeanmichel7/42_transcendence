@@ -1,8 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
-// import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
-
 import { JwtService } from '@nestjs/jwt';
 import { TrophiesEntity } from './entity/trophies.entity';
 import { TrophiesService } from './trophies.service';

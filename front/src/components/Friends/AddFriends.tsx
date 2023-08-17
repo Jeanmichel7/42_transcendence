@@ -9,8 +9,6 @@ import FriendItem from './FriendItem';
 import { requestAddFriend } from '../../api/relation';
 import { reduxAddWaitingFriendsSent } from '../../store/userSlice';
 
-//todo pagination for all users
-
 const AddFriendsRaw = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [allUsers, setAllUsers] = useState<UserInterface[]>([]);

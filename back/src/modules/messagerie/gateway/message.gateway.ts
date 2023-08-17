@@ -8,7 +8,6 @@ import {
 import { Server, Socket } from 'socket.io';
 
 import { MessageInterface } from 'src/modules/messagerie/interfaces/message.interface';
-// import { RequestWithUser } from 'src/modules/users/interfaces/request.user.interface';
 
 @WebSocketGateway({
   namespace: 'messagerie',
@@ -20,8 +19,6 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 })
 export class MessagerieWebsocketService {
   @WebSocketServer() server: Server;
-  // async handleConnection(@ConnectedSocket() client: Socket) {}
-  // async handleDisconnect(@ConnectedSocket() client: Socket) {}
 
   @SubscribeMessage('joinPrivateRoom')
   async handleJoin(

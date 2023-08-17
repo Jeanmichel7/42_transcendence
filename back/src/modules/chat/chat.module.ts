@@ -23,8 +23,6 @@ import { NotificationService } from '../notification/notification.service';
       UserEntity,
       NotificationEntity,
     ]),
-    // EventEmitterModule.forRoot(),
-    // WebsocketModule,
   ],
   providers: [
     ChatService,

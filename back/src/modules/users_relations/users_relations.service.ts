@@ -98,7 +98,7 @@ export class UsersRelationsService {
           relationType: 'friend',
         })
         .andWhere(
-          new Brackets((qb) => {
+          new Brackets(qb => {
             qb.where('userInitiateur.login = :login', { login }).orWhere(
               'userRelation.login = :login',
               { login },
@@ -109,7 +109,7 @@ export class UsersRelationsService {
 
     if (userRelations.length === 0) return [];
 
-    const allFriends: UserInterface[] = userRelations.map((relation) =>
+    const allFriends: UserInterface[] = userRelations.map(relation =>
       relation.userInitiateur.login == login
         ? relation.userRelation
         : relation.userInitiateur,
@@ -169,7 +169,7 @@ export class UsersRelationsService {
           relationType: 'friend',
         })
         .andWhere(
-          new Brackets((qb) => {
+          new Brackets(qb => {
             qb.where('userInitiateur.id = :userId', { userId }).orWhere(
               'userRelation.id = :userId',
               { userId },
@@ -179,7 +179,7 @@ export class UsersRelationsService {
         .getMany();
     // console.log('allRelationFriends : ', allRelationFriends);
 
-    const allFriends: UserInterface[] = allRelationFriends.map((relation) =>
+    const allFriends: UserInterface[] = allRelationFriends.map(relation =>
       relation.userInitiateur.id == userId
         ? relation.userRelation
         : relation.userInitiateur,
@@ -244,7 +244,7 @@ export class UsersRelationsService {
 
     if (allRelationBlocked.length === 0) return [];
 
-    const allBlocked: UserInterface[] = allRelationBlocked.map((relation) =>
+    const allBlocked: UserInterface[] = allRelationBlocked.map(relation =>
       relation.userInitiateur.id == userId
         ? relation.userRelation
         : relation.userInitiateur,
@@ -261,7 +261,7 @@ export class UsersRelationsService {
       });
     if (userRelations.length === 0) return [];
     const allRequestsWaiting: UserInterface[] = userRelations.map(
-      (relation) => relation.userInitiateur,
+      relation => relation.userInitiateur,
     );
     return allRequestsWaiting;
   }
@@ -274,7 +274,7 @@ export class UsersRelationsService {
       });
     if (userRelations.length === 0) return [];
     const allRequestsSent: UserInterface[] = userRelations.map(
-      (relation) => relation.userRelation,
+      relation => relation.userRelation,
     );
     return allRequestsSent;
   }

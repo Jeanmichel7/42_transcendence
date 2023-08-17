@@ -1,4 +1,3 @@
-// import { Param, Query } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -49,7 +48,7 @@ export class ChatGateway {
   emitNewMessage(message: ChatMsgInterface) {
     this.server
       .to(message.room.id.toString())
-      .emit('chat_message', message, (ack) => {
+      .emit('chat_message', message, ack => {
         if (ack) {
           // console.log('message sent to room' + message.room.id, message);
         } else {

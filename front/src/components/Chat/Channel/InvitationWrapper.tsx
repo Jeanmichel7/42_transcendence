@@ -13,7 +13,6 @@ import RoomCard from '../ConversationList/outlet/ChannelRoomCard';
 const InvitationWrapper = () => {
   const { channelId, channelName } = useParams();
   const [room, setRoom] = useState<RoomInterface | null>(null);
-  // const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userData } = useSelector((state: RootState) => state.user);
@@ -41,29 +40,13 @@ const InvitationWrapper = () => {
           ),
         );
         navigate('/chat');
-      } else {
-        // check private and password
-        // dispatch(reduxAddConversationList({ item: result, userId: userData.id }));
-        // navigate(`/chat/channel/${channelId}/${channelName}`);
       }
     }
   }, [channelId, dispatch, navigate, userData.id]);
 
   useEffect(() => {
-    if (
-      !channelId ||
-      !channelName
-      //  || !location.state
-    )
-      return;
-    // console.log('location : ', location);
-    // console.log('channelId : ', channelId);
-    // console.log('channelName : ', channelName);
-
+    if (!channelId || !channelName) return;
     fetchRoom();
-    //verifie acces
-    // ajoute list conv
-    // redirige vers conv
   }, [fetchRoom]);
 
   return <>{room && <RoomCard room={room} />}</>;

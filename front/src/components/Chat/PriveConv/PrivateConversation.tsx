@@ -229,7 +229,6 @@ const PrivateConversation: React.FC = () => {
     const element = e.target as HTMLDivElement;
     if (element.scrollTop === 0) {
       setPageDisplay(prev => prev + 1);
-      //display waiting message
     }
   };
 
@@ -262,7 +261,6 @@ const PrivateConversation: React.FC = () => {
           userId: userData.id,
         }),
       );
-      // dispatch(setMsgSnackbar('Friend deleted'));
       navigate('/chat');
     }
   };
@@ -408,7 +406,6 @@ const PrivateConversation: React.FC = () => {
           {/* display messages */}
           {messages && (
             <div className="text-lg m-1 p-2 ">
-              {/* { isLoadingPagination && <CircularProgress className='mx-auto' />} */}
               {messages.map((message: MessageInterface) => (
                 <MessageItem
                   key={message.id}

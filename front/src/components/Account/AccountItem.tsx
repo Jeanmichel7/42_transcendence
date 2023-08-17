@@ -59,11 +59,6 @@ export default function AccountItem({ keyName, value }: ItemProps) {
     (state: RootState) => state.user.userData,
   );
 
-  // useEffect(() => {
-  //   console.log('inputValue', inputValue);
-  //   console.log('value', value);
-  // }, [value]);
-
   async function handleClose2FA(): Promise<void> {
     const res: ApiLogin2FACode | ApiErrorResponse = await check2FACode(
       userCode,
@@ -76,13 +71,12 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       setQRCode('');
       setUserCode('');
       setMsgSnackbar('2FA actived!');
-      // setValidCode(false);
-      localStorage.removeItem('2FA'); // pas safe ? oui surement...
+      localStorage.removeItem('2FA'); //bad idea
     }
   }
 
   async function handleForm(): Promise<void> {
-    await new Promise(r => setTimeout(r, 300)); // pour le style
+    await new Promise(r => setTimeout(r, 300));
 
     const formData: FormData = new FormData();
     formData.append(keyName, inputValue as string);

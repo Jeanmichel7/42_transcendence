@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
-
 import { check2FACookie, check2FACode } from '../api/auth';
-
 import {
   FormControl,
   InputLabel,
@@ -180,7 +178,6 @@ function ConnectPage() {
               <Button
                 variant="contained"
                 color="primary"
-                // onClick={handleOAuthConnection}
                 fullWidth
                 style={{ marginBottom: '15px' }}
               >

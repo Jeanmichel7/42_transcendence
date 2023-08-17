@@ -13,7 +13,7 @@ export interface SnackbarInterface {
   trophyImg?: string;
   error: {
     error: string;
-    message: string;
+    message: string | string[];
     statusCode: number;
   };
 }
@@ -55,7 +55,6 @@ export interface NotificationInterface {
     | 'gameInviteAccepted'
     | 'gameInviteDeclined'
     | 'message';
-  // title: string;
   content: string;
   read: boolean;
   createdAt: Date;

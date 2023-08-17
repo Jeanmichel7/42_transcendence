@@ -87,8 +87,7 @@ const StickerWrapper = styled.span`
   }
 `;
 
-// Utilisation dans un composant React
-export const Sticker = ({ dataText }) => {
+export const Sticker = ({ dataText }: { dataText: string }) => {
   return (
     <StickerWrapper data-text={dataText}>
       <StickerSpan>

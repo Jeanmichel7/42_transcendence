@@ -4,14 +4,11 @@ import slow from '../../assets/slow.png';
 import bigRacket from '../../assets/bigRacket.png';
 import spriteBonusSelection from '../../assets/spriteBonusSelection.png';
 
-// Précharger les images
 const images = [laser, slow, bigRacket];
 images.forEach(imgSrc => {
   const img = new Image();
   img.src = imgSrc;
 });
-
-// Keyframes pour l'animation
 
 const getBonusImage = (bonusName: string) => {
   switch (bonusName) {

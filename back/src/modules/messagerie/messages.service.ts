@@ -161,7 +161,7 @@ export class MessageService {
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);
 
-    if (userReceive.blocked.map((user) => user.id).includes(userSend.id))
+    if (userReceive.blocked.map(user => user.id).includes(userSend.id))
       throw new ForbiddenException(`${userReceive.login} blocked you`);
     if (!userReceive)
       throw new NotFoundException(`User with id ${userIdTo} not found`);

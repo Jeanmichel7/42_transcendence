@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { UserInterface } from '../types';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { faker } from '@faker-js/faker';
 import { Link } from 'react-router-dom';
 import SigninAccount from '../components/Login/SigninAccount';
 import LoginAccount from '../components/Login/LoginAccount';
+import { faker } from '@faker-js/faker';
 
 export interface FormDataUser {
   login: string;

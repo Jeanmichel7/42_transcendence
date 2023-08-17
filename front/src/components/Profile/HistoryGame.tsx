@@ -57,7 +57,10 @@ export default function HistoryGame({ user }: PropsGames) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [games]);
 
-  const handleChangePage = (value: number) => {
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
     setCurrentPage(value);
     setNeedRef(true);
   };

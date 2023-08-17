@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
-
 import { UserEntity } from './entity/users.entity';
 import { multerConfig } from 'config/multer.config';
 import { JwtService } from '@nestjs/jwt';
@@ -21,12 +18,12 @@ import { NotificationEntity } from '../notification/entity/notification.entity';
       UserEntity,
       TrophiesEntity,
       UserTrophiesEntity,
-      NotificationEntity
+      NotificationEntity,
     ]),
-    MulterModule.register(multerConfig)
+    MulterModule.register(multerConfig),
   ],
   providers: [UsersService, AuthAdmin, JwtService, NotificationService],
   controllers: [UsersController],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 export class UsersModule {}
