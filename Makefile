@@ -50,4 +50,7 @@ logs:
 dbsave:
 	docker exec -t postgres pg_dump -U postgres pong_db > db/save.sql
 
+dbclear:
+	docker exec -i postgres psql -U postgres pong_db < db/clean.sql
+
 .PHONY	: all build down re clean fclean

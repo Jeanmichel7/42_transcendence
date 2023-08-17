@@ -5,23 +5,28 @@ import { MulterModule } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
-// import { AuthOwner } from 'src/modules/auth/guard/authOwner.guard';
 import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 
 import { UserEntity } from './entity/users.entity';
 import { multerConfig } from 'config/multer.config';
 import { JwtService } from '@nestjs/jwt';
+import { TrophiesEntity } from '../trophies/entity/trophies.entity';
+import { UserTrophiesEntity } from '../trophies/entity/userTrophiesProgress.entity';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationEntity } from '../notification/entity/notification.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    MulterModule.register(multerConfig),
-    // MulterModule.register({
-    //   dest: 'uploads/users_avatars',
-    // }),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      TrophiesEntity,
+      UserTrophiesEntity,
+      NotificationEntity
+    ]),
+    MulterModule.register(multerConfig)
   ],
-  providers: [UsersService, AuthAdmin, JwtService],
+  providers: [UsersService, AuthAdmin, JwtService, NotificationService],
   controllers: [UsersController],
-  exports: [UsersService],
+  exports: [UsersService]
 })
 export class UsersModule {}

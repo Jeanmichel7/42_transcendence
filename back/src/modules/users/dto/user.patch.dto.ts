@@ -11,21 +11,21 @@ import {
 export class UserPatchDTO {
   @IsOptional()
   @IsNotEmpty({ message: 'The first name is required' })
-  @Length(3, 20, {
-    message: 'The first name must be between 3 and 20 characters',
+  @Length(2, 22, {
+    message: 'The first name must be between 2 and 22 characters',
   })
   firstName: string;
 
   @IsOptional()
   @IsNotEmpty({ message: 'The last name is required' })
-  @Length(3, 20, {
-    message: 'The last name must be between 3 and 20 characters',
+  @Length(2, 22, {
+    message: 'The last name must be between 2 and 22 characters',
   })
   lastName: string;
 
   @IsOptional()
   @IsNotEmpty({ message: 'The login is required' })
-  @Length(3, 20, { message: 'The login must be between 3 and 20 characters' })
+  @Length(2, 22, { message: 'The login must be between 2 and 22 characters' })
   login: string;
 
   @IsOptional()

@@ -1,6 +1,6 @@
 FROM node:18
 
-RUN apt-get update
+# RUN apt-get update
 
 WORKDIR /app
 

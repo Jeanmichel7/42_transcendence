@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { UserInterface } from '../../types';
+import {
+  ApiErrorResponse,
+  UserInterface,
+  UserStatGamesInterface,
+} from '../../types';
 import { Line } from 'react-chartjs-2';
 import {
   ArcElement,
@@ -12,7 +16,7 @@ import {
   Title,
 } from 'chart.js';
 import { useDispatch } from 'react-redux';
-import { getHistoryGames } from '../../api/game';
+import { statsUserGames } from '../../api/game';
 import { setErrorSnackbar } from '../../store/snackbarSlice';
 
 Chart.register(
@@ -37,20 +41,12 @@ const StatsPlayerChart = ({ user }: StatsPlayerProps) => {
     async function fetchGames() {
       if (!user.id) return;
 
-      const gamesFetched = await getHistoryGames(user.id);
-      if ('error' in gamesFetched)
-        return dispatch(setErrorSnackbar(gamesFetched));
+      const statsGamesUser: UserStatGamesInterface[] | ApiErrorResponse =
+        await statsUserGames(user.id);
+      if ('error' in statsGamesUser)
+        return dispatch(setErrorSnackbar(statsGamesUser));
 
-      setScoreData([
-        1500,
-        ...gamesFetched
-          .map(game =>
-            game.player1.id === user.id
-              ? game.eloScorePlayer1
-              : game.eloScorePlayer2,
-          )
-          .reverse(),
-      ]);
+      setScoreData([1500, ...statsGamesUser.map(game => game.eloscore)]);
     }
     fetchGames();
   }, [dispatch, user.id]);

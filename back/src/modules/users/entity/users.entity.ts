@@ -108,12 +108,6 @@ export class UserEntity extends BaseEntity {
     type: 'integer',
     default: 0,
   })
-  gamesPlayed: number;
-
-  @Column({
-    type: 'integer',
-    default: 0,
-  })
   consecutiveWin: number;
 
   @Column({
@@ -144,7 +138,7 @@ export class UserEntity extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: 'cooper_3',
+    default: 'cooper_1',
     nullable: true,
   })
   rank: Rank;
@@ -189,74 +183,74 @@ export class UserEntity extends BaseEntity {
   numberOfGamesWonWithoutMissingBall: number;
 
   /* messagerie */
-  @OneToMany(() => MessageEntity, (message) => message.ownerUser, {
+  @OneToMany(() => MessageEntity, message => message.ownerUser, {
     cascade: true,
   })
   messagesSend: MessageEntity[];
 
-  @OneToMany(() => MessageEntity, (message) => message.destUser, {
+  @OneToMany(() => MessageEntity, message => message.destUser, {
     cascade: true,
   })
   messagesReceive: MessageEntity[];
 
   /* chat */
-  @OneToMany(() => ChatMessageEntity, (message) => message.ownerUser, {
+  @OneToMany(() => ChatMessageEntity, message => message.ownerUser, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   chatMessages: ChatMessageEntity[];
 
   //chat room
-  @OneToMany(() => ChatRoomEntity, (room) => room.ownerUser, {
+  @OneToMany(() => ChatRoomEntity, room => room.ownerUser, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   roomOwner: ChatRoomEntity[];
 
-  @ManyToMany(() => ChatRoomEntity, (room) => room.acceptedUsers, {
+  @ManyToMany(() => ChatRoomEntity, room => room.acceptedUsers, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   roomAccepted: ChatRoomEntity[];
 
-  @ManyToMany(() => ChatRoomEntity, (room) => room.admins, {
+  @ManyToMany(() => ChatRoomEntity, room => room.admins, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   roomAdmins: ChatRoomEntity[];
 
-  @ManyToMany(() => ChatRoomEntity, (room) => room.users, {
+  @ManyToMany(() => ChatRoomEntity, room => room.users, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   roomUsers: ChatRoomEntity[];
 
-  @ManyToMany(() => ChatRoomEntity, (room) => room.bannedUsers, {
+  @ManyToMany(() => ChatRoomEntity, room => room.bannedUsers, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   roomBannedUsers: ChatRoomEntity[];
 
-  @ManyToMany(() => ChatRoomEntity, (room) => room.mutedUsers, {
+  @ManyToMany(() => ChatRoomEntity, room => room.mutedUsers, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   roomMutedUsers: ChatRoomEntity[];
 
   /*  Games  */
-  @OneToMany(() => GameEntity, (game) => game.player1, {
+  @OneToMany(() => GameEntity, game => game.player1, {
     // cascade: true,
     onDelete: 'CASCADE',
   })
   gamesAsPlayer1: GameEntity[];
 
-  @OneToMany(() => GameEntity, (game) => game.player2, {
+  @OneToMany(() => GameEntity, game => game.player2, {
     // cascade: true,
     onDelete: 'CASCADE',
   })
   gamesAsPlayer2: GameEntity[];
 
-  @OneToMany(() => GameEntity, (game) => game.winner, {
+  @OneToMany(() => GameEntity, game => game.winner, {
     // cascade: true,
     onDelete: 'CASCADE',
   })
@@ -265,35 +259,35 @@ export class UserEntity extends BaseEntity {
   /* users relations */
   @OneToMany(
     () => UserRelationEntity,
-    (userRelation) => userRelation.userInitiateur,
+    userRelation => userRelation.userInitiateur
   )
   initiatedRelations: UserRelationEntity[];
 
   @OneToMany(
     () => UserRelationEntity,
-    (userRelation) => userRelation.userRelation,
+    userRelation => userRelation.userRelation
   )
   relatedRelations: UserRelationEntity[];
 
   /* notifications */
-  @OneToMany(() => NotificationEntity, (notif) => notif.sender, {
+  @OneToMany(() => NotificationEntity, notif => notif.sender, {
     // cascade: true,
     onDelete: 'CASCADE',
   })
   notificationsSend: NotificationEntity[];
 
-  @OneToMany(() => NotificationEntity, (notif) => notif.receiver, {
+  @OneToMany(() => NotificationEntity, notif => notif.receiver, {
     // cascade: true,
     onDelete: 'CASCADE',
   })
   notificationsReceived: NotificationEntity[];
 
   /* trophie */
-  @ManyToMany(() => TrophiesEntity, (trophie) => trophie.users)
+  @ManyToMany(() => TrophiesEntity, trophie => trophie.users)
   @JoinTable()
   trophies: TrophiesEntity[];
 
-  @OneToMany(() => UserTrophiesEntity, (userTrophy) => userTrophy.user)
+  @OneToMany(() => UserTrophiesEntity, userTrophy => userTrophy.user)
   trophiesProgress: UserTrophiesEntity[];
 
   /* helper */
@@ -304,24 +298,23 @@ export class UserEntity extends BaseEntity {
   get friends(): UserEntity[] {
     return [...this.initiatedRelations, ...this.relatedRelations]
       .filter(
-        (relation) =>
-          relation.relationType === 'friend' &&
-          relation.mutuelBlocked === false,
+        relation =>
+          relation.relationType === 'friend' && relation.mutuelBlocked === false
       )
-      .map((relation) =>
+      .map(relation =>
         relation.userInitiateur.id === this.id
           ? relation.userRelation
-          : relation.userInitiateur,
+          : relation.userInitiateur
       );
   }
 
   get blocked(): UserEntity[] {
     return [...this.initiatedRelations, ...this.relatedRelations]
-      .filter((relation) => relation.relationType === 'blocked')
-      .map((relation) =>
+      .filter(relation => relation.relationType === 'blocked')
+      .map(relation =>
         relation.userInitiateur.id === this.id
           ? relation.userRelation
-          : relation.userInitiateur,
+          : relation.userInitiateur
       );
   }
 }

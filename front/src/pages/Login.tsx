@@ -21,16 +21,6 @@ import {
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 
-const PingPongText = styled.span`
-  position: absolute;
-  right: 30%; // Ajustez ces valeurs en fonction de votre besoin
-  bottom: 30%;
-  font-size: 1.5rem; // Taille du texte
-  color: #ffffff; // Couleur du texte
-  padding: 8px 16px;
-  border-radius: 8px; // Arrondi du fond
-  z-index: 10; // Assurez-vous qu'il apparaît au-dessus d'autres éléments
-`;
 const slideInFromBottom = keyframes`{
   0% {
     transform: translateY(200%);
@@ -40,48 +30,67 @@ const slideInFromBottom = keyframes`{
   }
 }`;
 
-const slideInFromBottomSmallScreen = keyframes`{
-  0% {
-    transform: translateY(400%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}`;
+const fadeIn = keyframes`
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  `;
 
-const slideInFromBottomLink = keyframes`{
-  0% {
-    transform: translateY(200%);
-  }
-  50% {
-    transform: translateY(200%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}`;
+const slideInFromRight = keyframes`
+    0% {
+      transform: translateX(200%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  `;
 
+const PingPongText = styled.span`
+  position: absolute;
+  right: 15vw;
+  bottom: 15vh;
+  font-size: 2em;
+  color: #ffffff;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  animation: ${slideInFromRight} 2s ease-out 1s forwards;
+  transform: translateX(200%);
+`;
 
 const TitleWrapper = styled.div`
-  height: 200px;
-  width: 80%;
-  position: absolute;
-  left: 20%;
-  top: 20%;
-  overflow: hidden;
-  align-items: baseline;
+  position: relative;
+  left: 10vw;
+  top: 20vh;
   display: flex;
-  flex-direction: line;
+  flex-direction: row;
+  align-items: center;
+
   @media (max-width: 768px) {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
     flex-direction: column;
-    height: 400px;
+    align-items: center;
   }
 `;
 
 const Title = styled.h1`
-  font-size: 8rem;
-  animation: ${slideInFromBottom} 2s ease-out;
+  font-size: 10vw;
+  animation: ${slideInFromBottom} 2s ease-out forwards;
   color: #f4def8;
+  margin-right: 5vw;
+  margin-bottom: 2vh;
+
+  @media (max-width: 768px) {
+    font-size: 8em;
+    margin-right: 0;
+    position: absolute;
+    bottom: 70%;
+  }
 `;
 
 export const animationCircle = keyframes`
@@ -98,7 +107,7 @@ export const TransitionCircle = styled.span<{ expand: boolean }>`
   left: 50%;
   top: 50%;
   transform: translate(${props => (props.expand ? '-50%' : '-150%')}, -50%);
-  animation: ${animationCircle} 1s ease-out;
+  animation: ${animationCircle} 3s ease-out;
   width: 200vh;
   height: 200vh;
   background-color: white;
@@ -107,9 +116,27 @@ export const TransitionCircle = styled.span<{ expand: boolean }>`
   transition: transform 1s ease-out;
 `;
 
+interface CircleProps {
+  expand: boolean;
+}
+
+const BigCircle = styled.span<CircleProps & { hovered: boolean }>`
+  position: absolute;
+  left: 100%;
+  top: 100%;
+  transform: translate(-50%, -50%)
+    scale(${props => (props.expand ? 2.5 : props.hovered ? 0.8 : 0.4)});
+  opacity: ${props => (props.expand ? 1 : props.hovered ? 0.5 : 0.02)};
+  width: 100vh;
+  height: 100vh;
+  border-radius: 50%;
+  background-color: white;
+  z-index: 2;
+  transition: transform 1s ease-out, opacity 1s ease-out;
+`;
+
 const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   position: relative;
-  margin-left: 2rem;
   color: #fff;
   text-decoration: none;
   font-size: 1rem;
@@ -119,13 +146,23 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   width: 10rem;
   border: 2px solid #fff;
   border-radius: 2rem;
-  animation: ${slideInFromBottomLink} 3s ease-out;
+
+  animation: ${fadeIn} 2s ease-out 1s forwards;
+  opacity: 0;
+
   overflow: hidden;
   transition: color 0.3s ease;
   z-index: 10;
 
   @media (max-width: 768px) {
-    animation: ${slideInFromBottomSmallScreen} 3s ease-out;
+    animation: ${fadeIn} 2s ease-out 1s forwards;
+    font-size: 1.5em;
+    padding: 0.5em 1em;
+    width: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   &::before {
     content: '';
@@ -157,6 +194,7 @@ const LoginWrapper = styled.div`
 `;
 
 export default function Login() {
+  const [isHovered, setIsHovered] = useState(false);
   const [expand, setExpand] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -207,10 +245,11 @@ export default function Login() {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    const width = 800;
+    const width = 450;
     const height = 600;
-    const left = window.innerWidth / 2 - width / 2;
-    const top = window.innerHeight / 2 - height / 2;
+    const left = Math.floor(window.innerWidth / 2 - width / 2) + window.screenX;
+    const top =
+      Math.floor(window.innerHeight / 2 - height / 2) + window.screenY;
 
     const newWindow = window.open(
       'http://localhost:3006/connection',
@@ -222,6 +261,16 @@ export default function Login() {
 
     window.addEventListener('message', async event => {
       if (event.source !== newWindow) return;
+
+      if (event.data.msg === 'resize') {
+        const newX =
+          Math.floor(window.innerWidth / 2 - event.data.width / 2) +
+          window.screenX;
+        newWindow.resizeTo(event.data.width, event.data.height);
+        newWindow.moveTo(newX, top);
+        return;
+      }
+
       if (event.data.msg === 'user connected') {
         setExpand(true);
         if (event.data.id != -1) await saveUserData(event.data.id);
@@ -233,11 +282,11 @@ export default function Login() {
 
   return (
     <LoginWrapper>
-      {/*<TransitionCircle expand={expand} />
-        <BigCircle hovered={isHovered} expand={expand} />
-      */}
+      <TransitionCircle expand={expand} />
+      <BigCircle hovered={isHovered} expand={expand} />
+
       <TitleWrapper>
-        <Title>Pong</Title>
+        <Title>PONG</Title>
         <StyledLink
           onClick={handleConnection}
           onMouseEnter={() => setIsHovered(true)}
@@ -246,11 +295,6 @@ export default function Login() {
         >
           Login
         </StyledLink>
-        {/* <Link to="/fakeconnection">
-          <Button sx={{ my: 2, color: 'white', display: 'block' }}>
-            Login Fake
-          </Button>
-        </Link> */}
       </TitleWrapper>
       <PingPongText>Pong! le jeu qui fait ping</PingPongText>
     </LoginWrapper>

@@ -627,19 +627,20 @@ export class GameService {
   }
 
   determineRank(scoreElo: number): string {
-    if (scoreElo < 1600) return 'cooper_3';
-    if (scoreElo < 1700) return 'cooper_2';
-    if (scoreElo < 1800) return 'cooper_1';
+    if (scoreElo < 1550) return 'cooper_1';
+    if (scoreElo < 1600) return 'cooper_2';
+    if (scoreElo < 1650) return 'cooper_3';
+    if (scoreElo < 1700) return 'silver_1';
+    if (scoreElo < 1800) return 'silver_2';
     if (scoreElo < 1900) return 'silver_3';
-    if (scoreElo < 2000) return 'silver_2';
-    if (scoreElo < 2100) return 'silver_1';
-    if (scoreElo < 2200) return 'gold_3';
-    if (scoreElo < 2300) return 'gold_2';
-    if (scoreElo < 2400) return 'gold_1';
-    if (scoreElo < 2500) return 'master_3';
-    if (scoreElo < 2600) return 'master_2';
-    return 'master_1'; // pour les scores de 2500 et plus
+    if (scoreElo < 2000) return 'gold_1';
+    if (scoreElo < 2200) return 'gold_2';
+    if (scoreElo < 2400) return 'gold_3';
+    if (scoreElo < 2600) return 'master_1';
+    if (scoreElo < 2800) return 'master_2';
+    if (scoreElo < 3000) return 'master_3';
   }
+
   async updatePlayerStats(
     player: UserEntity,
     winnerId: string,
@@ -650,12 +651,12 @@ export class GameService {
     if (player.login == winnerId) {
       // do not update exp here
       player.level = this.computeLevel(player.experience);
-      player.numberOfConsecutiveWins += 1;
+      player.numberOfConsecutiveWins += 1; // check this
+      if (winWihoutLoseAPoint) {
+        player.numberOfConsecutiveWins += 1; //wtf
+      }
     } else {
       player.numberOfConsecutiveWins = 0;
-    }
-    if (winWihoutLoseAPoint) {
-      player.numberOfConsecutiveWins += 1; // on peux ++ les 2 users
     }
     player.bonusUsed += playerStats.numberOfBonusesUsed;
     player.laserKill += playerStats.numberOfLaserKills;
@@ -708,8 +709,8 @@ export class GameService {
       bonusMode
     );
     await this.trophiesService.updateTrophiesPlayer(
-      scorePlayer1,
       scorePlayer2,
+      scorePlayer1,
       game.player2,
       game,
       player2Stats,
@@ -739,7 +740,11 @@ export class GameService {
     return result;
   }
 
-  async getAllUserGames(userId: bigint): Promise<GameInterface[]> {
+  async getAllUserGames(
+    userId: bigint,
+    page: number,
+    limit: number,
+  ): Promise<GameInterface[]> {
     const games: GameEntity[] = await this.gameRepository
       .createQueryBuilder('games')
       .leftJoinAndSelect('games.player1', 'player1')
@@ -769,13 +774,58 @@ export class GameService {
       .where('(player1.id = :userId OR player2.id = :userId)', { userId })
       .andWhere('games.status IN (:...statuses)', {
         statuses: ['finished'],
-        // statuses: ['finished', 'playing'],
       })
       .orderBy('games.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
       .getMany();
 
     const result: GameInterface[] = games;
     return result;
+  }
+
+  async getStatsUser(userId: bigint): Promise<any> {
+    const games: GameEntity[] = await this.gameRepository
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.player1', 'player1')
+      .leftJoinAndSelect('games.player2', 'player2')
+      .where(
+        '(games.player1.id = :userId OR games.player2.id = :userId) AND games.status = :status',
+        {
+          userId,
+          status: 'finished',
+        }
+      )
+      .orderBy('games.createdAt', 'ASC')
+      .getMany();
+    const stats = games.map(game => {
+      const isPlayer1 = game.player1.id == userId;
+      return {
+        score: isPlayer1 ? game.scorePlayer1 : game.scorePlayer2,
+        eloscore: isPlayer1 ? game.eloScorePlayer1 : game.eloScorePlayer2,
+        exp: isPlayer1 ? game.expPlayer1 : game.expPlayer2,
+        level: isPlayer1 ? game.levelPlayer1 : game.levelPlayer2,
+        win: isPlayer1 ? game.scorePlayer1 > game.scorePlayer2 : false,
+      };
+    });
+
+    return stats;
+  }
+
+  async countAllGames(userId: bigint): Promise<number> {
+    const count = await this.gameRepository
+      .createQueryBuilder('games')
+      .leftJoinAndSelect('games.player1', 'player1')
+      .leftJoinAndSelect('games.player2', 'player2')
+      .where(
+        '(games.player1.id = :userId OR games.player2.id = :userId) AND games.status = :status',
+        {
+          userId,
+          status: 'finished',
+        }
+      )
+      .getCount();
+    return count;
   }
 
   /** **********************

@@ -142,24 +142,22 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
           </Tooltip>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom  p-3 ">
-        <div className="">
-          <div className="md:absolute top-10 left-9">
-            {user.avatar && (
-              <img
-                src={user.avatar}
-                className="rounded-lg shadow-lg w-[346px] md:max-w-[256px] mx-auto"
-                alt="avatar"
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src =
-                    'http://localhost:3000/avatars/defaultAvatar.png';
-                }}
-              />
-            )}
-          </div>
-          <p className=" text-center md:mt-[150px] ml-1 md:w-[256px] pt-3">
+      <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom p-3 ">
+        <div className="px-[10vw] md:px-0 md:w-4/12">
+          {user.avatar && (
+            <img
+              src={user.avatar}
+              className="rounded-lg shadow-lg overflow-hidden h-[250px] object-cover
+                w-full md:mt-[-40px] md:ml-[10px]"
+              alt="avatar"
+              onError={e => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              }}
+            />
+          )}
+          <p className="pt-3 pl-3 text-center md:text-left text-gray-500">
             {user.description ? user.description : 'No description'}
           </p>
         </div>

@@ -25,13 +25,7 @@ import { UsersService } from '../users/users.service';
     ]),
   ],
   controllers: [TrophiesController],
-  providers: [
-    JwtService,
-    TrophiesService,
-    NotificationService,
-    UsersService,
-    TrophiesService,
-  ],
+  providers: [JwtService, TrophiesService, NotificationService, UsersService],
   exports: [TrophiesService],
 })
 export class TrophieModule {}

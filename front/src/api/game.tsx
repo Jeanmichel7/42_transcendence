@@ -1,16 +1,6 @@
 import { apiRequest } from './index';
-import { ApiErrorResponse } from '../types';
+import { ApiErrorResponse, UserStatGamesInterface } from '../types';
 import { GameInterface } from '../types/GameTypes';
-
-export async function getHistoryGames(
-  userId: number,
-): Promise<GameInterface[] | ApiErrorResponse> {
-  return apiRequest<GameInterface[]>(
-    'get',
-    '/games/users/' + userId + '/allUserGames',
-    'Failed to get history games: ',
-  );
-}
 
 export async function getGame(
   gameId: number,
@@ -49,5 +39,37 @@ export async function declineGame(
     'patch',
     '/games/' + gameId + '/decline',
     'Failed to decline game: ',
+  );
+}
+
+export async function statsUserGames(
+  userId: number,
+): Promise<UserStatGamesInterface[] | ApiErrorResponse> {
+  return apiRequest<UserStatGamesInterface[]>(
+    'get',
+    '/games/users/' + userId + '/stats',
+    'Failed to get stats games: ',
+  );
+}
+
+export async function getHistoryGames(
+  userId: number,
+  page: number,
+  offset: number,
+): Promise<GameInterface[] | ApiErrorResponse> {
+  return apiRequest<GameInterface[]>(
+    'get',
+    '/games/users/' + userId + '/games?page=' + page + '&offset=' + offset,
+    'Failed to get history games: ',
+  );
+}
+
+export async function getAllGamesCount(
+  userId: number,
+): Promise<number | ApiErrorResponse> {
+  return apiRequest<number>(
+    'get',
+    '/games/users/' + userId + '/countAllGames',
+    'Failed to get all games count: ',
   );
 }
