@@ -32,8 +32,7 @@ export const notificationSlice = createSlice({
       action: PayloadAction<NotificationInterface>,
     ) => {
       state.notifications = state.notifications.filter(
-        (notif: NotificationInterface) =>
-          JSON.stringify(notif) !== JSON.stringify(action.payload),
+        (notif: NotificationInterface) => notif.id != action.payload.id,
       );
     },
     reduxReadNotification: (
@@ -42,8 +41,8 @@ export const notificationSlice = createSlice({
     ) => {
       state.notifications = state.notifications.map(
         (notif: NotificationInterface) => {
-          if (JSON.stringify(notif) === JSON.stringify(action.payload))
-            return { ...notif, read: true };
+          if (notif.read) return notif;
+          if (notif.id == action.payload.id) return { ...notif, read: true };
           return notif;
         },
       );

@@ -19,9 +19,10 @@ interface PropsGames {
 }
 
 export default function HistoryGame({ user }: PropsGames) {
-  const topRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const [games, setGames] = useState<GameInterface[]>([]);
+  const [needRef, setNeedRef] = useState(false); // to scroll to top when change page
   const [currentPage, setCurrentPage] = useState(1);
   const [gamePerPage, setUserPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
@@ -44,18 +45,25 @@ export default function HistoryGame({ user }: PropsGames) {
 
       if ('error' in resFetchGames) return console.warn(resFetchGames.error);
       setGames(resFetchGames);
-      topRef.current?.scrollIntoView({ behavior: 'smooth' });
+      // if (needRef) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     fetchTotalGames();
     fetchGames();
   }, [dispatch, currentPage, gamePerPage, user]);
 
+  useEffect(() => {
+    if (games && games.length > 0) {
+      if (needRef) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [games]);
+
   const handleChangePage = (
     event: React.ChangeEvent<unknown> | null,
     value: number,
   ) => {
     setCurrentPage(value);
+    setNeedRef(true);
   };
 
   const handleChangeUserPerPage = (event: any) => {
@@ -66,8 +74,6 @@ export default function HistoryGame({ user }: PropsGames) {
   return (
     <div className="p-5 bg-inherit">
       <div className="flex flex-col w-full">
-        <div ref={topRef} />
-
         <p className="mt-6">
           <Sticker dataText={'Games'} />
         </p>
@@ -117,6 +123,7 @@ export default function HistoryGame({ user }: PropsGames) {
             </Select>
           </div>
         </div>
+        <div ref={bottomRef} />
       </div>
     </div>
   );

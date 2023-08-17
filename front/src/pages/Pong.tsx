@@ -69,6 +69,7 @@ function Pong() {
   const [showOverlay, setShowOverlay] = useState(false);
   const [lobbyData, setLobbyData] = useState<GameCard[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [pageContent, setPageContent] = useState<ReactNode>(null);
 
   const toggleChat = () => {
     setChatOpen(prevState => !prevState);
@@ -190,55 +191,66 @@ function Pong() {
     statusComponent = undefined;
   }
 
-  let pageContent: ReactNode;
-  if (currentPage === 'lobby' && !gameIdInvit) {
-    pageContent = (
-      <Lobby
-        setCurrentPage={setCurrentPage}
-        socket={socket}
-        setBonus={setBonus}
-        lobbyData={lobbyData}
-        setGameIdSpectate={setGameIdSpectate}
-      />
-    );
-  } else if (currentPage === 'game') {
-    pageContent = (
-      <Game
-        socket={socket}
-        lastGameInfo={lastGameInfo}
-        setCurrentPage={setCurrentPage}
-        bonus={bonus}
-        isChatOpen={chatOpen}
-      />
-    );
-  } else if (currentPage === 'searchOpponent') {
-    pageContent = (
-      <SearchingOpponent
-        socket={socket}
-        setCurrentPage={setCurrentPage}
-        bonus={bonus}
-      />
-    );
-  } else if (currentPage === 'privateLobby' && gameIdInvit) {
-    pageContent = (
-      <PrivateLobby
-        setCurrentPage={setCurrentPage}
-        socket={socket}
-        gameId={gameIdInvit as string}
-        isPlayer1={isPlayer1}
-      />
-    );
-  } else if (currentPage === 'spectate' && gameIdInvitSpectate) {
-    pageContent = (
-      <GameSpectator
-        setCurrentPage={setCurrentPage}
-        socket={socket}
-        gameIdInvit={gameIdInvitSpectate}
-      />
-    );
-  } else {
-    // console.warn('current page not found', currentPage);
-  }
+  useEffect(() => {
+    if (!socket.emit) return;
+    if (currentPage === 'lobby' && !gameIdInvit) {
+      setPageContent(
+        <Lobby
+          setCurrentPage={setCurrentPage}
+          socket={socket}
+          setBonus={setBonus}
+          lobbyData={lobbyData}
+          setGameIdSpectate={setGameIdSpectate}
+        />,
+      );
+    } else if (currentPage === 'game') {
+      setPageContent(
+        <Game
+          socket={socket}
+          lastGameInfo={lastGameInfo}
+          setCurrentPage={setCurrentPage}
+          bonus={bonus}
+          isChatOpen={chatOpen}
+        />,
+      );
+    } else if (currentPage === 'searchOpponent') {
+      setPageContent(
+        <SearchingOpponent
+          socket={socket}
+          setCurrentPage={setCurrentPage}
+          bonus={bonus}
+        />,
+      );
+    } else if (currentPage === 'privateLobby' && gameIdInvit) {
+      setPageContent(
+        <PrivateLobby
+          setCurrentPage={setCurrentPage}
+          socket={socket}
+          gameId={gameIdInvit as string}
+          isPlayer1={isPlayer1}
+        />,
+      );
+    } else if (currentPage === 'spectate' && gameIdInvitSpectate) {
+      setPageContent(
+        <GameSpectator
+          setCurrentPage={setCurrentPage}
+          socket={socket}
+          gameIdInvit={gameIdInvitSpectate}
+        />,
+      );
+    } else {
+      // console.warn('current page not found', currentPage);
+    }
+  }, [
+    bonus,
+    chatOpen,
+    currentPage,
+    gameIdInvit,
+    gameIdInvitSpectate,
+    isPlayer1,
+    lobbyData,
+    socket,
+  ]);
 
   return (
     <div className="flex h-screen min-h-md relative w-full">

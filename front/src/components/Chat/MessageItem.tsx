@@ -1,11 +1,16 @@
 import { useState, FC, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 
 import { apiEditMessage } from '../../api/message';
 
-import { ApiErrorResponse, GameInterface, UserInterface } from '../../types';
+import {
+  ApiErrorResponse,
+  GameInterface,
+  NotificationInterface,
+  UserInterface,
+} from '../../types';
 import { ChatMsgInterface, MessageInterface } from '../../types/ChatTypes';
 import { BiPaperPlane } from 'react-icons/bi';
 import {
@@ -28,7 +33,8 @@ import {
 import { editChatMessage } from '../../api/chat';
 import { RootState } from '../../store';
 import { StyledLink } from './PriveConv/style';
-import { inviteGameUser } from '../../api/game';
+import { acceptGameByBtn, inviteGameUser } from '../../api/game';
+import { reduxRemoveNotification } from '../../store/notificationSlice';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -46,8 +52,12 @@ const MessageItem: FC<MessageItemProps> = ({
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData,
   );
+  const notifications: NotificationInterface[] = useSelector(
+    (state: RootState) => state.notification.notifications,
+  );
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>(message.text);
+  const [invitIsAccept, setInvitIsAccept] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
@@ -56,7 +66,7 @@ const MessageItem: FC<MessageItemProps> = ({
     getTimeSince(message.createdAt),
   );
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const handleEdit =
     (id: number) =>
     async (
@@ -139,6 +149,23 @@ const MessageItem: FC<MessageItemProps> = ({
     setIsHovered(false);
   };
 
+  const handleJoinInvitationGame = async (word: string) => {
+    const extractGameId: number = parseInt(word.split('game?id=')[1] as string);
+    const resAcceptRequest: GameInterface | ApiErrorResponse =
+      await acceptGameByBtn(extractGameId);
+    if ('error' in resAcceptRequest)
+      dispatch(setErrorSnackbar(resAcceptRequest));
+    else {
+      const notif: NotificationInterface | undefined = notifications.find(
+        n => n.invitationLink === word,
+      );
+      navigate(extractGameId ? word : '/chat');
+      if (notif) {
+        dispatch(reduxRemoveNotification(notif));
+      }
+    }
+  };
+
   // update time since message created
   useEffect(() => {
     const fctTime = setInterval(() => {
@@ -153,16 +180,23 @@ const MessageItem: FC<MessageItemProps> = ({
     const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
 
     const formatedLine = line.split(' ').map(word => {
-      if (word.match(urlRegex)) {
+      if (word.includes('game?id=')) {
         if (!isDefi) setIsDefi(true);
-        return word.includes('game?id=') ? (
+        return (
           <div className="flex flex-col justify-center items-center" key={word}>
             <p className="">Game Invitation</p>
-            <Button href={word} variant="contained">
+            <Button
+              variant="contained"
+              disabled={invitIsAccept}
+              onClick={() => handleJoinInvitationGame(word)}
+            >
               Join
             </Button>
           </div>
-        ) : (
+        );
+      }
+      if (word.match(urlRegex)) {
+        return (
           <StyledLink href={word} key={word}>
             {word + ' '}
           </StyledLink>

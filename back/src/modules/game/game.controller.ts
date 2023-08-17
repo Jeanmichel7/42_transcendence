@@ -48,6 +48,14 @@ export class GameController {
     return await this.gameService.saveAcceptGame(req.user.id, gameId);
   }
 
+  @Patch(':gameId/accept/noNotif')
+  async acceptNoNotif(
+    @Param('gameId', ParseIntPipe) gameId: bigint,
+    @Req() req: RequestWithUser
+  ): Promise<GameInterface> {
+    return await this.gameService.saveAcceptGameNoNotif(req.user.id, gameId);
+  }
+
   @Patch(':gameId/decline')
   async decline(
     @Param('gameId', ParseIntPipe) gameId: bigint,
