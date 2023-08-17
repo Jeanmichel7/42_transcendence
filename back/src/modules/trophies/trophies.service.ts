@@ -46,9 +46,6 @@ export class TrophiesService {
     const count = await this.trophyRepository.count();
 
     if (count === 0) {
-      console.log(
-        "Trophies table doesn't exist... Creating trophies table in dataBase/"
-      );
       for (const trophy of trophies) {
         await this.createTrophy(
           trophy.name,
@@ -64,9 +61,6 @@ export class TrophiesService {
     const count = await this.userTrophiesProgressRepository.count();
 
     if (count === 0) {
-      console.log(
-        "UserTrophiesProgress table doesn't exist... Creating table in dataBase/"
-      );
       const users = await this.userRepository.find();
       for (const user of users) {
         for (const trophy of trophies) {

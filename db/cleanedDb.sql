@@ -386,7 +386,7 @@ CREATE TABLE public.users (
     "numberOfEnemiesKilledWithLaser" integer DEFAULT 0 NOT NULL,
     "numberOfGamesPlayed" integer DEFAULT 0 NOT NULL,
     "numberOfGamesWonWithoutMissingBall" integer DEFAULT 0 NOT NULL,
-    rank text DEFAULT 'cooper_3'::text
+    rank text DEFAULT 'cooper_1'::text
 );
 
 
@@ -628,7 +628,7 @@ COPY public.trophies_progress (id, progress, total, "userId", "trophyId") FROM s
 --
 
 COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity", score, level, experience, "gamesPlayed", "consecutiveWin", "laserKill", "bonusUsed", "numberOfConsecutiveWins", "numberOfEnemiesKilledWithLaser", "numberOfGamesPlayed", "numberOfGamesWonWithoutMissingBall", rank) FROM stdin;
-0	Bot	Bot	Bot	Bot@bot.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	I'm a bot	f	offline	\N	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	1500	1	0	0	0	0	0	0	0	0	0	cooper_3
+0	Bot	Bot	Bot	Bot@bot.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	I'm a bot	f	offline	\N	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	1500	1	0	0	0	0	0	0	0	0	0	cooper_1
 \.
 
 

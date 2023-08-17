@@ -83,7 +83,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
           score: 1500,
           level: 0,
           experience: 0,
-          rank: 'cooper_3',
+          rank: 'cooper_1',
         }),
       );
       dispatch(setLogged(false));

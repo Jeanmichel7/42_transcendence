@@ -143,7 +143,7 @@ export class ChatService {
       const newNotif: NotificationEntity =
         await this.notificationService.createNotification({
           type: 'roomInvite',
-          content: `you have been invited to join the room ${room.name}`,
+          content: `invite you to join the channel ${room.name}`,
           receiver: userInvited,
           sender: {
             id: user.id,
@@ -366,7 +366,7 @@ export class ChatService {
     const newNotif: NotificationEntity =
       await this.notificationService.createNotification({
         type: 'roomInvite',
-        content: `${user.login} invite you to join the room ${room.name}`,
+        content: `${user.login} invite you to join the channel ${room.name}`,
         receiver: userToInvite,
         sender: {
           id: user.id,

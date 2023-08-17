@@ -118,7 +118,13 @@ function Header() {
 
   const notificationMenu = (
     <Menu
-      sx={{ mt: '55px' }}
+      sx={{
+        marginLeft: '-50px',
+        '& .MuiMenu-list': {
+          paddingTop: 0,
+          paddingBottom: 0,
+        },
+      }}
       id="menu-appbar"
       anchorEl={anchorElNotification}
       anchorOrigin={{

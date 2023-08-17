@@ -204,56 +204,58 @@ const NotificationItem = ({
   const handleMouseLeave = () => {};
 
   return (
-    <MenuItem
-      sx={{
-        borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-        borderTop: '1px solid rgba(0, 0, 0, 0.12)',
-      }}
+    <div
+      className={`flex justify-between items-center border-y-[1px] border-gray-300 max-w-[600px]
+      ${notification.read ? 'bg-gray-100' : 'bg-gray-200'}
+    `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {isLoading ? <CircularProgress /> : null}
-      <Typography component="span">
-        <span
-          className="font-bold mx-1"
+      <div className="flex flex-grow overflow-hidden whitespace-nowrap text-overflow-ellipsis">
+        {isLoading ? <CircularProgress /> : null}
+        <p
+          className="font-bold ml-5 mr-1"
           onClick={() => handleClickNotificationUser(notification)}
         >
           {notification.sender.login}
-        </span>
-        <span
+        </p>
+        <p
+          title={notification.content}
           className="mr-12"
           onClick={() => handleClickNotification(notification)}
         >
           {notification.content}
-        </span>
-      </Typography>
+        </p>
+      </div>
 
-      <Button
-        onClick={() => handleAcceptActionNotification(notification)}
-        color="primary"
-      >
-        Accept
-      </Button>
-      <Button
-        onClick={() => handleDenyActionNotification(notification)}
-        color="error"
-      >
-        Refuse
-      </Button>
-      <Tooltip
-        title="Close"
-        arrow
-        TransitionComponent={Zoom}
-        TransitionProps={{ timeout: 600 }}
-      >
-        <IconButton
-          onClick={() => handleDeleteNotification(notification)}
-          color="warning"
+      <div className="flex max-w-[200px] mr-1">
+        <Button
+          onClick={() => handleAcceptActionNotification(notification)}
+          color="primary"
         >
-          <CloseIcon color="error" />
-        </IconButton>
-      </Tooltip>
-    </MenuItem>
+          Accept
+        </Button>
+        <Button
+          onClick={() => handleDenyActionNotification(notification)}
+          color="error"
+        >
+          Refuse
+        </Button>
+        <Tooltip
+          title="Close"
+          arrow
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 600 }}
+        >
+          <IconButton
+            onClick={() => handleDeleteNotification(notification)}
+            color="warning"
+          >
+            <CloseIcon color="error" />
+          </IconButton>
+        </Tooltip>
+      </div>
+    </div>
   );
 };
 
