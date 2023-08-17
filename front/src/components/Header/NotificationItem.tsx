@@ -2,9 +2,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
-  MenuItem,
   Tooltip,
-  Typography,
   Zoom,
 } from '@mui/material';
 import {
@@ -36,18 +34,16 @@ import {
 import { RootState } from '../../store';
 import { readNotification } from '../../api/notification';
 import { declineRoom } from '../../api/chat';
-import { acceptGame } from '../../api/game';
+import { acceptGame, declineGame } from '../../api/game';
 
 interface NotificationItemProps {
   notification: NotificationInterface;
-  setAnchorElNotification: React.Dispatch<
-    React.SetStateAction<null | HTMLElement>
-  >;
+  setNotifOpen: React.Dispatch<boolean>;
 }
 
 const NotificationItem = ({
   notification,
-  setAnchorElNotification,
+  setNotifOpen,
 }: NotificationItemProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -72,7 +68,7 @@ const NotificationItem = ({
       dispatch(
         reduxAddConversationList({ item: userToAccept, userId: userData.id }),
       );
-      dispatch(setMsgSnackbar('Friend request accepted'));
+      // dispatch(setMsgSnackbar('Friend request accepted'));
     }
   };
 
@@ -83,12 +79,12 @@ const NotificationItem = ({
     );
     setIsLoading(false);
 
-    if (notifications.length == 1) setAnchorElNotification(null);
+    // if (notifications.length == 0) setAnchorElNotification(null);
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
       dispatch(setErrorSnackbar(resDeclineRequest));
     else {
       dispatch(reduxRemoveWaitingFriends(userToDecline));
-      dispatch(setMsgSnackbar('Friend request declined'));
+      // dispatch(setMsgSnackbar('Friend request declined'));
     }
   };
 
@@ -96,6 +92,7 @@ const NotificationItem = ({
     const extractRoomId: number = parseInt(
       notif.invitationLink?.split('/')[4] as string,
     );
+    console.log('room id : ', extractRoomId);
     setIsLoading(true);
     const resDeclineRequest: void | ApiErrorResponse = await declineRoom(
       extractRoomId,
@@ -139,26 +136,39 @@ const NotificationItem = ({
       notif.invitationLink?.split('?id=')[1] as string,
     );
     setIsLoading(true);
-    await declineRoom(extractGameId);
-    // const resDeclineRequest: void | ApiErrorResponse = await declineRoom(extractGameId);
-    // if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
-    // dispatch(setErrorSnackbar(resDeclineRequest.error + resDeclineRequest.message ? ': ' + resDeclineRequest.message : ''));
+    const resDeclineRequest: void | ApiErrorResponse = await declineGame(
+      extractGameId,
+    );
+    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
+      dispatch(setErrorSnackbar(resDeclineRequest));
+    setIsLoading(false);
+  };
+
+  const handleGameInvitationAccepted = async (notif: NotificationInterface) => {
+    const extractGameId: number = parseInt(
+      notif.invitationLink?.split('?id=')[1] as string,
+    );
+    setIsLoading(true);
+    const resDeclineRequest: void | ApiErrorResponse = await declineGame(
+      extractGameId,
+    );
+    if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
+      dispatch(setErrorSnackbar(resDeclineRequest));
     setIsLoading(false);
   };
 
   /* action notif */
   const handleClickNotification = (notif: NotificationInterface) => {
-    setAnchorElNotification(null);
     if (notif.type === 'friendRequest')
       navigate('/friends?tab=waiting_received');
   };
 
   const handleClickNotificationUser = (notif: NotificationInterface) => {
-    setAnchorElNotification(null);
     navigate('/profile/' + notif.sender.login);
   };
 
   const handleDeleteNotification = (notif: NotificationInterface) => {
+    if (notifications.length == 1) setNotifOpen(false);
     dispatch(reduxRemoveNotification(notif));
     localStorage.setItem(
       'notifications' + userData.id,
@@ -168,11 +178,14 @@ const NotificationItem = ({
         ).filter((n: NotificationInterface) => n.id !== notif.id),
       ),
     );
+    console.log('notif length : ', notifications.length);
   };
 
   const handleAcceptActionNotification = async (
     notif: NotificationInterface,
   ) => {
+    console.log('notif accept : ', notif);
+
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
     if (notif.type === 'roomInvite')
@@ -184,15 +197,19 @@ const NotificationItem = ({
   };
 
   const handleDenyActionNotification = async (notif: NotificationInterface) => {
+    console.log('notif deny : ', notif);
     if (notif.type === 'friendRequest')
       await handleDeclineFriendRequest(notif.sender);
     if (notif.type === 'roomInvite') await handleDeclineJoinRoom(notif);
     if (notif.type === 'gameInvite') await handleDeclineGameInvitation(notif);
+    if (notif.type === 'gameInviteAccepted')
+      await handleGameInvitationAccepted(notif);
     handleDeleteNotification(notif);
   };
 
   //handler mouse notif
   const handleMouseEnter = async () => {
+    setNotifOpen(true);
     const resReadNotif: void | ApiErrorResponse = await readNotification(
       notification.id,
     );
@@ -201,7 +218,9 @@ const NotificationItem = ({
     else dispatch(reduxReadNotification(notification));
   };
 
-  const handleMouseLeave = () => {};
+  const handleMouseLeave = () => {
+    setNotifOpen(false);
+  };
 
   return (
     <div

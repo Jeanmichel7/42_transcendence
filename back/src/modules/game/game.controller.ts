@@ -4,15 +4,12 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post,
   Query,
   Req,
 } from '@nestjs/common';
 import { GameService } from './game.service';
-// import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 import { GameInterface } from './interfaces/game.interface';
-import { UserInterface } from '../users/interfaces/users.interface';
 
 @Controller('games')
 export class GameController {
@@ -25,11 +22,6 @@ export class GameController {
   ) {
     return await this.gameService.getGame(req.user.id, gameId);
   }
-
-  // @Get('allUserGames')
-  // async getAllGames(@Req() req: RequestWithUser): Promise<GameInterface[]> {
-  //   return await this.gameService.getAllUserGames(req.user.id);
-  // }
 
   @Get('users/:userId/games')
   async getAllGamesWithUser(
