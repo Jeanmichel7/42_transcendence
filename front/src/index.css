@@ -16,9 +16,7 @@
   }
 
   .header__link {
-    @apply text-3xl font-bold font-Dance rounded-lg shadow-black p-4 m-2 hover:bg-indigo-800 hover:border-white
-      /* active:bg-violet-700  */
-      /* focus:outline-none focus:ring focus:ring-violet-300 */;
+    @apply text-3xl font-bold font-Dance rounded-lg shadow-black p-4 m-2 hover:bg-indigo-800 hover:border-white;
   }
 
   .header__link--activ {

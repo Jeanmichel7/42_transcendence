@@ -13,7 +13,7 @@ const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
   { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
   { id: 'slow', duration: 0, timeStart: 0, activate: false },
-  { id: 'laser', duration: 10000, timeStart: 0, activate: false }
+  { id: 'laser', duration: 10000, timeStart: 0, activate: false },
 ];
 
 // Variable constante for optimisation, don't change
@@ -102,7 +102,7 @@ export class Game {
       y: 500,
       vx: 0,
       vy: 0,
-      speed: INITIAL_BALL_SPEED
+      speed: INITIAL_BALL_SPEED,
     };
     this.initBall(true);
     this.socketPlayer1Id = socketPlayer1Id;
@@ -127,13 +127,13 @@ export class Game {
     this.player1Stats = {
       numberOfBonusesUsed: 0,
       numberOfLaserKills: 0,
-      maxSpeedScoring: 0
+      maxSpeedScoring: 0,
     };
 
     this.player2Stats = {
       numberOfBonusesUsed: 0,
       numberOfLaserKills: 0,
-      maxSpeedScoring: 0
+      maxSpeedScoring: 0,
     };
     this.consecutiveExchangesWithoutBounce = 0;
     this.racketLeftDamage = 0;
@@ -187,7 +187,7 @@ export class Game {
         x: x,
         y: Math.random() * GROUND_MAX_SIZE,
         //id: bonus_id[Math.floor(Math.random() * bonus_id.length)],
-        boxSize: 50
+        boxSize: 50,
       };
     }
   }
@@ -259,7 +259,7 @@ export class Game {
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     const bonus = {
-      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)]
+      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
     };
 
     // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
@@ -347,13 +347,8 @@ export class Game {
     }
   }
 
-<<<<<<< HEAD
   resetBallAndRackets(leftSideLoose: boolean) {
     this.initBall(leftSideLoose ? false : true);
-=======
-  resetBallAndRackets(_vx: number) {
-    this.initBall();
->>>>>>> main
     this.fail = false;
     this.racketLeftHeight = RACKET_HEIGHT_10;
     this.racketRightHeight = RACKET_HEIGHT_10;
@@ -540,7 +535,7 @@ export class Game {
       player1Avatar: this.player1Info.avatar,
       player1Connected: this.player1Connected,
       player2Connected: this.player2Connected,
-      isPaused: this.isPaused
+      isPaused: this.isPaused,
     };
   }
 
@@ -554,7 +549,7 @@ export class Game {
       player1Rank: this.player1Info.rank,
       player2Rank: this.player2Info.rank,
       player1Score: this.player1Score,
-      player2Score: this.player2Score
+      player2Score: this.player2Score,
     };
   }
 
