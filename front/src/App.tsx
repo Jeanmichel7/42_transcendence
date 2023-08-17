@@ -128,7 +128,7 @@ function App() {
         location.pathname != '/' &&
         location.pathname != '/login' &&
         location.pathname != '/connection' &&
-        location.pathname != '/fakeconnection'
+        location.pathname != '/accountconnection'
       )
         navigate('/');
       setUserId(-1);
@@ -141,7 +141,7 @@ function App() {
       location.pathname != '/' &&
       location.pathname != '/login' &&
       location.pathname != '/connection' &&
-      location.pathname != '/fakeconnection'
+      location.pathname != '/accountconnection'
     ) {
       checkAuth();
     }
@@ -152,7 +152,7 @@ function App() {
       {location &&
         location.pathname !== '/' &&
         location.pathname != '/connection' &&
-        location.pathname != '/fakeconnection' && <Header />}
+        location.pathname != '/accountconnection' && <Header />}
       {(location.pathname == '/' || location?.pathname == '/game') && (
         <CircleBackground />
       )}
@@ -162,7 +162,7 @@ function App() {
       {location &&
         location.pathname !== '/' &&
         location.pathname != '/connection' &&
-        location.pathname != '/fakeconnection' && <Footer />}
+        location.pathname != '/accountconnection' && <Footer />}
 
       <SnackBarApp />
     </div>

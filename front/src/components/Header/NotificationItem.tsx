@@ -77,6 +77,8 @@ const NotificationItem = ({
     const resDeclineRequest: void | ApiErrorResponse = await declineFriend(
       userToDecline.id,
     );
+    await new Promise(resolve => setTimeout(resolve, 10000)); // here we wait 10sec sdsdf df ddfsdfdsfsdf
+
     setIsLoading(false);
 
     // if (notifications.length == 0) setAnchorElNotification(null);
@@ -220,16 +222,18 @@ const NotificationItem = ({
 
   return (
     <div
-      className={`flex justify-between items-center border-y-[1px] border-gray-300 max-w-[600px]
+      className={`flex justify-between items-center border-y-[1px] border-gray-300 max-w-[600px] py-1
       ${notification.read ? 'bg-gray-100' : 'bg-gray-200'}
     `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex flex-grow overflow-hidden whitespace-nowrap text-overflow-ellipsis">
-        {isLoading ? <CircularProgress /> : null}
+      <div className="flex justify-center items-center flex-grow overflow-hidden whitespace-nowrap text-overflow-ellipsis">
+        <p className="flex justify-center items-center ml-2">
+          {isLoading && <CircularProgress size={16} sx={{ ml: 1 }} />}
+        </p>
         <p
-          className="font-bold ml-5 mr-1"
+          className="font-bold ml-2 mr-1"
           onClick={() => handleClickNotificationUser(notification)}
         >
           {notification.sender.login}

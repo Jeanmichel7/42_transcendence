@@ -65,7 +65,7 @@ export async function loginFakeUser(
   return apiRequest<AuthInterface>(
     'post',
     '/auth/loginFakeUser',
-    'Failed to login fake user: ',
+    'Failed to login account user: ',
     body,
   );
 }
@@ -76,7 +76,7 @@ export async function registerFakeUser(
   return apiRequest<UserInterface>(
     'post',
     '/users/registerFakeUser',
-    'Failed to register fake user: ',
+    'Failed to register account user: ',
     body,
   );
 }
