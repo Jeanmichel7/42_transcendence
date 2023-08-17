@@ -28,6 +28,9 @@ import { join } from 'path';
 import { ChatRoomInterface } from '../chat/interfaces/chat.room.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserUpdateEvent } from '../notification/events/notification.event';
+import { TrophiesEntity } from 'config';
+import { trophies } from '../trophies/trophies.data';
+import { UserTrophiesEntity } from '../trophies/entity/userTrophiesProgress.entity';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +40,11 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private readonly eventEmitter: EventEmitter2,
+    @InjectRepository(TrophiesEntity)
+    private readonly trophyRepository: Repository<TrophiesEntity>,
+    @InjectRepository(UserTrophiesEntity)
+    private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
+    private readonly eventEmitter: EventEmitter2
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
@@ -175,13 +182,13 @@ export class UsersService {
         'score',
       ],
     });
-    const result: UserInterface[] = users.map((user) => ({ ...user }));
+    const result: UserInterface[] = users.map(user => ({ ...user }));
     return result;
   }
 
   async findAllUsersPaginate(
     page: number,
-    limit: number,
+    limit: number
   ): Promise<UserInterface[]> {
     const users: UserEntity[] = await this.userRepository.find({
       select: [
@@ -198,7 +205,7 @@ export class UsersService {
       skip: (page - 1) * limit,
       take: limit,
     });
-    const result: UserInterface[] = users.map((user) => ({ ...user }));
+    const result: UserInterface[] = users.map(user => ({ ...user }));
     return result;
   }
 
@@ -236,7 +243,10 @@ export class UsersService {
       const salt: string = await bcrypt.genSalt();
       const hash: string = await bcrypt.hash(newUser.password, salt);
       newUser.password = hash;
-      return await this.userRepository.save(newUser);
+      const userCreated: UserEntity = await this.userRepository.save(newUser);
+      await this.initTrophiesProgressForUser(userCreated);
+      // await this.trophyRepository.initTrophiesProgressForUser(newUser)
+      return userCreated;
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -262,6 +272,7 @@ export class UsersService {
     newUser.avatar = 'http://localhost:3000/avatars/' + avatarName;
     const user: UserEntity = await this.userRepository.save(newUser);
     if (!user) throw new NotFoundException(`User ${newUser.login} not created`);
+    await this.initTrophiesProgressForUser(user);
     const result: UserInterface = { ...user };
     return result;
   }
@@ -269,7 +280,7 @@ export class UsersService {
   async patchUser(
     id: bigint,
     updateUser: UserPatchDTO,
-    file: Express.Multer.File,
+    file: Express.Multer.File
   ): Promise<UserInterface> {
     const userToUpdate: UserInterface = await this.findUserWithPwd(id);
     if (!userToUpdate) throw new NotFoundException(`User ${id} not found`);
@@ -283,21 +294,21 @@ export class UsersService {
     if (updateUser.lastName) updateData.lastName = updateUser.lastName;
     if (updateUser.login) {
       const isAvailable: boolean = await this.isLoginAvailable(
-        updateUser.login,
+        updateUser.login
       );
       if (!isAvailable)
         throw new BadRequestException(
-          `Login ${updateUser.login} not available`,
+          `Login ${updateUser.login} not available`
         );
       updateData.login = updateUser.login;
     }
     if (updateUser.email) {
       const isAvailable: boolean = await this.isEmailAvailable(
-        updateUser.email,
+        updateUser.email
       );
       if (!isAvailable)
         throw new BadRequestException(
-          `Email ${updateUser.email} not available`,
+          `Email ${updateUser.email} not available`
         );
       updateData.email = updateUser.email;
     }
@@ -305,7 +316,7 @@ export class UsersService {
     if (updateUser.password) {
       const isMatch = await bcrypt.compare(
         updateUser.oldPassword,
-        userToUpdate.password,
+        userToUpdate.password
       );
       if (!isMatch) throw new BadRequestException(`Wrong password`);
       try {
@@ -322,7 +333,7 @@ export class UsersService {
         {
           ...updateData,
           updatedAt: new Date(),
-        },
+        }
       );
       if (isUpdated.affected === 0)
         throw new BadRequestException(`User ${id} has not been updated.`);
@@ -369,6 +380,19 @@ export class UsersService {
   /*                                                  */
   /* ************************************************ */
 
+  private async initTrophiesProgressForUser(user: UserEntity): Promise<void> {
+    for (const trophy of trophies) {
+      const newTrophy = new UserTrophiesEntity();
+      newTrophy.trophy = await this.trophyRepository.findOne({
+        where: { name: trophy.name },
+      });
+      newTrophy.user = user;
+      newTrophy.progress = trophy.progress || 0;
+      newTrophy.total = trophy.total || 0;
+      await this.userTrophiesProgressRepository.save(newTrophy);
+    }
+  }
+
   private async userExist(userId: bigint): Promise<boolean> {
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId },
@@ -404,7 +428,7 @@ export class UsersService {
       '../../../..',
       'uploads',
       'users_avatars',
-      avatarName,
+      avatarName
     );
     // console.log('path : ', localImagePath);
 
@@ -422,7 +446,7 @@ export class UsersService {
       writer.on('finish', () => {
         console.log('Image downloaded and saved successfully!');
       });
-      writer.on('error', (error) => {
+      writer.on('error', error => {
         console.error('Error while saving the image:', error);
       });
       return avatarName;
@@ -434,7 +458,7 @@ export class UsersService {
   private async deleteAvatar(avatarName: string): Promise<void> {
     const localPath = join(
       __dirname,
-      '../../../uploads/users_avatars/' + avatarName,
+      '../../../uploads/users_avatars/' + avatarName
     );
     try {
       access(localPath, null);
@@ -473,7 +497,7 @@ export class UsersService {
         {
           status: newStatus,
           updatedAt: new Date(),
-        },
+        }
       );
 
       const userUpdated = new UserUpdateEvent({

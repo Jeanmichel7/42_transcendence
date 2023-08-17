@@ -68,7 +68,7 @@ function Pong() {
   >();
   const [showOverlay, setShowOverlay] = useState(false);
   const [lobbyData, setLobbyData] = useState<GameCard[]>([]);
-  const [chatOpen, setChatOpen] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const toggleChat = () => {
     setChatOpen(prevState => !prevState);
@@ -248,19 +248,52 @@ function Pong() {
         {pageContent}
       </GameWrapper>
 
-      <div className="flex justify-center items-center border-l-[1px] border-blue-800">
-        <IconButton
-          size="small"
-          aria-label="close"
-          color="warning"
-          onClick={toggleChat}
-        >
-          {chatOpen ? (
-            <KeyboardArrowRightIcon fontSize="small" />
-          ) : (
-            <KeyboardArrowLeftIcon fontSize="small" />
-          )}
-        </IconButton>
+      <div
+        onClick={toggleChat}
+        title={chatOpen ? 'Close chat' : 'Open chat'}
+        className="border-l-[1px] border-blue-800"
+      >
+        <div className="flex flex-col justify-center items-center w-full h-full cursor-pointer hover:bg-blue-600">
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="warning"
+            sx={{ p: 0, m: 0 }}
+          >
+            {chatOpen ? (
+              <KeyboardArrowRightIcon fontSize="small" sx={{ p: 0, m: 0 }} />
+            ) : (
+              <KeyboardArrowLeftIcon fontSize="small" sx={{ p: 0, m: 0 }} />
+            )}
+          </IconButton>
+          <div style={{ width: '20px' }}>
+            <p
+              style={{
+                textTransform: 'uppercase',
+                transform: 'rotate(90deg)',
+                transformOrigin: 'left bottom',
+                marginBottom: '90px',
+                whiteSpace: 'nowrap',
+                fontSize: '0.8rem',
+                color: '#fff',
+              }}
+            >
+              {chatOpen ? 'Close chat' : 'Open chat'}
+            </p>
+          </div>
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="warning"
+            sx={{ p: 0, m: 0 }}
+          >
+            {chatOpen ? (
+              <KeyboardArrowRightIcon fontSize="small" sx={{ p: 0, m: 0 }} />
+            ) : (
+              <KeyboardArrowLeftIcon fontSize="small" sx={{ p: 0, m: 0 }} />
+            )}
+          </IconButton>
+        </div>
       </div>
 
       <div className={`h-full ${chatOpen ? 'w-1/4' : 'hidden'} bg-[#e5e5f2]`}>

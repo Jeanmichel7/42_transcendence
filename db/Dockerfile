@@ -3,4 +3,4 @@ FROM postgres
 RUN apt-get update && apt install -y sudo &&\
     adduser postgres sudo
 
-COPY ./save.sql /docker-entrypoint-initdb.d/
+COPY ./cleanedDb.sql /docker-entrypoint-initdb.d/

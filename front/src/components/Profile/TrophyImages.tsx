@@ -17,9 +17,11 @@ import pingKing from '../../assets/trophies/ping_king.jpg';
 import fasterThanLight from '../../assets/trophies/faster_than_light.jpg';
 import blitzPong from '../../assets/trophies/blitz_pong.jpg';
 import invincibleResistant from '../../assets/trophies/invincible_resistant.jpg';
+import Beginner from '../../assets/trophies/beginner.jpg';
 import pointProspector from '../../assets/trophies/point_prospector.jpg';
 
 const trophyImages = {
+  Beginner: Beginner,
   Warrior: warrior,
   Lord: lord,
   Emperor: emperor,

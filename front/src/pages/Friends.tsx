@@ -71,7 +71,7 @@ export default function FriendsPage() {
   const [blockedCount, setBlockedCount] = useState<number>(0);
   const [waitingRequestCount, setWaitingRequestCount] = useState<number>(0);
   const [waitingSentCount, setWaitingSentCount] = useState<number>(0);
-  const [viewType, setViewType] = useState<string>('list');
+  const [viewType, setViewType] = useState<'list' | 'grid'>('grid');
 
   const matchesSmallScreen = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down('sm'),

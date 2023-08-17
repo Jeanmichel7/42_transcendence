@@ -1,146 +1,15 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TrophiesEntity } from './entity/trophies.entity'; // Assurez-vous que le chemin est correct
+import { TrophiesEntity } from './entity/trophies.entity';
 import { GameEntity } from '../game/entity/game.entity';
 import { UserEntity } from '../users/entity/users.entity';
 import { PlayerStats } from '../game/game.class';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationEntity } from '../notification/entity/notification.entity';
 import { NotificationCreateDTO } from '../notification/dto/notification.create.dto';
 import { UserTrophiesEntity } from './entity/userTrophiesProgress.entity';
-
-const trophies = [
-  {
-    name: 'Warrior',
-    description: 'Win 3 games in a row',
-    imagePath: 'warrior.jpeg',
-    total: 3,
-  },
-  {
-    name: 'Lord',
-    description: 'Win 5 games in a row',
-    imagePath: 'lord.jpeg',
-    progress: 0,
-    total: 5,
-  },
-  {
-    name: 'Emperor',
-    description: 'Win 10 games in a row',
-    imagePath: 'emperor.jpeg',
-    progress: 0,
-    total: 10,
-  },
-  {
-    name: 'Laser Pointer',
-    description: 'Kill an opponent with a Laser',
-    imagePath: 'laser_pointer.jpeg',
-  },
-  {
-    name: 'Gamma Laser',
-    description: 'Kill 5 opponents with a laser',
-    imagePath: 'gamma_laser.jpeg',
-    progress: 0,
-    total: 5,
-  },
-  {
-    name: 'Scorificator',
-    description: 'Kill 10 opponents with a laser',
-    imagePath: 'scorificator.jpeg',
-    progress: 0,
-    total: 10,
-  },
-  {
-    name: 'Regular',
-    description: 'Play 20 games',
-    imagePath: 'regular.jpeg',
-    progress: 0,
-    total: 20,
-  },
-  {
-    name: 'Addict',
-    description: 'Play 50 games',
-    imagePath: 'addict.jpeg',
-    progress: 0,
-    total: 50,
-  },
-  {
-    name: 'NoLife',
-    description: 'Play 100 games',
-    imagePath: 'nolife.jpeg',
-    progress: 0,
-    total: 100,
-  },
-  {
-    name: 'Bonus Master',
-    description: 'Use 3 bonuses in one game',
-    imagePath: 'bonus_master.jpeg',
-    progress: 0,
-    total: 3,
-  },
-  {
-    name: 'Bonus Pro',
-    description: 'Use 5 bonuses in one game',
-    imagePath: 'bonus_pro.jpeg',
-    progress: 0,
-    total: 5,
-  },
-  {
-    name: 'Bonus Cheater',
-    description: 'Use 10 bonuses in one game',
-    imagePath: 'bonus_cheater.jpeg',
-    progress: 0,
-    total: 10,
-  },
-  {
-    name: 'Pong-tastic',
-    description: 'Win 5 games without missing a single ball',
-    imagePath: 'pong_tastic.jpeg',
-    progress: 0,
-    total: 5,
-  },
-  {
-    name: 'Tireless Returner',
-    description:
-      'Return the ball 10 times in a row without it touching the sides',
-    imagePath: 'tireless_returner.jpeg',
-    progress: 0,
-    total: 10,
-  },
-  {
-    name: 'Why Not',
-    description: 'Win a bonus game without using any bonuses',
-    imagePath: 'why_not.jpeg',
-  },
-  {
-    name: 'Ping King',
-    description: 'Score a point when the ball is at high speed',
-    imagePath: 'ping_king.jpeg',
-  },
-  {
-    name: 'Faster Than Light',
-    description: 'Score a point when the ball is at maximum speed',
-    imagePath: 'faster_than_light.jpeg',
-  },
-  {
-    name: 'Blitz Pong',
-    description: 'Win a game in less than 2 minutes',
-    imagePath: 'blitz_pong.jpeg',
-  },
-  {
-    name: 'Invincible Resistant',
-    description: 'Win a game without losing a single point',
-    imagePath: 'invincible_resistant.jpeg',
-  },
-  {
-    name: 'Point Prospector',
-    description: 'Win a game with a minimum of 30 points scored',
-    imagePath: 'point_prospector.jpeg',
-    progress: 0,
-    total: 30,
-  },
-];
+import { trophies } from './trophies.data';
 
 @Injectable()
 export class TrophiesService {
@@ -153,7 +22,7 @@ export class TrophiesService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     // private readonly eventEmitter: EventEmitter2,
-    private readonly notificationService: NotificationService,
+    private readonly notificationService: NotificationService
   ) {
     this.initializeTrophies();
     this.initializeTrophiesProgress();
@@ -163,7 +32,7 @@ export class TrophiesService {
     name: string,
     description: string,
     path: string,
-    total: number,
+    total: number
   ): Promise<TrophiesEntity> {
     const newTrophy = new TrophiesEntity();
     newTrophy.name = name;
@@ -178,14 +47,14 @@ export class TrophiesService {
 
     if (count === 0) {
       console.log(
-        "Trophies table doesn't exist... Creating trophies table in dataBase/",
+        "Trophies table doesn't exist... Creating trophies table in dataBase/"
       );
       for (const trophy of trophies) {
         await this.createTrophy(
           trophy.name,
           trophy.description,
           trophy.imagePath,
-          trophy.total,
+          trophy.total
         );
       }
     }
@@ -196,7 +65,7 @@ export class TrophiesService {
 
     if (count === 0) {
       console.log(
-        "UserTrophiesProgress table doesn't exist... Creating table in dataBase/",
+        "UserTrophiesProgress table doesn't exist... Creating table in dataBase/"
       );
       const users = await this.userRepository.find();
       for (const user of users) {
@@ -211,14 +80,6 @@ export class TrophiesService {
       }
     }
   }
-
-  // async assignTrophyToPlayer(
-  //   player: UserEntity,
-  //   trophy: TrophiesEntity,
-  // ): Promise<void> {
-  //   player.trophies = [...(player.trophies || []), trophy];
-  //   await this.userRepository.save(player);
-  // }
 
   async getTrophyByName(name: string): Promise<TrophiesEntity | null> {
     return await this.trophyRepository.findOne({ where: { name } });
@@ -238,7 +99,7 @@ export class TrophiesService {
     game: GameEntity,
     playerStats: PlayerStats,
     consecutiveExchangesWithoutBounce: number,
-    bonusMode: boolean,
+    bonusMode: boolean
   ): Promise<void> {
     const trophyNamesToAssign: string[] = [];
     if (playerStats.numberOfBonusesUsed >= 3) {
@@ -280,6 +141,9 @@ export class TrophiesService {
     if (consecutiveExchangesWithoutBounce >= 10) {
       trophyNamesToAssign.push('Tireless Returner');
     }
+    if (player.numberOfGamesPlayed >= 1) {
+      trophyNamesToAssign.push('Beginner');
+    }
     if (player.numberOfGamesPlayed >= 20) {
       trophyNamesToAssign.push('Regular');
     }
@@ -289,7 +153,10 @@ export class TrophiesService {
     if (player.numberOfGamesPlayed >= 100) {
       trophyNamesToAssign.push('NoLife');
     }
-    if (this.calculDuration(game.createdAt, game.finishAt) <= 120) {
+    if (
+      playerScore > opponentScore &&
+      this.calculDuration(game.createdAt, game.finishAt) <= 120
+    ) {
       trophyNamesToAssign.push('Blitz Pong');
     }
     if (playerScore >= 30) {
@@ -301,29 +168,22 @@ export class TrophiesService {
     if (player.numberOfGamesWonWithoutMissingBall >= 5) {
       trophyNamesToAssign.push('Pong-tastic');
     }
-    // console.log('trophyNamesToAssign', trophyNamesToAssign);
-    // Récupérez les trophées par leurs noms
+
     let trophiesToAssign: TrophiesEntity[] = await Promise.all(
-      trophyNamesToAssign.map(async (name) => {
+      trophyNamesToAssign.map(async name => {
         const trophy = await this.getTrophyByName(name);
         return trophy;
-      }),
+      })
     );
 
-    // Filtrer les trophées que le joueur possède déjà
-    // console.log('trophiesToAssign', trophiesToAssign);
-    trophiesToAssign = trophiesToAssign.filter((trophy) => trophy !== null);
-    const trophiesToAdd = trophiesToAssign?.filter((trophy) => {
+    trophiesToAssign = trophiesToAssign.filter(trophy => trophy !== null);
+    const trophiesToAdd = trophiesToAssign?.filter(trophy => {
       return !player.trophies?.some(
-        (playerTrophy) => playerTrophy.id === trophy.id,
+        playerTrophy => playerTrophy.id === trophy.id
       );
     });
-    // console.log('trophiesToAdd', trophiesToAdd);
-    // console.log('trophiesPlayer', player.trophies);
-    // console.log('playerId', player.id);
 
-    const trophyNamesToCheck: string[] = trophies.map((t) => t.name);
-
+    const trophyNamesToCheck: string[] = trophies.map(t => t.name);
     for (const trophyName of trophyNamesToCheck) {
       const trophy = await this.getTrophyByName(trophyName);
       if (!trophy || trophy.total == 0) continue;
@@ -337,11 +197,14 @@ export class TrophiesService {
         });
 
       if (!userTrophyProgress) continue;
-      if (player.trophies?.some((t) => t.id === trophy.id)) continue;
-      console.log('userTrophyProgress', userTrophyProgress);
-      console.log('trophyName', trophyName);
-      console.log('user : ', player);
+      if (player.trophies?.some(t => t.id === trophy.id)) continue;
       switch (trophyName) {
+        case 'Beginner':
+          userTrophyProgress.progress =
+            player.numberOfGamesPlayed > userTrophyProgress.progress
+              ? player.numberOfGamesPlayed
+              : userTrophyProgress.progress;
+          break;
         case 'Warrior':
           userTrophyProgress.progress =
             player.numberOfConsecutiveWins > userTrophyProgress.progress
@@ -458,7 +321,7 @@ export class TrophiesService {
 
           if (!newNotif)
             throw new InternalServerErrorException(
-              `Can't create notification for user ${player.login}`,
+              `Can't create notification for user ${player.login}`
             );
         }
       }

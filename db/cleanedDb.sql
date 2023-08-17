@@ -64,12 +64,12 @@ ALTER SEQUENCE public.chat_messages_id_seq OWNED BY public.chat_messages.id;
 CREATE TABLE public.chat_rooms (
     id bigint NOT NULL,
     type text DEFAULT 'public'::text NOT NULL,
-    "isProtected" boolean DEFAULT false NOT NULL,
     name text DEFAULT 'room'::text NOT NULL,
     password text,
     "createdAt" timestamp without time zone DEFAULT now(),
     "updatedAt" timestamp without time zone DEFAULT now(),
-    "ownerUserId" bigint
+    "ownerUserId" bigint,
+    "isProtected" boolean DEFAULT false NOT NULL
 );
 
 
@@ -164,20 +164,20 @@ CREATE TABLE public.games (
     id bigint NOT NULL,
     status text DEFAULT 'in progress'::text NOT NULL,
     "createdAt" timestamp without time zone DEFAULT now(),
-    "updatedAt" timestamp without time zone DEFAULT now(),
     "finishAt" timestamp without time zone DEFAULT now(),
     "abortedAt" timestamp without time zone DEFAULT now(),
     "scorePlayer1" integer DEFAULT 0,
     "scorePlayer2" integer DEFAULT 0,
+    "player1Id" bigint,
+    "player2Id" bigint,
+    "winnerId" bigint,
+    "updatedAt" timestamp without time zone DEFAULT now(),
     "eloScorePlayer1" integer DEFAULT 1500 NOT NULL,
     "eloScorePlayer2" integer DEFAULT 1500 NOT NULL,
     "levelPlayer1" integer DEFAULT 1 NOT NULL,
     "levelPlayer2" integer DEFAULT 1 NOT NULL,
     "expPlayer1" integer DEFAULT 0 NOT NULL,
-    "expPlayer2" integer DEFAULT 0 NOT NULL,
-    "player1Id" bigint,
-    "player2Id" bigint,
-    "winnerId" bigint
+    "expPlayer2" integer DEFAULT 0 NOT NULL
 );
 
 
@@ -250,11 +250,11 @@ CREATE TABLE public.notifications (
     type text NOT NULL,
     content text NOT NULL,
     read boolean DEFAULT false NOT NULL,
-    "invitationLink" text,
     "createdAt" timestamp without time zone DEFAULT now(),
     "updatedAt" timestamp without time zone DEFAULT now(),
     "senderId" bigint,
-    "receiverId" bigint
+    "receiverId" bigint,
+    "invitationLink" text
 );
 
 
@@ -369,6 +369,12 @@ CREATE TABLE public.users (
     role text DEFAULT 'user'::text NOT NULL,
     avatar text,
     description text,
+    "is2FAEnabled" boolean DEFAULT false,
+    status text DEFAULT 'offline'::text,
+    "secret2FA" text,
+    "createdAt" timestamp without time zone DEFAULT now(),
+    "updatedAt" timestamp without time zone DEFAULT now(),
+    "lastActivity" timestamp without time zone DEFAULT now(),
     score double precision DEFAULT '1500'::double precision NOT NULL,
     level integer DEFAULT 1 NOT NULL,
     experience integer DEFAULT 0 NOT NULL,
@@ -376,16 +382,11 @@ CREATE TABLE public.users (
     "consecutiveWin" integer DEFAULT 0 NOT NULL,
     "laserKill" integer DEFAULT 0 NOT NULL,
     "bonusUsed" integer DEFAULT 0 NOT NULL,
-    "is2FAEnabled" boolean DEFAULT false,
-    status text DEFAULT 'offline'::text,
-    "secret2FA" text,
-    "createdAt" timestamp without time zone DEFAULT now(),
-    "updatedAt" timestamp without time zone DEFAULT now(),
-    "lastActivity" timestamp without time zone DEFAULT now(),
     "numberOfConsecutiveWins" integer DEFAULT 0 NOT NULL,
     "numberOfEnemiesKilledWithLaser" integer DEFAULT 0 NOT NULL,
     "numberOfGamesPlayed" integer DEFAULT 0 NOT NULL,
-    "numberOfGamesWonWithoutMissingBall" integer DEFAULT 0 NOT NULL
+    "numberOfGamesWonWithoutMissingBall" integer DEFAULT 0 NOT NULL,
+    rank text DEFAULT 'cooper_3'::text
 );
 
 
@@ -419,11 +420,11 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 CREATE TABLE public.users_relation (
     id integer NOT NULL,
     "relationType" text DEFAULT 'pending'::text NOT NULL,
-    "mutuelBlocked" boolean DEFAULT false NOT NULL,
     "createdAt" timestamp without time zone DEFAULT now(),
     "updatedAt" timestamp without time zone DEFAULT now(),
-    "userInitiateurId" bigint,
-    "userRelationId" bigint
+    "userRelationId" bigint,
+    "mutuelBlocked" boolean DEFAULT false NOT NULL,
+    "userInitiateurId" bigint
 );
 
 
@@ -538,7 +539,7 @@ COPY public.chat_messages (id, text, "createdAt", "updatedAt", "ownerUserId", "r
 -- Data for Name: chat_rooms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.chat_rooms (id, type, "isProtected", name, password, "createdAt", "updatedAt", "ownerUserId") FROM stdin;
+COPY public.chat_rooms (id, type, name, password, "createdAt", "updatedAt", "ownerUserId", "isProtected") FROM stdin;
 \.
 
 
@@ -586,7 +587,7 @@ COPY public.chat_rooms_users_users ("chatRoomsId", "usersId") FROM stdin;
 -- Data for Name: games; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.games (id, status, "createdAt", "updatedAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "eloScorePlayer1", "eloScorePlayer2", "levelPlayer1", "levelPlayer2", "expPlayer1", "expPlayer2", "player1Id", "player2Id", "winnerId") FROM stdin;
+COPY public.games (id, status, "createdAt", "finishAt", "abortedAt", "scorePlayer1", "scorePlayer2", "player1Id", "player2Id", "winnerId", "updatedAt", "eloScorePlayer1", "eloScorePlayer2", "levelPlayer1", "levelPlayer2", "expPlayer1", "expPlayer2") FROM stdin;
 \.
 
 
@@ -602,7 +603,7 @@ COPY public.messages (id, text, "createdAt", "updatedAt", "ownerUserId", "destUs
 -- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.notifications (id, type, content, read, "invitationLink", "createdAt", "updatedAt", "senderId", "receiverId") FROM stdin;
+COPY public.notifications (id, type, content, read, "createdAt", "updatedAt", "senderId", "receiverId", "invitationLink") FROM stdin;
 \.
 
 
@@ -611,26 +612,6 @@ COPY public.notifications (id, type, content, read, "invitationLink", "createdAt
 --
 
 COPY public.trophies (id, name, description, "imagePath", total) FROM stdin;
-1	Warrior	Win 3 games in a row	warrior.jpeg	3
-2	Lord	Win 5 games in a row	lord.jpeg	5
-3	Emperor	Win 10 games in a row	emperor.jpeg	10
-4	Laser Pointer	Kill an opponent with a Laser	laser_pointer.jpeg	0
-5	Gamma Laser	Kill 5 opponents with a laser	gamma_laser.jpeg	5
-6	Scorificator	Kill 10 opponents with a laser	scorificator.jpeg	10
-7	Regular	Play 20 games	regular.jpeg	20
-8	Addict	Play 50 games	addict.jpeg	50
-9	NoLife	Play 100 games	nolife.jpeg	100
-10	Bonus Master	Use 3 bonuses in one game	bonus_master.jpeg	3
-11	Bonus Pro	Use 5 bonuses in one game	bonus_pro.jpeg	5
-12	Bonus Cheater	Use 10 bonuses in one game	bonus_cheater.jpeg	10
-13	Pong-tastic	Win 5 games without missing a single ball	pong_tastic.jpeg	5
-14	Tireless Returner	Return the ball 10 times in a row without it touching the sides	tireless_returner.jpeg	10
-15	Why Not	Win a bonus game without using any bonuses	why_not.jpeg	0
-16	Ping King	Score a point when the ball is at high speed	ping_king.jpeg	0
-17	Faster Than Light	Score a point when the ball is at maximum speed	faster_than_light.jpeg	0
-18	Blitz Pong	Win a game in less than 2 minutes	blitz_pong.jpeg	0
-19	Invincible Resistant	Win a game without losing a single point	invincible_resistant.jpeg	0
-20	Point Prospector	Win a game with a minimum of 30 points scored	point_prospector.jpeg	30
 \.
 
 
@@ -639,26 +620,6 @@ COPY public.trophies (id, name, description, "imagePath", total) FROM stdin;
 --
 
 COPY public.trophies_progress (id, progress, total, "userId", "trophyId") FROM stdin;
-1	0	3	1	1
-2	0	5	1	2
-3	0	10	1	3
-4	0	0	1	4
-5	0	5	1	5
-6	0	10	1	6
-7	0	20	1	7
-8	0	50	1	8
-9	0	100	1	9
-10	0	3	1	10
-11	0	5	1	11
-12	0	10	1	12
-13	0	5	1	13
-14	0	10	1	14
-15	0	0	1	15
-16	0	0	1	16
-17	0	0	1	17
-18	0	0	1	18
-19	0	0	1	19
-20	0	30	1	20
 \.
 
 
@@ -666,9 +627,8 @@ COPY public.trophies_progress (id, progress, total, "userId", "trophyId") FROM s
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, score, level, experience, "gamesPlayed", "consecutiveWin", "laserKill", "bonusUsed", "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity", "numberOfConsecutiveWins", "numberOfEnemiesKilledWithLaser", "numberOfGamesPlayed", "numberOfGamesWonWithoutMissingBall") FROM stdin;
-0	Bot	Bot	Bot	bot@mail.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	I'm a bot	9999999	9999999	0	0	0	0	0	f	offline	\N	2023-08-12 22:05:42.469254	2023-08-12 22:05:42.469254	2023-08-12 22:05:42.469254	0	0	0	0
-1	Myrl	Altenwerth	Clementine.Mills	Dulce.Grimes73@yahoo.com	$2b$10$udkJScrgUQ7iK.LhRL.tRuXn/udQq8/BvY1R22JDeqUEw4gNbYUpq	user	https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/202.jpg	Provident atque voluptate voluptatum accusantium.	1500	1	0	0	0	0	0	f	online	\N	2023-08-12 22:03:45.8082	2023-08-12 22:03:50.166	2023-08-12 22:08:18.024	0	0	0	0
+COPY public.users (id, "firstName", "lastName", login, email, password, role, avatar, description, "is2FAEnabled", status, "secret2FA", "createdAt", "updatedAt", "lastActivity", score, level, experience, "gamesPlayed", "consecutiveWin", "laserKill", "bonusUsed", "numberOfConsecutiveWins", "numberOfEnemiesKilledWithLaser", "numberOfGamesPlayed", "numberOfGamesWonWithoutMissingBall", rank) FROM stdin;
+0	Bot	Bot	Bot	Bot@bot.com	\N	user	https://t3.ftcdn.net/jpg/01/36/49/90/360_F_136499077_xp7bSQB4Dx13ktQp0OYJ5ricWXhiFtD2.jpg	I'm a bot	f	offline	\N	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	2023-08-16 21:34:36.841798	1500	1	0	0	0	0	0	0	0	0	0	cooper_3
 \.
 
 
@@ -676,7 +636,7 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 -- Data for Name: users_relation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users_relation (id, "relationType", "mutuelBlocked", "createdAt", "updatedAt", "userInitiateurId", "userRelationId") FROM stdin;
+COPY public.users_relation (id, "relationType", "createdAt", "updatedAt", "userRelationId", "mutuelBlocked", "userInitiateurId") FROM stdin;
 \.
 
 
@@ -692,63 +652,63 @@ COPY public.users_trophies_trophies ("usersId", "trophiesId") FROM stdin;
 -- Name: chat_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_messages_id_seq', 1, false);
+SELECT pg_catalog.setval('public.chat_messages_id_seq', 2840, true);
 
 
 --
 -- Name: chat_rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.chat_rooms_id_seq', 1, false);
+SELECT pg_catalog.setval('public.chat_rooms_id_seq', 94, true);
 
 
 --
 -- Name: games_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.games_id_seq', 1, false);
+SELECT pg_catalog.setval('public.games_id_seq', 328, true);
 
 
 --
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_id_seq', 1, false);
+SELECT pg_catalog.setval('public.messages_id_seq', 305, true);
 
 
 --
 -- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notifications_id_seq', 1, false);
+SELECT pg_catalog.setval('public.notifications_id_seq', 1348, true);
 
 
 --
 -- Name: trophies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.trophies_id_seq', 20, true);
+SELECT pg_catalog.setval('public.trophies_id_seq', 439, true);
 
 
 --
 -- Name: trophies_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.trophies_progress_id_seq', 20, true);
+SELECT pg_catalog.setval('public.trophies_progress_id_seq', 3456, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 651, true);
 
 
 --
 -- Name: users_relation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_relation_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_relation_id_seq', 225, true);
 
 
 --
@@ -800,6 +760,14 @@ ALTER TABLE ONLY public.trophies
 
 
 --
+-- Name: users_relation PK_6973ffe5e4128326da10a9527d1; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_relation
+    ADD CONSTRAINT "PK_6973ffe5e4128326da10a9527d1" PRIMARY KEY (id);
+
+
+--
 -- Name: notifications PK_6a72c3c0f683f6462415e653c3a; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -829,14 +797,6 @@ ALTER TABLE ONLY public.chat_rooms_muted_users_users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY (id);
-
-
---
--- Name: users_relation PK_b87982b74800d6cf7aaaa9f1549; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users_relation
-    ADD CONSTRAINT "PK_b87982b74800d6cf7aaaa9f1549" PRIMARY KEY (id);
 
 
 --
