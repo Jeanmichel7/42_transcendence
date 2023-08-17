@@ -10,6 +10,10 @@ services:
       - 3000:3000
     depends_on:
       - postgres
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - back:/app
+      - /app/node_modules
     restart: always
 
   postgres:
@@ -34,6 +38,9 @@ services:
       - 3006:3006
     depends_on:
       - nestjs
+    volumes:
+      - front:/app
+      - /app/node_modules
     restart: always
 
   pgadmin:
@@ -53,4 +60,14 @@ volumes:
   postgres_data:
   pgadmin_data:
   front:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${FRONT_VOLUME}
+      o: bind
   back:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${BACK_VOLUME}
+      o: bind

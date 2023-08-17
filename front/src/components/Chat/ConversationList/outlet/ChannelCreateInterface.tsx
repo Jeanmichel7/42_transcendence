@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 import {
   setErrorSnackbar,
+  setMsgSnackbar,
   setPersonalizedErrorSnackbar,
 } from '../../../../store/snackbarSlice';
 import { createChannel } from '../../../../api/chat';
@@ -105,7 +106,7 @@ const CreateGroupInterface = () => {
     if ('error' in resCreateChannel) {
       dispatch(setErrorSnackbar(resCreateChannel));
     } else {
-      dispatch(setPersonalizedErrorSnackbar('Channel created'));
+      dispatch(setMsgSnackbar('Channel created'));
 
       dispatch(
         reduxAddConversationList({

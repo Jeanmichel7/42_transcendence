@@ -124,9 +124,13 @@ export class NotificationGateway {
   }
 
   emitNotificationGameInviteDeclined(data: NotificationInterface) {
+    console.log('emitNotificationGameInviteDeclined', data);
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_game_invite_declined', data);
+    // this.server
+    //   .to('notification_room_' + data.sender.id)
+    //   .emit('notification_game_invite_declined', data);
   }
 
   /* Private Message */

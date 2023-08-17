@@ -57,7 +57,6 @@ export class NotificationService {
     const savedNotification = await this.notificationRepository.save(
       newNotification,
     );
-    // console.log('savedNotification : ', savedNotification);
 
     this.eventEmitter.emit(
       'notification.' + savedNotification.type,

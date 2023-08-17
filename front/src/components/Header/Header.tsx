@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLogged, setLogout } from '../../store/userSlice';
@@ -43,18 +43,13 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  const [anchorElNotification, setAnchorElNotification] =
-    useState<null | HTMLElement>(null);
   const [activePath, setActivePath] = useState('');
-
+  const [notifNotRead, setNotifNotRead] = useState<number>(0);
+  const [notifOpen, setNotifOpen] = useState<boolean>(false);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname) setActivePath(location.pathname.split('/')[1]);
-  }, [location]);
-
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData,
   );
@@ -66,6 +61,21 @@ function Header() {
   );
 
   useConnection();
+
+  useEffect(() => {
+    const nbMotifNotRead = notifications.filter(
+      (n: NotificationInterface) => !n.read,
+    ).length;
+    setNotifNotRead(nbMotifNotRead);
+  }, [notifications]);
+
+  useEffect(() => {
+    if (notifNotRead > 0) setNotifOpen(true);
+  }, [notifNotRead]);
+
+  useEffect(() => {
+    if (location.pathname) setActivePath(location.pathname.split('/')[1]);
+  }, [location]);
 
   useEffect(() => {
     if (
@@ -98,11 +108,11 @@ function Header() {
   };
 
   // handler notifications
-  const handleOpenNotificationMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNotification(event.currentTarget);
+  const handleOpenNotif = () => {
+    setNotifOpen(true);
   };
-  const handleCloseNotificationMenu = () => {
-    setAnchorElNotification(null);
+  const handleCloseNotif = () => {
+    setNotifOpen(false);
   };
 
   async function handleLogout() {
@@ -117,39 +127,37 @@ function Header() {
   }
 
   const notificationMenu = (
-    <Menu
-      sx={{
-        marginLeft: '-50px',
-        '& .MuiMenu-list': {
-          paddingTop: 0,
-          paddingBottom: 0,
-        },
-      }}
-      id="menu-appbar"
-      anchorEl={anchorElNotification}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      keepMounted
-      transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
-      }}
-      open={Boolean(anchorElNotification) && notifications.length > 0}
-      onClose={handleCloseNotificationMenu}
+    <div
+      ref={notificationsRef}
+      className="fixed top-[20px] right-[100px] z-index-1000
+     border-2 border-gray-400 rounded-sm text-gray-700"
     >
       {notifications.map(
         (notification: NotificationInterface, index: number) => (
           <NotificationItem
             key={index}
             notification={notification}
-            setAnchorElNotification={setAnchorElNotification}
+            setNotifOpen={setNotifOpen}
           />
         ),
       )}
-    </Menu>
+    </div>
   );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target as Node)
+      ) {
+        handleCloseNotif();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [notificationsRef, setNotifOpen]);
 
   return (
     <Box className="bg-blue-700 text-white flex justify-between items-center fixed w-full h-[56px] z-50">
@@ -196,14 +204,6 @@ function Header() {
           </NavLink>
           <Divider />
 
-          <NavLink to="/leaderboard">
-            <MenuItem onClick={handleCloseNavMenu}>
-              <LeaderboardIcon className="m-2" />
-              Leaderboard
-            </MenuItem>
-          </NavLink>
-          <Divider />
-
           <NavLink to="/chat">
             <MenuItem onClick={handleCloseNavMenu}>
               <ChatIcon className="m-2" />
@@ -224,6 +224,14 @@ function Header() {
             <MenuItem onClick={handleCloseNavMenu}>
               <PersonSearchIcon className="m-2" />
               Profile
+            </MenuItem>
+          </NavLink>
+          <Divider />
+
+          <NavLink to="/leaderboard">
+            <MenuItem onClick={handleCloseNavMenu}>
+              <LeaderboardIcon className="m-2" />
+              Leaderboard
             </MenuItem>
           </NavLink>
         </Menu>
@@ -303,24 +311,6 @@ function Header() {
         </NavLink>
 
         <NavLink
-          to="/leaderboard"
-          className={`h-full flex justify-center items-center px-3
-          ${activePath === 'leaderboard' ? 'bg-blue-600' : 'initial'} `}
-        >
-          <Button
-            sx={{
-              color: 'white',
-              paddingX: 1,
-              paddingY: 1,
-              ':hover': { backgroundColor: 'rgb(59 130 246)' },
-            }}
-          >
-            <LeaderboardIcon className="mr-2" />
-            <p className="mt-0.5">Leaderboard</p>
-          </Button>
-        </NavLink>
-
-        <NavLink
           to="/chat"
           className={`h-full flex justify-center items-center px-3
          ${activePath === 'chat' ? 'bg-blue-600' : 'initial'} `}
@@ -373,6 +363,24 @@ function Header() {
             <p className="mt-0.5">Profile</p>
           </Button>
         </NavLink>
+
+        <NavLink
+          to="/leaderboard"
+          className={`h-full flex justify-center items-center px-3
+          ${activePath === 'leaderboard' ? 'bg-blue-600' : 'initial'} `}
+        >
+          <Button
+            sx={{
+              color: 'white',
+              paddingX: 1,
+              paddingY: 1,
+              ':hover': { backgroundColor: 'rgb(59 130 246)' },
+            }}
+          >
+            <LeaderboardIcon className="mr-2" />
+            <p className="mt-0.5">Leaderboard</p>
+          </Button>
+        </NavLink>
       </Box>
 
       {/**
@@ -413,7 +421,7 @@ function Header() {
                 size="large"
                 aria-label="show new notifications"
                 color="inherit"
-                onClick={handleOpenNotificationMenu}
+                onClick={handleOpenNotif}
               >
                 <Badge
                   badgeContent={
@@ -507,7 +515,7 @@ function Header() {
               </MenuItem>
             </div>
           </Menu>
-          {notificationMenu}
+          {notifOpen && notificationMenu}
         </Box>
       )}
     </Box>

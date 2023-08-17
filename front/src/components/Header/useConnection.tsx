@@ -191,6 +191,7 @@ const useConnection = () => {
     socket.on(
       'notification_game_invite',
       (notification: NotificationInterface) => {
+        console.log('notification_game_invite : ', notification);
         dispatch(reduxAddNotification(notification));
       },
     );
@@ -198,6 +199,7 @@ const useConnection = () => {
     socket.on(
       'notification_game_invite_accepted',
       (notification: NotificationInterface) => {
+        console.log('notification_game_invite_accepted : ', notification);
         dispatch(reduxAddNotification(notification));
       },
     );
@@ -205,6 +207,7 @@ const useConnection = () => {
     socket.on(
       'notification_game_invite_declined',
       (notification: NotificationInterface) => {
+        console.log('notification_game_invite_declined : ', notification);
         dispatch(
           setMsgSnackbar(notification.sender.login + ': Game request declined'),
         );
