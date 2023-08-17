@@ -3,11 +3,7 @@ import { Socket, io } from 'socket.io-client';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import {
-  setErrorSnackbar,
-  setMsgSnackbar,
-  setPersonalizedErrorSnackbar,
-} from '../../../store/snackbarSlice';
+import { setErrorSnackbar, setMsgSnackbar } from '../../../store/snackbarSlice';
 
 import FormPriveConv from './FormPriveConv';
 import MessageItem from '../MessageItem';

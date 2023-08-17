@@ -53,15 +53,11 @@ export default function HistoryGame({ user }: PropsGames) {
   }, [dispatch, currentPage, gamePerPage, user]);
 
   useEffect(() => {
-    if (games && games.length > 0) {
-      if (needRef) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (games && games.length > 0 && needRef)
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [games]);
 
-  const handleChangePage = (
-    event: React.ChangeEvent<unknown> | null,
-    value: number,
-  ) => {
+  const handleChangePage = (value: number) => {
     setCurrentPage(value);
     setNeedRef(true);
   };

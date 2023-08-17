@@ -6,7 +6,7 @@ import Chat from '../pages/Chat';
 import Account from '../pages/Account';
 import Pong from '../pages/Pong';
 import ConnectPage from '../pages/Connection';
-import FakeConnection from '../pages/ConnectionFakeUser';
+import AccountConnection from '../pages/ConnectionFakeUser';
 import Profile from '../pages/Profile';
 import Error404 from '../pages/Error404';
 import FriendsPage from '../pages/Friends';
@@ -48,7 +48,7 @@ const AppRoutes: React.FC = () => (
       <Route path="/leaderboard" element={<LeaderBoard />} />
       <Route path="/friends" element={<FriendsPage />} />
       <Route path="/connection" element={<ConnectPage />} />
-      <Route path="/fakeconnection" element={<FakeConnection />} />
+      <Route path="/accountconnection" element={<AccountConnection />} />
       <Route path="/profile/:pseudo" element={<Profile />} />
       <Route path="/account" element={<Account />} />
       <Route path="/achievement" element={<Achievement />} />

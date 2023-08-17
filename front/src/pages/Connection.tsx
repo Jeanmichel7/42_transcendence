@@ -96,7 +96,7 @@ function ConnectPage() {
       {is2FAactiv ? (
         <>
           <div className="absolute top-0 right-0 text-blue-500 m-5">
-            <Link to="/fakeconnection">Login Account</Link>
+            <Link to="/accountconnection">Login Account</Link>
           </div>
 
           <div className="absolute top-0 text-blue-500 left-0 m-5">
@@ -188,7 +188,7 @@ function ConnectPage() {
               </Button>
             </Link>
 
-            <Link to="/fakeconnection">
+            <Link to="/accountconnection">
               <Button variant="contained" color="secondary" fullWidth>
                 Account
               </Button>

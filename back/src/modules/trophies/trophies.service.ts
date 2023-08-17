@@ -291,33 +291,31 @@ export class TrophiesService {
               : userTrophyProgress.progress;
           break;
       }
-
-      // Save updated trophy progress
       await this.userTrophiesProgressRepository.save(userTrophyProgress);
+    }
 
-      // Ajouter les trophées au joueur
-      if (trophiesToAdd && trophiesToAdd.length > 0) {
-        player.trophies = [...(player.trophies || []), ...trophiesToAdd];
-        await this.userRepository.save(player);
+    if (trophiesToAdd && trophiesToAdd.length > 0) {
+      player.trophies = [...(player.trophies || []), ...trophiesToAdd];
+      await this.userRepository.save(player);
 
-        const bot: UserEntity = await this.userRepository.findOne({
-          where: { login: 'bot' },
-        });
+      const bot: UserEntity = await this.userRepository.findOne({
+        where: { login: 'Bot' },
+      });
+      console.log('trophies player', player.trophies);
+      console.log('trophiesToAdd', trophiesToAdd);
+      for (const trophy of trophiesToAdd) {
+        const newNotif: NotificationEntity =
+          await this.notificationService.sendNotification({
+            type: 'trophy',
+            content: `You win a trophy : ${trophy.name}`,
+            receiver: player,
+            sender: bot,
+          } as NotificationCreateDTO);
 
-        for (const trophy of trophiesToAdd) {
-          const newNotif: NotificationEntity =
-            await this.notificationService.sendNotification({
-              type: 'trophy',
-              content: `You win a trophy : ${trophy.name}`,
-              receiver: player,
-              sender: bot,
-            } as NotificationCreateDTO);
-
-          if (!newNotif)
-            throw new InternalServerErrorException(
-              `Can't create notification for user ${player.login}`
-            );
-        }
+        if (!newNotif)
+          throw new InternalServerErrorException(
+            `Can't create notification for user ${player.login}`
+          );
       }
     }
   }

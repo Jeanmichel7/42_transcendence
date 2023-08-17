@@ -57,7 +57,7 @@ const MessageItem: FC<MessageItemProps> = ({
   );
   const [editMessage, setEditMessage] = useState<boolean>(false);
   const [inputMessage, setInputMessage] = useState<string>(message.text);
-  const [invitIsAccept, setInvitIsAccept] = useState<boolean>(false);
+  // const [invitIsAccept, setInvitIsAccept] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
@@ -187,7 +187,6 @@ const MessageItem: FC<MessageItemProps> = ({
             <p className="">Game Invitation</p>
             <Button
               variant="contained"
-              disabled={invitIsAccept}
               onClick={() => handleJoinInvitationGame(word)}
             >
               Join
