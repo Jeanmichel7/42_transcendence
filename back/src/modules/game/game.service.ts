@@ -258,6 +258,7 @@ export class GameService {
     this.eventEmitter.emit('updateLobbyRoomRequire');
     return game;
   }
+
   getAllGamesInfo(): GameInfo[] {
     const gamesInfo: GameInfo[] = [];
     this.games.forEach(game => {
@@ -397,10 +398,13 @@ export class GameService {
     newGame.status = 'waiting';
     newGame.createdAt = new Date();
     const newGameCreated: GameEntity = await this.gameRepository.save(newGame);
+    console.log('newGameCreated : ', newGameCreated);
+    console.log('user : ', user);
+    console.log('userToInvite : ', userToInvite);
 
     //create message
     const newBotMessage: MessageCreateDTO = {
-      text: `http://localhost:3006/game?id=${newGameCreated.id}`
+      text: `/game?id=${newGameCreated.id}`
     };
 
     const res = await this.messageService.createInvitationBotMessage(
@@ -439,11 +443,22 @@ export class GameService {
     });
     if (!game) throw new BadRequestException('game not found');
 
+    const isPlayer1 = game.player1.id == user.id;
+    const isPlayer2 = game.player2.id == user.id;
+    if (!isPlayer1 && !isPlayer2)
+      throw new BadRequestException('You are not allowed to accept this game');
+
+    if (game.status == 'waiting_start') {
+      game.status = 'playing';
+      game.updatedAt = new Date();
+      const gameUpdated: GameEntity = await this.gameRepository.save(game);
+      return gameUpdated;
+    }
     if (game.status !== 'waiting')
       throw new BadRequestException('game already started');
 
-    if (game.player2.id != user.id)
-      throw new BadRequestException('You are not allowed to accept this game');
+    if (game.player1.status === 'in game' || game.player2.status === 'in game')
+      throw new BadRequestException('user already in game');
 
     game.status = 'waiting_start';
     game.updatedAt = new Date();
@@ -455,9 +470,9 @@ export class GameService {
         type: 'gameInviteAccepted',
         content: `'s challenge accepted, let's play`,
         receiver: {
-          id: game.player1.id,
-          login: game.player1.login,
-          avatar: game.player1.avatar
+          id: isPlayer1 ? game.player2.id : game.player1.id,
+          login: isPlayer1 ? game.player2.login : game.player1.login,
+          avatar: isPlayer1 ? game.player2.avatar : game.player1.avatar
         },
         sender: {
           id: user.id,
@@ -471,8 +486,45 @@ export class GameService {
     return gameUpdated;
   }
 
+  async saveAcceptGameNoNotif(
+    userId: bigint,
+    roomId: bigint
+  ): Promise<GameInterface> {
+    const user: UserEntity = await this.userRepository.findOne({
+      where: { id: userId }
+    });
+    if (!user) throw new BadRequestException('user not found');
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: roomId },
+      relations: ['player1', 'player2']
+    });
+    if (!game) throw new BadRequestException('game not found');
+
+    const isPlayer1 = game.player1.id == user.id;
+    const isPlayer2 = game.player2.id == user.id;
+    if (!isPlayer1 && !isPlayer2)
+      throw new BadRequestException('You are not allowed to accept this game');
+
+    if (game.status == 'waiting_start') {
+      game.status = 'playing';
+      game.updatedAt = new Date();
+      const gameUpdated: GameEntity = await this.gameRepository.save(game);
+      return gameUpdated;
+    }
+    if (game.status !== 'waiting')
+      throw new BadRequestException('game already started');
+
+    if (game.player1.status === 'in game' || game.player2.status === 'in game')
+      throw new BadRequestException('user already in game');
+
+    game.status = 'waiting_start';
+    game.updatedAt = new Date();
+    const gameUpdated: GameEntity = await this.gameRepository.save(game);
+
+    return gameUpdated;
+  }
+
   async saveDeclineGame(userId: bigint, roomId: bigint): Promise<void> {
-    console.log('saveDeclineGame', userId, roomId);
     const user: UserEntity = await this.userRepository.findOne({
       where: { id: userId }
     });
@@ -483,7 +535,6 @@ export class GameService {
       relations: ['player1', 'player2']
     });
     if (!game) throw new BadRequestException('game not found');
-    console.log('game : ', game);
 
     if (game.player1.id != user.id && game.player2.id != user.id)
       throw new BadRequestException('You are not allowed to decline this game');

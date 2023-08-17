@@ -32,6 +32,16 @@ export async function acceptGame(
   );
 }
 
+export async function acceptGameByBtn(
+  gameId: number,
+): Promise<GameInterface | ApiErrorResponse> {
+  return apiRequest<GameInterface>(
+    'patch',
+    '/games/' + gameId + '/accept/noNotif',
+    'Failed to accept game: ',
+  );
+}
+
 export async function declineGame(
   gameId: number,
 ): Promise<void | ApiErrorResponse> {

@@ -257,7 +257,7 @@ export default function Login() {
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
         scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
     );
-    if (!newWindow) return console.log('erreur new windows  ');
+    if (!newWindow) return console.warn('erreur new windows  ');
 
     window.addEventListener('message', async event => {
       if (event.source !== newWindow) return;
@@ -296,7 +296,7 @@ export default function Login() {
           Login
         </StyledLink>
       </TitleWrapper>
-      <PingPongText>Pong! le jeu qui fait ping</PingPongText>
+      <PingPongText>Pong! Le jeu qui ping</PingPongText>
     </LoginWrapper>
   );
 }

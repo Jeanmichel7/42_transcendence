@@ -5,7 +5,6 @@ import { Nothing } from '../Friends/Nothing';
 import { TrophyCard } from './TrophyCard';
 
 export default function ProfileTrophies({ user }: { user: UserInterface }) {
-  console.log('user.trophies', user.trophies);
   return (
     <>
       <p className="mt-6">

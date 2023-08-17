@@ -150,7 +150,7 @@ const PrivateConversation: React.FC = () => {
     });
 
     socket.on('error', error => {
-      console.log('erreur socket : ', error);
+      console.warn('erreur socket : ', error);
     });
 
     socket.emit('joinPrivateRoom', {

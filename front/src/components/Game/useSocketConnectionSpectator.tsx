@@ -10,7 +10,6 @@ const useSocketConnectionSpectator = (
   const [data, setData] = useState<GameData | undefined>();
 
   useEffect(() => {
-    console.log('spectateGame', gameId);
     socket.emit('spectateGame', gameId);
     socket.on('gameUpdate', (serverData: GameData) => {
       setData(serverData);

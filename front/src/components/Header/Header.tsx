@@ -63,13 +63,6 @@ function Header() {
   useConnection();
 
   useEffect(() => {
-    const nbMotifNotRead = notifications.filter(
-      (n: NotificationInterface) => !n.read,
-    ).length;
-    setNotifNotRead(nbMotifNotRead);
-  }, [notifications]);
-
-  useEffect(() => {
     if (notifNotRead > 0) setNotifOpen(true);
   }, [notifNotRead]);
 
@@ -78,6 +71,11 @@ function Header() {
   }, [location]);
 
   useEffect(() => {
+    const nbMotifNotRead = notifications.filter(
+      (n: NotificationInterface) => !n.read,
+    ).length;
+    setNotifNotRead(nbMotifNotRead);
+
     if (
       userData.id === undefined ||
       userData.id == -1 ||

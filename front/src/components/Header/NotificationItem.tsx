@@ -92,7 +92,6 @@ const NotificationItem = ({
     const extractRoomId: number = parseInt(
       notif.invitationLink?.split('/')[4] as string,
     );
-    console.log('room id : ', extractRoomId);
     setIsLoading(true);
     const resDeclineRequest: void | ApiErrorResponse = await declineRoom(
       extractRoomId,
@@ -169,23 +168,21 @@ const NotificationItem = ({
 
   const handleDeleteNotification = (notif: NotificationInterface) => {
     if (notifications.length == 1) setNotifOpen(false);
+
     dispatch(reduxRemoveNotification(notif));
-    localStorage.setItem(
-      'notifications' + userData.id,
-      JSON.stringify(
-        JSON.parse(
-          localStorage.getItem('notifications' + userData.id) as string,
-        ).filter((n: NotificationInterface) => n.id !== notif.id),
-      ),
-    );
-    console.log('notif length : ', notifications.length);
+    // localStorage.setItem(
+    //   'notifications' + userData.id,
+    //   JSON.stringify(
+    //     JSON.parse(
+    //       localStorage.getItem('notifications' + userData.id) as string,
+    //     ).filter((n: NotificationInterface) => n.id !== notif.id),
+    //   ),
+    // );
   };
 
   const handleAcceptActionNotification = async (
     notif: NotificationInterface,
   ) => {
-    console.log('notif accept : ', notif);
-
     if (notif.type === 'friendRequest')
       await handleAcceptFriendRequest(notif.sender);
     if (notif.type === 'roomInvite')
@@ -197,7 +194,6 @@ const NotificationItem = ({
   };
 
   const handleDenyActionNotification = async (notif: NotificationInterface) => {
-    console.log('notif deny : ', notif);
     if (notif.type === 'friendRequest')
       await handleDeclineFriendRequest(notif.sender);
     if (notif.type === 'roomInvite') await handleDeclineJoinRoom(notif);
