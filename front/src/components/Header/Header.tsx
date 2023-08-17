@@ -14,7 +14,7 @@ import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import NotificationItem from './NotificationItem';
 import { logout } from '../../api/auth';
 
-import { Badge, Divider, Popover } from '@mui/material';
+import { Badge, Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -46,7 +46,7 @@ function Header() {
   const [activePath, setActivePath] = useState('');
   const [notifNotRead, setNotifNotRead] = useState<number>(0);
   const [notifOpen, setNotifOpen] = useState<boolean>(false);
-  const anchorNotif = useRef<HTMLButtonElement>();
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -112,9 +112,7 @@ function Header() {
     setNotifOpen(true);
   };
   const handleCloseNotif = () => {
-    // setTimeout(() => {
     setNotifOpen(false);
-    // }, 400);
   };
 
   async function handleLogout() {
@@ -128,28 +126,11 @@ function Header() {
     }
   }
 
-  const notificationMenu = anchorNotif.current && (
-    <Popover
-      sx={{
-        marginTop: '30px',
-        '& .MuiMenu-list': {
-          paddingTop: 0,
-          paddingBottom: 0,
-        },
-      }}
-      id="notification-popover"
-      anchorEl={anchorNotif.current}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      // keepMounted
-      transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
-      }}
-      open={notifOpen}
-      onClose={handleCloseNotif}
+  const notificationMenu = (
+    <div
+      ref={notificationsRef}
+      className="fixed top-[20px] right-[100px] z-index-1000
+     border-2 border-gray-400 rounded-sm text-gray-700"
     >
       {notifications.map(
         (notification: NotificationInterface, index: number) => (
@@ -160,8 +141,23 @@ function Header() {
           />
         ),
       )}
-    </Popover>
+    </div>
   );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target as Node)
+      ) {
+        handleCloseNotif();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [notificationsRef, setNotifOpen]);
 
   return (
     <Box className="bg-blue-700 text-white flex justify-between items-center fixed w-full h-[56px] z-50">
@@ -422,7 +418,6 @@ function Header() {
           <Box>
             <Tooltip title={`${notifications.length} notifications`} arrow>
               <IconButton
-                ref={anchorNotif}
                 size="large"
                 aria-label="show new notifications"
                 color="inherit"
@@ -520,7 +515,7 @@ function Header() {
               </MenuItem>
             </div>
           </Menu>
-          {notificationMenu}
+          {notifOpen && notificationMenu}
         </Box>
       )}
     </Box>
