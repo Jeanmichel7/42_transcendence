@@ -508,7 +508,6 @@ export class Game {
       isPlayerRight: false,
       player1Username: this.player1Username,
       player2Username: this.player2Username,
-      playerAvatar: this.player1Info.avatar,
       gameStart: this.gameStart,
       bonus: this.bonus,
       bonusPlayer1:
@@ -533,6 +532,7 @@ export class Game {
       player2Laser: this.player2Laser,
       bonusMode: this.bonusMode,
       player1Avatar: this.player1Info.avatar,
+      player2Avatar: this.player2Info.avatar,
       player1Connected: this.player1Connected,
       player2Connected: this.player2Connected,
       isPaused: this.isPaused,
