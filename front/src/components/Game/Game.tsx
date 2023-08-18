@@ -22,6 +22,7 @@ import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
 import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
+import { DisconnectCountDown } from './DisconnectCountDown';
 
 export const Playground = styled.div`
   width: 100%;
@@ -58,6 +59,9 @@ const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
 const RACKET_HEIGHT_10 = RACKET_HEIGHT * 10;
 const RACKET_LEFT_POS_X_10 = RACKET_LEFT_POS_X * 10;
 const RACKET_RIGHT_POS_X_10 = RACKET_RIGHT_POS_X * 10;
+const RACKET_LEFT_HITBOX_BOUNDARY =
+  RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
+const RACKET_RIGHT_HITBOX_BOUNDARY = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
 
 const animationBonus = keyframes`
   0% { background-position: 0px; }
@@ -379,6 +383,10 @@ function Game({
       const currentTime = performance.now();
       const deltaTime = currentTime - lastTime;
       lastTime = currentTime;
+      if (gameData.current?.isPaused) {
+        animationFrameId = requestAnimationFrame(upLoop);
+        return;
+      }
       if (keyStateRef.current.ArrowDown) {
         posRacket.current.left =
           posRacket.current.left < 1000 - racketHeightRef.current.left
@@ -405,12 +413,12 @@ function Game({
           newBall.vy = -newBall.vy;
         }
         if (
-          oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS &&
+          oldBall.x < RACKET_LEFT_HITBOX_BOUNDARY &&
           oldBall.y > posRacket.current.left &&
           oldBall.y < posRacket.current.left + racketHeightRef.current.left &&
           fail.current === false
         ) {
-          newBall.x = RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS;
+          newBall.x = RACKET_LEFT_HITBOX_BOUNDARY;
 
           newBall.speed += SPEED_INCREASE;
           const racketCenter =
@@ -422,12 +430,12 @@ function Game({
           newBall.vx = Math.sqrt(1 - newBall.vy * newBall.vy) * newBall.speed;
           newBall.vy *= newBall.speed;
         } else if (
-          oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS &&
+          oldBall.x > RACKET_RIGHT_HITBOX_BOUNDARY &&
           oldBall.y > posRacket.current.right &&
           oldBall.y < posRacket.current.right + racketHeightRef.current.right &&
           fail.current === false
         ) {
-          newBall.x = RACKET_RIGHT_POS_X_10 - BALL_RADIUS;
+          newBall.x = RACKET_RIGHT_HITBOX_BOUNDARY;
           newBall.speed += SPEED_INCREASE;
           const racketCenter =
             posRacket.current.right + racketHeightRef.current.right / 2;
@@ -440,8 +448,8 @@ function Game({
           newBall.vy *= newBall.speed;
           newBall.vx = -newBall.vx;
         } else if (
-          oldBall.x > RACKET_RIGHT_POS_X_10 - BALL_RADIUS ||
-          oldBall.x < RACKET_LEFT_POS_X_10 + RACKET_WIDTH_10 + BALL_RADIUS
+          oldBall.x > RACKET_RIGHT_HITBOX_BOUNDARY ||
+          oldBall.x < RACKET_LEFT_HITBOX_BOUNDARY
         ) {
           fail.current = true;
         }
@@ -575,6 +583,7 @@ function Game({
         >
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
+        {gameData.current?.isPaused && <DisconnectCountDown />}
       </Playground>
     </GameWrapper>
   );

@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import {
   ConnectedSocket,
   MessageBody,
-  SubscribeMessage,
+  SubscribeMessage
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Game } from './game.class';
@@ -23,8 +23,8 @@ interface clientUpdate {
 @WebSocketGateway({
   namespace: '/game',
   cors: {
-    origin: '*',
-  },
+    origin: '*'
+  }
 })
 export class GameEvents {
   @WebSocketServer()
@@ -77,7 +77,7 @@ export class GameEvents {
     try {
       const jwtSecret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(jwtToken, {
-        secret: jwtSecret,
+        secret: jwtSecret
       });
       // Maintenant, vous avez validé le jeton et extrait le payload.
       // Vous pouvez utiliser le payload pour obtenir des informations sur l'utilisateur.
@@ -100,6 +100,7 @@ export class GameEvents {
   //desconexio
   handleDisconnect(client: Socket) {
     this.gameService.removeFromQueue(client.id);
+    this.gameService.breakGame(client.data.userId);
   }
 
   @SubscribeMessage('spectateGame')
@@ -148,7 +149,7 @@ export class GameEvents {
       socketId: client.id,
       gameId: update.gameId,
       mode: update.mode,
-      ready: update.ready,
+      ready: update.ready
     };
     const gameStarted = this.gameService.updatePrivateLobby(
       update.player1,
@@ -275,7 +276,7 @@ export class GameEvents {
     client.emit('message', {
       message: data.message,
       username: client.data.userId,
-      avatar: data.avatar,
+      avatar: data.avatar
     });
 
     client
@@ -287,7 +288,7 @@ export class GameEvents {
       .emit('message', {
         message: data.message,
         username: client.data.userId,
-        avatar: data.avatar,
+        avatar: data.avatar
       });
     // } else {
     //   console.error('Client is not in the desired room.');

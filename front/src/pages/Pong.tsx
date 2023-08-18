@@ -169,12 +169,14 @@ function Pong() {
       dispatch(desactivateEffect());
     } else if (currentPage === 'privateLobby') {
       dispatch(desactivateEffect());
-    } else if (currentPage === 'searchOpponent') {
+    } else if (currentPage === 'searchOpponent' && !bonus) {
       dispatch(desactivateEffect());
+    } else if (currentPage === 'searchOpponent' && bonus) {
+      dispatch(activateEffect('red'));
     } else if (currentPage === 'game') {
-      dispatch(activateEffect());
+      dispatch(activateEffect('black'));
     } else if (currentPage === 'spectate') {
-      dispatch(activateEffect());
+      dispatch(activateEffect('black'));
     }
   }, [currentPage, gameIdInvit, dispatch]);
 

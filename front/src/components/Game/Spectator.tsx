@@ -16,6 +16,8 @@ import useSocketConnectionSpectator from './useSocketConnectionSpectator';
 import { Ball, Bonus, GameWrapper, Laser, Playground, Racket } from './Game';
 import { StatutBar } from './StatutBar';
 import { StyledButton } from './EndGame';
+import { DisconnectCountDown } from './DisconnectCountDown';
+import { DisconnectCountDownSpectator } from './DisconnectCountDownSpectator';
 
 function GameSpectator({
   socket,
@@ -119,6 +121,14 @@ function GameSpectator({
                 Return to Lobby
               </StyledButton>
             </div>
+            {gameData.isPaused && (
+              <DisconnectCountDownSpectator
+                player1Connected={gameData.player1Connected}
+                player2Connected={gameData.player2Connected}
+                player1Username={gameData.player1Username}
+                player2Username={gameData.player2Username}
+              />
+            )}
           </>
         )}
       </Playground>
