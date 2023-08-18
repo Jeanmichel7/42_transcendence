@@ -39,6 +39,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import macHostName from '/src/config.js';
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -386,7 +387,7 @@ function Header() {
        */}
       {userIsLogged == false && (
         <div className="flex">
-          <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
+          <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code">
             <Button
               onClick={handleCloseNavMenu}
               sx={{ my: 2, color: 'white', display: 'block' }}
@@ -453,11 +454,10 @@ function Header() {
                 <Avatar
                   alt="avatar"
                   src={userData.avatar}
-                  onError={e => {
+                  onError={ e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src =
-                      'http://localhost:3000/avatars/defaultAvatar.png';
+                    target.src = macHostName + ':3000/avatars/defaultAvatar.png'
                   }}
                   sx={{ width: 32, height: 32 }}
                 />

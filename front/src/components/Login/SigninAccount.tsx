@@ -8,8 +8,8 @@ import {
 import { useState } from 'react';
 import { registerFakeUser } from '../../api/auth';
 import { ApiErrorResponse, UserInterface } from '../../types';
-
 import { VisibilityOff, Visibility } from '@mui/icons-material';
+import macHostName from '/src/config.js';
 
 export interface FormDataUser {
   login: string;
@@ -46,7 +46,7 @@ export default function SigninAccount({
     firstName: '',
     lastName: '',
     description: '',
-    avatar: 'http://localhost:3000/avatars/defaultAvatar.png',
+    avatar: macHostName + ':3000/avatars/defaultAvatar.png',
   } as FormDataUser);
 
   const handleFormCreateAccountChange = (e: any) => {

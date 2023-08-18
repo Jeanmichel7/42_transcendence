@@ -12,7 +12,7 @@ import { UserInterface } from 'src/modules/users/interfaces/users.interface';
 @WebSocketGateway({
   namespace: 'chat',
   cors: {
-    origin: 'http://localhost:3006',
+    origin: 'k1r2p6:3006',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },

@@ -47,6 +47,7 @@ import {
 } from '../../../store/userSlice';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
+import macHostName from '/src/config.js';
 
 const PrivateConversation: React.FC = () => {
   const convId = +(useParams<{ convId: string }>().convId || '-1');
@@ -117,9 +118,12 @@ const PrivateConversation: React.FC = () => {
 
   const connectSocket = useCallback(() => {
     if (id == -1 || userData.id == -1) return;
-    const socket = io('http://localhost:3000/messagerie', {
-      reconnectionDelayMax: 10000,
+    const socket = io('http://' + macHostName + ':3000/messagerie', {
       withCredentials: true,
+      transports: ['websocket'],
+      corse: {
+        origin: 'http://' + macHostName + ':3006',
+      }
     });
 
     socket.on('message', message => {

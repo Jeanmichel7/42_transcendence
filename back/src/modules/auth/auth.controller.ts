@@ -37,7 +37,7 @@ export class AuthController {
   }
 
   /*
-	https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code
+	https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code
 	*/
   @Get('loginOAuth')
   @Public()
@@ -52,7 +52,7 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
-    res.redirect(`http://localhost:3006/connection?checked=true`);
+    res.redirect(`/connection?checked=true`);
   }
 
   @Post('loginFakeUser')

@@ -33,6 +33,7 @@ import {
 } from '../../../../api/chat';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../../../store';
+import macHostName from '/src/config.js';
 
 interface UserCardProps {
   user: UserInterface;
@@ -313,7 +314,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'http://localhost:3000/avatars/defaultAvatar.png';
+                    macHostName + ':3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />

@@ -1,17 +1,31 @@
 import styled, { keyframes } from 'styled-components';
 
 const shineAnimation = keyframes`
+0% {
+    background-position: 100% 50%;
+}
 5% {
-  background-position: 0% 50%;
+  background-position: 100% 50%;
 }
 20% {
-  background-position: 100% 50%;
+  background-position: 0% 50%;
 }
 100% {
-  background-position: 100% 50%;
+  background-position: 0% 50%;
 }
 `;
 
+// const shineAnimation = keyframes`
+// 5% {
+//   background-position: 0% 50%;
+// }
+// 20% {
+//   background-position: 100% 50%;
+// }
+// 100% {
+//   background-position: 100% 50%;
+// }
+// `;
 const ShineSpan = styled.span`
   background: linear-gradient(
     var(--shine-angle),

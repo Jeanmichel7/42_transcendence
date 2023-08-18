@@ -1,8 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types';
+import macHostName from '/src/config.js';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://' + macHostName + ':3000',
   withCredentials: true,
 });
 

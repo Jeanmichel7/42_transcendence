@@ -90,7 +90,9 @@ export class AuthService {
     let clientSecret: string;
     try {
       clientSecret = this.configService.get<string>('OAUTH_INTRA');
+      console.log('clientSecret:', clientSecret);
       accessToken = await this.OAuthGetToken(code, clientSecret);
+      console.log('accessToken:', accessToken);
     } catch {
       console.error(
         'Error OAuthGetToken, first token expired, test second token',
@@ -259,7 +261,7 @@ export class AuthService {
           client_id: clientId,
           client_secret: clientSecret,
           code: code,
-          redirect_uri: 'http://localhost:3000/auth/loginOAuth',
+          redirect_uri: '/auth/loginOAuth',
         },
       );
       if (tokenResponse.status != 200) {

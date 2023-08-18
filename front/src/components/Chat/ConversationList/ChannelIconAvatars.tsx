@@ -4,6 +4,7 @@ import { Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import { RootState } from '../../../store';
 import { useSelector } from 'react-redux';
+import macHostName from '/src/config.js';
 
 interface ConversationListRoomItemIconsProps {
   conv: ConversationInterface;
@@ -91,7 +92,7 @@ const ConversationListRoomItemIcons = ({
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -110,7 +111,7 @@ const ConversationListRoomItemIcons = ({
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
                     target.src =
-                      'http://localhost:3000/avatars/defaultAvatar.png';
+                      macHostName + ':3000/avatars/defaultAvatar.png';
                   }}
                   alt="avatar"
                 />

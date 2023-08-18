@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GameInterface, UserInterface } from '../../types';
 import { Link } from 'react-router-dom';
+import macHostName from '/src/config.js';
 
 interface GameCardProps {
   game: GameInterface;
@@ -47,7 +48,7 @@ const GameCard = ({ game, user }: GameCardProps) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'http://localhost:3000/avatars/defaultAvatar.png';
+                    macHostName + ':3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />
@@ -92,7 +93,7 @@ const GameCard = ({ game, user }: GameCardProps) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'http://localhost:3000/avatars/defaultAvatar.png';
+                    macHostName + ':3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />

@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import cuteBallsClimbingVines from '../assets/cuteBallsClimbingVines.png';
+import macHostName from '/src/config.js';
 
 function ConnectPage() {
   const [is2FAactiv, setIs2FAactiv] = useState(false);
@@ -34,6 +35,7 @@ function ConnectPage() {
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading(true);
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+    console.log('res check need 2FA: ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {
@@ -43,7 +45,7 @@ function ConnectPage() {
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://localhost:3006',
+          'http://' + macHostName + ':3006',
         );
       }
     }
@@ -72,7 +74,7 @@ function ConnectPage() {
       code2FA,
       userId,
     );
-
+    console.log('res check 2FA : ', res);
     if ('error' in res) {
       setError(true);
       // dispatch(setErrorSnackbar(res));
@@ -80,14 +82,14 @@ function ConnectPage() {
       setError(false);
       window.opener.postMessage(
         { msg: 'user connected', id: userId },
-        'http://localhost:3006',
+        'http://' + macHostName + ':3006',
       );
     }
     setIsLoading(false);
   }
-
-  const urlOAuth =
-    'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code';
+  const urlOAuth = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code'
+  // const urlOAuth =
+  //   'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code';
 
   return (
     <>

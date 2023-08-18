@@ -24,6 +24,7 @@ interface clientUpdate {
   namespace: '/game',
   cors: {
     origin: '*',
+    credentials: true,
   },
 })
 export class GameEvents {

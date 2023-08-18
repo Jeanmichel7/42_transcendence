@@ -9,7 +9,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-
 import { ChatCreateMsgDTO } from './dto/chat.message.create.dto';
 import { ChatCreateRoomDTO } from './dto/chat.room.create.dto';
 import { ChatUpdateRoomDTO } from './dto/chat.room.update.dto';
@@ -125,7 +124,7 @@ export class ChatService {
       .getOne();
 
     const newBotMessage: ChatCreateMsgDTO = {
-      text: `Invitation link http://localhost:3006/chat/channel/invitation/${room.id}/${room.name}`,
+      text: `Invitation link k1r2p6:3006/chat/channel/invitation/${room.id}/${room.name}`,
     };
 
     const userBot: UserEntity = await this.userRepository.findOne({

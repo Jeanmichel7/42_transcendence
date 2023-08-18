@@ -1,6 +1,7 @@
 import { Badge, Button, Typography } from '@mui/material';
 import { UserInterface } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import macHostName from '/src/config.js';
 
 interface FriendItemProps {
   user: UserInterface;
@@ -76,7 +77,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
                     target.src =
-                      'http://localhost:3000/avatars/defaultAvatar.png';
+                      macHostName + ':3000/avatars/defaultAvatar.png';
                   }}
                   alt="avatar"
                 />

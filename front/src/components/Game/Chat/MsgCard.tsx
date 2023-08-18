@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
+import macHostName from '/src/config.js';
 
 export interface MessageInterfaceTmp {
   message: string;
@@ -38,7 +39,7 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              target.src = macHostName
             }}
             alt="avatar"
           />

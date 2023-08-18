@@ -7,7 +7,7 @@ export function CircleBackground() {
   const effect = useSelector((state: RootState) => state.game.effect);
   const colorBackground = effect === 'black' ? 'black' : '';
   const colorCircle =
-    effect === 'black' ? '#330207' : effect === 'red' ? 'red' : '';
+    effect === 'black' ? '#330207' : effect === 'red' ? '#8F00FF' : '';
 
   return (
     <div
