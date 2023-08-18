@@ -20,7 +20,7 @@ Port 3006
 <hr/>
 
 ### Postgres via pgAdmin
-http://localhost:5050
+http://k1r2p6:5050
 
 admin@admin.com  
 admin

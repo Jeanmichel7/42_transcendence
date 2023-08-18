@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 const fadeAndZoomIn = keyframes`
   0% {
@@ -29,10 +29,11 @@ const CountdownWrapper = styled.div`
 interface NumberProps {
   visible: boolean;
 }
+
 const Number = styled.span<NumberProps>`
-  font-size: 8em; // Augmenter la taille de la police
+  font-size: 8em;
   color: #;
-  animation: ${fadeAndZoomIn} 1s ease-out;
+  animation: ${props => (props.visible ? css`${fadeAndZoomIn} 1s ease-out` : 'none')};
   opacity: ${props => (props.visible ? 1 : 0)};
   transition: opacity 0.3s ease-out;
 `;

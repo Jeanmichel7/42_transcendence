@@ -118,7 +118,7 @@ export default function LoginAccount({
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://localhost:3006',
+          'http://k1r2p6:3006',
         );
       }
     }
@@ -185,7 +185,7 @@ export default function LoginAccount({
       setError(false);
       window.opener.postMessage(
         { msg: 'user connected', id: userId },
-        'http://localhost:3006',
+        'localhost:3006',
       );
     }
     setIsLoading2FA(false);

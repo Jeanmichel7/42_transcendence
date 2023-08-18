@@ -78,7 +78,7 @@ sudo apt install pgadmin4
 # Configure the webserver, if you installed pgadmin4-web:
 sudo /usr/pgadmin4/bin/setup-web.sh
 
-http://localhost:5050/
+http://k1r2p6:5050/
 
 
 

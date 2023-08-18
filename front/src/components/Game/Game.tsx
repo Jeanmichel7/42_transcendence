@@ -31,7 +31,7 @@ export const Playground = styled.div`
   position: absolute;
   border: 10px 
   border: 0.2rem solid #fff;
-  padding: 0.4em;
+  padding: 5em;
   box-shadow: 0 0 .2rem #fff,
             0 0 .2rem #fff,
             0 0 2rem #bc13fe,

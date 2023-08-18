@@ -117,7 +117,7 @@ const PrivateConversation: React.FC = () => {
 
   const connectSocket = useCallback(() => {
     if (id == -1 || userData.id == -1) return;
-    const socket = io('http://localhost:3000/messagerie', {
+    const socket = io('k1r2p6:3000/messagerie', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });

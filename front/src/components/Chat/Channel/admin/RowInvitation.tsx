@@ -48,7 +48,7 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = 'http://localhost:3000/avatars/defaultAvatar.png';
+              target.src = 'k1r2p6:3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />

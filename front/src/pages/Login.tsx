@@ -252,7 +252,7 @@ export default function Login() {
       Math.floor(window.innerHeight / 2 - height / 2) + window.screenY;
 
     const newWindow = window.open(
-      'http://localhost:3006/connection',
+      'http://k1r2p6:3006/connection',
       '_blank',
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
         scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,

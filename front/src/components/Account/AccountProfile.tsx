@@ -127,7 +127,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'http://localhost:3000/avatars/defaultAvatar.png';
+                    'k1r2p6:3000/avatars/defaultAvatar.png';
                 }}
               />
 

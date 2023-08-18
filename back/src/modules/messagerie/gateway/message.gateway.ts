@@ -12,7 +12,7 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 @WebSocketGateway({
   namespace: 'messagerie',
   cors: {
-    origin: 'http://localhost:3006',
+    origin: 'k1r2p6:3006',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },

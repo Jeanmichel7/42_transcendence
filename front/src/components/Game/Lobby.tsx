@@ -5,6 +5,7 @@ import { ranksImages } from '../../utils/rankImages';
 import '../../utils/animation.css';
 import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { Socket } from 'socket.io-client';
+import { Sticker } from '../../utils/StyledTitle';
 
 export const fadeIn = keyframes`
   from {
@@ -43,7 +44,10 @@ export const StyledButton = styled.button<StyledButtonProps>`
     transition: width 0.2s ease;
     z-index: -1;
     visibility: ${props => (props.activateEffect ? 'visible' : 'hidden')};
-    left: -50%;
+    left: -20%;
+    @media (max-width: 768px) {
+      left: -10%;
+    }
   }
 
   &:hover {
@@ -52,8 +56,12 @@ export const StyledButton = styled.button<StyledButtonProps>`
       `
     color: var(--color-primary);
       &::before {
-        width: 200%;
+        width: 139%;
       }
+      @media (max-width: 768px) {
+        &::before {
+          width: 119%;
+        }
     `}
   }
 `;
@@ -62,9 +70,8 @@ interface ButtonWrapperProps {
   animation: boolean;
 }
 export const ButtonWrapper = styled.div<ButtonWrapperProps>`
-  height: 35%;
+  height: 40%;
   width: 30%;
-  margin-top: 15%;
   display: flex;
   position: relative;
   align-items: flex-start;
@@ -75,7 +82,7 @@ export const ButtonWrapper = styled.div<ButtonWrapperProps>`
   left: 50%;
   z-index: 10;
   @media (max-width: 1280px) {
-    width: 50%;
+    width: 40%;
   }
   @media (max-width: 768px) {
     width: 80%;
@@ -92,7 +99,10 @@ const StyledCircle = styled.div<StyledCircleProps>`
   background-color: #fff;
   border-radius: 3rem;
   z-index: 1;
-  left: -50%;
+  left: -20%;
+  @media (max-width: 768px) {
+    left: -10%;
+  }
   transition: top 0.2s ease;
   ${props => {
     return props.pos === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
@@ -155,6 +165,10 @@ function Lobby({
 
   return (
     <div className=" w-full h-full">
+      <div className="h-1/6 text-center flex items-center justify-center mb-10">
+    <Sticker dataText='Game Mode' />
+</div>
+ 
       <ButtonWrapper animation={true}>
         <StyledCircle pos={circlePostion.current} ref={circleRef} />
         <StyledButton
@@ -203,7 +217,7 @@ function Lobby({
         </StyledButton>
       </ButtonWrapper>
 
-      <div className="grid xl:grid-cols-3 items-center h-1/2 justify-items-center relative w-full">
+      <div className="grid xl:grid-cols-3 items-center h-2/5 justify-items-center relative w-full">
         {lobbyData.map(card => {
           return (
             <div

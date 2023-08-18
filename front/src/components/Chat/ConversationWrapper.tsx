@@ -17,7 +17,7 @@ const ConversationWrapper = () => {
   useEffect(() => {
     if (login || userData.id == -1) return;
     if (!socketRef.current || !socketRef.current.connected) {
-      const socket: Socket = io('http://localhost:3000/chat', {
+      const socket: Socket = io('k1r2p6:3000/chat', {
         reconnectionDelayMax: 10000,
         withCredentials: true,
       });

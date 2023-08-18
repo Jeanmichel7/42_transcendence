@@ -13,13 +13,11 @@ interface StyledCircleProps {
   position: string;
 }
 const StyledCircle = styled.div<StyledCircleProps>`
-  position: absolute;
   height: 5rem;
   width: 5rem;
   background-color: #fff;
   border-radius: 3rem;
   z-index: 1;
-  left: ${props => props.position};
   transition: top 0.2s ease;
   ${props => {
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
@@ -65,16 +63,27 @@ const StyledButtonOrder = styled(StyledButton)<StyledButtonOrderProps>`
 
 const reduceSize = keyframes`
   0% {
-    width : 200%;
+    width : 139%;
   }
   30% {
-    width: 200%;
+    width: 139%;
   }
   100% {
     width: 5rem;
   }
 `;
 
+const reduceSizeMobile = keyframes`
+  0% {
+    width : 119%;
+  }
+  30% {
+    width: 119%;
+  }
+  100% {
+    width: 5rem;
+  }
+`;
 const expandEffect = keyframes`
 0% {
   transform: scaleX(1) scaleY(1)
@@ -85,6 +94,16 @@ const expandEffect = keyframes`
   opacity: 0;
 }
 
+`;
+const StyledContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% + 40%);
+  margin-left: -20%;
+  @media (max-width: 768px) {
+    width: calc(100% + 20%);
+    margin-left: -10%;
+  }
 `;
 
 interface StyledOblongProps {
@@ -100,7 +119,11 @@ export const StyledOblong = styled.button<StyledOblongProps>`
   transition: width 0.2s ease;
   z-index: 1;
   visibility: visible;
-  left: -50%;
+  left: -20%;
+  @media (max-width: 768px) {
+    left: -10%;
+    animation: ${reduceSizeMobile} 1s ease-out forwards;
+  }
   ${props => {
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
@@ -142,6 +165,8 @@ function SearchingOpponent({
 
   return (
     <div className="h-full  w-full ">
+      <div className="h-1/6 text-center flex items-center justify-center mb-10">
+</div>
       <ButtonWrapper animation={true}>
         <StyledButtonOrder
           order={bonus ? '0' : '1'}
@@ -154,11 +179,11 @@ function SearchingOpponent({
           Cancel
         </StyledButtonOrder>
         {loadingDot ? (
-          <div>
-            <StyledCircle3 top={bonus ? 'bottom' : 'top'} position={'-50%'} />
-            <StyledCircle2 top={bonus ? 'bottom' : 'top'} position={'37%'} />
-            <StyledCircle top={bonus ? 'bottom' : 'top'} position={'125%'} />
-          </div>
+          <StyledContainer>
+            <StyledCircle3 top={bonus ? 'bottom' : 'top'}  />
+            <StyledCircle2 top={bonus ? 'bottom' : 'top'} />
+            <StyledCircle top={bonus ? 'bottom' : 'top'} />
+          </StyledContainer>
         ) : (
           <div>
             <StyledOblong

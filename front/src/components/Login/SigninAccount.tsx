@@ -46,7 +46,7 @@ export default function SigninAccount({
     firstName: '',
     lastName: '',
     description: '',
-    avatar: 'http://localhost:3000/avatars/defaultAvatar.png',
+    avatar: 'k1r2p6:3000/avatars/defaultAvatar.png',
   } as FormDataUser);
 
   const handleFormCreateAccountChange = (e: any) => {

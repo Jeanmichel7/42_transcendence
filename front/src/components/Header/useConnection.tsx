@@ -88,7 +88,7 @@ const useConnection = () => {
 
   useEffect(() => {
     if (!userData.id || userData.id === -1) return;
-    const socket = io('http://localhost:3000/notification', {
+    const socket = io('k1r2p6:3000/notification', {
       reconnectionDelayMax: 10000,
       withCredentials: true,
     });
