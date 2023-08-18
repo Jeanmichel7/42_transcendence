@@ -55,7 +55,6 @@ export class AuthController {
     res.redirect(`http://localhost:3006/connection?checked=true`);
   }
 
-  // supprimer plus tard
   @Post('loginFakeUser')
   @Public()
   @UsePipes(ValidationPipe)
@@ -102,7 +101,7 @@ export class AuthController {
     res.status(200).send({ message: 'Connexion réussie' });
   }
 
-  @Public() // remove ?
+  @Public()
   @Get('check-2FA')
   async checkJwtCookie(
     @Req() req: RequestWithUser,

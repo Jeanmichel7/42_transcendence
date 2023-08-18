@@ -139,7 +139,12 @@ const useConnection = () => {
     socket.on(
       'notification_friend_request_canceled',
       (notification: NotificationInterface) => {
-        dispatch(reduxRemoveNotification(notification));
+        dispatch(
+          reduxRemoveNotification({
+            notifId: notification.id,
+            userId: userData.id,
+          }),
+        );
         dispatch(
           setMsgSnackbar(
             notification.sender.login + ': Friend request canceled',

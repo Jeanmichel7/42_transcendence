@@ -49,9 +49,9 @@ export const DisconnectCountDown = () => {
       Opponent Disconnect <br />
       Time left before win:
       <Timer>
-        {secondsLeft}:{centisecondsLeft < 10 ? '0' : ''}{centisecondsLeft}
+        {secondsLeft}:{centisecondsLeft < 10 ? '0' : ''}
+        {centisecondsLeft}
       </Timer>
     </Overlay>
   );
 };
-

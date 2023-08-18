@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { ClientToServerEvents, ServerToClientEvents } from './Interface';
-import { GameData } from './Interface';
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  GameData,
+} from './Interface';
 
 const useSocketConnectionSpectator = (
   socket: Socket<ServerToClientEvents, ClientToServerEvents>,

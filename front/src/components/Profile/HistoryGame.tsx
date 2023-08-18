@@ -45,7 +45,6 @@ export default function HistoryGame({ user }: PropsGames) {
 
       if ('error' in resFetchGames) return console.warn(resFetchGames.error);
       setGames(resFetchGames);
-      // if (needRef) bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     fetchTotalGames();

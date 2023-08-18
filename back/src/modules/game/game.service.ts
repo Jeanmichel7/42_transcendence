@@ -69,7 +69,6 @@ export class GameService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly eventEmitter: EventEmitter2,
-    // private readonly messageRepository: Repository<MessageEntity>,
     private readonly messageService: MessageService,
     private readonly notificationService: NotificationService,
     private readonly trophiesService: TrophiesService,

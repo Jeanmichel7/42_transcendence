@@ -72,7 +72,7 @@ export interface GameData {
   bonusMode: boolean;
   player1Avatar: string;
   player2Avatar: string;
-  player1Connected: boolean,
-  player2Connected: boolean,
-  isPaused: boolean,
+  player1Connected: boolean;
+  player2Connected: boolean;
+  isPaused: boolean;
 }

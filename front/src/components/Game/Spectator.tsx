@@ -16,7 +16,6 @@ import useSocketConnectionSpectator from './useSocketConnectionSpectator';
 import { Ball, Bonus, GameWrapper, Laser, Playground, Racket } from './Game';
 import { StatutBar } from './StatutBar';
 import { StyledButton } from './EndGame';
-import { DisconnectCountDown } from './DisconnectCountDown';
 import { DisconnectCountDownSpectator } from './DisconnectCountDownSpectator';
 
 function GameSpectator({

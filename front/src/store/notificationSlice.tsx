@@ -27,12 +27,23 @@ export const notificationSlice = createSlice({
         state.notifications = [action.payload];
       else state.notifications = [...state.notifications, action.payload];
     },
+    reduxAddManyNotifications: (
+      state,
+      action: PayloadAction<NotificationInterface[]>,
+    ) => {
+      state.notifications = [...state.notifications, ...action.payload];
+    },
     reduxRemoveNotification: (
       state,
-      action: PayloadAction<NotificationInterface>,
+      action: PayloadAction<{ notifId: number; userId: number }>,
     ) => {
+      const { notifId, userId } = action.payload;
       state.notifications = state.notifications.filter(
-        (notif: NotificationInterface) => notif.id != action.payload.id,
+        (notif: NotificationInterface) => notif.id != notifId,
+      );
+      localStorage.setItem(
+        'notifications' + userId,
+        JSON.stringify(state.notifications),
       );
     },
     reduxReadNotification: (
@@ -46,12 +57,6 @@ export const notificationSlice = createSlice({
           return notif;
         },
       );
-    },
-    reduxAddManyNotifications: (
-      state,
-      action: PayloadAction<NotificationInterface[]>,
-    ) => {
-      state.notifications = [...state.notifications, ...action.payload];
     },
   },
 });

@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import {
   ConnectedSocket,
   MessageBody,
-  SubscribeMessage
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
 import { Game } from './game.class';
@@ -23,8 +23,8 @@ interface clientUpdate {
 @WebSocketGateway({
   namespace: '/game',
   cors: {
-    origin: '*'
-  }
+    origin: '*',
+  },
 })
 export class GameEvents {
   @WebSocketServer()
@@ -40,7 +40,6 @@ export class GameEvents {
       this.server
         .to('LobbyRoom')
         .emit('lobbyRoomUpdate', this.gameService.getAllGamesInfo());
-      // Faites ce que vous devez faire quand l'événement est déclenché
     });
     setInterval(() => {
       const games: Map<bigint, Game> = this.gameService.getGames();
@@ -70,21 +69,14 @@ export class GameEvents {
     });
 
     if (!jwtToken) {
-      // throw new UnauthorizedException("You're not logged in", 'No token found');
       return;
     }
-
     try {
       const jwtSecret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(jwtToken, {
-        secret: jwtSecret
+        secret: jwtSecret,
       });
-      // Maintenant, vous avez validé le jeton et extrait le payload.
-      // Vous pouvez utiliser le payload pour obtenir des informations sur l'utilisateur.
-
-      // Par exemple, si vous avez l'ID de l'utilisateur dans le payload :
       client.data.userId = payload.login;
-      // console.log(client.data);
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
@@ -122,15 +114,11 @@ export class GameEvents {
   handleJoinLobbyRoom(client: Socket) {
     client.join('LobbyRoom');
     client.emit('lobbyRoomUpdate', this.gameService.getAllGamesInfo());
-    // client.join('LobbyRoomChat');
-    // console.log('join lobby room');
   }
 
   @SubscribeMessage('leaveLobbyRoom')
   handleLeaveLobbyRoom(client: Socket) {
     client.leave('LobbyRoom');
-    // client.leave('LobbyRoomChat');
-    // console.log('leave lobby room');
   }
 
   @SubscribeMessage('privateLobby')
@@ -149,7 +137,7 @@ export class GameEvents {
       socketId: client.id,
       gameId: update.gameId,
       mode: update.mode,
-      ready: update.ready
+      ready: update.ready,
     };
     const gameStarted = this.gameService.updatePrivateLobby(
       update.player1,
@@ -227,7 +215,6 @@ export class GameEvents {
   //     timestamp: Date.now(),
   //   };
   //   return rt_data;
-  //   // recevoir un event (s'abonner a` un message)
   // }
 
   /* CHAT */
@@ -276,7 +263,7 @@ export class GameEvents {
     client.emit('message', {
       message: data.message,
       username: client.data.userId,
-      avatar: data.avatar
+      avatar: data.avatar,
     });
 
     client
@@ -288,7 +275,7 @@ export class GameEvents {
       .emit('message', {
         message: data.message,
         username: client.data.userId,
-        avatar: data.avatar
+        avatar: data.avatar,
       });
     // } else {
     //   console.error('Client is not in the desired room.');

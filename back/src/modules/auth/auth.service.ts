@@ -210,8 +210,6 @@ export class AuthService {
       secret2FA,
     );
     const qrcode: string = await toDataURL(otpauthUrl);
-
-    // const user = await this.usersService.findUser(userId);
     return qrcode;
   }
 

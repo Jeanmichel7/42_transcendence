@@ -27,7 +27,6 @@ import { AuthAdmin } from 'src/modules/auth/guard/authAdmin.guard';
 export class MessageController {
   constructor(private readonly MessageService: MessageService) {}
 
-  // get All message of a user
   @Get()
   async findAllOfUser(
     @Req() req: RequestWithUser,

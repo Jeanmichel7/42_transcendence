@@ -76,10 +76,7 @@ const NotificationItem = ({
     const resDeclineRequest: void | ApiErrorResponse = await declineFriend(
       userToDecline.id,
     );
-    await new Promise(resolve => setTimeout(resolve, 10000)); // here we wait 10sec sdsdf df ddfsdfdsfsdf
-
     setIsLoading(false);
-
     if (typeof resDeclineRequest === 'object' && 'error' in resDeclineRequest)
       dispatch(setErrorSnackbar(resDeclineRequest));
     else dispatch(reduxRemoveWaitingFriends(userToDecline));
@@ -153,41 +150,52 @@ const NotificationItem = ({
   };
 
   /* action notif */
-  const handleClickNotification = (notif: NotificationInterface) => {
-    if (notif.type === 'friendRequest')
+  const handleClickNotification = () => {
+    if (notification.type === 'friendRequest')
       navigate('/friends?tab=waiting_received');
   };
 
-  const handleClickNotificationUser = (notif: NotificationInterface) => {
-    navigate('/profile/' + notif.sender.login);
+  const handleClickNotificationUser = () => {
+    navigate('/profile/' + notification.sender.login);
   };
 
-  const handleDeleteNotification = (notif: NotificationInterface) => {
+  const handleDeleteNotification = () => {
     if (notifications.length == 1) setNotifOpen(false);
-    dispatch(reduxRemoveNotification(notif));
+    console.log('notifications : ', notifications.length);
+    dispatch(
+      reduxRemoveNotification({
+        notifId: notification.id,
+        userId: userData.id,
+      }),
+    );
   };
 
-  const handleAcceptActionNotification = async (
-    notif: NotificationInterface,
-  ) => {
-    if (notif.type === 'friendRequest')
-      await handleAcceptFriendRequest(notif.sender);
-    if (notif.type === 'roomInvite')
-      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
-    if (notif.type === 'gameInvite') await handleAcceptGameInvite(notif);
-    if (notif.type === 'gameInviteAccepted')
-      navigate(notif.invitationLink ? notif.invitationLink : '/chat');
-    handleDeleteNotification(notif);
+  const handleAcceptActionNotification = async () => {
+    if (notification.type === 'friendRequest')
+      await handleAcceptFriendRequest(notification.sender);
+    if (notification.type === 'roomInvite')
+      navigate(
+        notification.invitationLink ? notification.invitationLink : '/chat',
+      );
+    if (notification.type === 'gameInvite')
+      await handleAcceptGameInvite(notification);
+    if (notification.type === 'gameInviteAccepted')
+      navigate(
+        notification.invitationLink ? notification.invitationLink : '/chat',
+      );
+    handleDeleteNotification();
   };
 
-  const handleDenyActionNotification = async (notif: NotificationInterface) => {
-    if (notif.type === 'friendRequest')
-      await handleDeclineFriendRequest(notif.sender);
-    if (notif.type === 'roomInvite') await handleDeclineJoinRoom(notif);
-    if (notif.type === 'gameInvite') await handleDeclineGameInvitation(notif);
-    if (notif.type === 'gameInviteAccepted')
-      await handleGameInvitationAccepted(notif);
-    handleDeleteNotification(notif);
+  const handleDenyActionNotification = async () => {
+    if (notification.type === 'friendRequest')
+      await handleDeclineFriendRequest(notification.sender);
+    if (notification.type === 'roomInvite')
+      await handleDeclineJoinRoom(notification);
+    if (notification.type === 'gameInvite')
+      await handleDeclineGameInvitation(notification);
+    if (notification.type === 'gameInviteAccepted')
+      await handleGameInvitationAccepted(notification);
+    handleDeleteNotification();
   };
 
   //handler mouse notif
@@ -219,30 +227,24 @@ const NotificationItem = ({
         </p>
         <p
           className="font-bold ml-2 mr-1"
-          onClick={() => handleClickNotificationUser(notification)}
+          onClick={handleClickNotificationUser}
         >
           {notification.sender.login}
         </p>
         <p
           title={notification.content}
           className="mr-12"
-          onClick={() => handleClickNotification(notification)}
+          onClick={handleClickNotification}
         >
           {notification.content}
         </p>
       </div>
 
       <div className="flex max-w-[200px] mr-1">
-        <Button
-          onClick={() => handleAcceptActionNotification(notification)}
-          color="primary"
-        >
+        <Button onClick={handleAcceptActionNotification} color="primary">
           Accept
         </Button>
-        <Button
-          onClick={() => handleDenyActionNotification(notification)}
-          color="error"
-        >
+        <Button onClick={handleDenyActionNotification} color="error">
           Refuse
         </Button>
         <Tooltip
@@ -251,10 +253,7 @@ const NotificationItem = ({
           TransitionComponent={Zoom}
           TransitionProps={{ timeout: 600 }}
         >
-          <IconButton
-            onClick={() => handleDeleteNotification(notification)}
-            color="warning"
-          >
+          <IconButton onClick={handleDeleteNotification} color="warning">
             <CloseIcon color="error" />
           </IconButton>
         </Tooltip>

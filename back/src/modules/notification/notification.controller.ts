@@ -13,7 +13,6 @@ import { NotificationService } from './notification.service';
 import { NotificationInterface } from './interfaces/notification.interface';
 import { RequestWithUser } from '../auth/interfaces/request.user.interface';
 import { NotificationCreateDTO } from './dto/notification.create.dto';
-// import { AuthAdmin } from '../auth/guard/authAdmin.guard';
 
 @Controller('notification')
 export class NotificationController {

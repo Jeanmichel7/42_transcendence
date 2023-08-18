@@ -157,7 +157,12 @@ const MessageItem: FC<MessageItemProps> = ({
       );
       navigate(extractGameId ? word : '/chat');
       if (notif) {
-        dispatch(reduxRemoveNotification(notif));
+        dispatch(
+          reduxRemoveNotification({
+            notifId: notif.id,
+            userId: userData.id,
+          }),
+        );
       }
     }
   };

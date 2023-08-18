@@ -52,7 +52,13 @@ const WaitingAcceptRequest = () => {
           n.sender.id === userToAccept.id &&
           n.receiver.id === userData.id,
       ) as NotificationInterface;
-      if (notif) dispatch(reduxRemoveNotification(notif));
+      if (notif)
+        dispatch(
+          reduxRemoveNotification({
+            notifId: notif.id,
+            userId: userData.id,
+          }),
+        );
 
       dispatch(setMsgSnackbar('Friend request accepted'));
     }
@@ -77,7 +83,13 @@ const WaitingAcceptRequest = () => {
           n.sender.id === userToDecline.id &&
           n.receiver.id === userData.id,
       ) as NotificationInterface;
-      if (notif) dispatch(reduxRemoveNotification(notif));
+      if (notif)
+        dispatch(
+          reduxRemoveNotification({
+            notifId: notif.id,
+            userId: userData.id,
+          }),
+        );
 
       dispatch(setMsgSnackbar('Friend request declined'));
     }

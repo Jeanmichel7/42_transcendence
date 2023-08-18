@@ -30,7 +30,6 @@ export class NotificationGateway {
     console.log('joined room notification_' + data.userId, data);
   }
 
-  // @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
     @MessageBody() data: { roomName: string; userId: string },
     @ConnectedSocket() client: Socket,
@@ -40,7 +39,6 @@ export class NotificationGateway {
   }
 
   emitNotificationFriendRequest(data: NotificationInterface) {
-    // console.log('emitNotificationFriendRequest', data);
     this.server
       .to('notification_room_' + data.receiver.id)
       .emit('notification_friend_request', data);
