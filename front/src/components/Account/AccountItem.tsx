@@ -22,7 +22,6 @@ import {
 } from '@mui/material';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TransitionProps } from '@mui/material/transitions';
 import Slide from '@mui/material/Slide';
@@ -307,14 +306,12 @@ export default function AccountItem({ keyName, value }: ItemProps) {
       >
         <div className="flex flex-col justify-center items-center">
           <DialogTitle id="alert-dialog-title">
-            {'Scan QRCode with your 2FA app'}
+            Scan QRCode with your 2FA app
           </DialogTitle>
           <DialogContent sx={{ p: 0, m: 0 }}>
-            <DialogContentText id="alert-dialog-description">
-              <div className="border-2 border-blue-100 rounded-md mb-2">
-                <img src={QRCode} alt="QRCode" />
-              </div>
-            </DialogContentText>
+            <div className="border-2 border-blue-100 rounded-md mb-2">
+              <img src={QRCode} alt="QRCode" />
+            </div>
             <TextField
               fullWidth
               label="Enter the code"

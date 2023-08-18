@@ -207,9 +207,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
       )}
 
       <Dialog open={openDialog} keepMounted onClose={handleCloseDialog}>
-        <DialogTitle>
-          {'Are you sure you want to delete your account?'}
-        </DialogTitle>
+        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
         <DialogContent>
           <DialogContentText>
             By deleting your account, all your data will be removed permanently.

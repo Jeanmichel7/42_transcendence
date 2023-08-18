@@ -11,7 +11,7 @@ module.exports = {
     'plugin:import/warnings',
     'airbnb-typescript',
     'plugin:import/typescript',
-    'plugin:prettier/recommended', // Ajout de Prettier après les autres extensions
+    'plugin:prettier/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -22,12 +22,8 @@ module.exports = {
     sourceType: 'module',
     project: 'front/tsconfig.json',
   },
-  plugins: [
-    'react',
-    '@typescript-eslint',
-    'prettier', // Assurez-vous d'ajouter 'prettier' ici
-  ],
+  plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
-    'prettier/prettier': 'error', // Activez la règle prettier
+    'prettier/prettier': 'error',
   },
 };
