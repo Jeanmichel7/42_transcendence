@@ -28,8 +28,8 @@ import {
 import { setErrorSnackbar } from '../../store/snackbarSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SendIcon from '@mui/icons-material/Send';
-
 import { VisibilityOff, Visibility } from '@mui/icons-material';
+import macHostName from '/src/config.js';
 
 export interface FormDataUser {
   login: string;
@@ -118,7 +118,7 @@ export default function LoginAccount({
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://k1r2p6:3006',
+          'http://' + macHostName + ':3006',
         );
       }
     }

@@ -28,6 +28,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from '../../store';
+import macHostName from '/src/config.js';
+
 
 const useConnection = () => {
   const dispatch = useDispatch();
@@ -88,9 +90,12 @@ const useConnection = () => {
 
   useEffect(() => {
     if (!userData.id || userData.id === -1) return;
-    const socket = io('k1r2p6:3000/notification', {
-      reconnectionDelayMax: 10000,
+    const socket = io('http://' + macHostName + ':3000/notification', {
       withCredentials: true,
+      transports: ['websocket'],
+      corse: {
+        origin: 'http://' + macHostName + ':3006',
+      }
     });
 
     //connect room

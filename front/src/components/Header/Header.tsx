@@ -39,6 +39,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import macHostName from '/src/config.js';
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -453,11 +454,10 @@ function Header() {
                 <Avatar
                   alt="avatar"
                   src={userData.avatar}
-                  onError={e => {
+                  onError={ e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src =
-                      'k1r2p6:3000/avatars/defaultAvatar.png';
+                    target.src = macHostName + ':3000/avatars/defaultAvatar.png'
                   }}
                   sx={{ width: 32, height: 32 }}
                 />

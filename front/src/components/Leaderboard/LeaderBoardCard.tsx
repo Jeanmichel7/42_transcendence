@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ExperienceBar from '../Profile/ExperienceBar';
 import StatsPlayerChart from './StatsPlayer';
+import macHostName from '/src/config.js';
 
 interface LeaderBoardProps {
   user: UserInterface;
@@ -36,7 +37,7 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
               onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = 'k1r2p6:3000/avatars/defaultAvatar.png';
+                target.src = macHostName + ':3000/avatars/defaultAvatar.png';
               }}
               alt="avatar"
             />

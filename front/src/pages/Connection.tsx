@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import cuteBallsClimbingVines from '../assets/cuteBallsClimbingVines.png';
+import macHostName from '/src/config.js';
 
 function ConnectPage() {
   const [is2FAactiv, setIs2FAactiv] = useState(false);
@@ -44,7 +45,7 @@ function ConnectPage() {
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://k1r2p6:3006',
+          'http://' + macHostName + ':3006',
         );
       }
     }
@@ -81,7 +82,7 @@ function ConnectPage() {
       setError(false);
       window.opener.postMessage(
         { msg: 'user connected', id: userId },
-        'http://k1r2p6:3006',
+        'http://' + macHostName + ':3006',
       );
     }
     setIsLoading(false);

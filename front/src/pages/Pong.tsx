@@ -22,6 +22,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { IconButton } from '@mui/material';
 import ChatWrapper from '../components/Game/Chat/ChatWrapper';
+import macHostName from '/src/config.js';
 
 type GameWrapperProps = {
   chatOpen: boolean;
@@ -127,15 +128,14 @@ function Pong() {
   }, [currentPage, socket]);
 
   useEffect(() => {
-    const newSocket = io('http://k1r2p6:3000/game', {
+    const newSocket = io('http://' + macHostName + ':3000/game', {
       withCredentials: true,
-      // cors origine
       transports: ['websocket'],
       corse: {
-        origin: 'http://k1r2p6:3006',
+        origin: 'http://' + macHostName + ':3006',
       }
-      
     });
+
     newSocket.on('connect', () => {
       setConnectStatus('connected');
     });

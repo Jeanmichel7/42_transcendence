@@ -41,7 +41,7 @@ const SnackBarApp = () => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = 'k1r2p6:3000/avatars/defaultAvatar.png';
+              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -77,7 +77,7 @@ const SnackBarApp = () => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = 'k1r2p6:3000/avatars/defaultAvatar.png';
+              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />

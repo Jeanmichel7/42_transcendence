@@ -6,8 +6,6 @@ import store from './store';
 import './index.css';
 import { ThemeProvider, createTheme } from '@mui/material';
 
-export const hostname = 'k1r2p6';
-
 const theme = createTheme({
   typography: {
     fontFamily: "monospace, sans-serif",

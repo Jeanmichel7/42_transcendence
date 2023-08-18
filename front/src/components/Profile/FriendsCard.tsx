@@ -7,6 +7,7 @@ import {
 import { RootState } from '../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { Link, useNavigate } from 'react-router-dom';
+import macHostName from '/src/config.js';
 
 import {
   deleteFriend,
@@ -192,7 +193,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'k1r2p6:3000/avatars/defaultAvatar.png';
+                    macHostName + ':3000/avatars/defaultAvatar.png';
                 }}
               />
             </Badge>
@@ -205,7 +206,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
               onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = 'k1r2p6:3000/avatars/defaultAvatar.png';
+                target.src = macHostName + ':3000/avatars/defaultAvatar.png';
               }}
             />
           )}

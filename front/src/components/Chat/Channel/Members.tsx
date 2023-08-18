@@ -2,6 +2,7 @@ import { Badge, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { RoomInterface, UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
+import macHostName from '/src/config.js';
 
 const MembersCard = ({ user }: { user: UserInterface }) => {
   return (
@@ -58,7 +59,7 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src =
-                    'k1r2p6:3000/avatars/defaultAvatar.png';
+                    macHostName + ':3000/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />
