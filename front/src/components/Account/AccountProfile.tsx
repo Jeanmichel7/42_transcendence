@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from '@mui/material';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface AccountProfileProps {
   user: UserInterface;
 }
@@ -126,8 +128,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                 onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src =
-                    macHostName + ':3000/avatars/defaultAvatar.png';
+                  target.src = API_URL + '/avatars/defaultAvatar.png';
                 }}
               />
 

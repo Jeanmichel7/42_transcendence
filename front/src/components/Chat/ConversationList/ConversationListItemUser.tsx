@@ -14,7 +14,8 @@ import {
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface ConvProps {
   conv: ConversationInterface;
@@ -92,8 +93,7 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
                 onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src =
-                    macHostName + ':3000/avatars/defaultAvatar.png';
+                  target.src = API_URL + '/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />

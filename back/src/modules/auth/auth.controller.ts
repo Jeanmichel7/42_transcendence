@@ -47,14 +47,13 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
-    console.log('token : ', result.accessToken);
+    // console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
     const url = this.configService.get('API_URL') + '/connection?checked=true';
-    console.log('url : ', url);
     res.redirect(
       this.configService.get('API_URL') + '/connection?checked=true',
     );
@@ -92,12 +91,11 @@ export class AuthController {
     @Body() body: AuthDTO,
     @Res() res: Response,
   ): Promise<void> {
-    console.log('body : ', body);
     const result: AuthInterface = await this.authService.loginOAuth2FA(
       body.code,
       body.userId,
     );
-    console.log('token : ', result.accessToken);
+    // console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
@@ -113,7 +111,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const jwtCookie: string = req.cookies['jwt'];
-    console.log('jwt cookie : ', jwtCookie);
+    // console.log('jwt cookie : ', jwtCookie);
     if (!jwtCookie) return;
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {

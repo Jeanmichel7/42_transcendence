@@ -2,7 +2,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export interface MessageInterfaceTmp {
   message: string;
@@ -39,7 +40,7 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = macHostName
+              target.src = API_URL + '/images/avatars/default.png';
             }}
             alt="avatar"
           />

@@ -2,8 +2,8 @@ version: "3"
 services:
   nestjs:
     build:
-      context: ./back
-      dockerfile: ./docker/Dockerfile
+      context: .
+      dockerfile: back/docker/Dockerfile
     container_name: nestjs
     ports:
       - 3000:3000
@@ -15,15 +15,7 @@ services:
       - /app/node_modules
     restart: always
     environment:
-      API_URL: ${API_URL}
-      # POSTGRES_USER: ${DB_USERNAME}
-      # POSTGRES_PASSWORD: ${DB_PASSWORD}
-      # POSTGRES_DB: ${DB_NAME}
-      # DB_PORT: ${DB_PORT}
-      # JWT_SECRET: ${JWT_SECRET}
-      # CLIENT_ID: ${CLIENT_ID}
-      # OAUTH_INTRA: ${OAUTH_INTRA}
-      # OAUTH_INTRA_NEXT: ${OAUTH_INTRA_NEXT}
+      API_URL: ${HOST_IP_FRONT}
 
   postgres:
     build: db/
@@ -51,6 +43,8 @@ services:
       - front:/app
       - /app/node_modules
     restart: always
+    environment:
+      VITE_API_URL: ${HOST_IP_BACK}
 
   pgadmin:
     container_name: pgadmin

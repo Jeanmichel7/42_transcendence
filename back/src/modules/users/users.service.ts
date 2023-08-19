@@ -17,10 +17,8 @@ import {
 } from 'fs';
 
 import { UserEntity } from 'src/modules/users/entity/users.entity';
-
 import { UserInterface } from './interfaces/users.interface';
 import { ProfilInterface } from './interfaces/profil.interface';
-
 import { UserPatchDTO } from './dto/user.patch.dto';
 import { UserCreateDTO } from './dto/user.create.dto';
 import axios from 'axios';
@@ -31,6 +29,7 @@ import { UserUpdateEvent } from '../notification/events/notification.event';
 import { TrophiesEntity } from 'config';
 import { trophies } from '../trophies/trophies.data';
 import { UserTrophiesEntity } from '../trophies/entity/userTrophiesProgress.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -45,6 +44,7 @@ export class UsersService {
     @InjectRepository(UserTrophiesEntity)
     private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
     private readonly eventEmitter: EventEmitter2,
+    private configService: ConfigService,
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
@@ -269,7 +269,8 @@ export class UsersService {
     newUser.email = data.email;
     newUser.description = data.description;
     const avatarName: string = await this.uploadAndSaveAvatar(data.image.link);
-    newUser.avatar = 'http://localhost:3000/avatars/' + avatarName;
+    newUser.avatar =
+      this.configService.get('API_URL') + '/avatars/' + avatarName;
     const user: UserEntity = await this.userRepository.save(newUser);
     if (!user) throw new NotFoundException(`User ${newUser.login} not created`);
     await this.initTrophiesProgressForUser(user);
@@ -287,7 +288,8 @@ export class UsersService {
 
     const updateData: Partial<UserEntity> = {};
     if (file) {
-      updateData.avatar = 'http://localhost:3000/avatars/' + file.filename;
+      updateData.avatar =
+        this.configService.get('API_URL') + '/avatars/' + file.filename;
       this.deleteAvatar(userToUpdate.avatar);
     } else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;

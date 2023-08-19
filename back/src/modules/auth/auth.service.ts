@@ -90,9 +90,7 @@ export class AuthService {
     let clientSecret: string;
     try {
       clientSecret = this.configService.get<string>('OAUTH_INTRA');
-      console.log('clientSecret:', clientSecret);
       accessToken = await this.OAuthGetToken(code, clientSecret);
-      console.log('accessToken:', accessToken);
     } catch (e) {
       console.error(
         'Error OAuthGetToken, first token expired, test second token',
@@ -259,6 +257,7 @@ export class AuthService {
   ): Promise<string> {
     const clientId: string = this.configService.get<string>('CLIENT_ID');
     const redirect_uris = [
+      'http://localhost:3000/auth/loginOAuth',
       'http://k1r2p1:3000/auth/loginOAuth',
       'http://k1r2p2:3000/auth/loginOAuth',
       'http://k1r2p3:3000/auth/loginOAuth',
@@ -267,7 +266,34 @@ export class AuthService {
       'http://k1r2p6:3000/auth/loginOAuth',
       'http://k1r2p7:3000/auth/loginOAuth',
       'http://k1r2p8:3000/auth/loginOAuth',
-      'http://localhost:3000/auth/loginOAuth',
+      'http://k0r3p1:3000/auth/loginOAuth',
+      'http://k0r3p2:3000/auth/loginOAuth',
+      'http://k0r3p3:3000/auth/loginOAuth',
+      'http://k0r3p4:3000/auth/loginOAuth',
+      'http://k0r3p5:3000/auth/loginOAuth',
+      'http://k0r3p6:3000/auth/loginOAuth',
+      'http://k0r3p7:3000/auth/loginOAuth',
+      'http://k0r3p8:3000/auth/loginOAuth',
+      'http://k0r3p9:3000/auth/loginOAuth',
+      'http://k0r3p10:3000/auth/loginOAuth',
+      'http://k0r3p11:3000/auth/loginOAuth',
+      'http://k0r3p12:3000/auth/loginOAuth',
+      'http://k0r3p13:3000/auth/loginOAuth',
+      'http://k0r3p14:3000/auth/loginOAuth',
+      'http://k0r4p1:3000/auth/loginOAuth',
+      'http://k0r4p2:3000/auth/loginOAuth',
+      'http://k0r4p3:3000/auth/loginOAuth',
+      'http://k0r4p4:3000/auth/loginOAuth',
+      'http://k0r4p5:3000/auth/loginOAuth',
+      'http://k0r4p6:3000/auth/loginOAuth',
+      'http://k0r4p7:3000/auth/loginOAuth',
+      'http://k0r4p8:3000/auth/loginOAuth',
+      'http://k0r4p9:3000/auth/loginOAuth',
+      'http://k0r4p10:3000/auth/loginOAuth',
+      'http://k0r4p11:3000/auth/loginOAuth',
+      'http://k0r4p12:3000/auth/loginOAuth',
+      'http://k0r4p13:3000/auth/loginOAuth',
+      'http://k0r4p14:3000/auth/loginOAuth',
     ];
     let error: any = null;
     const handleError = (error: any) => {

@@ -39,7 +39,8 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -385,138 +386,116 @@ function Header() {
       {/**
        * Always display
        */}
-      {userIsLogged == false && (
-        <div className="flex">
-          {/* <NavLink to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code">
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              Login Intra
-            </Button>
-          </NavLink>
-          <NavLink to="/accountconnection">
-            <Button
-              onClick={handleCloseNavMenu}
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              Login Fake
-            </Button>
-          </NavLink> */}
-        </div>
-      )}
-      {userIsLogged && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            // height: "100%",
-          }}
-        >
-          <Box>
-            <Tooltip title={`${notifications.length} notifications`} arrow>
-              <IconButton
-                size="large"
-                aria-label="show new notifications"
-                color="inherit"
-                onClick={handleOpenNotif}
-              >
-                <Badge
-                  badgeContent={
-                    notifications.filter((n: NotificationInterface) => !n.read)
-                      .length
-                  }
-                  color="error"
-                >
-                  {notifications.filter((n: NotificationInterface) => !n.read)
-                    .length ? (
-                    <NotificationsActiveIcon />
-                  ) : notifications.length ? (
-                    <NotificationsIcon />
-                  ) : (
-                    <NotificationsNoneIcon />
-                  )}
-                </Badge>
-              </IconButton>
-            </Tooltip>
-          </Box>
 
-          <Tooltip title="Open settings" arrow>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          // height: "100%",
+        }}
+      >
+        <Box>
+          <Tooltip title={`${notifications.length} notifications`} arrow>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-haspopup="true"
-              onClick={handleOpenUserMenu}
+              aria-label="show new notifications"
               color="inherit"
+              onClick={handleOpenNotif}
             >
-              {userData.avatar && (
-                <Avatar
-                  alt="avatar"
-                  src={userData.avatar}
-                  onError={e => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src =
-                      macHostName + ':3000/avatars/defaultAvatar.png';
-                  }}
-                  sx={{ width: 32, height: 32 }}
-                />
-              )}
+              <Badge
+                badgeContent={
+                  notifications.filter((n: NotificationInterface) => !n.read)
+                    .length
+                }
+                color="error"
+              >
+                {notifications.filter((n: NotificationInterface) => !n.read)
+                  .length ? (
+                  <NotificationsActiveIcon />
+                ) : notifications.length ? (
+                  <NotificationsIcon />
+                ) : (
+                  <NotificationsNoneIcon />
+                )}
+              </Badge>
             </IconButton>
           </Tooltip>
-
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            sx={{
-              mt: '2px',
-            }}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            <NavLink to="/about">
-              <MenuItem onClick={handleCloseUserMenu}>
-                <InfoIcon className="mr-2" />
-                About
-              </MenuItem>
-            </NavLink>
-
-            <NavLink to="/account">
-              <MenuItem onClick={handleCloseUserMenu}>
-                <SettingsIcon className="mr-2" />
-                Account
-              </MenuItem>
-            </NavLink>
-
-            <NavLink to={`/achievement/${userData.login}`}>
-              <MenuItem onClick={handleCloseUserMenu}>
-                <EmojiEventsIcon className="mr-2" />
-                Achievement
-              </MenuItem>
-            </NavLink>
-
-            <Divider />
-
-            <div>
-              <MenuItem onClick={handleLogout}>
-                <LogoutIcon className="mr-2" />
-                Logout
-              </MenuItem>
-            </div>
-          </Menu>
-          {notifOpen && notificationMenu}
         </Box>
-      )}
+
+        <Tooltip title="Open settings" arrow>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-haspopup="true"
+            onClick={handleOpenUserMenu}
+            color="inherit"
+          >
+            {userData.avatar && (
+              <Avatar
+                alt="avatar"
+                src={userData.avatar}
+                onError={e => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = API_URL + '/avatars/defaultAvatar.png';
+                }}
+                sx={{ width: 32, height: 32 }}
+              />
+            )}
+          </IconButton>
+        </Tooltip>
+
+        <Menu
+          id="menu-appbar"
+          anchorEl={anchorElUser}
+          sx={{
+            mt: '2px',
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+        >
+          <NavLink to="/about">
+            <MenuItem onClick={handleCloseUserMenu}>
+              <InfoIcon className="mr-2" />
+              About
+            </MenuItem>
+          </NavLink>
+
+          <NavLink to="/account">
+            <MenuItem onClick={handleCloseUserMenu}>
+              <SettingsIcon className="mr-2" />
+              Account
+            </MenuItem>
+          </NavLink>
+
+          <NavLink to={`/achievement/${userData.login}`}>
+            <MenuItem onClick={handleCloseUserMenu}>
+              <EmojiEventsIcon className="mr-2" />
+              Achievement
+            </MenuItem>
+          </NavLink>
+
+          <Divider />
+
+          <div>
+            <MenuItem onClick={handleLogout}>
+              <LogoutIcon className="mr-2" />
+              Logout
+            </MenuItem>
+          </div>
+        </Menu>
+        {notifOpen && notificationMenu}
+      </Box>
     </Box>
   );
 }
