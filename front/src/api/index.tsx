@@ -1,9 +1,10 @@
 import axios, { AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types';
-import macHostName from '/src/config.js';
 
+const API_URL = import.meta.env.VITE_API_URL;
+console.log('API_URL : ', API_URL);
 const api = axios.create({
-  baseURL: 'http://' + macHostName + ':3000',
+  baseURL: API_URL,
   withCredentials: true,
 });
 
@@ -20,6 +21,8 @@ export async function apiRequest<T>(
   data?: unknown,
 ): Promise<T | ApiErrorResponse> {
   try {
+    console.log('API_URL : ', API_URL);
+
     const response = await api[method]<T>(url, data);
     if (response.status === 200 || response.status === 201) {
       return response.data;

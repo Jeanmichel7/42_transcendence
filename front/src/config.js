@@ -1,2 +1,2 @@
-const macHostName = 'k1r2p6';
+const macHostName = 'localhost';
 export default macHostName;

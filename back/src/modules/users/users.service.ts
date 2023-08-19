@@ -269,7 +269,7 @@ export class UsersService {
     newUser.email = data.email;
     newUser.description = data.description;
     const avatarName: string = await this.uploadAndSaveAvatar(data.image.link);
-    newUser.avatar = 'k1r2p6:3000/avatars/' + avatarName;
+    newUser.avatar = 'http://localhost:3000/avatars/' + avatarName;
     const user: UserEntity = await this.userRepository.save(newUser);
     if (!user) throw new NotFoundException(`User ${newUser.login} not created`);
     await this.initTrophiesProgressForUser(user);
@@ -287,7 +287,7 @@ export class UsersService {
 
     const updateData: Partial<UserEntity> = {};
     if (file) {
-      updateData.avatar = 'k1r2p6:3000/avatars/' + file.filename;
+      updateData.avatar = 'http://localhost:3000/avatars/' + file.filename;
       this.deleteAvatar(userToUpdate.avatar);
     } else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;

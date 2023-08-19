@@ -93,12 +93,17 @@ export class AuthService {
       console.log('clientSecret:', clientSecret);
       accessToken = await this.OAuthGetToken(code, clientSecret);
       console.log('accessToken:', accessToken);
-    } catch {
+    } catch (e) {
       console.error(
         'Error OAuthGetToken, first token expired, test second token',
+        e,
       );
-      clientSecret = this.configService.get<string>('OAUTH_INTRA_NEXT');
-      accessToken = await this.OAuthGetToken(code, clientSecret);
+      try {
+        clientSecret = this.configService.get<string>('OAUTH_INTRA_NEXT');
+        accessToken = await this.OAuthGetToken(code, clientSecret);
+      } catch (e) {
+        throw new UnauthorizedException('Intra OAuth: ' + e.response, e.status);
+      }
     }
     const userData42: UserInterface = await this.OAuthGetUserData(accessToken);
 
@@ -253,27 +258,46 @@ export class AuthService {
     clientSecret: string,
   ): Promise<string> {
     const clientId: string = this.configService.get<string>('CLIENT_ID');
-    try {
-      const tokenResponse = await axios.post(
-        'https://api.intra.42.fr/oauth/token',
+    const redirect_uris = [
+      'http://k1r2p1:3000/auth/loginOAuth',
+      'http://k1r2p2:3000/auth/loginOAuth',
+      'http://k1r2p3:3000/auth/loginOAuth',
+      'http://k1r2p4:3000/auth/loginOAuth',
+      'http://k1r2p5:3000/auth/loginOAuth',
+      'http://k1r2p6:3000/auth/loginOAuth',
+      'http://k1r2p7:3000/auth/loginOAuth',
+      'http://k1r2p8:3000/auth/loginOAuth',
+      'http://localhost:3000/auth/loginOAuth',
+    ];
+    let error: any = null;
+    const handleError = (error: any) => {
+      throw new HttpException(
+        error.response.data.error + ':' + error.response.data.error_description,
+        error.status,
         {
-          grant_type: 'authorization_code',
-          client_id: clientId,
-          client_secret: clientSecret,
-          code: code,
-          redirect_uri: '/auth/loginOAuth',
+          cause: new UnauthorizedException(),
         },
       );
-      if (tokenResponse.status != 200) {
-        throw new HttpException('Invalid code', tokenResponse.status);
+    };
+
+    for (const redirect_uri of redirect_uris) {
+      try {
+        const tokenResponse = await axios.post(
+          'https://api.intra.42.fr/oauth/token',
+          {
+            grant_type: 'authorization_code',
+            client_id: clientId,
+            client_secret: clientSecret,
+            code: code,
+            redirect_uri: redirect_uri,
+          },
+        );
+        if (tokenResponse.status == 200) return tokenResponse.data.access_token;
+      } catch (e) {
+        error = e;
       }
-      return tokenResponse.data.access_token;
-    } catch (error) {
-      throw new UnauthorizedException(
-        'Intra OAuth: ' + error.response,
-        error.status,
-      );
     }
+    handleError(error);
   }
 
   private async OAuthGetUserData(accessToken: string): Promise<any> {

@@ -28,8 +28,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from '../../store';
-import macHostName from '/src/config.js';
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 const useConnection = () => {
   const dispatch = useDispatch();
@@ -82,7 +82,6 @@ const useConnection = () => {
         );
       },
     );
-
     return () => {
       socketRef.current?.off('notification_private_message');
     };
@@ -90,12 +89,9 @@ const useConnection = () => {
 
   useEffect(() => {
     if (!userData.id || userData.id === -1) return;
-    const socket = io('http://' + macHostName + ':3000/notification', {
+    console.log('api url : ', API_URL);
+    const socket = io(API_URL + '/notification', {
       withCredentials: true,
-      transports: ['websocket'],
-      corse: {
-        origin: 'http://' + macHostName + ':3006',
-      }
     });
 
     //connect room

@@ -21,9 +21,10 @@ interface clientUpdate {
 }
 
 @WebSocketGateway({
-  namespace: '/game',
+  namespace: 'game',
   cors: {
-    origin: '*',
+    origin: process.env.API_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },
 })

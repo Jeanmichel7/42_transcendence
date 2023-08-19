@@ -17,7 +17,6 @@ import SendIcon from '@mui/icons-material/Send';
 import { Api2FAResponse, ApiErrorResponse, ApiLogin2FACode } from '../types';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import cuteBallsClimbingVines from '../assets/cuteBallsClimbingVines.png';
-import macHostName from '/src/config.js';
 
 function ConnectPage() {
   const [is2FAactiv, setIs2FAactiv] = useState(false);
@@ -45,7 +44,7 @@ function ConnectPage() {
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://' + macHostName + ':3006',
+          '/',
         );
       }
     }
@@ -80,16 +79,14 @@ function ConnectPage() {
       // dispatch(setErrorSnackbar(res));
     } else {
       setError(false);
-      window.opener.postMessage(
-        { msg: 'user connected', id: userId },
-        'http://' + macHostName + ':3006',
-      );
+      window.opener.postMessage({ msg: 'user connected', id: userId }, '/');
     }
     setIsLoading(false);
   }
-  const urlOAuth = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code'
+  const urlOAuth =
+    'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code';
   // const urlOAuth =
-  //   'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code';
+  //   'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2FloginOAuth&response_type=code';
 
   return (
     <>

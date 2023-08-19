@@ -24,10 +24,14 @@ import { RequestWithUser } from './interfaces/request.user.interface';
 import { UserLoginDTO } from '../users/dto/user.login.dto';
 import { AuthDTO } from './dto/user2fa.auth.dto';
 import { AuthAdmin } from './guard/authAdmin.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   // @Public()
   @Get('isAuthenticated')
@@ -36,9 +40,6 @@ export class AuthController {
     else return false;
   }
 
-  /*
-	https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code
-	*/
   @Get('loginOAuth')
   @Public()
   async logInOAuth(
@@ -52,7 +53,11 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
-    res.redirect(`/connection?checked=true`);
+    const url = this.configService.get('API_URL') + '/connection?checked=true';
+    console.log('url : ', url);
+    res.redirect(
+      this.configService.get('API_URL') + '/connection?checked=true',
+    );
   }
 
   @Post('loginFakeUser')
