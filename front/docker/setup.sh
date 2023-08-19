@@ -1,5 +1,5 @@
-#!/bin/bash
+# #!/bin/bash
 
-chown -R node:node /app/.git
+# chown -R node:node /app/.git
 
-exec "$@"
+# exec "$@"

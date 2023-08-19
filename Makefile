@@ -1,7 +1,14 @@
 NAME = transcendence
 OS	= ${shell uname}
+COMPOSE_HTTP_TIMEOUT = 480
+export COMPOSE_HTTP_TIMEOUT
+
+IP_HOST=$(shell hostname | cut -d'.' -f1)
+export HOST_IP_BACK=http://$(IP_HOST):3000
+export HOST_IP_FRONT=http://$(IP_HOST):3006
 
 all:
+	echo ${HOST_IP_FRONT}
 	printf "Launch configuration ${NAME}..."
 	docker-compose up
 

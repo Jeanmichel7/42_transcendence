@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types';
-import macHostName from '/src/config.js';
 
+const API_URL = import.meta.env.VITE_API_URL;
 const api = axios.create({
-  baseURL: 'http://' + macHostName + ':3000',
+  baseURL: API_URL,
   withCredentials: true,
 });
 

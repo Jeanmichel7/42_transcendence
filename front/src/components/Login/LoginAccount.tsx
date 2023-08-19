@@ -29,7 +29,6 @@ import { setErrorSnackbar } from '../../store/snackbarSlice';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SendIcon from '@mui/icons-material/Send';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
-import macHostName from '/src/config.js';
 
 export interface FormDataUser {
   login: string;
@@ -92,6 +91,7 @@ export default function LoginAccount({
     const data: FormDataUser = generateUser();
     setIsLoadingCreate(true);
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
+    console.log('res', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
       return null;
@@ -105,7 +105,6 @@ export default function LoginAccount({
   };
 
   // CONNECTION
-
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading2FA(true);
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
@@ -118,7 +117,7 @@ export default function LoginAccount({
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          'http://' + macHostName + ':3006',
+          '/',
         );
       }
     }
@@ -183,10 +182,7 @@ export default function LoginAccount({
       // dispatch(setErrorSnackbar(res));
     } else {
       setError(false);
-      window.opener.postMessage(
-        { msg: 'user connected', id: userId },
-        'localhost:3006',
-      );
+      window.opener.postMessage({ msg: 'user connected', id: userId }, '/');
     }
     setIsLoading2FA(false);
   }

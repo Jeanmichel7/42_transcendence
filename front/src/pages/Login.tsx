@@ -20,7 +20,6 @@ import {
 } from '../types';
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar } from '../store/snackbarSlice';
-import macHostName from '/src/config.js';
 
 const slideInFromBottom = keyframes`{
   0% {
@@ -251,9 +250,8 @@ export default function Login() {
     const left = Math.floor(window.innerWidth / 2 - width / 2) + window.screenX;
     const top =
       Math.floor(window.innerHeight / 2 - height / 2) + window.screenY;
-
     const newWindow = window.open(
-      'http://' + macHostName + ':3006/connection',
+      '/connection',
       '_blank',
       `toolbar=no, location=no, directories=no, status=no, menubar=no,
         scrollbars=yes, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,

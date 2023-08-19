@@ -1,6 +1,7 @@
 import { Badge } from '@mui/material';
 import { UserInterface } from '../../../../types';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
   return (
@@ -49,7 +50,7 @@ const RowOfFriendToInvit = ({ user }: { user: UserInterface }) => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+              target.src = API_URL + '/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />

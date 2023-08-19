@@ -7,8 +7,6 @@ import {
 import { RootState } from '../../store';
 import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
 import { Link, useNavigate } from 'react-router-dom';
-import macHostName from '/src/config.js';
-
 import {
   deleteFriend,
   apiBlockUser,
@@ -20,7 +18,6 @@ import {
   UserInterface,
   UserRelation,
 } from '../../types';
-
 import {
   Card,
   CardActionArea,
@@ -43,6 +40,8 @@ import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
 import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface FriendCardProps {
   actualUserLogin?: string;
@@ -192,8 +191,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src =
-                    macHostName + ':3000/avatars/defaultAvatar.png';
+                  target.src = API_URL + '/avatars/defaultAvatar.png';
                 }}
               />
             </Badge>
@@ -206,7 +204,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
               onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+                target.src = API_URL + '/avatars/defaultAvatar.png';
               }}
             />
           )}

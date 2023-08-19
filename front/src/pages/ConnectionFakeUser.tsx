@@ -5,6 +5,8 @@ import SigninAccount from '../components/Login/SigninAccount';
 import LoginAccount from '../components/Login/LoginAccount';
 import { faker } from '@faker-js/faker';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export interface FormDataUser {
   login: string;
   password: string;
@@ -64,7 +66,7 @@ export default function AccountConnection() {
     <div className="bg-inherit">
       {/* link prev page */}
       <div className="absolute top-0 right-0 m-5 text-blue-500">
-        <Link to="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2Fk1r2p6%3A3000%2Fauth%2FloginOAuth&response_type=code">
+        <Link to={`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2F${API_URL}%3A3000%2Fauth%2FloginOAuth&response_type=code`}>
           Login Intra
         </Link>
       </div>

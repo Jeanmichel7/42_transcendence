@@ -33,7 +33,8 @@ import {
 } from '../../../../api/chat';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../../../store';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface UserCardProps {
   user: UserInterface;
@@ -313,8 +314,7 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
                 onError={e => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src =
-                    macHostName + ':3000/avatars/defaultAvatar.png';
+                  target.src = API_URL + '/avatars/defaultAvatar.png';
                 }}
                 alt="avatar"
               />

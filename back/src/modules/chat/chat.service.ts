@@ -124,7 +124,7 @@ export class ChatService {
       .getOne();
 
     const newBotMessage: ChatCreateMsgDTO = {
-      text: `Invitation link k1r2p6:3006/chat/channel/invitation/${room.id}/${room.name}`,
+      text: `Invitation link ${process.env.API_URL}/chat/channel/invitation/${room.id}/${room.name}`,
     };
 
     const userBot: UserEntity = await this.userRepository.findOne({

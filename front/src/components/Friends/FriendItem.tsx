@@ -1,7 +1,8 @@
 import { Badge, Button, Typography } from '@mui/material';
 import { UserInterface } from '../../types';
 import { useNavigate } from 'react-router-dom';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface FriendItemProps {
   user: UserInterface;
@@ -76,8 +77,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
                   onError={e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src =
-                      macHostName + ':3000/avatars/defaultAvatar.png';
+                    target.src = API_URL + '/avatars/defaultAvatar.png';
                   }}
                   alt="avatar"
                 />

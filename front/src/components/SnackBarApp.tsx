@@ -8,6 +8,8 @@ import { RootState } from '../store';
 import { useNavigate } from 'react-router-dom';
 import { closeSnackbar } from '../store/snackbarSlice';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const SnackBarApp = () => {
   const { snackbar } = useSelector((state: RootState) => state.snackbar);
   const dispatch = useDispatch();
@@ -41,7 +43,7 @@ const SnackBarApp = () => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+              target.src = API_URL + '/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
@@ -77,7 +79,7 @@ const SnackBarApp = () => {
             onError={e => {
               const target = e.target as HTMLImageElement;
               target.onerror = null;
-              target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+              target.src = API_URL + '/avatars/defaultAvatar.png';
             }}
             alt="avatar"
           />
