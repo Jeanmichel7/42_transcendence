@@ -305,7 +305,7 @@ function Header() {
             }}
           >
             <SportsEsportsIcon className="mr-2" />
-            <p className="mt-0.5">Game</p>
+            <h2 className="mt-0.5 font-bold">Game</h2>
           </Button>
         </NavLink>
 
@@ -323,7 +323,7 @@ function Header() {
             }}
           >
             <ChatIcon className="mr-2" />
-            <p className="mt-0.5">Chat</p>
+            <h2 className="mt-0.5 font-bold">Chat</h2>
           </Button>
         </NavLink>
 
@@ -341,7 +341,7 @@ function Header() {
             }}
           >
             <GroupIcon className="mr-2" />
-            <p className="mt-0.5">Friends</p>
+            <h2 className="mt-0.5 font-bold">Friends</h2>
           </Button>
         </NavLink>
 
@@ -359,7 +359,7 @@ function Header() {
             }}
           >
             <PersonSearchIcon className="mr-2" />
-            <p className="mt-0.5">Profile</p>
+            <h2 className="mt-0.5 font-bold">Profile</h2>
           </Button>
         </NavLink>
 
@@ -377,7 +377,7 @@ function Header() {
             }}
           >
             <LeaderboardIcon className="mr-2" />
-            <p className="mt-0.5">Leaderboard</p>
+            <h2 className="mt-0.5 font-bold">Leaderboard</h2>
           </Button>
         </NavLink>
       </Box>
