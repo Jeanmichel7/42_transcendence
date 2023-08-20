@@ -4,7 +4,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import './App.css';
 
-import AppRoutes from './routes/indexRoutes';
+import AppRoutes from './routes/appRoutes';
 import { isAuthenticated } from './api/auth';
 import { getUserData } from './api/user';
 import {
@@ -123,48 +123,29 @@ function App() {
     } else {
       dispatch(setLogged(false));
       //disconnect user
-      if (
-        location &&
-        location.pathname != '/' &&
-        location.pathname != '/login' &&
-        location.pathname != '/connection' &&
-        location.pathname != '/oauthredirection' &&
-        location.pathname != '/accountconnection'
-      )
+      if (location && location.pathname != '/' && location.pathname != '/login')
         navigate('/');
       setUserId(-1);
     }
   }, [dispatch, fetchData, location, navigate, userId]);
 
   useEffect(() => {
-    if (
-      location &&
-      location.pathname != '/' &&
-      location.pathname != '/login' &&
-      location.pathname != '/connection' &&
-      location.pathname != '/oauthredirection' &&
-      location.pathname != '/accountconnection'
-    ) {
+    if (location && location.pathname != '/' && location.pathname != '/login') {
       checkAuth();
     }
   }, [dispatch, navigate, fetchData, checkAuth, location]);
 
   return (
     <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
-      {location &&
-        location.pathname !== '/' &&
-        location.pathname != '/connection' &&
-        location.pathname != '/accountconnection' && <Header />}
+      {location && location.pathname !== '/' && <Header />}
+
       {(location.pathname == '/' || location?.pathname == '/game') && (
         <CircleBackground />
       )}
 
       <AppRoutes />
 
-      {location &&
-        location.pathname !== '/' &&
-        location.pathname != '/connection' &&
-        location.pathname != '/accountconnection' && <Footer />}
+      {location && location.pathname !== '/' && <Footer />}
 
       <SnackBarApp />
     </div>

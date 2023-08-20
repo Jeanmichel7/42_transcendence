@@ -1,10 +1,11 @@
-import App from './App';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 import './index.css';
 import { ThemeProvider, createTheme } from '@mui/material';
+import connectRoutes from './routes/connectRoutes';
+import App from './App';
 
 const theme = createTheme({
   typography: {
@@ -12,12 +13,19 @@ const theme = createTheme({
   },
 });
 
+const RootComponent =
+  window.location.pathname.includes('connection') ||
+  window.location.pathname.includes('accountconnection') ||
+  window.location.pathname.includes('oauthredirection')
+    ? connectRoutes
+    : App;
+
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
       <BrowserRouter>
-        <App />
+        <RootComponent />
       </BrowserRouter>
     </ThemeProvider>
   </Provider>,
