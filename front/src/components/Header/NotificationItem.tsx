@@ -161,7 +161,6 @@ const NotificationItem = ({
 
   const handleDeleteNotification = () => {
     if (notifications.length == 1) setNotifOpen(false);
-    console.log('notifications : ', notifications.length);
     dispatch(
       reduxRemoveNotification({
         notifId: notification.id,

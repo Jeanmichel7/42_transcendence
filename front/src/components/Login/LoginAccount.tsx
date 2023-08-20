@@ -91,7 +91,6 @@ export default function LoginAccount({
     const data: FormDataUser = generateUser();
     setIsLoadingCreate(true);
     const res: UserInterface | ApiErrorResponse = await registerFakeUser(data);
-    console.log('res', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
       return null;
@@ -107,9 +106,7 @@ export default function LoginAccount({
   // CONNECTION
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading2FA(true);
-    console.log('la ok encore');
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
-    console.log('res check need 2FA: ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {
@@ -119,7 +116,7 @@ export default function LoginAccount({
       } else {
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          '/',
+          window.location.origin,
         );
       }
     }
@@ -184,7 +181,10 @@ export default function LoginAccount({
       // dispatch(setErrorSnackbar(res));
     } else {
       setError(false);
-      window.opener.postMessage({ msg: 'user connected', id: userId }, '/');
+      window.opener.postMessage(
+        { msg: 'user connected', id: userId },
+        window.location.origin,
+      );
     }
     setIsLoading2FA(false);
   }

@@ -59,6 +59,19 @@ export async function check2FACode(
   );
 }
 
+export async function loginOAuth(
+  code: string,
+): Promise<UserInterface | ApiErrorResponse> {
+  return apiRequest<UserInterface>(
+    'post',
+    '/auth/loginOAuth',
+    'Failed to login OAuth: ',
+    {
+      code: code,
+    },
+  );
+}
+
 export async function loginFakeUser(
   body: FormDataUser,
 ): Promise<AuthInterface | ApiErrorResponse> {

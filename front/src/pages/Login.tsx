@@ -21,8 +21,6 @@ import {
 import { useDispatch } from 'react-redux';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const slideInFromBottom = keyframes`{
   0% {
     transform: translateY(200%);
@@ -260,22 +258,11 @@ export default function Login() {
     );
     if (!newWindow) return console.warn('erreur new windows  ');
 
-    console.log('Parent window origin:', window.location.origin);
-    console.log('Child window origin:', newWindow.location.origin);
     window.addEventListener('message', async event => {
-      console.log('event.source', event.source);
-      console.log('event.origin', event.origin);
-      console.log('newWindow : ', newWindow);
-      console.log('API_URL', API_URL);
-      console.log('new URL(API_URL).origin', new URL(API_URL).origin);
-      if (
-        event.source !== newWindow &&
-        event.origin !== new URL(API_URL).origin
-      ) {
-        console.log('Mismatching source for event');
+      if (event.source !== newWindow) {
+        // console.log('Mismatching source for event');
         return;
       }
-
       if (event.data.msg === 'resize') {
         const newX =
           Math.floor(window.innerWidth / 2 - event.data.width / 2) +

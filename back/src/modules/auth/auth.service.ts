@@ -63,7 +63,6 @@ export class AuthService {
     if (resultUpdate.affected === 0)
       throw new BadRequestException(`User ${user.id} has not been updated.`);
 
-    console.log('la ok');
     res.accessToken = await this.createJWT(user);
     return res;
   }
@@ -258,44 +257,44 @@ export class AuthService {
   ): Promise<string> {
     const clientId: string = this.configService.get<string>('CLIENT_ID');
     const redirect_uris = [
-      'http://localhost:3000/auth/loginOAuth',
-      'http://pcbureau:3000/auth/loginOAuth',
-      'http://k1r2p1:3000/auth/loginOAuth',
-      'http://k1r2p2:3000/auth/loginOAuth',
-      'http://k1r2p3:3000/auth/loginOAuth',
-      'http://k1r2p4:3000/auth/loginOAuth',
-      'http://k1r2p5:3000/auth/loginOAuth',
-      'http://k1r2p6:3000/auth/loginOAuth',
-      'http://k1r2p7:3000/auth/loginOAuth',
-      'http://k1r2p8:3000/auth/loginOAuth',
-      'http://k0r3p1:3000/auth/loginOAuth',
-      'http://k0r3p2:3000/auth/loginOAuth',
-      'http://k0r3p3:3000/auth/loginOAuth',
-      'http://k0r3p4:3000/auth/loginOAuth',
-      'http://k0r3p5:3000/auth/loginOAuth',
-      'http://k0r3p6:3000/auth/loginOAuth',
-      'http://k0r3p7:3000/auth/loginOAuth',
-      'http://k0r3p8:3000/auth/loginOAuth',
-      'http://k0r3p9:3000/auth/loginOAuth',
-      'http://k0r3p10:3000/auth/loginOAuth',
-      'http://k0r3p11:3000/auth/loginOAuth',
-      'http://k0r3p12:3000/auth/loginOAuth',
-      'http://k0r3p13:3000/auth/loginOAuth',
-      'http://k0r3p14:3000/auth/loginOAuth',
-      'http://k0r4p1:3000/auth/loginOAuth',
-      'http://k0r4p2:3000/auth/loginOAuth',
-      'http://k0r4p3:3000/auth/loginOAuth',
-      'http://k0r4p4:3000/auth/loginOAuth',
-      'http://k0r4p5:3000/auth/loginOAuth',
-      'http://k0r4p6:3000/auth/loginOAuth',
-      'http://k0r4p7:3000/auth/loginOAuth',
-      'http://k0r4p8:3000/auth/loginOAuth',
-      'http://k0r4p9:3000/auth/loginOAuth',
-      'http://k0r4p10:3000/auth/loginOAuth',
-      'http://k0r4p11:3000/auth/loginOAuth',
-      'http://k0r4p12:3000/auth/loginOAuth',
-      'http://k0r4p13:3000/auth/loginOAuth',
-      'http://k0r4p14:3000/auth/loginOAuth',
+      'http://pcbureau:3006/oauthredirection',
+      'http://localhost:3006/oauthredirection',
+      'http://k1r2p1:3006/oauthredirection',
+      'http://k1r2p2:3006/oauthredirection',
+      'http://k1r2p3:3006/oauthredirection',
+      'http://k1r2p4:3006/oauthredirection',
+      'http://k1r2p5:3006/oauthredirection',
+      'http://k1r2p6:3006/oauthredirection',
+      'http://k1r2p7:3006/oauthredirection',
+      'http://k1r2p8:3006/oauthredirection',
+      'http://k0r3p1:3006/oauthredirection',
+      'http://k0r3p2:3006/oauthredirection',
+      'http://k0r3p3:3006/oauthredirection',
+      'http://k0r3p4:3006/oauthredirection',
+      'http://k0r3p5:3006/oauthredirection',
+      'http://k0r3p6:3006/oauthredirection',
+      'http://k0r3p7:3006/oauthredirection',
+      'http://k0r3p8:3006/oauthredirection',
+      'http://k0r3p9:3006/oauthredirection',
+      'http://k0r3p10:3006/oauthredirection',
+      'http://k0r3p11:3006/oauthredirection',
+      'http://k0r3p12:3006/oauthredirection',
+      'http://k0r3p13:3006/oauthredirection',
+      'http://k0r3p14:3006/oauthredirection',
+      'http://k0r4p1:3006/oauthredirection',
+      'http://k0r4p2:3006/oauthredirection',
+      'http://k0r4p3:3006/oauthredirection',
+      'http://k0r4p4:3006/oauthredirection',
+      'http://k0r4p5:3006/oauthredirection',
+      'http://k0r4p6:3006/oauthredirection',
+      'http://k0r4p7:3006/oauthredirection',
+      'http://k0r4p8:3006/oauthredirection',
+      'http://k0r4p9:3006/oauthredirection',
+      'http://k0r4p10:3006/oauthredirection',
+      'http://k0r4p11:3006/oauthredirection',
+      'http://k0r4p12:3006/oauthredirection',
+      'http://k0r4p13:3006/oauthredirection',
+      'http://k0r4p14:3006/oauthredirection',
     ];
     let error: any = null;
     const handleError = (error: any) => {
@@ -357,9 +356,7 @@ export class AuthService {
 
   private async createJWT(user: UserInterface): Promise<string> {
     const payload = { id: user.id, login: user.login, role: user.role };
-    console.log('payload', payload);
     const token = await this.jwtService.signAsync(payload);
-    console.log('token', token);
     return token;
   }
 

@@ -1,5 +1,4 @@
 import {
-  Query,
   Controller,
   Get,
   Post,
@@ -39,23 +38,19 @@ export class AuthController {
     else return false;
   }
 
-  @Get('loginOAuth')
+  @Post('loginOAuth')
   @Public()
   async logInOAuth(
-    @Query('code') code: string,
+    @Body('code') code: string,
     @Res() res: Response,
   ): Promise<void> {
     const result: AuthInterface = await this.authService.logInOAuth(code);
-    // console.log('token : ', result.accessToken);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
       sameSite: 'strict',
     });
-    const url = this.configService.get('API_URL') + '/connection?checked=true';
-    res.redirect(
-      this.configService.get('API_URL') + '/connection?checked=true',
-    );
+    res.status(200).send(result);
   }
 
   @Post('loginFakeUser')
@@ -66,7 +61,6 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<any> {
     const result: AuthInterface = await this.authService.login(newUser);
-    console.log('result : ', result);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
@@ -111,13 +105,11 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<void> {
     const jwtCookie: string = req.cookies['jwt'];
-    console.log('jwt cookie : ', jwtCookie);
     if (!jwtCookie) {
       // res unauth
       res.status(401).send({ message: "Vous n'êtes pas connecté" });
       return;
     }
-    console.log('jwtCookie.split : ');
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({

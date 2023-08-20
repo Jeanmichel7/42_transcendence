@@ -128,6 +128,7 @@ function App() {
         location.pathname != '/' &&
         location.pathname != '/login' &&
         location.pathname != '/connection' &&
+        location.pathname != '/oauthredirection' &&
         location.pathname != '/accountconnection'
       )
         navigate('/');
@@ -141,6 +142,7 @@ function App() {
       location.pathname != '/' &&
       location.pathname != '/login' &&
       location.pathname != '/connection' &&
+      location.pathname != '/oauthredirection' &&
       location.pathname != '/accountconnection'
     ) {
       checkAuth();

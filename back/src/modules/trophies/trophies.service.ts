@@ -299,8 +299,8 @@ export class TrophiesService {
       const bot: UserEntity = await this.userRepository.findOne({
         where: { login: 'Bot' },
       });
-      console.log('trophies player', player.trophies);
-      console.log('trophiesToAdd', trophiesToAdd);
+      // console.log('trophies player', player.trophies);
+      // console.log('trophiesToAdd', trophiesToAdd);
       for (const trophy of trophiesToAdd) {
         const newNotif: NotificationEntity =
           await this.notificationService.sendNotification({

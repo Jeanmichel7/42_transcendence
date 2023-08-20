@@ -19,6 +19,7 @@ import InvitationWrapper from '../components/Chat/Channel/InvitationWrapper';
 import LeaderBoard from '../pages/LeaderBoard';
 import Achievement from '../pages/Achievement';
 import HomeChat from '../components/Chat/HomeChat';
+import OAuthRedirect from '../pages/OAuthRedirect';
 
 const AppRoutes: React.FC = () => (
   <>
@@ -47,6 +48,7 @@ const AppRoutes: React.FC = () => (
       </Route>
       <Route path="/leaderboard" element={<LeaderBoard />} />
       <Route path="/friends" element={<FriendsPage />} />
+      <Route path="/oauthredirection" element={<OAuthRedirect />} />
       <Route path="/connection" element={<ConnectPage />} />
       <Route path="/accountconnection" element={<AccountConnection />} />
       <Route path="/profile/:pseudo" element={<Profile />} />

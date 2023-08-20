@@ -432,9 +432,6 @@ export class GameService {
     newGame.status = 'waiting';
     newGame.createdAt = new Date();
     const newGameCreated: GameEntity = await this.gameRepository.save(newGame);
-    console.log('newGameCreated : ', newGameCreated);
-    console.log('user : ', user);
-    console.log('userToInvite : ', userToInvite);
 
     //create message
     const newBotMessage: MessageCreateDTO = {
