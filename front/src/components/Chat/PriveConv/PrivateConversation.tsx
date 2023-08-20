@@ -48,8 +48,6 @@ import {
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const PrivateConversation: React.FC = () => {
   const convId = +(useParams<{ convId: string }>().convId || '-1');
   const id = +(useParams<{ id: string }>().id || '-1');
@@ -119,7 +117,7 @@ const PrivateConversation: React.FC = () => {
 
   const connectSocket = useCallback(() => {
     if (id == -1 || userData.id == -1) return;
-    const socket = io(API_URL + '/messagerie', {
+    const socket = io('/messagerie', {
       withCredentials: true,
     });
     socket.on('message', message => {

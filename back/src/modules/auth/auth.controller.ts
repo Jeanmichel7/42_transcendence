@@ -33,7 +33,6 @@ export class AuthController {
     private configService: ConfigService,
   ) {}
 
-  // @Public()
   @Get('isAuthenticated')
   async isAuth(@Req() req: RequestWithUser): Promise<boolean> {
     if (req.user?.id != undefined) return true;
@@ -67,6 +66,7 @@ export class AuthController {
     @Res() res: Response,
   ): Promise<any> {
     const result: AuthInterface = await this.authService.login(newUser);
+    console.log('result : ', result);
     res.cookie('jwt', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 999, //999 jours
@@ -85,8 +85,8 @@ export class AuthController {
     res.status(200).send({ message: 'Déconnexion réussie' });
   }
 
-  @Public()
   @Post('login2fa')
+  @Public()
   async loginOAuth2FA(
     @Body() body: AuthDTO,
     @Res() res: Response,
@@ -104,15 +104,20 @@ export class AuthController {
     res.status(200).send({ message: 'Connexion réussie' });
   }
 
-  @Public()
   @Get('check-2FA')
+  @Public()
   async checkJwtCookie(
     @Req() req: RequestWithUser,
     @Res() res: Response,
   ): Promise<void> {
     const jwtCookie: string = req.cookies['jwt'];
-    // console.log('jwt cookie : ', jwtCookie);
-    if (!jwtCookie) return;
+    console.log('jwt cookie : ', jwtCookie);
+    if (!jwtCookie) {
+      // res unauth
+      res.status(401).send({ message: "Vous n'êtes pas connecté" });
+      return;
+    }
+    console.log('jwtCookie.split : ');
     const isNeed2FA: boolean = jwtCookie.split(',')[0] === 'need2FA';
     if (isNeed2FA) {
       res.status(200).send({

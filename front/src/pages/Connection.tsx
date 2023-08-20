@@ -35,6 +35,7 @@ function ConnectPage() {
 
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading(true);
+    console.log('la ok');
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
     console.log('res check need 2FA: ', res);
     if ('error' in res) {
@@ -44,10 +45,14 @@ function ConnectPage() {
         setIs2FAactiv(res.is2FAactived);
         setUserId(res.user.id);
       } else {
+        console.log('Sending message to parent');
+        console.log('Popup window origin:', window.location.origin);
+
         window.opener.postMessage(
           { msg: 'user connected', id: res.user.id },
-          '/',
+          window.location.origin,
         );
+        console.log('Message sent');
       }
     }
     setIsLoading(false);
@@ -55,6 +60,7 @@ function ConnectPage() {
 
   //check if 2FA is activated
   useEffect(() => {
+    console.log('page connection');
     if (checked == 'true') {
       fetchAndSetIs2FAactived();
     }
@@ -85,6 +91,8 @@ function ConnectPage() {
     }
     setIsLoading(false);
   }
+
+  console.log('API_URL', API_URL);
   const protocolUrl = API_URL.split('://')[0];
   const hostUrl = API_URL.split('://')[1].split(':')[0];
   const portUrl = API_URL.split('://')[1].split(':')[1];

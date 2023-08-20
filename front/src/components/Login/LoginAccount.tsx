@@ -107,7 +107,9 @@ export default function LoginAccount({
   // CONNECTION
   const fetchAndSetIs2FAactived = useCallback(async () => {
     setIsLoading2FA(true);
+    console.log('la ok encore');
     const res: Api2FAResponse | ApiErrorResponse = await check2FACookie();
+    console.log('res check need 2FA: ', res);
     if ('error' in res) {
       dispatch(setErrorSnackbar(res));
     } else {

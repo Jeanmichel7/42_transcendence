@@ -63,6 +63,7 @@ export class AuthService {
     if (resultUpdate.affected === 0)
       throw new BadRequestException(`User ${user.id} has not been updated.`);
 
+    console.log('la ok');
     res.accessToken = await this.createJWT(user);
     return res;
   }
@@ -258,6 +259,7 @@ export class AuthService {
     const clientId: string = this.configService.get<string>('CLIENT_ID');
     const redirect_uris = [
       'http://localhost:3000/auth/loginOAuth',
+      'http://pcbureau:3000/auth/loginOAuth',
       'http://k1r2p1:3000/auth/loginOAuth',
       'http://k1r2p2:3000/auth/loginOAuth',
       'http://k1r2p3:3000/auth/loginOAuth',
@@ -355,7 +357,9 @@ export class AuthService {
 
   private async createJWT(user: UserInterface): Promise<string> {
     const payload = { id: user.id, login: user.login, role: user.role };
+    console.log('payload', payload);
     const token = await this.jwtService.signAsync(payload);
+    console.log('token', token);
     return token;
   }
 

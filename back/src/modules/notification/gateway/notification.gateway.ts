@@ -13,7 +13,19 @@ import { MessageInterface } from 'src/modules/messagerie/interfaces/message.inte
 @WebSocketGateway({
   namespace: 'notification',
   cors: {
-    origin: process.env.API_URL,
+    origin: (origin, callback) => {
+      // Allow localhost:3006 and whatever process.env.API_URL is
+      console.log('origine : ', origin);
+      if (
+        origin === 'http://localhost:3006' ||
+        origin === process.env.API_URL ||
+        !origin
+      ) {
+        return callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },

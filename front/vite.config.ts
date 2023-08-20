@@ -6,5 +6,17 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3006,
+    proxy: {
+      '/api': {
+        target: 'http://nestjs:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+      '/socket.io': {
+        target: 'http://nestjs:3000',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
 });
