@@ -221,6 +221,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 overflow: 'hidden',
                 textOverflow: 'nowrap',
                 textAlign: 'center',
+                fontWeight: 'bold',
+                fontFamily: '"Alegreya Sans SC", sans-serif',
               }}
               title={friend.firstName + ' ' + friend.lastName}
             >

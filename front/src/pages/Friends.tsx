@@ -213,7 +213,6 @@ export default function FriendsPage() {
               border: '1px solid #00CB36',
               borderRadius: '8px',
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
             }}
             onClick={() => {
               setValue(5);

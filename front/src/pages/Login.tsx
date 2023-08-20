@@ -146,7 +146,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   position: relative;
   color: #fff;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
   font-style: italic;
   font-family: "Alegreya Sans SC", sans-serif;
