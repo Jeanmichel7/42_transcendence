@@ -21,7 +21,8 @@ import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '@mui/icons-material/Chat';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function ProfileInfo({ user }: { user: UserInterface }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -154,7 +155,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+                target.src = API_URL + '/avatars/defaultAvatar.png';
               }}
             />
           )}

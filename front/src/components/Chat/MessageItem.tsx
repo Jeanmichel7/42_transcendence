@@ -35,7 +35,8 @@ import { RootState } from '../../store';
 import { StyledLink } from './PriveConv/style';
 import { acceptGameByBtn, inviteGameUser } from '../../api/game';
 import { reduxRemoveNotification } from '../../store/notificationSlice';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -230,8 +231,7 @@ const MessageItem: FC<MessageItemProps> = ({
                   onError={e => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src =
-                      macHostName + ':3000/avatars/defaultAvatar.png';
+                    target.src = API_URL + '/avatars/defaultAvatar.png';
                   }}
                   alt="avatar"
                 />

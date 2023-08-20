@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ExperienceBar from '../Profile/ExperienceBar';
 import StatsPlayerChart from './StatsPlayer';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface LeaderBoardProps {
   user: UserInterface;
@@ -37,7 +38,7 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
               onError={e => {
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
-                target.src = macHostName + ':3000/avatars/defaultAvatar.png';
+                target.src = API_URL + '/avatars/defaultAvatar.png';
               }}
               alt="avatar"
             />

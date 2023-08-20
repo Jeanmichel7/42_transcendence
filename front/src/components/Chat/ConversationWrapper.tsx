@@ -8,6 +8,8 @@ import { RootState } from '../../store';
 import { useConnectionSocketChat } from './useSocketChat';
 import Loaderperosnalized from '../../utils/LoaderPerosnalized';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ConversationWrapper = () => {
   const { convId, login, name } = useParams();
   const { userData } = useSelector((state: RootState) => state.user);
@@ -17,13 +19,9 @@ const ConversationWrapper = () => {
   useEffect(() => {
     if (login || userData.id == -1) return;
     if (!socketRef.current || !socketRef.current.connected) {
-      const socket = io('http://' + macHostName + ':3000/game', {
-      withCredentials: true,
-      transports: ['websocket'],
-      corse: {
-        origin: 'http://' + macHostName + ':3006',
-      }
-    });
+      const socket = io(API_URL + '/chat', {
+        withCredentials: true,
+      });
       socketRef.current = socket;
     }
     return () => {

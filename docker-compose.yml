@@ -1,10 +1,9 @@
-version: '3'
+version: "3"
 services:
-
   nestjs:
     build:
-      context: ./back
-      dockerfile: ./docker/Dockerfile
+      context: .
+      dockerfile: back/docker/Dockerfile
     container_name: nestjs
     ports:
       - 3000:3000
@@ -15,6 +14,8 @@ services:
       - back:/app
       - /app/node_modules
     restart: always
+    environment:
+      API_URL: ${HOST_IP_FRONT}
 
   postgres:
     build: db/
@@ -42,6 +43,8 @@ services:
       - front:/app
       - /app/node_modules
     restart: always
+    environment:
+      VITE_API_URL: ${HOST_IP_BACK}
 
   pgadmin:
     container_name: pgadmin

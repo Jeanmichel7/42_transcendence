@@ -20,10 +20,8 @@ export class AuthAdmin implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('Admin Guard');
     const request = context.switchToHttp().getRequest();
     const token = request.cookies['jwt'];
-    console.error('token : ', token);
 
     if (!token)
       throw new UnauthorizedException(

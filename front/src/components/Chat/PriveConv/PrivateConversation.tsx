@@ -47,7 +47,8 @@ import {
 } from '../../../store/userSlice';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getProfileByPseudo } from '../../../api/user';
-import macHostName from '/src/config.js';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const PrivateConversation: React.FC = () => {
   const convId = +(useParams<{ convId: string }>().convId || '-1');
@@ -118,14 +119,9 @@ const PrivateConversation: React.FC = () => {
 
   const connectSocket = useCallback(() => {
     if (id == -1 || userData.id == -1) return;
-    const socket = io('http://' + macHostName + ':3000/messagerie', {
+    const socket = io(API_URL + '/messagerie', {
       withCredentials: true,
-      transports: ['websocket'],
-      corse: {
-        origin: 'http://' + macHostName + ':3006',
-      }
     });
-
     socket.on('message', message => {
       setMessages(prevMessages => [...prevMessages, message]);
       setOffsetPagniation(prev => prev + 1);
