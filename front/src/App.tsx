@@ -136,7 +136,10 @@ function App() {
   }, [dispatch, navigate, fetchData, checkAuth, location]);
 
   return (
-    <div className="flex flex-col h-screen min-h-md relative bg-[var(--background-color)] z-10 ">
+    <div
+      className="flex flex-col h-screen min-h-md relative 
+      bg-gray-100 z-10 "
+    >
       {location && location.pathname !== '/' && <Header />}
 
       {(location.pathname == '/' || location?.pathname == '/game') && (

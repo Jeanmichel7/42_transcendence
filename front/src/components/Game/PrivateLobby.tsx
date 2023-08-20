@@ -7,6 +7,13 @@ import {
 } from './Interface';
 import { StyledButton } from './Lobby';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { UserInterface, NotificationInterface } from '../../types';
+import {
+  reduxReadNotification,
+  reduxRemoveNotification,
+} from '../../store/notificationSlice';
 const ButtonWrapper = styled.div`
   height: 100%;
   width: 100%;
@@ -53,16 +60,42 @@ const ChoiceIndicator = styled.div<ChoiceIndicatorProps>`
 `;
 
 interface LobbyProps {
-  setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   gameId: string;
   isPlayer1: boolean;
 }
 
 function PrivateLobby({ socket, gameId, isPlayer1 }: LobbyProps) {
+  const userData: UserInterface = useSelector(
+    (state: RootState) => state.user.userData,
+  );
+  const notifications: NotificationInterface[] = useSelector(
+    (state: RootState) => state.notification.notifications,
+  );
+  const dispatch = useDispatch();
   const [opponentStatus, setOpponentStatus] = useState<PlayerStatus>();
   const [mode, setMode] = useState<string>('normal');
   const [ready, setReady] = useState<boolean>(false);
+
+  //delete notif if in lobby
+  useEffect(() => {
+    if (!gameId) return;
+    notifications.forEach((notif: NotificationInterface) => {
+      if (notif.type === 'gameInvite' || notif.type === 'gameInviteAccepted') {
+        const gameIdNotif = notif.invitationLink?.split('/game?id=')[1];
+        if (gameIdNotif === gameId) {
+          dispatch(reduxReadNotification(notif));
+          dispatch(
+            reduxRemoveNotification({
+              notifId: notif.id,
+              userId: userData.id,
+            }),
+          );
+        }
+      }
+    });
+    console.log('Notifictions: ', notifications);
+  }, [dispatch, gameId, notifications, userData.id]);
 
   useEffect(() => {
     socket.on('privateLobby', (opponentNewStatus: PlayerStatus) => {

@@ -90,7 +90,7 @@ const useSocketConnection = (
 
   useEffect(() => {
     if (!socket) return;
-    const intervalId: number = setInterval(() => {
+    const intervalId = setInterval(() => {
       socket.emit('clientUpdate', {
         posRacket: posRacket.current!.left,
         ArrowDown: keyStateRef.current!.ArrowDown,

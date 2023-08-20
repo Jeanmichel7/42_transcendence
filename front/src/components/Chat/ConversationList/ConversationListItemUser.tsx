@@ -14,8 +14,7 @@ import {
 } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../../utils/displayImage';
 
 interface ConvProps {
   conv: ConversationInterface;
@@ -87,15 +86,10 @@ const ConversationListUserItem: React.FC<ConvProps> = ({ conv }) => {
                 },
               }}
             >
-              <img
-                className="w-10 h-10 rounded-full object-cover mr-2 border border-[#5f616f]"
+              <DisplayImg
                 src={conv.user.avatar}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
                 alt="avatar"
+                className="w-10 h-10 rounded-full object-cover mr-2 border border-[#5f616f]"
               />
             </Badge>
           </Badge>

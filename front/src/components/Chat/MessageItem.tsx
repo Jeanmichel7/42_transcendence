@@ -33,10 +33,12 @@ import {
 import { editChatMessage } from '../../api/chat';
 import { RootState } from '../../store';
 import { StyledLink } from './PriveConv/style';
-import { acceptGameByBtn, inviteGameUser } from '../../api/game';
-import { reduxRemoveNotification } from '../../store/notificationSlice';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { acceptGame, inviteGameUser } from '../../api/game';
+import {
+  reduxReadNotification,
+  reduxRemoveNotification,
+} from '../../store/notificationSlice';
+import DisplayImg from '../../utils/displayImage';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -149,8 +151,9 @@ const MessageItem: FC<MessageItemProps> = ({
 
   const handleJoinInvitationGame = async (word: string) => {
     const extractGameId: number = parseInt(word.split('game?id=')[1] as string);
-    const resAcceptRequest: GameInterface | ApiErrorResponse =
-      await acceptGameByBtn(extractGameId);
+    const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(
+      extractGameId,
+    );
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest));
     else {
@@ -159,6 +162,7 @@ const MessageItem: FC<MessageItemProps> = ({
       );
       navigate(extractGameId ? word : '/chat');
       if (notif) {
+        dispatch(reduxReadNotification(notif));
         dispatch(
           reduxRemoveNotification({
             notifId: notif.id,
@@ -225,15 +229,10 @@ const MessageItem: FC<MessageItemProps> = ({
           <>
             <div className="flex-none w-14 mr-2">
               <Link to={'/profile/' + message.ownerUser.login}>
-                <img
-                  className="w-10 h-10 rounded-full m-2 object-cover "
+                <DisplayImg
                   src={message.ownerUser.avatar}
-                  onError={e => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = API_URL + '/avatars/defaultAvatar.png';
-                  }}
                   alt="avatar"
+                  className="w-10 h-10 rounded-full m-2 object-cover "
                 />
               </Link>
             </div>

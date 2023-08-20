@@ -38,12 +38,17 @@ export const notificationSlice = createSlice({
       action: PayloadAction<{ notifId: number; userId: number }>,
     ) => {
       const { notifId, userId } = action.payload;
+      //call reduxReadNotification
       state.notifications = state.notifications.filter(
         (notif: NotificationInterface) => notif.id != notifId,
       );
       localStorage.setItem(
         'notifications' + userId,
-        JSON.stringify(state.notifications),
+        JSON.stringify(
+          state.notifications.filter(
+            (notif: NotificationInterface) => notif.id != notifId,
+          ),
+        ),
       );
     },
     reduxReadNotification: (

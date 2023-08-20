@@ -8,7 +8,7 @@ export function ButtonCreateGroup() {
   return (
     <Link to="/chat/createChannel" className="w-full">
       <Button color="primary" className="w-full">
-        <p className="mr-2 text-green-700">Create</p>
+        <p className="mr-2">Create</p>
         <AddCircleOutlineIcon color="success" />
       </Button>
     </Link>

@@ -2,8 +2,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { UserInterface } from '../../../types';
 import { useEffect, useState } from 'react';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../../utils/displayImage';
 
 export interface MessageInterfaceTmp {
   message: string;
@@ -21,7 +20,9 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
 
   useEffect(() => {
     if (!userBlocked) return;
-    const isBlocked = userBlocked.some(u => u.login == data.username);
+    const isBlocked = userBlocked.some(
+      (u: UserInterface) => u.login == data.username,
+    );
     setIsUserBlocked(isBlocked);
   }, [userBlocked, data]);
 
@@ -34,15 +35,10 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
           } `}
         >
           <p className={isMyMsg ? 'mr-2' : 'hidden'}>{data.message}</p>
-          <img
-            className="w-6 h-6 rounded-full object-cover mr-2 "
+          <DisplayImg
             src={data.avatar}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              target.src = API_URL + '/images/avatars/default.png';
-            }}
             alt="avatar"
+            className="w-6 h-6 rounded-full object-cover mr-2 "
           />
           <p className={isMyMsg ? 'hidden' : ''}>{data.message}</p>
         </div>

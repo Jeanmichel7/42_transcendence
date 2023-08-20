@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { ButtonWrapper, StyledButton } from './Lobby';
 import { dotAnimation } from './Utils';
+import { Socket } from 'socket.io-client';
+
 interface SearchingOpponentProps {
-  socket: any;
+  socket: Socket;
   setCurrentPage: React.Dispatch<React.SetStateAction<string>>;
   bonus: boolean;
 }
 
 interface StyledCircleProps {
   top: string;
-  position: string;
 }
 const StyledCircle = styled.div<StyledCircleProps>`
   height: 5rem;
@@ -165,8 +166,7 @@ function SearchingOpponent({
 
   return (
     <div className="h-full  w-full ">
-      <div className="h-1/6 text-center flex items-center justify-center mb-10">
-</div>
+      <div className="h-1/6 text-center flex items-center justify-center mb-10"></div>
       <ButtonWrapper animation={true}>
         <StyledButtonOrder
           order={bonus ? '0' : '1'}
@@ -180,7 +180,7 @@ function SearchingOpponent({
         </StyledButtonOrder>
         {loadingDot ? (
           <StyledContainer>
-            <StyledCircle3 top={bonus ? 'bottom' : 'top'}  />
+            <StyledCircle3 top={bonus ? 'bottom' : 'top'} />
             <StyledCircle2 top={bonus ? 'bottom' : 'top'} />
             <StyledCircle top={bonus ? 'bottom' : 'top'} />
           </StyledContainer>

@@ -21,8 +21,7 @@ import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '@mui/icons-material/Chat';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 export default function ProfileInfo({ user }: { user: UserInterface }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -147,16 +146,11 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
       <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom p-3 ">
         <div className="px-[10vw] md:px-0 md:w-4/12">
           {user.avatar && (
-            <img
+            <DisplayImg
               src={user.avatar}
+              alt="avatar"
               className="rounded-lg shadow-lg overflow-hidden h-[250px] object-cover
                 w-full md:mt-[-40px] md:ml-[10px]"
-              alt="avatar"
-              onError={e => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = API_URL + '/avatars/defaultAvatar.png';
-              }}
             />
           )}
           <p className="pt-3 pl-3 text-center md:text-left text-gray-500">

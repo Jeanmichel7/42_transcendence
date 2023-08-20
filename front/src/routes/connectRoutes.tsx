@@ -6,8 +6,6 @@ import AccountConnection from '../pages/ConnectionFakeUser';
 import OAuthRedirect from '../pages/OAuthRedirect';
 
 const connectRoutes: React.FC = () => {
-  console.log('coucou');
-
   return (
     <Routes>
       <Route path="/connection" element={<ConnectPage />} />

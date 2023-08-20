@@ -6,8 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ExperienceBar from '../Profile/ExperienceBar';
 import StatsPlayerChart from './StatsPlayer';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 interface LeaderBoardProps {
   user: UserInterface;
@@ -32,15 +31,11 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
 
         <div className="flex items-center w-4/12">
           <div className="flex items-center">
-            <img
-              className="w-14 h-14 object-cover mr-2 "
+            <DisplayImg
               src={user.avatar}
-              onError={e => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = API_URL + '/avatars/defaultAvatar.png';
-              }}
               alt="avatar"
+              className="w-14 h-14 rounded-full object-cover border border-[#5f616f]"
+              // className="w-14 h-14 object-cover mr-2"
             />
             <p className="ml-1 overflow-hidden ">{user.login}</p>
           </div>

@@ -269,8 +269,7 @@ export class UsersService {
     newUser.email = data.email;
     newUser.description = data.description;
     const avatarName: string = await this.uploadAndSaveAvatar(data.image.link);
-    newUser.avatar =
-      this.configService.get('API_URL') + '/avatars/' + avatarName;
+    newUser.avatar = avatarName;
     const user: UserEntity = await this.userRepository.save(newUser);
     if (!user) throw new NotFoundException(`User ${newUser.login} not created`);
     await this.initTrophiesProgressForUser(user);
@@ -288,8 +287,7 @@ export class UsersService {
 
     const updateData: Partial<UserEntity> = {};
     if (file) {
-      updateData.avatar =
-        this.configService.get('API_URL') + '/avatars/' + file.filename;
+      updateData.avatar = file.filename;
       this.deleteAvatar(userToUpdate.avatar);
     } else if (updateUser.avatar) updateData.avatar = updateUser.avatar;
     if (updateUser.firstName) updateData.firstName = updateUser.firstName;

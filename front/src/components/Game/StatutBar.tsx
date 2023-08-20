@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import Score from './Score';
 import BonusBox from './BonusBox';
 import { PlayersInfo } from './Game';
+import DisplayImg from '../../utils/displayImage';
 
 const StatutWrapper = styled.div`
   color: white;
@@ -43,10 +44,10 @@ export function StatutBar({
       {bonusActive && (
         <BonusBox bonusIsLoading={bonusIsLoading} bonusName={bonusName} />
       )}
-      <img
-        className="md:h-24 h-12 rounded-full"
+      <DisplayImg
         src={playersInfo?.playerLeftAvatar}
-        title={'profile picture'}
+        alt="avatar"
+        className="md:h-24 h-12 rounded-full"
       />
       <h2 className="md:text-xl font-bold  w-1/4 text-center  ">
         {playersInfo?.playerLeftUsername}
@@ -61,10 +62,10 @@ export function StatutBar({
         {playersInfo?.playerRightUsername}
       </h2>
 
-      <img
-        className="md:h-24 h-12 rounded-full"
+      <DisplayImg
         src={playersInfo?.playerRightAvatar}
-        title={'profile picture'}
+        alt="avatar"
+        className="md:h-24 h-12 rounded-full"
       />
 
       {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GameInterface, UserInterface } from '../../types';
 import { Link } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 interface GameCardProps {
   game: GameInterface;
@@ -42,15 +41,10 @@ const GameCard = ({ game, user }: GameCardProps) => {
         >
           <div className="flex">
             <div className="p-2 text-center">
-              <img
-                className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
+              <DisplayImg
                 src={p1IsWinner ? game.player1.avatar : game.player2.avatar}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
                 alt="avatar"
+                className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
               />
             </div>
 
@@ -86,15 +80,10 @@ const GameCard = ({ game, user }: GameCardProps) => {
             </div>
 
             <div className="p-2">
-              <img
-                className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
+              <DisplayImg
                 src={!p1IsWinner ? game.player1.avatar : game.player2.avatar}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
                 alt="avatar"
+                className="w-12 h-12 rounded-full object-cover border border-[#5f616f]"
               />
             </div>
           </div>

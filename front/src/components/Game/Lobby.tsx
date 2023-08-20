@@ -6,6 +6,7 @@ import '../../utils/animation.css';
 import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { Socket } from 'socket.io-client';
 import { Sticker } from '../../utils/StyledTitle';
+import DisplayImg from '../../utils/displayImage';
 
 export const fadeIn = keyframes`
   from {
@@ -166,9 +167,9 @@ function Lobby({
   return (
     <div className=" w-full h-full">
       <div className="h-1/6 text-center flex items-center justify-center mb-10">
-    <Sticker dataText='Game Mode' />
-</div>
- 
+        <Sticker dataText="Game Mode" />
+      </div>
+
       <ButtonWrapper animation={true}>
         <StyledCircle pos={circlePostion.current} ref={circleRef} />
         <StyledButton
@@ -227,14 +228,14 @@ function Lobby({
             >
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center">
-                  <img
+                  <DisplayImg
                     src={card.player1Avatar}
                     alt={card.player1Username}
                     className="w-10 h-10 rounded-full mr-4"
                   />
                   <div className="text-left">
                     <p className="font-semibold">{card.player1Username}</p>
-                    <img
+                    <DisplayImg
                       src={ranksImages[card.player2Rank]}
                       alt={card.player2Rank}
                       className="w-10 h-10 mr-4"
@@ -246,14 +247,14 @@ function Lobby({
 
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <img
+                  <DisplayImg
                     src={card.player2Avatar}
                     alt={card.player2Username}
                     className="w-10 h-10 rounded-full mr-4"
                   />
                   <div className="text-left">
                     <p className="font-semibold">{card.player2Username}</p>
-                    <img
+                    <DisplayImg
                       src={ranksImages[card.player2Rank]}
                       alt={card.player2Rank}
                       className="w-10 h-10 mr-4"

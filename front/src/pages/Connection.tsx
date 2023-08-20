@@ -10,8 +10,6 @@ function ConnectPage() {
     3006 +
     '%2Foauthredirection&response_type=code';
 
-  console.log('blabal');
-
   return (
     <Box
       display="flex"

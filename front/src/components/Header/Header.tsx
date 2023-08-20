@@ -20,7 +20,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
@@ -39,8 +38,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InfoIcon from '@mui/icons-material/Info';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -432,15 +430,10 @@ function Header() {
             color="inherit"
           >
             {userData.avatar && (
-              <Avatar
-                alt="avatar"
+              <DisplayImg
                 src={userData.avatar}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
-                sx={{ width: 32, height: 32 }}
+                alt="avatar"
+                className="w-10 h-10 rounded-full object-cover mr-2"
               />
             )}
           </IconButton>

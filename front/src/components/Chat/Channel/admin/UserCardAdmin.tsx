@@ -33,8 +33,7 @@ import {
 } from '../../../../api/chat';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../../../store';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../../../utils/displayImage';
 
 interface UserCardProps {
   user: UserInterface;
@@ -308,15 +307,10 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
                 },
               }}
             >
-              <img
-                className="w-10 h-10 rounded-full object-cover mr-2 "
+              <DisplayImg
                 src={user.avatar}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
                 alt="avatar"
+                className="w-10 h-10 rounded-full object-cover mr-2 "
               />
             </Badge>
           </Badge>

@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useNavigate } from 'react-router-dom';
 import { closeSnackbar } from '../store/snackbarSlice';
+import DisplayImg from '../utils/displayImage';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -37,15 +38,10 @@ const SnackBarApp = () => {
     <SnackbarContent
       message={
         <div className="flex" onClick={handleClickSnackbar}>
-          <img
-            className="w-10 h-10 rounded-full object-cover mr-2 "
+          <DisplayImg
             src={snackbar.avatar}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              target.src = API_URL + '/avatars/defaultAvatar.png';
-            }}
             alt="avatar"
+            className="w-10 h-10 rounded-full object-cover mr-2"
           />
           <div>
             <p>{snackbar.loginFrom}</p>

@@ -220,7 +220,6 @@ function Pong() {
     } else if (currentPage === 'privateLobby' && gameIdInvit) {
       setPageContent(
         <PrivateLobby
-          setCurrentPage={setCurrentPage}
           socket={socket}
           gameId={gameIdInvit as string}
           isPlayer1={isPlayer1}

@@ -1,8 +1,7 @@
 import { Badge, Button, Typography } from '@mui/material';
 import { UserInterface } from '../../types';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 interface FriendItemProps {
   user: UserInterface;
@@ -71,15 +70,10 @@ const FriendItem: React.FC<FriendItemProps> = ({
               }}
             >
               {user.avatar && (
-                <img
-                  className="w-10 h-10 rounded-full object-cover mr-2 "
+                <DisplayImg
                   src={user.avatar}
-                  onError={e => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = API_URL + '/avatars/defaultAvatar.png';
-                  }}
                   alt="avatar"
+                  className="w-10 h-10 rounded-full object-cover mr-2 "
                 />
               )}
             </Badge>

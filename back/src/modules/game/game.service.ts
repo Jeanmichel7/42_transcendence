@@ -479,6 +479,12 @@ export class GameService {
     if (!isPlayer1 && !isPlayer2)
       throw new BadRequestException('You are not allowed to accept this game');
 
+    if (game.player1.id === userId) {
+      game.player1.status = 'in game';
+      game.player1.updatedAt = new Date();
+      await this.userRepository.save(game.player1);
+      return game;
+    }
     if (game.status == 'waiting_start') {
       game.status = 'playing';
       game.updatedAt = new Date();
