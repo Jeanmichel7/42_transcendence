@@ -51,6 +51,7 @@ const slideInFromRight = keyframes`
   `;
 
 const PingPongText = styled.span`
+font-family: "Alegreya Sans SC", sans-serif;
   position: absolute;
   right: 15vw;
   bottom: 15vh;
@@ -148,6 +149,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   font-size: 1rem;
   font-weight: bold;
   font-style: italic;
+  font-family: "Alegreya Sans SC", sans-serif;
   text-align: center;
   padding: 1rem 1rem;
   width: 10rem;

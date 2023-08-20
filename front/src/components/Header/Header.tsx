@@ -278,7 +278,7 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            PONG
+            <h2 className="italic ">PONG</h2>
           </Typography>
         </NavLink>
       </Box>

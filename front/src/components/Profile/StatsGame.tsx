@@ -18,6 +18,7 @@ import {
   Filler,
 } from 'chart.js';
 import { statsUserGames } from '../../api/game';
+import { Nothing } from '../Friends/Nothing';
 
 Chart.register(
   Filler,
@@ -68,6 +69,7 @@ export default function StatsGame({ user }: PropsGames) {
       <p className="mt-6">
         <Sticker dataText="Stats" />
       </p>
+      {games && games.length === 0 && (<Nothing text="No stats" />)}
       {games && games.length > 0 && (
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* ELO SCORE CHART */}

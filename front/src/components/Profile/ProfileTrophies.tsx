@@ -11,7 +11,7 @@ export default function ProfileTrophies({ user }: { user: UserInterface }) {
         <Sticker dataText={'Achievements'} />
       </p>
       {user.trophies?.length === 0 && (
-        <Nothing text={'No Trophy won'} angry={false} />
+        <Nothing text={'No trophy won'} angry={false} />
       )}
       <div className="flex flex-wrap justify-center">
         {user.trophies?.map(trophy => {
@@ -19,7 +19,7 @@ export default function ProfileTrophies({ user }: { user: UserInterface }) {
           return <TrophyCard key={trophy.id} trophy={trophy} />;
         })}
       </div>
-      <p className="text-center text-blue-600 ">
+      <p className="text-center text-blue-600 hover:underline font-bold ">
         <Link to={`/achievement/${user.login}`}>See all achievements</Link>
       </p>
     </>

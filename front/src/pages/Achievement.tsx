@@ -70,7 +70,7 @@ const Achievement = () => {
       <p className="mt-2">
         <Sticker dataText={'Achievements'} />
       </p>
-      <p className="text-center"> {login} </p>
+      <p className="text-center  text-4xl  font-bold mb-5 mt-5"> {login} </p>
       <div className="flex flex-wrap justify-center bg-inherit">
         {allTrophies.map(trophy => (
           <TrophyCard key={trophy.id} trophy={trophy} />

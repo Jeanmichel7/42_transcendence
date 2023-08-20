@@ -8,8 +8,20 @@ import { ThemeProvider, createTheme } from '@mui/material';
 
 const theme = createTheme({
   typography: {
-    fontFamily: 'Alegreya Sans SC',
+    fontFamily: 'roboto',
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: '"Alegreya Sans SC", sans-serif',
+          fontWeight: 'bold',
+        },
+      },
+    },
+  },
+
+ 
 });
 
 const root = createRoot(document.getElementById('root') as HTMLElement);

@@ -131,7 +131,7 @@ export default function FriendsPage() {
   return (
     <div className="bg-inherit">
       <AppBar position="static">
-        <div className="flex bg-gray-800">
+        <div className="flex bg-gray-800 ">
           <Tabs
             value={value}
             onChange={handleChange}
@@ -144,26 +144,46 @@ export default function FriendsPage() {
           >
             <Tab
               label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')}
+              sx={{
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
+              }}
             />
             <Tab
               label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')}
+              sx={{
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
+              }}
             />
             <Tab
               label={
                 'Invit received' +
                 (waitingRequestCount ? ' (' + waitingRequestCount + ')' : '')
               }
+              sx={{
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
+              }}
             />
             <Tab
               label={
                 'Invit sent' +
                 (waitingSentCount ? ' (' + waitingSentCount + ')' : '')
               }
+              sx={{
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
+              }}
             />
             <Tab
               label={
                 'Blocked' + (blockedCount ? ' (' + blockedCount + ')' : '')
               }
+              sx={{
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
+              }}
             />
             <Tab
               sx={{ p: 0, m: 0, padding: 0, margin: 0, width: 0 }}
@@ -192,6 +212,8 @@ export default function FriendsPage() {
               fontWeight: 'bold',
               border: '1px solid #00CB36',
               borderRadius: '8px',
+                fontFamily: '"Alegreya Sans SC", sans-serif',
+                fontWeight: 'bold'
             }}
             onClick={() => {
               setValue(5);
