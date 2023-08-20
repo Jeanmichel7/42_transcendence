@@ -65,13 +65,15 @@ export default function AccountConnection() {
   return (
     <div className="bg-inherit">
       {/* link prev page */}
-      <div className="absolute top-0 right-0 m-5 text-blue-500">
-        <Link to={`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2F${API_URL}%3A3000%2Fauth%2FloginOAuth&response_type=code`}>
+      <div className="absolute top-0 right-0 m-5 text-blue-500 font-bold">
+        <Link
+          to={`https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-406bbf6d602e19bc839bfe3f45f42cf949704f9d71f1de286e9721bcdeff5171&redirect_uri=http%3A%2F%2F${API_URL}%3A3000%2Fauth%2FloginOAuth&response_type=code`}
+        >
           Login Intra
         </Link>
       </div>
 
-      <div className="absolute top-0 left-0 m-5 text-blue-500">
+      <div className="absolute top-0 left-0 m-5 text-blue-500 font-bold">
         <Link to="/connection">Retour</Link>
       </div>
 
