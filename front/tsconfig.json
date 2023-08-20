@@ -16,8 +16,8 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", ".eslintrc.cjs"],
+  "include": ["src", ".eslintrc.cjs", "vite-env.d.ts"],
   "exclude": ["node_modules", "build"],
   "types": ["react", "react-dom", "jest", "node"],
-  "typeRoots": ["./node_modules/@types", "./src/@types"],
+  "typeRoots": ["./node_modules/@types", "./src/@types"]
 }

@@ -1,9 +1,14 @@
 import axios, { AxiosError } from 'axios';
 import { ApiErrorResponse } from '../types';
 
+// const API_URL = import.meta.env.VITE_API_URL;
+// console.log('API_URL', API_URL);
+// const host = window.location.host.split(':')[0];
+// console.log('host', host);
+
 const API_URL = import.meta.env.VITE_API_URL;
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/api/',
   withCredentials: true,
 });
 

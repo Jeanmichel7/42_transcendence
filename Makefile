@@ -3,7 +3,7 @@ OS	= ${shell uname}
 COMPOSE_HTTP_TIMEOUT = 480
 export COMPOSE_HTTP_TIMEOUT
 
-IP_HOST=$(shell hostname | cut -d'.' -f1)
+IP_HOST=$(shell hostname | cut -d'.' -f1 | tr '[:upper:]' '[:lower:]')
 export HOST_IP_BACK=http://$(IP_HOST):3000
 export HOST_IP_FRONT=http://$(IP_HOST):3006
 

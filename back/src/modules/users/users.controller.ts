@@ -95,7 +95,9 @@ export class UsersController {
   @Public()
   @UsePipes(ValidationPipe)
   async createUser(@Body() newUser: UserCreateDTO): Promise<UserInterface> {
+    console.log('newUser : ', newUser);
     const result: UserInterface = await this.usersService.createUser(newUser);
+    console.log('result : ', result);
     return result;
   }
 

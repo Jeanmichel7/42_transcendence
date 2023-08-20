@@ -29,8 +29,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { RootState } from '../../store';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const useConnection = () => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -89,8 +87,8 @@ const useConnection = () => {
 
   useEffect(() => {
     if (!userData.id || userData.id === -1) return;
-    console.log('api url : ', API_URL);
-    const socket = io(API_URL + '/notification', {
+    // console.log('api url : ', API_URL);
+    const socket = io('/notification', {
       withCredentials: true,
     });
 
