@@ -154,6 +154,8 @@ interface StyleProps {
   };
 }
 
+
+
 const StyledRacket = styled.div.attrs<RacketProps>(
   (props): StyleProps => ({
     style: {
@@ -179,6 +181,8 @@ const StyledRacket = styled.div.attrs<RacketProps>(
   box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
     0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
+
+
 
 // Composant Raquette avec le Laser comme enfant
 export const Racket = ({
@@ -584,6 +588,9 @@ function Game({
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
         {gameData.current?.isPaused && <DisconnectCountDown />}
+        {bonusValueRef.current && (<p className="text-white  animate-pulse text-3xl absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
+  Press Espace to activate bonus
+</p>)} 
       </Playground>
     </GameWrapper>
   );
