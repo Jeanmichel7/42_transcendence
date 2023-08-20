@@ -23,8 +23,6 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { IconButton } from '@mui/material';
 import ChatWrapper from '../components/Game/Chat/ChatWrapper';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 type GameWrapperProps = {
   chatOpen: boolean;
 };
@@ -129,7 +127,7 @@ function Pong() {
   }, [currentPage, socket]);
 
   useEffect(() => {
-    const newSocket = io(API_URL + '/game', {
+    const newSocket = io('/game', {
       withCredentials: true,
     });
     newSocket.on('connect', () => {
