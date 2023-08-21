@@ -62,9 +62,9 @@ const ConversationGame = ({
   return (
     <>
       <div className="flex flex-col h-full justify-between">
-        <h3 className="font-bold text-center">{type} chat</h3>
+        <h3 className="font-bold text-center text-xl py-2">{type} chat</h3>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-108px)] bg-[#efeff8]">
+        <div className="overflow-y-auto max-h-[calc(100vh-117px)]">
           {messages && (
             <>
               {messages.map((msg, i) => (

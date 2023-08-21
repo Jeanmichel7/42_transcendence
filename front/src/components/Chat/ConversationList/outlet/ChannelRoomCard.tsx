@@ -27,7 +27,7 @@ import { RootState } from '../../../../store';
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import KeyIcon from '@mui/icons-material/Key';
+import LockIcon from '@mui/icons-material/Lock';
 
 export interface RoomCardProps {
   room: RoomInterface;
@@ -104,7 +104,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            {room.isProtected && <KeyIcon />}
+            {room.isProtected && <LockIcon fontSize="small" />}
           </Grid>
         </Grid>
 

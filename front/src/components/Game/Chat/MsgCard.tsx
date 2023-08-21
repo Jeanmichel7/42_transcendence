@@ -30,17 +30,21 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
     <>
       {!isUserBlocked && (
         <div
-          className={`flex items-center ${
+          className={` my-1 flex items-center ${
             isMyMsg ? 'justify-end' : 'justify-start'
           } `}
         >
-          <p className={isMyMsg ? 'mr-2' : 'hidden'}>{data.message}</p>
+          <p className={`break-all ${isMyMsg ? 'px-2' : 'hidden'}`}>
+            {data.message}
+          </p>
           <DisplayImg
             src={data.avatar}
             alt="avatar"
-            className="w-6 h-6 rounded-full object-cover mr-2 "
+            className="w-8 h-8 rounded-full object-cover mx-1 "
           />
-          <p className={isMyMsg ? 'hidden' : ''}>{data.message}</p>
+          <p className={`break-all ${isMyMsg ? 'hidden' : 'px-2'}`}>
+            {data.message}
+          </p>
         </div>
       )}
     </>

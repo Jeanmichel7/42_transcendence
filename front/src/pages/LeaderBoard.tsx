@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getLeaderboard } from '../api/leaderBoard';
-import { ApiErrorResponse, UserInterface } from '../types';
+import { UserInterface } from '../types';
 import { Sticker } from '../utils/StyledTitle';
 import { getAllUsersCount } from '../api/user';
 import { setErrorSnackbar } from '../store/snackbarSlice';
@@ -25,27 +25,31 @@ const LeaderBoard = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    async function fetchTotalUsers() {
-      const res: number | ApiErrorResponse = await getAllUsersCount();
-      if (typeof res != 'number' && 'error' in res)
-        dispatch(setErrorSnackbar(res));
-      else setTotalPages(Math.ceil(res / userPerPage));
+    async function fetchData() {
+      setIsLoading(true);
+
+      const [userCountRes, leaderBoardRes] = await Promise.all([
+        getAllUsersCount(),
+        getLeaderboard(currentPage, userPerPage),
+      ]);
+
+      if (typeof userCountRes !== 'number' && 'error' in userCountRes) {
+        dispatch(setErrorSnackbar(userCountRes));
+      } else {
+        setTotalPages(Math.ceil(userCountRes / userPerPage));
+      }
+
+      if ('error' in leaderBoardRes) {
+        console.warn(leaderBoardRes.error);
+      } else {
+        setLeaderBoard(leaderBoardRes);
+        topRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      setIsLoading(false);
     }
 
-    const fetchLeaderBoard = async () => {
-      setIsLoading(true);
-      const resFatchLeaderBoard: UserInterface[] | ApiErrorResponse =
-        await getLeaderboard(currentPage, userPerPage);
-      setIsLoading(false);
-
-      if ('error' in resFatchLeaderBoard)
-        return console.warn(resFatchLeaderBoard.error);
-      setLeaderBoard(resFatchLeaderBoard);
-      topRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    fetchTotalUsers();
-    fetchLeaderBoard();
+    fetchData();
   }, [dispatch, currentPage, userPerPage]);
 
   const handleChangePage = (

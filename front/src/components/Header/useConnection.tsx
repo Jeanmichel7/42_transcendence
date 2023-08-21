@@ -83,7 +83,7 @@ const useConnection = () => {
     return () => {
       socketRef.current?.off('notification_private_message');
     };
-  }, [pathRef.current, userData.id, socketRef.current]);
+  }, [userData.id, socketRef, dispatch]);
 
   useEffect(() => {
     if (!userData.id || userData.id === -1) return;

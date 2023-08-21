@@ -21,7 +21,6 @@ import {
 import {
   Card,
   CardActionArea,
-  CardMedia,
   CardContent,
   Typography,
   CardActions,
@@ -40,8 +39,7 @@ import { inviteGameUser } from '../../api/game';
 import ChatIcon from '@mui/icons-material/Chat';
 import { reduxAddConversationList } from '../../store/convListSlice';
 import { getConvIdFromUserOrRoom } from '../../utils/utils';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import DisplayImg from '../../utils/displayImage';
 
 interface FriendCardProps {
   actualUserLogin?: string;
@@ -183,7 +181,12 @@ const FriendCard: React.FC<FriendCardProps> = ({
               anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
               badgeContent={<span className="p-1">{friend.status}</span>}
             >
-              <CardMedia
+              <DisplayImg
+                src={friend.avatar}
+                alt={friend.login}
+                className="w-full h-32 object-cover"
+              />
+              {/* <CardMedia
                 component="img"
                 image={friend.avatar}
                 alt={friend.login}
@@ -193,19 +196,13 @@ const FriendCard: React.FC<FriendCardProps> = ({
                   target.onerror = null;
                   target.src = API_URL + '/avatars/defaultAvatar.png';
                 }}
-              />
+              /> */}
             </Badge>
           ) : (
-            <CardMedia
-              component="img"
-              image={friend.avatar}
+            <DisplayImg
+              src={friend.avatar}
               alt={friend.login}
-              sx={{ height: 140, objectFit: 'cover' }}
-              onError={e => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = API_URL + '/avatars/defaultAvatar.png';
-              }}
+              className="w-full h-32 object-cover"
             />
           )}
           <Divider />

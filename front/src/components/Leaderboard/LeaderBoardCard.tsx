@@ -1,11 +1,12 @@
-import { Tooltip } from '@mui/material';
+import React, { Suspense, lazy } from 'react';
+import { CircularProgress, Tooltip } from '@mui/material';
 import { UserInterface } from '../../types';
 import { ranksImages } from '../../utils/rankImages';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ExperienceBar from '../Profile/ExperienceBar';
-import StatsPlayerChart from './StatsPlayer';
+const StatsPlayerChart = lazy(() => import('./StatsPlayer'));
 import DisplayImg from '../../utils/displayImage';
 
 interface LeaderBoardProps {
@@ -34,7 +35,7 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
             <DisplayImg
               src={user.avatar}
               alt="avatar"
-              className="w-14 h-14 rounded-full object-cover border border-[#5f616f]"
+              className="w-14 h-14 object-cover border border-[#5f616f]"
               // className="w-14 h-14 object-cover mr-2"
             />
             <p className="ml-1 overflow-hidden ">{user.login}</p>
@@ -65,11 +66,13 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
         </div>
 
         <div className="w-2/12 flex justify-center max-h-[60px]">
-          <StatsPlayerChart user={user} />
+          <Suspense fallback={<CircularProgress />}>
+            <StatsPlayerChart user={user} />
+          </Suspense>
         </div>
       </div>
     </Link>
   );
 };
 
-export default LeaderboardCard;
+export default React.memo(LeaderboardCard);

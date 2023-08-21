@@ -235,7 +235,7 @@ function Lobby({
                   />
                   <div className="text-left">
                     <p className="font-semibold">{card.player1Username}</p>
-                    <DisplayImg
+                    <img
                       src={ranksImages[card.player2Rank]}
                       alt={card.player2Rank}
                       className="w-10 h-10 mr-4"
@@ -254,7 +254,7 @@ function Lobby({
                   />
                   <div className="text-left">
                     <p className="font-semibold">{card.player2Username}</p>
-                    <DisplayImg
+                    <img
                       src={ranksImages[card.player2Rank]}
                       alt={card.player2Rank}
                       className="w-10 h-10 mr-4"

@@ -319,7 +319,7 @@ const PrivateConversation: React.FC = () => {
   return (
     <>
       <div className="flex flex-col h-full justify-between">
-        <div className="flex w-full justify-between items-center text-lg text-blue text-center">
+        <div className="flex w-full justify-between items-center text-lg text-blue text-center bg-slate-200">
           <div className="mr-6">
             <Tooltip
               title="Defi"

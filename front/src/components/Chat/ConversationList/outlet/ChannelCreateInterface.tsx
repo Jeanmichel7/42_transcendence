@@ -146,6 +146,7 @@ const CreateGroupInterface = () => {
               value={form.name}
               variant="outlined"
               onChange={handleChangeInput}
+              autoComplete="channel-name"
             />
 
             <TextField
@@ -174,6 +175,7 @@ const CreateGroupInterface = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={form.password ? form.password : ''}
                 onChange={handleChangeInput}
+                autoComplete="password-channel-protected"
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
