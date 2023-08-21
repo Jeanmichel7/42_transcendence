@@ -1,7 +1,11 @@
 import { useState, FC, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import {
+  closeSnackbar,
+  setErrorSnackbar,
+  setMsgSnackbar,
+} from '../../store/snackbarSlice';
 
 import { apiEditMessage } from '../../api/message';
 
@@ -33,12 +37,13 @@ import {
 import { editChatMessage } from '../../api/chat';
 import { RootState } from '../../store';
 import { StyledLink } from './PriveConv/style';
-import { acceptGame, inviteGameUser } from '../../api/game';
+import { acceptGame, getStatusGame, inviteGameUser } from '../../api/game';
 import {
   reduxReadNotification,
   reduxRemoveNotification,
 } from '../../store/notificationSlice';
 import DisplayImg from '../../utils/displayImage';
+import { readNotification } from '../../api/notification';
 
 interface MessageItemProps {
   message: MessageInterface | ChatMsgInterface;
@@ -63,6 +68,7 @@ const MessageItem: FC<MessageItemProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingDefi, setIsLoadingDefi] = useState<boolean>(false);
   const [isDefi, setIsDefi] = useState<boolean>(false);
+  const [gameStatus, setGameStatus] = useState<string>('');
   const [messageTime, setMessageTime] = useState<string>(
     getTimeSince(message.createdAt),
   );
@@ -151,17 +157,27 @@ const MessageItem: FC<MessageItemProps> = ({
 
   const handleJoinInvitationGame = async (word: string) => {
     const extractGameId: number = parseInt(word.split('game?id=')[1] as string);
+    const notif: NotificationInterface | undefined = notifications.find(
+      n => n.invitationLink === word,
+    );
+    if (notif) {
+      const resReadNotif: void | ApiErrorResponse = await readNotification(
+        notif.id,
+      );
+      if (typeof resReadNotif === 'object' && 'error' in resReadNotif)
+        dispatch(setErrorSnackbar(resReadNotif));
+      else dispatch(reduxReadNotification(notif));
+    }
+
     const resAcceptRequest: GameInterface | ApiErrorResponse = await acceptGame(
       extractGameId,
     );
     if ('error' in resAcceptRequest)
       dispatch(setErrorSnackbar(resAcceptRequest));
     else {
-      const notif: NotificationInterface | undefined = notifications.find(
-        n => n.invitationLink === word,
-      );
       navigate(extractGameId ? word : '/chat');
       if (notif) {
+        console.log('delete notif : ', notif);
         dispatch(reduxReadNotification(notif));
         dispatch(
           reduxRemoveNotification({
@@ -169,6 +185,7 @@ const MessageItem: FC<MessageItemProps> = ({
             userId: userData.id,
           }),
         );
+        dispatch(closeSnackbar());
       }
     }
   };
@@ -183,6 +200,28 @@ const MessageItem: FC<MessageItemProps> = ({
     };
   }, [message.createdAt, message.text, message.updatedAt]);
 
+  useEffect(() => {
+    const isButtonDisabled = async () => {
+      if (!message.text) return;
+
+      const isDefiRegex = /game\?id=/g;
+      if (message.text.match(isDefiRegex)) {
+        const gameId = parseInt(message.text.split('game?id=')[1]);
+        const fetchGameStatus: string | ApiErrorResponse = await getStatusGame(
+          gameId,
+        );
+        if (typeof fetchGameStatus == 'object' && 'error' in fetchGameStatus) {
+          if (fetchGameStatus.statusCode === 404) {
+            setGameStatus('finished');
+          }
+        } else {
+          setGameStatus(fetchGameStatus);
+        }
+      }
+    };
+    isButtonDisabled();
+  }, [message.text]);
+
   const formatingLine = (line: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
 
@@ -195,6 +234,7 @@ const MessageItem: FC<MessageItemProps> = ({
             <Button
               variant="contained"
               onClick={() => handleJoinInvitationGame(word)}
+              disabled={gameStatus === 'finished'}
             >
               Join
             </Button>

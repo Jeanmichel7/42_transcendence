@@ -32,6 +32,16 @@ export async function acceptGame(
   );
 }
 
+export async function getStatusGame(
+  gameId: number,
+): Promise<string | ApiErrorResponse> {
+  return apiRequest<string>(
+    'get',
+    '/games/' + gameId + '/status',
+    'Failed to get status game: ',
+  );
+}
+
 export async function acceptGameByBtn(
   gameId: number,
 ): Promise<GameInterface | ApiErrorResponse> {

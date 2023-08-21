@@ -77,8 +77,12 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
   return (
     <>
       {/* display form message */}
-      <form className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2">
+      <form
+        className="rounded-md shadow-md flex border-2 border-zinc-400 mt-2"
+        id="formPriveConv"
+      >
         <TextareaAutosize
+          id="textareaFormPriveConv"
           ref={textareaRef}
           name="text"
           value={text}

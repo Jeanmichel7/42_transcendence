@@ -23,6 +23,13 @@ export class GameController {
     return await this.gameService.getGame(req.user.id, gameId);
   }
 
+  @Get(':id/status')
+  async getGameStatus(
+    @Param('id', ParseIntPipe) gameId: bigint,
+  ): Promise<string> {
+    return await this.gameService.getGameStatus(gameId);
+  }
+
   @Get('users/:userId/games')
   async getAllGamesWithUser(
     @Param('userId', ParseIntPipe) userId: bigint,

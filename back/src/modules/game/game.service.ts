@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConsoleLogger, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from './entity/game.entity';
 import { Game } from './game.class';
@@ -411,6 +411,14 @@ export class GameService {
     return result;
   }
 
+  async getGameStatus(gameId: bigint): Promise<string> {
+    const game: GameEntity = await this.gameRepository.findOne({
+      where: { id: gameId },
+    });
+    if (!game) throw new NotFoundException('game not found');
+    return game.status;
+  }
+
   async saveInviteGame(
     userId: bigint,
     userIdToInvite: bigint,
@@ -480,9 +488,11 @@ export class GameService {
       throw new BadRequestException('You are not allowed to accept this game');
 
     if (game.player1.id === userId) {
+      console.log('player 1 already in room no invit');
       game.player1.status = 'in game';
       game.player1.updatedAt = new Date();
       await this.userRepository.save(game.player1);
+      await this.gameRepository.save(game);
       return game;
     }
     if (game.status == 'waiting_start') {
@@ -502,23 +512,25 @@ export class GameService {
     const gameUpdated: GameEntity = await this.gameRepository.save(game);
 
     //event notification
-    const newNotif: NotificationEntity =
-      await this.notificationService.createNotification({
-        type: 'gameInviteAccepted',
-        content: `'s challenge accepted, let's play`,
-        receiver: {
-          id: isPlayer1 ? game.player2.id : game.player1.id,
-          login: isPlayer1 ? game.player2.login : game.player1.login,
-          avatar: isPlayer1 ? game.player2.avatar : game.player1.avatar,
-        },
-        sender: {
-          id: user.id,
-          login: user.login,
-          avatar: user.avatar,
-        },
-        invitationLink: `/game?id=${game.id}`,
-      } as NotificationCreateDTO);
-    if (!newNotif) throw new Error('Notification not created');
+    if (game.player2.id == user.id) {
+      const newNotif: NotificationEntity =
+        await this.notificationService.createNotification({
+          type: 'gameInviteAccepted',
+          content: `'s challenge accepted, let's play`,
+          receiver: {
+            id: game.player1.id,
+            login: game.player1.login,
+            avatar: game.player1.avatar,
+          },
+          sender: {
+            id: user.id,
+            login: user.login,
+            avatar: user.avatar,
+          },
+          invitationLink: `/game?id=${game.id}`,
+        } as NotificationCreateDTO);
+      if (!newNotif) throw new Error('Notification not created');
+    }
 
     return gameUpdated;
   }

@@ -35,9 +35,9 @@ const useConnection = () => {
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData,
   );
-  const userIsLogged: boolean = useSelector(
-    (state: RootState) => state.user.isLogged,
-  );
+  // const userIsLogged: boolean = useSelector(
+  //   (state: RootState) => state.user.isLogged,
+  // );
   const socketRef = useRef<Socket>();
   const pathRef = useRef<string>(pathname);
 
@@ -235,7 +235,7 @@ const useConnection = () => {
     socketRef.current = socket;
 
     return () => {
-      if (userIsLogged) return;
+      // if (userIsLogged) return;
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');
       socket.off('notification_friend_request_declined');
@@ -250,7 +250,7 @@ const useConnection = () => {
       socket.off('notification_game_invite_declined');
       socket.disconnect();
     };
-  }, [userData.id]);
+  }, [dispatch, userData.id]);
 };
 
 export default useConnection;
