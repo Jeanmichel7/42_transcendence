@@ -24,11 +24,15 @@ import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
 import { DisconnectCountDown } from './DisconnectCountDown';
 import spriteRacket from '../../assets/spriteRacket.png';
+import ballElectricity from '../../assets/ballElectricity.png';
 
 export const Playground = styled.div`
-  width: 100%;
+  width: 90%;
   top: 20%;
-  height: 80%;
+  left: 5%;
+  overflow: hidden;
+  height: 75%;
+  bottom: 5%;
   position: absolute;
   border: 10px 
   border: 0.2rem solid #fff;
@@ -232,12 +236,56 @@ interface BallProps {
   posY: number;
 }
 
+const ballAnimation = keyframes`
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: -6144px 0px; // 12 images * 512px par image - 512px = 6656px
+  }
+`;
+
+interface BallProps {
+  posX: number;
+  posY: number;
+  electricity: boolean | undefined;
+}
+
+// export const Ball = styled.div.attrs<BallProps>(props => {
+//   return {
+//     style: {
+//       transform: `translate(${props.posX - BALL_RADIUS}px, ${
+//         props.posY - BALL_RADIUS
+//       }px)`,
+//     },
+//   };
+// })<BallProps>`
+//   width: ${BALL_DIAMETER}px;
+//   height: ${BALL_DIAMETER}px;
+//   background-color: white;
+//   position: absolute;
+//   left: 0%;
+//   top: 0%;
+//   border-radius: 50%;
+//   transform: translate(-50%, -50%);
+
+//   &::before {
+//     content: '';
+//     display: ${props => (props.electricity ? 'block' : 'none')};
+//     background-image: url(${ballElectricity});
+//     background-size: 2048px 1536px; // Ajustez selon vos besoins
+//     width: 512px; /* Taille de chaque sprite */
+//     height: 512px;
+//     transform: translate(-50%, -50%) scale(0.15); /* Centre le sprite */
+//     position: absolute;
+//     animation: ${ballAnimation} 1.2s steps(12) infinite;
+//   }
+// `;
 export const Ball = styled.div.attrs<BallProps>(props => {
   return {
     style: {
-      transform: `translate(${props.posX - BALL_RADIUS}px, ${
-        props.posY - BALL_RADIUS
-      }px)`,
+      left: `${props.posX - BALL_RADIUS}px`,
+      top: `${props.posY - BALL_RADIUS}px`,
     },
   };
 })<BallProps>`
@@ -245,9 +293,22 @@ export const Ball = styled.div.attrs<BallProps>(props => {
   height: ${BALL_DIAMETER}px;
   background-color: white;
   position: absolute;
-  left: 0%;
-  top: 0%;
   border-radius: 50%;
+
+  &::before {
+    content: '';
+    display: ${props => (props.electricity ? 'block' : 'none')};
+    background-image: url(${ballElectricity});
+    background-size: 6144px 512px;
+    background-position: 0px 0px;
+    width: 512px;
+    height: 512px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.15); // pour centrer le sprite
+    animation: ${ballAnimation} 1s steps(12) infinite;
+  }
 `;
 
 const laserGlow = keyframes`
@@ -577,6 +638,7 @@ function Game({
         <Ball
           posX={ball.x * (gameDimensions.current.width / 1000)}
           posY={ball.y * (gameDimensions.current.height / 1000)}
+          electricity={gameData?.current?.ballElectricity}
         />
         {gameStarted && gameData?.current!.bonusMode && (
           <Bonus

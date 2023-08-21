@@ -75,4 +75,5 @@ export interface GameData {
   player1Connected: boolean;
   player2Connected: boolean;
   isPaused: boolean;
+  ballElectricity: boolean;
 }

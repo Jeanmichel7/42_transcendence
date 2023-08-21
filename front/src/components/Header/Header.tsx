@@ -199,7 +199,7 @@ function Header() {
           <NavLink to="/game">
             <MenuItem onClick={handleCloseNavMenu}>
               <SportsEsportsIcon className="m-2" />
-              Game
+              <h2 className="mt-0.5 font-bold">Game</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -207,7 +207,7 @@ function Header() {
           <NavLink to="/chat">
             <MenuItem onClick={handleCloseNavMenu}>
               <ChatIcon className="m-2" />
-              Chat
+              <h2 className="mt-0.5 font-bold">Chat</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -215,7 +215,7 @@ function Header() {
           <NavLink to="/friends">
             <MenuItem onClick={handleCloseNavMenu}>
               <GroupIcon className="m-2" />
-              Friends
+              <h2 className="mt-0.5 font-bold">Friends</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -223,7 +223,7 @@ function Header() {
           <NavLink to={'/profile/' + userData.login}>
             <MenuItem onClick={handleCloseNavMenu}>
               <PersonSearchIcon className="m-2" />
-              Profile
+              <h2 className="mt-0.5 font-bold">Profile</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -231,7 +231,7 @@ function Header() {
           <NavLink to="/leaderboard">
             <MenuItem onClick={handleCloseNavMenu}>
               <LeaderboardIcon className="m-2" />
-              Leaderboard
+              <h2 className="mt-0.5 font-bold">Leaderboard</h2>
             </MenuItem>
           </NavLink>
         </Menu>

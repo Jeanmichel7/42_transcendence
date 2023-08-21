@@ -82,18 +82,18 @@ function GameSpectator({
       <Playground id="playground">
         {gameData && (
           <>
-            <StyledRacket
+            <Racket
               posY={gameData.racketLeft}
               height={gameData.racketLeftHeight}
               type={'left'}
-              isExploding={gameData.racketLeftHeight === 0}
             >
               {gameData.player1Laser && <Laser type={'left'} />}
-            </StyledRacket>
+            </Racket>
 
             <Ball
               posX={gameData.ball.x * (gameDimensions.current.width / 1000)}
               posY={gameData.ball.y * (gameDimensions.current.height / 1000)}
+              electricity={gameData.ballElectricity}
             />
             {gameData.bonusMode && (
               <Bonus
@@ -110,14 +110,13 @@ function GameSpectator({
                 }
               />
             )}
-            <StyledRacket
+            <Racket
               posY={gameData.racketRight}
               height={gameData.racketRightHeight}
               type={'right'}
-              isExploding={gameData.racketRightHeight === 0}
             >
               {gameData.player2Laser && <Laser type={'right'} />}
-            </StyledRacket>
+            </Racket>
 
             <div className="absolute left-1/2 -translate-y-2/4	 -translate-x-2/4	  bottom-0 mx-auto">
               <StyledButton onClick={() => setCurrentPage('lobby')}>
