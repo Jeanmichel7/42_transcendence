@@ -258,9 +258,10 @@ export class Game {
     }
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    const bonus = {
-      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
-    };
+    // const bonus = {
+    //   ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+    // };
+    const bonus = { ...BONUSES_TAB[2] };
 
     // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
     if (this.bonusPlayer1Loading) {

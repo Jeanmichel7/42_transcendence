@@ -82,13 +82,15 @@ function GameSpectator({
       <Playground id="playground">
         {gameData && (
           <>
-            <Racket
+            <StyledRacket
               posY={gameData.racketLeft}
               height={gameData.racketLeftHeight}
               type={'left'}
+              isExploding={gameData.racketLeftHeight === 0}
             >
               {gameData.player1Laser && <Laser type={'left'} />}
-            </Racket>
+            </StyledRacket>
+
             <Ball
               posX={gameData.ball.x * (gameDimensions.current.width / 1000)}
               posY={gameData.ball.y * (gameDimensions.current.height / 1000)}
@@ -108,13 +110,15 @@ function GameSpectator({
                 }
               />
             )}
-            <Racket
+            <StyledRacket
               posY={gameData.racketRight}
               height={gameData.racketRightHeight}
               type={'right'}
+              isExploding={gameData.racketRightHeight === 0}
             >
               {gameData.player2Laser && <Laser type={'right'} />}
-            </Racket>
+            </StyledRacket>
+
             <div className="absolute left-1/2 -translate-y-2/4	 -translate-x-2/4	  bottom-0 mx-auto">
               <StyledButton onClick={() => setCurrentPage('lobby')}>
                 Return to Lobby

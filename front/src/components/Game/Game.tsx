@@ -23,6 +23,7 @@ import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
 import { DisconnectCountDown } from './DisconnectCountDown';
+import spriteRacket from '../../assets/spriteRacket.png';
 
 export const Playground = styled.div`
   width: 100%;
@@ -72,6 +73,11 @@ const animationBonusExplode = keyframes`
   0% { background-position: 0px; opacity: 1; }
   100% { background-position: -2400px; opacity: 0;}
   `;
+
+const explosionAnimation = keyframes`{
+    0% { background-position: 0px; opacity: 1; }
+    100% { background-position: -2400px; opacity: 0;}
+  }`;
 
 const fadeIn = keyframes`
   from {
@@ -136,9 +142,8 @@ export function Bonus({
 }
 
 const explodeAnimation = keyframes`
-  0% {opacity: 1; }
-  50% { opacity: 0.5; }
-  100% {opacity: 0; }
+from { opacity: 1; }
+to { opacity: 0; }
 `;
 
 type RacketProps = {
@@ -154,8 +159,6 @@ interface StyleProps {
   };
 }
 
-
-
 const StyledRacket = styled.div.attrs<RacketProps>(
   (props): StyleProps => ({
     style: {
@@ -165,26 +168,37 @@ const StyledRacket = styled.div.attrs<RacketProps>(
 )<RacketProps>`
   width: ${RACKET_WIDTH}%;
   height: ${props => props.height / 10}%;
-  background-color: blue;
   position: absolute;
   left: ${props =>
     props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
   top: 0%;
-  border-radius: 0px;
   z-index: 2;
-  animation: ${props =>
-    props.isExploding
-      ? css`
-          ${explodeAnimation} 1s forwards
-        `
-      : 'none'};
-  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
-    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
+  &:before {
+    top: 10px;
+    width: 100%;
+    content: '';
+    position: absolute;
+    background-color: blue;
+    opacity: ${props => (props.isExploding ? 0 : 1)};
+    height: calc(100% - 20px);
+    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+      0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
+  }
+  &:after {
+    content: ${props => (props.isExploding ? "''" : 'none')};
+    width: 200px;
+    height: 400px;
+    background: url(${spriteRacket}) no-repeat;
+    background-position: 0 0; /* début du sprite */
+    animation: ${explosionAnimation} 1.5s steps(12) forwards;
+    position: absolute;
+    top: -150px; /* Vous devrez peut-être ajuster ces valeurs */
+    left: -95px; /* pour centrer l'explosion sur la rackette */
+    transform-origin: 50% 0; /* Centre supérieur */
+    z-index: 10;
+  }
 `;
 
-
-
-// Composant Raquette avec le Laser comme enfant
 export const Racket = ({
   posY,
   height,
@@ -211,6 +225,7 @@ export const Racket = ({
     </StyledRacket>
   );
 };
+// Composant Raquette avec le Laser comme enfant
 
 interface BallProps {
   posX: number;
@@ -558,6 +573,7 @@ function Game({
         >
           {laser.current.left && <Laser type={'left'} />}
         </Racket>
+
         <Ball
           posX={ball.x * (gameDimensions.current.width / 1000)}
           posY={ball.y * (gameDimensions.current.height / 1000)}
@@ -587,10 +603,8 @@ function Game({
         >
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
+
         {gameData.current?.isPaused && <DisconnectCountDown />}
-        {bonusValueRef.current && (<p className="text-white  animate-pulse text-3xl absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
-  Press Espace to activate bonus
-</p>)} 
       </Playground>
     </GameWrapper>
   );
