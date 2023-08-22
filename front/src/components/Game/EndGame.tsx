@@ -212,8 +212,9 @@ const neonAnimationStartUp = keyframes`
 const NeonSign = styled.div`
   font-size: 1em;
   position: absolute;
-  left: 120%;
-  top: -125%;
+  white-space: nowrap;
+  left: 110%;
+  top: -115%;
   rotate: 30deg;
   font-size: 1rem;
   text-align: center;
