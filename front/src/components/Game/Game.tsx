@@ -23,11 +23,16 @@ import './font.css';
 import EndGame from './EndGame';
 import { StatutBar } from './StatutBar';
 import { DisconnectCountDown } from './DisconnectCountDown';
+import spriteRacket from '../../assets/spriteRacket.png';
+import ballElectricity from '../../assets/ballElectricity.png';
 
 export const Playground = styled.div`
-  width: 100%;
+  width: 90%;
   top: 20%;
-  height: 80%;
+  left: 5%;
+  overflow: hidden;
+  height: 75%;
+  bottom: 5%;
   position: absolute;
   border: 10px 
   border: 0.2rem solid #fff;
@@ -72,6 +77,11 @@ const animationBonusExplode = keyframes`
   0% { background-position: 0px; opacity: 1; }
   100% { background-position: -2400px; opacity: 0;}
   `;
+
+const explosionAnimation = keyframes`{
+    0% { background-position: 0px; opacity: 1; }
+    100% { background-position: -2400px; opacity: 0;}
+  }`;
 
 const fadeIn = keyframes`
   from {
@@ -136,9 +146,8 @@ export function Bonus({
 }
 
 const explodeAnimation = keyframes`
-  0% {opacity: 1; }
-  50% { opacity: 0.5; }
-  100% {opacity: 0; }
+from { opacity: 1; }
+to { opacity: 0; }
 `;
 
 type RacketProps = {
@@ -163,24 +172,37 @@ const StyledRacket = styled.div.attrs<RacketProps>(
 )<RacketProps>`
   width: ${RACKET_WIDTH}%;
   height: ${props => props.height / 10}%;
-  background-color: blue;
   position: absolute;
   left: ${props =>
     props.type === 'left' ? RACKET_LEFT_POS_X + '%' : RACKET_RIGHT_POS_X + '%'};
   top: 0%;
-  border-radius: 0px;
   z-index: 2;
-  animation: ${props =>
-    props.isExploding
-      ? css`
-          ${explodeAnimation} 1s forwards
-        `
-      : 'none'};
-  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
-    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
+  &:before {
+    top: 10px;
+    width: 100%;
+    content: '';
+    position: absolute;
+    background-color: blue;
+    opacity: ${props => (props.isExploding ? 0 : 1)};
+    height: calc(100% - 20px);
+    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+      0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
+  }
+  &:after {
+    content: ${props => (props.isExploding ? "''" : 'none')};
+    width: 200px;
+    height: 400px;
+    background: url(${spriteRacket}) no-repeat;
+    background-position: 0 0; /* début du sprite */
+    animation: ${explosionAnimation} 1.5s steps(12) forwards;
+    position: absolute;
+    top: -150px; /* Vous devrez peut-être ajuster ces valeurs */
+    left: -95px; /* pour centrer l'explosion sur la rackette */
+    transform-origin: 50% 0; /* Centre supérieur */
+    z-index: 10;
+  }
 `;
 
-// Composant Raquette avec le Laser comme enfant
 export const Racket = ({
   posY,
   height,
@@ -207,18 +229,63 @@ export const Racket = ({
     </StyledRacket>
   );
 };
+// Composant Raquette avec le Laser comme enfant
 
 interface BallProps {
   posX: number;
   posY: number;
 }
 
+const ballAnimation = keyframes`
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: -6144px 0px; // 12 images * 512px par image - 512px = 6656px
+  }
+`;
+
+interface BallProps {
+  posX: number;
+  posY: number;
+  electricity: boolean | undefined;
+}
+
+// export const Ball = styled.div.attrs<BallProps>(props => {
+//   return {
+//     style: {
+//       transform: `translate(${props.posX - BALL_RADIUS}px, ${
+//         props.posY - BALL_RADIUS
+//       }px)`,
+//     },
+//   };
+// })<BallProps>`
+//   width: ${BALL_DIAMETER}px;
+//   height: ${BALL_DIAMETER}px;
+//   background-color: white;
+//   position: absolute;
+//   left: 0%;
+//   top: 0%;
+//   border-radius: 50%;
+//   transform: translate(-50%, -50%);
+
+//   &::before {
+//     content: '';
+//     display: ${props => (props.electricity ? 'block' : 'none')};
+//     background-image: url(${ballElectricity});
+//     background-size: 2048px 1536px; // Ajustez selon vos besoins
+//     width: 512px; /* Taille de chaque sprite */
+//     height: 512px;
+//     transform: translate(-50%, -50%) scale(0.15); /* Centre le sprite */
+//     position: absolute;
+//     animation: ${ballAnimation} 1.2s steps(12) infinite;
+//   }
+// `;
 export const Ball = styled.div.attrs<BallProps>(props => {
   return {
     style: {
-      transform: `translate(${props.posX - BALL_RADIUS}px, ${
-        props.posY - BALL_RADIUS
-      }px)`,
+      left: `${props.posX - BALL_RADIUS}px`,
+      top: `${props.posY - BALL_RADIUS}px`,
     },
   };
 })<BallProps>`
@@ -226,9 +293,22 @@ export const Ball = styled.div.attrs<BallProps>(props => {
   height: ${BALL_DIAMETER}px;
   background-color: white;
   position: absolute;
-  left: 0%;
-  top: 0%;
   border-radius: 50%;
+
+  &::before {
+    content: '';
+    display: ${props => (props.electricity ? 'block' : 'none')};
+    background-image: url(${ballElectricity});
+    background-size: 6144px 512px;
+    background-position: 0px 0px;
+    width: 512px;
+    height: 512px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.15); // pour centrer le sprite
+    animation: ${ballAnimation} 1s steps(12) infinite;
+  }
 `;
 
 const laserGlow = keyframes`
@@ -554,9 +634,11 @@ function Game({
         >
           {laser.current.left && <Laser type={'left'} />}
         </Racket>
+
         <Ball
           posX={ball.x * (gameDimensions.current.width / 1000)}
           posY={ball.y * (gameDimensions.current.height / 1000)}
+          electricity={gameData?.current?.ballElectricity}
         />
         {gameStarted && gameData?.current!.bonusMode && (
           <Bonus
@@ -583,6 +665,7 @@ function Game({
         >
           {laser.current.right && <Laser type={'right'} />}
         </Racket>
+
         {gameData.current?.isPaused && <DisconnectCountDown />}
       </Playground>
     </GameWrapper>

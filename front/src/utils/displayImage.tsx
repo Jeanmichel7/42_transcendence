@@ -10,7 +10,6 @@ const DisplayImg = ({ src, alt, className }: Props) => {
   const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
   if (!src?.match(urlRegex) && src !== 'pong-nav.png')
     src = API_URL + '/avatars/' + src;
-
   return (
     <img
       className={className}

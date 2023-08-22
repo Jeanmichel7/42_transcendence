@@ -11,7 +11,7 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
         <Link
           key={user.id}
           to={'/profile/' + user.login}
-          className="flex flex-grow text-black p-1 pl-2 items-center "
+          className="flex flex-grow text-black p-1 pl-2 items-center font-bold hover:bg-gray-200 rounded-md "
         >
           <Badge
             color={
@@ -66,6 +66,8 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
               textOverflow: 'ellipsis',
               maxWidth: '100%',
               whiteSpace: 'nowrap',
+              fontFamily: '"Alegreya Sans SC", sans-serif',
+              fontWeight: 'bold',
             }}
             title={user.login}
           >
@@ -107,7 +109,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
     <div className="hidden md:block mx-2">
       {room.admins && (
         <>
-          <h3> ADMINS - {room.admins.length} </h3>
+          <h3 className="font-bold text-blue-600"> ADMINS - {room.admins.length} </h3>
           {room.admins.map(user => (
             <MembersCard key={user.id} user={user} />
           ))}
@@ -116,7 +118,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
       {userWithoutAdmins && (
         <>
-          <h3> MEMBRES - {userWithoutAdmins.length} </h3>
+          <h3 className="font-bold text-blue-600"> MEMBRES - {userWithoutAdmins.length} </h3>
           {userWithoutAdmins.map(user => (
             <MembersCard key={user.id} user={user} />
           ))}

@@ -35,7 +35,7 @@ export default function ProfileFriends({ user }: { user: UserInterface }) {
         {friends.length == 0 ? (
           <NavLink to="/friends?tab=add">
             <Nothing
-              text="Sorry... go to Add Friends for adding new friends!"
+              text="No friends"
               angry={false}
             />
           </NavLink>

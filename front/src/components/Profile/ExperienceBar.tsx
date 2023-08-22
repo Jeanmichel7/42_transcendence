@@ -58,6 +58,8 @@ const Graduation = styled.div`
 const LevelLabel = styled.p<{ bottom?: boolean }>`
   font-weight: bold;
   font-size: 0.8rem;
+  font-family: "Alegreya Sans SC", sans-serif;
+  font-weight: bold;
   z-index: 3;
   color: gray;
   left: 10px;

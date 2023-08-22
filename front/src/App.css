@@ -1,8 +1,24 @@
-@import url("https://fonts.googleapis.com/css2?family=Alegreya+Sans&family=Alegreya+Sans+SC:ital,wght@1,900&family=Roboto:wght@300;400&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC:ital,wght@0,300;0,900;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 :root {
   --color-primary: #1976d2;
   --color-secondary: #c95ddc;
   --color-tertiary: #9c27b0;
   --background-color: #f2f2ff;
-  font-family: "monospace", "Alegreya Sans SC", sans-serif;
+  font-family: "Alegreya Sans SC";
+}
+
+
+p, div {
+  font-family: "roboto", sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: "Alegreya Sans SC", sans-serif;
+}
+
+
+div.font-bold, 
+p.font-bold {
+  font-family: "Alegreya Sans SC", sans-serif;
 }

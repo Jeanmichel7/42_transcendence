@@ -13,7 +13,8 @@ const StatutWrapper = styled.div`
   padding-top: 1rem;
   justify-content: between;
   align-items: center;
-  height: 15%;
+
+  height: 20%;
 `;
 
 interface StatutBarProps {

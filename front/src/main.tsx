@@ -9,8 +9,20 @@ import App from './App';
 
 const theme = createTheme({
   typography: {
-    fontFamily: 'monospace, sans-serif',
+    fontFamily: 'roboto',
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: '"Alegreya Sans SC", sans-serif',
+          fontWeight: 'bold',
+        },
+      },
+    },
+  },
+
+ 
 });
 
 const RootComponent =

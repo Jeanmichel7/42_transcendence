@@ -31,6 +31,7 @@ export const StyledButton = styled.button<StyledButtonProps>`
   text-align: center;
   padding: 1rem;
   border-radius: 3rem;
+  font-family: "Alegreya Sans SC", sans-serif;
   transition: color 0.2s ease;
   z-index: 10;
 
@@ -71,8 +72,14 @@ interface ButtonWrapperProps {
   animation: boolean;
 }
 export const ButtonWrapper = styled.div<ButtonWrapperProps>`
-  height: 40%;
+  height: 30%;
   width: 30%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  @media (max-height: 600px) {
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
   display: flex;
   position: relative;
   align-items: flex-start;

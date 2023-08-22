@@ -49,9 +49,12 @@ const slideInFromRight = keyframes`
   `;
 
 const PingPongText = styled.span`
+font-family: "Alegreya Sans SC", sans-serif;
   position: absolute;
   right: 15vw;
   bottom: 15vh;
+  font-weight: bold;
+  font-style: italic;
   font-size: 2em;
   color: #ffffff;
   padding: 0.5em 1em;
@@ -64,6 +67,8 @@ const TitleWrapper = styled.div`
   position: relative;
   left: 10vw;
   top: 20vh;
+  font-weight: bold;
+  font-style: italic;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -139,8 +144,10 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   position: relative;
   color: #fff;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
+  font-style: italic;
+  font-family: "Alegreya Sans SC", sans-serif;
   text-align: center;
   padding: 1rem 1rem;
   width: 10rem;

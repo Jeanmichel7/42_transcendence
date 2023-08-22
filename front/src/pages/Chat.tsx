@@ -12,7 +12,7 @@ function Chat() {
     <div className="flex h-screen w-full min-h-md relative ">
       <div className="h-full w-full max-w-[200px] min-w-fit bg-[#e5e5f2]">
         <div className="w-full justify-center items-center">
-          <p className="p-[5px] bg-gray-300 text-blue-700 text-sm ">CHANNEL </p>
+          <p className="p-[5px] bg-gray-300 text-blue-700 text-sm font-bold ">CHANNEL </p>
           <ButtonCreateGroup />
           <ButtonInterfaceAddGroups />
         </div>

@@ -77,7 +77,7 @@ export default function AccountConnection() {
         </Link>
       </div>
 
-      <div className="absolute top-0 left-0 m-5 text-blue-500">
+      <div className="absolute top-0 left-0 m-5 text-blue-500 font-bold">
         <Link to="/connection">Retour</Link>
       </div>
 

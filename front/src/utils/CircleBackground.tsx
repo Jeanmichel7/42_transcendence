@@ -9,22 +9,26 @@ export function CircleBackground() {
   const colorCircle =
     effect === 'black' ? '#330207' : effect === 'red' ? '#8F00FF' : '';
 
-  return (
-    <div
-      className="particle-container"
-      style={{ backgroundColor: colorBackground }}
-    >
-      <div className="particles">
-        {Array(30)
-          .fill(0)
-          .map((_, i) => (
-            <span
-              className="circle blinking-effect"
-              style={{ backgroundColor: colorCircle }}
-              key={i}
-            ></span>
-          ))}
+  
+    return (
+      <div
+        className="particle-container"
+        style={{ backgroundColor: colorBackground }}
+      >
+        <div className="particles">
+          {effect !== 'black' && 
+            Array(30)
+              .fill(0)
+              .map((_, i) => (
+                <span
+                  className="circle blinking-effect"
+                  style={{ backgroundColor: colorCircle }}
+                  key={i}
+                ></span>
+              ))
+          }
+        </div>
       </div>
-    </div>
-  );
+    );
+
 }

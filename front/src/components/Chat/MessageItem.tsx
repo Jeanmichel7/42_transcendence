@@ -278,7 +278,7 @@ const MessageItem: FC<MessageItemProps> = ({
             </div>
 
             <div className="flex-grow">
-              <div className="font-semibold">
+              <div className="font-bold">
                 <Link to={'/profile/' + message.ownerUser.login}>
                   {message.ownerUser.login}
                 </Link>

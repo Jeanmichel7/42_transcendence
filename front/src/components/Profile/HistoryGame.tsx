@@ -13,6 +13,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import { Nothing } from '../Friends/Nothing';
 
 interface PropsGames {
   user: UserInterface;
@@ -89,10 +90,9 @@ export default function HistoryGame({ user }: PropsGames) {
 
         <div>
           {games && games.length === 0 && (
-            <div className="flex justify-center">
-              <p className="text-2xl text-gray-400">No games found</p>
-            </div>
-          )}
+                  <Nothing text="No games" />)}
+      
+          
           {games &&
             games.length > 0 &&
             games.map(game => (

@@ -197,7 +197,7 @@ function Header() {
           <NavLink to="/game">
             <MenuItem onClick={handleCloseNavMenu}>
               <SportsEsportsIcon className="m-2" />
-              Game
+              <h2 className="mt-0.5 font-bold">Game</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -205,7 +205,7 @@ function Header() {
           <NavLink to="/chat">
             <MenuItem onClick={handleCloseNavMenu}>
               <ChatIcon className="m-2" />
-              Chat
+              <h2 className="mt-0.5 font-bold">Chat</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -213,7 +213,7 @@ function Header() {
           <NavLink to="/friends">
             <MenuItem onClick={handleCloseNavMenu}>
               <GroupIcon className="m-2" />
-              Friends
+              <h2 className="mt-0.5 font-bold">Friends</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -221,7 +221,7 @@ function Header() {
           <NavLink to={'/profile/' + userData.login}>
             <MenuItem onClick={handleCloseNavMenu}>
               <PersonSearchIcon className="m-2" />
-              Profile
+              <h2 className="mt-0.5 font-bold">Profile</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -229,7 +229,7 @@ function Header() {
           <NavLink to="/leaderboard">
             <MenuItem onClick={handleCloseNavMenu}>
               <LeaderboardIcon className="m-2" />
-              Leaderboard
+              <h2 className="mt-0.5 font-bold">Leaderboard</h2>
             </MenuItem>
           </NavLink>
         </Menu>
@@ -264,20 +264,7 @@ function Header() {
               className="text-center h-[56px] w-[56px] mr-3"
             />
           </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            sx={{
-              mr: 2,
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            PONG
-          </Typography>
+          <h2 className="mr-2 flex-grow text-xl font-bold ">PONG</h2>
         </NavLink>
       </Box>
 
@@ -304,7 +291,7 @@ function Header() {
             }}
           >
             <SportsEsportsIcon className="mr-2" />
-            <p className="mt-0.5">Game</p>
+            <h2 className="mt-0.5 font-bold">Game</h2>
           </Button>
         </NavLink>
 
@@ -322,7 +309,7 @@ function Header() {
             }}
           >
             <ChatIcon className="mr-2" />
-            <p className="mt-0.5">Chat</p>
+            <h2 className="mt-0.5 font-bold">Chat</h2>
           </Button>
         </NavLink>
 
@@ -340,7 +327,7 @@ function Header() {
             }}
           >
             <GroupIcon className="mr-2" />
-            <p className="mt-0.5">Friends</p>
+            <h2 className="mt-0.5 font-bold">Friends</h2>
           </Button>
         </NavLink>
 
@@ -358,7 +345,7 @@ function Header() {
             }}
           >
             <PersonSearchIcon className="mr-2" />
-            <p className="mt-0.5">Profile</p>
+            <h2 className="mt-0.5 font-bold">Profile</h2>
           </Button>
         </NavLink>
 
@@ -376,7 +363,7 @@ function Header() {
             }}
           >
             <LeaderboardIcon className="mr-2" />
-            <p className="mt-0.5">Leaderboard</p>
+            <h2 className="mt-0.5 font-bold">Leaderboard</h2>
           </Button>
         </NavLink>
       </Box>

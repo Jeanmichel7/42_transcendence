@@ -1,3 +1,4 @@
+import { threadId } from 'worker_threads';
 import { UserEntity } from '../users/entity/users.entity';
 import { GameInfo } from './game.service';
 import { BonusPosition, clientUpdate } from './interfaces/game.interface';
@@ -7,7 +8,7 @@ const RACKET_LEFT_POS_X = 5;
 const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 20;
 const GROUND_MAX_SIZE = 1000;
-const SCORE_FOR_WIN = 6;
+const SCORE_FOR_WIN = 20;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
@@ -82,6 +83,7 @@ export class Game {
   player1Connected: boolean;
   player1TimeoutId: any;
   player2TimeoutId: any;
+  ballElectricity: boolean;
   //Stats
 
   constructor(
@@ -154,6 +156,7 @@ export class Game {
     this.isPaused = false;
     this.player1Connected = true;
     this.player2Connected = true;
+    this.ballElectricity = false;
   }
 
   // async initIdGame() {
@@ -173,6 +176,7 @@ export class Game {
       : -INITIAL_BALL_SPEED * cosValue;
     this.ball.vy = INITIAL_BALL_SPEED * Math.sin(angle);
     this.ball.speed = INITIAL_BALL_SPEED;
+    this.ballElectricity = false;
   }
 
   generateBonus() {
@@ -219,7 +223,7 @@ export class Game {
       ) {
         toDelete = index;
         if (bonus.id == 'bigRacket') {
-          this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+          this.racketLeftHeight = RACKET_HEIGHT_10;
         } else if (bonus.id == 'laser') {
           this.player1Laser = false;
         }
@@ -238,7 +242,7 @@ export class Game {
       ) {
         toDelete = index;
         if (bonus.id == 'bigRacket') {
-          this.racketLeftHeight = RACKET_HEIGHT_10 * 2;
+          this.racketRightHeight = RACKET_HEIGHT_10;
         } else if (bonus.id == 'laser') {
           this.player2Laser = false;
         }
@@ -262,12 +266,17 @@ export class Game {
       ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
     };
 
-    // Assigner le bonus à player1 ou player2 en fonction de this.ball.vx
     if (this.bonusPlayer1Loading) {
-      this.bonusesPlayer1.push(bonus);
+      if (
+        this.bonusesPlayer1[this.bonusesPlayer1.length - 1]?.activate !== false
+      )
+        this.bonusesPlayer1.push(bonus);
       this.bonusPlayer1Loading = false;
     } else {
-      this.bonusesPlayer2.push(bonus);
+      if (
+        this.bonusesPlayer2[this.bonusesPlayer2.length - 1]?.activate !== false
+      )
+        this.bonusesPlayer2.push(bonus);
       this.bonusPlayer2Loading = false;
     }
   }
@@ -281,7 +290,8 @@ export class Game {
       } else if (
         this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == 'slow'
       ) {
-        this.ball.speed = INITIAL_BALL_SPEED;
+        this.ballElectricity = true;
+        this.ball.speed += 2;
       } else if (
         this.bonusesPlayer1[this.bonusesPlayer1.length - 1].id == 'laser'
       ) {
@@ -299,7 +309,8 @@ export class Game {
       } else if (
         this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == 'slow'
       ) {
-        this.ball.speed = INITIAL_BALL_SPEED;
+        this.ballElectricity = true;
+        this.ball.speed += 2;
       } else if (
         this.bonusesPlayer2[this.bonusesPlayer2.length - 1].id == 'laser'
       ) {
@@ -350,8 +361,12 @@ export class Game {
   resetBallAndRackets(leftSideLoose: boolean) {
     this.initBall(leftSideLoose ? false : true);
     this.fail = false;
-    this.racketLeftHeight = RACKET_HEIGHT_10;
-    this.racketRightHeight = RACKET_HEIGHT_10;
+    this.racketLeftHeight === 0
+      ? (this.racketLeftHeight = RACKET_HEIGHT_10)
+      : null;
+    this.racketRightHeight === 0
+      ? (this.racketRightHeight = RACKET_HEIGHT_10)
+      : null;
     this.consecutiveExchangesWithoutBounce = -1;
     this.emitEvent('updateLobbyRoomRequire');
   }
@@ -418,6 +433,7 @@ export class Game {
       this.ball.y <= this.racketLeft + this.racketLeftHeight &&
       !this.fail
     ) {
+      this.ballElectricity = false;
       this.ball.x = RACKET_LEFT_HITBOX_BOUNDARY;
       const racketCenter = this.racketLeft + this.racketLeftHeight / 2;
       const relativePostion = this.ball.y - racketCenter;
@@ -435,8 +451,8 @@ export class Game {
       this.ball.y <= this.racketRight + this.racketRightHeight &&
       !this.fail
     ) {
+      this.ballElectricity = false;
       this.ball.x = RACKET_RIGHT_HITBOX_BOUNDARY;
-
       const racketCenter = this.racketRight + this.racketRightHeight / 2;
       const relativePostion = this.ball.y - racketCenter;
       let proportion = relativePostion / (this.racketRightHeight / 2);
@@ -536,6 +552,7 @@ export class Game {
       player1Connected: this.player1Connected,
       player2Connected: this.player2Connected,
       isPaused: this.isPaused,
+      ballElectricity: this.ballElectricity,
     };
   }
 

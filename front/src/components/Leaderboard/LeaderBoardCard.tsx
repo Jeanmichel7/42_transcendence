@@ -28,7 +28,7 @@ const LeaderboardCard = ({ user, indexUser, classement }: LeaderBoardProps) => {
       hover:bg-blue-200
       `}
       >
-        <p className="w-[24px] font-bold text-center ml-1">#{classement}</p>
+        <p className="w-[24px] font-bold text-gray-500 text-center ml-1">#{classement}</p>
 
         <div className="flex items-center w-4/12">
           <div className="flex items-center">
