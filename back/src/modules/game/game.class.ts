@@ -9,8 +9,8 @@ const RACKET_RIGHT_POS_X = 93;
 const BALL_DIAMETER = 20;
 const GROUND_MAX_SIZE = 1000;
 const SCORE_FOR_WIN = 12;
-const INITIAL_BALL_SPEED = 0.25;
-const SPEED_INCREASE = 0.04;
+const INITIAL_BALL_SPEED = 0.40;
+const SPEED_INCREASE = 0.03;
 const BONUSES_TAB = [
   { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
   { id: 'slow', duration: 0, timeStart: 0, activate: false },

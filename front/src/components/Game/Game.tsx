@@ -21,7 +21,7 @@ import spriteBonus from '../../assets/spriteBonus.png';
 import spriteBonusExplode from '../../assets/spriteBonusExplode.png';
 import './font.css';
 import EndGame from './EndGame';
-import { StatutBar } from './StatutBar';
+import StatutBar from './StatutBar';
 import { DisconnectCountDown } from './DisconnectCountDown';
 import spriteRacket from '../../assets/spriteRacket.png';
 import ballElectricity from '../../assets/ballElectricity.png';
@@ -54,10 +54,10 @@ const BALL_DIAMETER = 20;
 const BALL_RADIUS = BALL_DIAMETER / 2;
 // max position of ball on X axis for compensate ball radius
 export const GROUND_MAX_SIZE = 1000;
-const INITIAL_BALL_SPEED = 0.25;
+const INITIAL_BALL_SPEED = 0.40;
 // POSITION_THRESHOLD value for correction of ball position with server state
 const POSITION_THRESHOLD = 30;
-const SPEED_INCREASE = 0.04;
+const SPEED_INCREASE = 0.03;
 
 // Variable constante for optimisation, don't change
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;

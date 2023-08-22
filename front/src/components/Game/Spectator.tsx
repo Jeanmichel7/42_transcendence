@@ -14,7 +14,7 @@ import {
 import './font.css';
 import useSocketConnectionSpectator from './useSocketConnectionSpectator';
 import { Ball, Bonus, GameWrapper, Laser, Playground, Racket } from './Game';
-import { StatutBar } from './StatutBar';
+import StatutBar from './StatutBar';
 import { StyledButton } from './EndGame';
 import { DisconnectCountDownSpectator } from './DisconnectCountDownSpectator';
 

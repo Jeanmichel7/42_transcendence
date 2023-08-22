@@ -3,6 +3,7 @@ import Score, { ScoreValue } from './Score';
 import BonusBox from './BonusBox';
 import { PlayersInfo } from './Game';
 import DisplayImg from '../../utils/displayImage';
+import { memo } from 'react';
 
 const StatutWrapper = styled.div`
   color: white;
@@ -13,7 +14,6 @@ const StatutWrapper = styled.div`
   padding-top: 1rem;
   justify-content: between;
   align-items: center;
-
   height: 20%;
 `;
 
@@ -29,7 +29,7 @@ interface StatutBarProps {
   bonusNamePlayerRight?: string | undefined;
 }
 
-export function StatutBar({
+const StatutBar = ({
   playersInfo,
   scorePlayerLeft,
   scorePlayerRight,
@@ -39,18 +39,19 @@ export function StatutBar({
   spectateMode,
   bonusIsLoadingPlayerRight,
   bonusNamePlayerRight,
-}: StatutBarProps) {
+}: StatutBarProps) => {
   return (
     <StatutWrapper>
       <div className="w-1/2 flex items-center justify-between">
         {bonusActive && (
           <BonusBox bonusIsLoading={bonusIsLoading} bonusName={bonusName} />
         )}
+        {playersInfo && 
         <DisplayImg
           src={playersInfo?.playerLeftAvatar}
           alt="avatar"
           className="md:h-24 h-12 rounded-full"
-        />
+        />}
         <h2 className="md:text-xl font-bold w-1/4 text-center truncate">
           {playersInfo?.playerLeftUsername}
         </h2>
@@ -62,11 +63,12 @@ export function StatutBar({
         <h2 className="md:text-xl font-bold w-1/4 text-center truncate">
           {playersInfo?.playerRightUsername}
         </h2>
+        {playersInfo && 
         <DisplayImg
           src={playersInfo?.playerRightAvatar}
           alt="avatar"
           className="md:h-24 h-12 rounded-full"
-        />
+        />}
         {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (
           <BonusBox
             bonusIsLoading={bonusIsLoadingPlayerRight}
@@ -78,3 +80,13 @@ export function StatutBar({
     </StatutWrapper>
   );
 }
+
+const areEqual = (prevProps: StatutBarProps, nextProps: StatutBarProps) => {
+  return ((
+    prevProps.scorePlayerLeft === nextProps.scorePlayerLeft &&
+    prevProps.scorePlayerRight === nextProps.scorePlayerRight) &&
+    prevProps.scorePlayerLeft !== 0 && prevProps.scorePlayerLeft !== 0
+  );
+};
+
+export default memo(StatutBar, areEqual);

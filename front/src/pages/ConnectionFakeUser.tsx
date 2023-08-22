@@ -58,7 +58,7 @@ export default function AccountConnection() {
     return data;
   };
 
-  window.opener.postMessage({ msg: 'resize', width: 900, height: 450 }, '*');
+  window.opener.postMessage({ msg: 'resize', width: 900, height: 550 }, '*');
 
   return (
     <div className="bg-inherit">
@@ -82,7 +82,7 @@ export default function AccountConnection() {
       </div>
 
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold mb-5">Account connection</h1>
+        <h1 className="text-4xl font-extrabold my-10">Account connection</h1>
       </div>
 
       <div className="flex justify-around">
