@@ -86,17 +86,29 @@ const LeaderBoard = () => {
         <div
           className="w-full flex justify-between items-center
           border-b-[1px] border-blue-500
-          font-bold py-2"
+          font-extrabold py-2"
         >
-          <div className="text-center  w-[24px] font-bold text-xl text-gray-500">Rank</div>
-          <div className="text-center overflow-hidden w-4/12 font-bold text-xl text-gray-500">Player</div>
-          <div className="text-center overflow-hidden w-1/12 font-bold text-xl text-gray-500">Elo score</div>
-          <div className="text-center overflow-hidden w-1/12 font-bold text-xl text-gray-500">Grade</div>
-          <div className="text-center overflow-hidden w-1/12 font-bold text-xl text-gray-500">Level</div>
-          <div className="text-center overflow-hidden w-[100px] md:w-[150px] font-bold text-xl text-gray-500">
+          <div className="text-center  w-[24px] font-extrabold text-xl text-gray-500">
+            Rank
+          </div>
+          <div className="text-center overflow-hidden w-4/12 font-extrabold text-xl text-gray-500">
+            Player
+          </div>
+          <div className="text-center overflow-hidden w-1/12 font-extrabold text-xl text-gray-500">
+            Elo score
+          </div>
+          <div className="text-center overflow-hidden w-1/12 font-extrabold text-xl text-gray-500">
+            Grade
+          </div>
+          <div className="text-center overflow-hidden w-1/12 font-extrabold text-xl text-gray-500">
+            Level
+          </div>
+          <div className="text-center overflow-hidden w-[100px] md:w-[150px] font-extrabold text-xl text-gray-500">
             Experience
           </div>
-          <div className="text-center overflow-hidden w-2/12 font-bold text-xl text-gray-500">Progress</div>
+          <div className="text-center overflow-hidden w-2/12 font-extrabold text-xl text-gray-500">
+            Progress
+          </div>
         </div>
 
         <div>

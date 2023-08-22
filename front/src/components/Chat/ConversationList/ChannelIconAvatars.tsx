@@ -121,7 +121,7 @@ const ConversationListRoomItemIcons = ({
           title={room.name}
         >
           <div className="flex flex-col">
-            <p>
+            <p className="font-bold">
               {room.isProtected ? (
                 <LockIcon sx={{ fontSize: 16, marginRight: 0.5 }} />
               ) : (

@@ -121,7 +121,6 @@ export const TransitionCircle = styled.span<{ expand: boolean }>`
   transition: transform 1s ease-out;
 `;
 
-
 const BigCircle = styled.span<{ hovered: boolean }>`
   position: absolute;
   left: 100%;
@@ -142,7 +141,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   color: #fff;
   text-decoration: none;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 900;
   font-style: italic;
   font-family: 'Alegreya Sans SC', sans-serif;
   text-align: center;
@@ -302,7 +301,7 @@ export default function Login() {
           Login
         </StyledLink>
       </TitleWrapper>
-      <PingPongText>Pong! Le jeu qui ping</PingPongText>
+      <PingPongText>Pong! Le jeu qui fait ping</PingPongText>
     </LoginWrapper>
   );
 }

@@ -32,7 +32,11 @@ function ConnectPage() {
         <Typography
           variant="h4"
           align="center"
-          style={{ marginBottom: '40px' }}
+          style={{
+            marginBottom: '40px',
+            fontFamily: '"Alegreya Sans SC", sans-serif',
+            fontWeight: 'bold',
+          }}
         >
           Connection via
         </Typography>

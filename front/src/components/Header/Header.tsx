@@ -197,7 +197,7 @@ function Header() {
           <NavLink to="/game">
             <MenuItem onClick={handleCloseNavMenu}>
               <SportsEsportsIcon className="m-2" />
-              <h2 className="mt-0.5 font-bold">Game</h2>
+              <h2 className="mt-0.5 font-extrabold">Game</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -205,7 +205,7 @@ function Header() {
           <NavLink to="/chat">
             <MenuItem onClick={handleCloseNavMenu}>
               <ChatIcon className="m-2" />
-              <h2 className="mt-0.5 font-bold">Chat</h2>
+              <h2 className="mt-0.5 font-extrabold">Chat</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -213,7 +213,7 @@ function Header() {
           <NavLink to="/friends">
             <MenuItem onClick={handleCloseNavMenu}>
               <GroupIcon className="m-2" />
-              <h2 className="mt-0.5 font-bold">Friends</h2>
+              <h2 className="mt-0.5 font-extrabold">Friends</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -221,7 +221,7 @@ function Header() {
           <NavLink to={'/profile/' + userData.login}>
             <MenuItem onClick={handleCloseNavMenu}>
               <PersonSearchIcon className="m-2" />
-              <h2 className="mt-0.5 font-bold">Profile</h2>
+              <h2 className="mt-0.5 font-extrabold">Profile</h2>
             </MenuItem>
           </NavLink>
           <Divider />
@@ -229,7 +229,7 @@ function Header() {
           <NavLink to="/leaderboard">
             <MenuItem onClick={handleCloseNavMenu}>
               <LeaderboardIcon className="m-2" />
-              <h2 className="mt-0.5 font-bold">Leaderboard</h2>
+              <h2 className="mt-0.5 font-extrabold">Leaderboard</h2>
             </MenuItem>
           </NavLink>
         </Menu>
@@ -264,7 +264,7 @@ function Header() {
               className="text-center h-[56px] w-[56px] mr-3"
             />
           </IconButton>
-          <h2 className="mr-2 flex-grow text-xl font-bold ">PONG</h2>
+          <h2 className="mr-2 flex-grow text-xl font-extrabold ">PONG</h2>
         </NavLink>
       </Box>
 
@@ -291,7 +291,7 @@ function Header() {
             }}
           >
             <SportsEsportsIcon className="mr-2" />
-            <h2 className="mt-0.5 font-bold">Game</h2>
+            <h2 className="mt-0.5 font-extrabold">Game</h2>
           </Button>
         </NavLink>
 
@@ -309,7 +309,7 @@ function Header() {
             }}
           >
             <ChatIcon className="mr-2" />
-            <h2 className="mt-0.5 font-bold">Chat</h2>
+            <h2 className="mt-0.5 font-extrabold">Chat</h2>
           </Button>
         </NavLink>
 
@@ -327,7 +327,7 @@ function Header() {
             }}
           >
             <GroupIcon className="mr-2" />
-            <h2 className="mt-0.5 font-bold">Friends</h2>
+            <h2 className="mt-0.5 font-extrabold">Friends</h2>
           </Button>
         </NavLink>
 
@@ -345,7 +345,7 @@ function Header() {
             }}
           >
             <PersonSearchIcon className="mr-2" />
-            <h2 className="mt-0.5 font-bold">Profile</h2>
+            <h2 className="mt-0.5 font-extrabold">Profile</h2>
           </Button>
         </NavLink>
 
@@ -363,7 +363,7 @@ function Header() {
             }}
           >
             <LeaderboardIcon className="mr-2" />
-            <h2 className="mt-0.5 font-bold">Leaderboard</h2>
+            <h2 className="mt-0.5 font-extrabold">Leaderboard</h2>
           </Button>
         </NavLink>
       </Box>
@@ -447,21 +447,21 @@ function Header() {
           <NavLink to="/about">
             <MenuItem onClick={handleCloseUserMenu}>
               <InfoIcon className="mr-2" />
-              <h2 className="mt-0.5 font-bold">About</h2>
+              <h2 className="mt-0.5 font-extrabold">About</h2>
             </MenuItem>
           </NavLink>
 
           <NavLink to="/account">
             <MenuItem onClick={handleCloseUserMenu}>
               <SettingsIcon className="mr-2" />
-              <h2 className="mt-0.5 font-bold">Account</h2>
+              <h2 className="mt-0.5 font-extrabold">Account</h2>
             </MenuItem>
           </NavLink>
 
           <NavLink to={`/achievement/${userData.login}`}>
             <MenuItem onClick={handleCloseUserMenu}>
               <EmojiEventsIcon className="mr-2" />
-              <h2 className="mt-0.5 font-bold">Achievement</h2>
+              <h2 className="mt-0.5 font-extrabold">Achievement</h2>
             </MenuItem>
           </NavLink>
 
@@ -470,7 +470,7 @@ function Header() {
           <div>
             <MenuItem onClick={handleLogout}>
               <LogoutIcon className="mr-2" />
-              <h2 className="mt-0.5 font-bold">Logout</h2>
+              <h2 className="mt-0.5 font-extrabold">Logout</h2>
             </MenuItem>
           </div>
         </Menu>

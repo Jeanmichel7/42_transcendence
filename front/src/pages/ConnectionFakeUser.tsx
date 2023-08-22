@@ -58,7 +58,7 @@ export default function AccountConnection() {
     return data;
   };
 
-  window.opener.postMessage({ msg: 'resize', width: 900, height: 600 }, '*');
+  window.opener.postMessage({ msg: 'resize', width: 900, height: 450 }, '*');
 
   return (
     <div className="bg-inherit">
@@ -73,7 +73,7 @@ export default function AccountConnection() {
             '%2Foauthredirection&response_type=code'
           }
         >
-         Login Intra
+          Login Intra
         </Link>
       </div>
 

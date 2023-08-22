@@ -99,7 +99,15 @@ const RoomCard = ({ room }: RoomCardProps) => {
       <CardContent>
         <Grid container alignItems="center" spacing={2} className="mb-2">
           <Grid item xs={9}>
-            <Typography variant="h5" component="div" noWrap>
+            <Typography
+              variant="h5"
+              component="div"
+              noWrap
+              sx={{
+                fontFamily: 'Alegreya Sans SC',
+                fontWeight: 700,
+              }}
+            >
               {room.name.toUpperCase()}
             </Typography>
           </Grid>
