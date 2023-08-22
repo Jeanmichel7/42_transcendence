@@ -49,7 +49,7 @@ const slideInFromRight = keyframes`
   `;
 
 const PingPongText = styled.span`
-font-family: "Alegreya Sans SC", sans-serif;
+  font-family: 'Alegreya Sans SC', sans-serif;
   position: absolute;
   right: 15vw;
   bottom: 15vh;
@@ -117,21 +117,18 @@ export const TransitionCircle = styled.span<{ expand: boolean }>`
   height: 200vh;
   background-color: white;
   border-radius: 50%;
-  z-index: 3;
+  z-index: 1100;
   transition: transform 1s ease-out;
 `;
 
-interface CircleProps {
-  expand: boolean;
-}
 
-const BigCircle = styled.span<CircleProps & { hovered: boolean }>`
+const BigCircle = styled.span<{ hovered: boolean }>`
   position: absolute;
   left: 100%;
   top: 100%;
   transform: translate(-50%, -50%)
-    scale(${props => (props.expand ? 2.5 : props.hovered ? 0.8 : 0.4)});
-  opacity: ${props => (props.expand ? 1 : props.hovered ? 0.5 : 0.02)};
+    scale(${props => (props.hovered ? 0.8 : 0.4)});
+  opacity: ${props => (props.hovered ? 0.5 : 0.02)};
   width: 100vh;
   height: 100vh;
   border-radius: 50%;
@@ -147,7 +144,7 @@ const StyledLink = styled(({ expand, ...props }) => <Link {...props} />)`
   font-size: 1.5rem;
   font-weight: bold;
   font-style: italic;
-  font-family: "Alegreya Sans SC", sans-serif;
+  font-family: 'Alegreya Sans SC', sans-serif;
   text-align: center;
   padding: 1rem 1rem;
   width: 10rem;
@@ -281,9 +278,10 @@ export default function Login() {
 
       if (event.data.msg === 'user connected') {
         setExpand(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
         if (event.data.id != -1) await saveUserData(event.data.id);
         newWindow.close();
-        navigate('/game');
+        navigate('/game', { state: { fromLogin: true } });
       }
     });
   };
@@ -291,7 +289,7 @@ export default function Login() {
   return (
     <LoginWrapper>
       <TransitionCircle expand={expand} />
-      <BigCircle hovered={isHovered} expand={expand} />
+      <BigCircle hovered={isHovered} />
 
       <TitleWrapper>
         <Title>PONG</Title>

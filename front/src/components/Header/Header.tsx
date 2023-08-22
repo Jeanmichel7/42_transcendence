@@ -447,21 +447,21 @@ function Header() {
           <NavLink to="/about">
             <MenuItem onClick={handleCloseUserMenu}>
               <InfoIcon className="mr-2" />
-              About
+              <h2 className="mt-0.5 font-bold">About</h2>
             </MenuItem>
           </NavLink>
 
           <NavLink to="/account">
             <MenuItem onClick={handleCloseUserMenu}>
               <SettingsIcon className="mr-2" />
-              Account
+              <h2 className="mt-0.5 font-bold">Account</h2>
             </MenuItem>
           </NavLink>
 
           <NavLink to={`/achievement/${userData.login}`}>
             <MenuItem onClick={handleCloseUserMenu}>
               <EmojiEventsIcon className="mr-2" />
-              Achievement
+              <h2 className="mt-0.5 font-bold">Achievement</h2>
             </MenuItem>
           </NavLink>
 
@@ -470,7 +470,7 @@ function Header() {
           <div>
             <MenuItem onClick={handleLogout}>
               <LogoutIcon className="mr-2" />
-              Logout
+              <h2 className="mt-0.5 font-bold">Logout</h2>
             </MenuItem>
           </div>
         </Menu>

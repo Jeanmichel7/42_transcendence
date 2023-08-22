@@ -2,10 +2,12 @@ import * as React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Loaderperosnalized from '../utils/LoaderPerosnalized';
 
-const Login = React.lazy(() => import('../pages/Login'));
+// const Login = React.lazy(() => import('../pages/Login'));
+import Login from '../pages/Login';
 const Chat = React.lazy(() => import('../pages/Chat'));
 const Account = React.lazy(() => import('../pages/Account'));
-const Pong = React.lazy(() => import('../pages/Pong'));
+// const Pong = React.lazy(() => import('../pages/Pong'));
+import Pong from '../pages/Pong';
 const Profile = React.lazy(() => import('../pages/Profile'));
 const Error404 = React.lazy(() => import('../pages/Error404'));
 const FriendsPage = React.lazy(() => import('../pages/Friends'));

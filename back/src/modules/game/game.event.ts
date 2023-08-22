@@ -55,7 +55,7 @@ export class GameEvents {
         this.server.to(game.socketPlayer2Id).emit('gameUpdate', update);
         if (!game.isOver) game.isBeingProcessed = false;
       });
-    }, 1000 / 60);
+    }, 1000 / 30);
   }
 
   //conexion

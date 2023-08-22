@@ -5,7 +5,7 @@ import { Socket, io } from 'socket.io-client';
 import Lobby from '../components/Game/Lobby';
 import SearchingOpponent from '../components/Game/SearchingOpponent';
 import { Overlay } from '../components/Game/Overlay';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ApiErrorResponse, GameInterface } from '../types';
 import { getGame } from '../api/game';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +22,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { IconButton } from '@mui/material';
 import ChatWrapper from '../components/Game/Chat/ChatWrapper';
+import { TransitionCircle } from './Login';
 
 type GameWrapperProps = {
   chatOpen: boolean;
@@ -69,6 +70,8 @@ function Pong() {
   const [lobbyData, setLobbyData] = useState<GameCard[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
   const [pageContent, setPageContent] = useState<ReactNode>(null);
+  const location = useLocation();
+  const cameFromLogin = location.state?.fromLogin;
 
   const toggleChat = () => {
     setChatOpen(prevState => !prevState);
@@ -248,7 +251,8 @@ function Pong() {
   ]);
 
   return (
-    <div className="flex h-screen min-h-md relative w-full">
+    <div className="flex h-screen min-h-md relative w-full overflow-hidden">
+      {cameFromLogin && <TransitionCircle expand={false} />}
       <GameWrapper chatOpen={chatOpen}>
         {showOverlay && <Overlay />}
         {statusComponent}
