@@ -194,7 +194,7 @@ const MessageItem: FC<MessageItemProps> = ({
   useEffect(() => {
     const fctTime = setInterval(() => {
       setMessageTime(getTimeSince(message.createdAt));
-    }, 1000 * 30);
+    }, 1000 * 10);
     return () => {
       clearInterval(fctTime);
     };

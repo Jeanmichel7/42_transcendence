@@ -98,7 +98,7 @@ const useSocketConnection = (
         gameId: gameId.current!,
         useBonus: keyStateRef.current![' '],
       });
-    }, 1000 / 60);
+    }, 1000 / 30);
 
     socket.on('gameUpdate', (serverData: GameData) => {
       data.current = normalizeGameData(serverData);

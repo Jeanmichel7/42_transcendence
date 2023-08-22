@@ -49,7 +49,7 @@ export default function ChannelSearch() {
 
   const topRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [userPerPage, setUserPerPage] = useState(20);
+  const [userPerPage, setUserPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const dispatch = useDispatch();
 

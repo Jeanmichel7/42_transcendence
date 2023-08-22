@@ -16,7 +16,7 @@ import { NotificationEntity } from 'src/modules/notification/entity/notification
 import { TrophiesEntity } from 'src/modules/trophies/entity/trophies.entity';
 import { UserTrophiesEntity } from 'src/modules/trophies/entity/userTrophiesProgress.entity';
 
-type Rank =
+export type Rank =
   | 'cooper_3'
   | 'cooper_2'
   | 'cooper_1'
@@ -135,7 +135,7 @@ export class UserEntity extends BaseEntity {
 
   @Column({
     type: 'text',
-    default: 'cooper_1',
+    default: 'silver_2',
     nullable: true,
   })
   rank: Rank;

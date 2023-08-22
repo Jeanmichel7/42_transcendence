@@ -180,7 +180,7 @@ export const userSlice = createSlice({
         score: 1500,
         level: 0,
         experience: 0,
-        rank: 'cooper_1',
+        rank: 'silver_2',
       };
     },
 

@@ -6,7 +6,7 @@ import { Game } from './game.class';
 import { Repository } from 'typeorm';
 import { PlayerStats } from './game.class';
 
-import { UserEntity } from '../users/entity/users.entity';
+import { Rank, UserEntity } from '../users/entity/users.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { GameInterface, clientUpdate } from './interfaces/game.interface';
 import { BadRequestException } from '@nestjs/common';
@@ -733,19 +733,19 @@ export class GameService {
     return game;
   }
 
-  determineRank(scoreElo: number): string {
-    if (scoreElo < 1550) return 'cooper_1';
-    if (scoreElo < 1600) return 'cooper_2';
-    if (scoreElo < 1650) return 'cooper_3';
-    if (scoreElo < 1700) return 'silver_1';
-    if (scoreElo < 1800) return 'silver_2';
-    if (scoreElo < 1900) return 'silver_3';
-    if (scoreElo < 2000) return 'gold_1';
-    if (scoreElo < 2200) return 'gold_2';
-    if (scoreElo < 2400) return 'gold_3';
-    if (scoreElo < 2600) return 'master_1';
-    if (scoreElo < 2800) return 'master_2';
-    if (scoreElo < 3000) return 'master_3';
+  determineRank(scoreElo: number): Rank {
+    if (scoreElo < 1400) return 'cooper_3';
+    if (scoreElo < 1430) return 'cooper_2';
+    if (scoreElo < 1460) return 'cooper_1';
+    if (scoreElo < 1480) return 'silver_3';
+    if (scoreElo < 1500) return 'silver_2';
+    if (scoreElo < 1520) return 'silver_1';
+    if (scoreElo < 1540) return 'gold_3';
+    if (scoreElo < 1570) return 'gold_2';
+    if (scoreElo < 1600) return 'gold_1';
+    if (scoreElo < 1700) return 'master_3';
+    if (scoreElo < 1800) return 'master_2';
+    if (scoreElo < 2000) return 'master_1';
   }
 
   async updatePlayerStats(
@@ -771,6 +771,7 @@ export class GameService {
     player.status = 'online';
     player.score = scoreElo;
     player.updatedAt = new Date();
+    player.rank = this.determineRank(scoreElo);
     await this.userRepository.save(player);
   }
 

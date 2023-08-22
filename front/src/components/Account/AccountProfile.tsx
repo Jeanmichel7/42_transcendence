@@ -1,7 +1,11 @@
 import React, { useState, createRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setErrorSnackbar, setMsgSnackbar } from '../../store/snackbarSlice';
+import {
+  setErrorSnackbar,
+  setMsgSnackbar,
+  setPersonalizedErrorSnackbar,
+} from '../../store/snackbarSlice';
 import { setLogged, setUser } from '../../store/userSlice';
 import { Sticker } from '../../utils/StyledTitle';
 import AccountItem from './AccountItem';
@@ -35,20 +39,61 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Vérification de la taille (e.g. 5MB ici)
+    if (file.size > 5 * 1024 * 1024) {
+      dispatch(
+        setPersonalizedErrorSnackbar('File size should be less than 5MB'),
+      );
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const originalImage = new Image();
+      originalImage.src = reader.result as string;
+
+      originalImage.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = originalImage.width;
+        let height = originalImage.height;
+
+        if (width > 800 || height > 800) {
+          if (width > height) {
+            height = Math.round((height * 800) / width);
+            width = 800;
+          } else {
+            width = Math.round((width * 800) / height);
+            height = 800;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(originalImage, 0, 0, width, height);
+        const compressedImage = canvas.toDataURL('image/jpeg', 0.8); // 0.8 est le taux de qualité
+
+        setPreviewAvatar(compressedImage);
+      };
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleFileUpload = async () => {
-    const fileInput: HTMLInputElement | null = fileInputRef.current;
-    const formData: FormData = new FormData();
-    formData.append('avatar', fileInput?.files?.[0] as File);
+    if (!previewAvatar) return;
+
     setIsLoading(true);
+
+    // Convertir Data URL en Blob
+    const fetchRes = await fetch(previewAvatar);
+    const blob = await fetchRes.blob();
+
+    const formData: FormData = new FormData();
+    formData.append('avatar', blob, 'compressed_image.jpg'); // Nommez le fichier comme vous le souhaitez
+
     const updatedUser: UserInterface | ApiErrorResponse =
       await patchUserAccount(formData);
     if ('error' in updatedUser) {
@@ -84,7 +129,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
           score: 1500,
           level: 0,
           experience: 0,
-          rank: 'cooper_1',
+          rank: 'silver_2',
         }),
       );
       dispatch(setLogged(false));
@@ -118,13 +163,19 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
                   d="M26.6,12.9l-2.9-0.3c-0.2-0.7-0.5-1.4-0.8-2l1.8-2.3c0.2-0.2,0.1-0.5,0-0.7l-2.2-2.2c-0.2-0.2-0.5-0.2-0.7,0  l-2.3,1.8c-0.6-0.4-1.3-0.6-2-0.8l-0.3-2.9C17,3.2,16.8,3,16.6,3h-3.1c-0.3,0-0.5,0.2-0.5,0.4l-0.3,2.9c-0.7,0.2-1.4,0.5-2,0.8  L8.3,5.4c-0.2-0.2-0.5-0.1-0.7,0L5.4,7.6c-0.2,0.2-0.2,0.5,0,0.7l1.8,2.3c-0.4,0.6-0.6,1.3-0.8,2l-2.9,0.3C3.2,13,3,13.2,3,13.4v3.1  c0,0.3,0.2,0.5,0.4,0.5l2.9,0.3c0.2,0.7,0.5,1.4,0.8,2l-1.8,2.3c-0.2,0.2-0.1,0.5,0,0.7l2.2,2.2c0.2,0.2,0.5,0.2,0.7,0l2.3-1.8  c0.6,0.4,1.3,0.6,2,0.8l0.3,2.9c0,0.3,0.2,0.4,0.5,0.4h3.1c0.3,0,0.5-0.2,0.5-0.4l0.3-2.9c0.7-0.2,1.4-0.5,2-0.8l2.3,1.8  c0.2,0.2,0.5,0.1,0.7,0l2.2-2.2c0.2-0.2,0.2-0.5,0-0.7l-1.8-2.3c0.4-0.6,0.6-1.3,0.8-2l2.9-0.3c0.3,0,0.4-0.2,0.4-0.5v-3.1  C27,13.2,26.8,13,26.6,12.9z M15,19c-2.2,0-4-1.8-4-4c0-2.2,1.8-4,4-4s4,1.8,4,4C19,17.2,17.2,19,15,19z"
                 />
               </svg>
-              <DisplayImg
-                src={
-                  previewAvatar && openInputAvatar ? previewAvatar : user.avatar
-                }
-                alt="avatar"
-                className="mb-2 w-auto rounded-lg max-h-[200px] border-2 border-blue-500"
-              />
+              {previewAvatar && openInputAvatar ? (
+                <img
+                  src={previewAvatar}
+                  alt="preview"
+                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <DisplayImg
+                  src={user.avatar}
+                  alt={user.login + 'avatar'}
+                  className="mb-2 w-auto rounded-lg max-h-[200px] border-2 border-blue-500"
+                />
+              )}
 
               <div className="mt-3 flex flex-col items-center">
                 {openInputAvatar ? (
