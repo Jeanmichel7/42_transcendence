@@ -177,7 +177,6 @@ const MessageItem: FC<MessageItemProps> = ({
     else {
       navigate(extractGameId ? word : '/chat');
       if (notif) {
-        console.log('delete notif : ', notif);
         dispatch(reduxReadNotification(notif));
         dispatch(
           reduxRemoveNotification({

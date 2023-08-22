@@ -94,7 +94,6 @@ function PrivateLobby({ socket, gameId, isPlayer1 }: LobbyProps) {
         }
       }
     });
-    console.log('Notifictions: ', notifications);
   }, [dispatch, gameId, notifications, userData.id]);
 
   useEffect(() => {

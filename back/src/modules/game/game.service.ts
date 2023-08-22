@@ -488,7 +488,6 @@ export class GameService {
       throw new BadRequestException('You are not allowed to accept this game');
 
     if (game.player1.id === userId) {
-      console.log('player 1 already in room no invit');
       game.player1.status = 'in game';
       game.player1.updatedAt = new Date();
       await this.userRepository.save(game.player1);

@@ -107,10 +107,10 @@ export class AuthService {
 
     let user: UserInterface = null;
     if (await this.userAlreadyExist(userData42.email)) {
-      console.log('User already exist');
+      // console.log('User already exist');
       user = await this.findUserByMail(userData42.email);
     } else {
-      console.log('createOAuthUser');
+      // console.log('createOAuthUser');
       user = await this.usersService.createOAuthUser(userData42);
     }
 

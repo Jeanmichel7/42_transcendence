@@ -45,11 +45,13 @@ export function StatutBar({
       {bonusActive && (
         <BonusBox bonusIsLoading={bonusIsLoading} bonusName={bonusName} />
       )}
-      <DisplayImg
-        src={playersInfo?.playerLeftAvatar}
-        alt="avatar"
-        className="md:h-24 h-12 rounded-full"
-      />
+      {playersInfo && (
+        <DisplayImg
+          src={playersInfo?.playerLeftAvatar}
+          alt="avatar"
+          className="md:h-24 h-12 rounded-full"
+        />
+      )}
       <h2 className="md:text-xl font-bold  w-1/4 text-center  ">
         {playersInfo?.playerLeftUsername}
       </h2>
@@ -63,11 +65,13 @@ export function StatutBar({
         {playersInfo?.playerRightUsername}
       </h2>
 
-      <DisplayImg
-        src={playersInfo?.playerRightAvatar}
-        alt="avatar"
-        className="md:h-24 h-12 rounded-full"
-      />
+      {playersInfo && (
+        <DisplayImg
+          src={playersInfo?.playerRightAvatar}
+          alt="avatar"
+          className="md:h-24 h-12 rounded-full"
+        />
+      )}
 
       {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (
         <BonusBox

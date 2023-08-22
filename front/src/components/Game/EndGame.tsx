@@ -294,9 +294,7 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
 
   useEffect(() => {
     if (lastGameInfo.current && lastGameInfo.current.win) {
-      console.log('confetti');
       setTimeout(() => {
-        console.log('confetti CREATE');
         const myConfetti = confetti.create(
           document.getElementById('myCanvas') as HTMLCanvasElement,
           { useWorker: true, resize: true },

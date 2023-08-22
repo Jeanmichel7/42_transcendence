@@ -29,7 +29,6 @@ import { UserUpdateEvent } from '../notification/events/notification.event';
 import { TrophiesEntity } from 'config';
 import { trophies } from '../trophies/trophies.data';
 import { UserTrophiesEntity } from '../trophies/entity/userTrophiesProgress.entity';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -44,7 +43,6 @@ export class UsersService {
     @InjectRepository(UserTrophiesEntity)
     private readonly userTrophiesProgressRepository: Repository<UserTrophiesEntity>,
     private readonly eventEmitter: EventEmitter2,
-    private configService: ConfigService,
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {

@@ -132,7 +132,6 @@ export function Bonus({
       setIsBonusVisible(true);
       setPosition([posX, posY]);
     } else if (position[0] !== -1) {
-      console.log('bonus not detected');
       setIsBonusVisible(false);
       setBonusExplode(true);
     }
@@ -144,11 +143,6 @@ export function Bonus({
     </div>
   );
 }
-
-const explodeAnimation = keyframes`
-from { opacity: 1; }
-to { opacity: 0; }
-`;
 
 type RacketProps = {
   posY: number;
