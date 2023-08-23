@@ -8,6 +8,7 @@ const Chat = React.lazy(() => import('../pages/Chat'));
 const Account = React.lazy(() => import('../pages/Account'));
 // const Pong = React.lazy(() => import('../pages/Pong'));
 import Pong from '../pages/Pong';
+import About from '../pages/About';
 const Profile = React.lazy(() => import('../pages/Profile'));
 const Error404 = React.lazy(() => import('../pages/Error404'));
 const FriendsPage = React.lazy(() => import('../pages/Friends'));
@@ -69,6 +70,7 @@ const AppRoutes: React.FC = () => (
         <Route path="/account" element={<Account />} />
         <Route path="/achievement" element={<Achievement />} />
         <Route path="/achievement/:login" element={<Achievement />} />
+        <Route path="/about" element={<About />} />
         <Route path="*" element={<Error404 />} />
       </Routes>
     </React.Suspense>

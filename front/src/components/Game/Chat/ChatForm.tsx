@@ -6,18 +6,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 
 interface FormChannelProps {
-  setShouldScrollToBottom: React.Dispatch<React.SetStateAction<boolean>>;
   socket: Socket;
   gameId: string;
   type: string;
 }
 
-const FormPriveGameConv = ({
-  setShouldScrollToBottom,
-  socket,
-  gameId,
-  type,
-}: FormChannelProps) => {
+const FormPriveGameConv = ({ socket, gameId, type }: FormChannelProps) => {
   const [text, setText] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { userData } = useSelector((state: RootState) => state.user);
@@ -49,8 +43,6 @@ const FormPriveGameConv = ({
         message: text,
         avatar: userData.avatar,
       });
-
-      setShouldScrollToBottom(true);
       setText('');
     },
     [text],
@@ -60,12 +52,12 @@ const FormPriveGameConv = ({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setText(e.target.value);
     },
-    [],
+    [text],
   );
 
   return (
     <>
-      <form className="flex border-t-2 border-zinc-400 mt-2">
+      <form className="flex mt-2 ">
         <TextareaAutosize
           ref={textareaRef}
           name="text"
@@ -73,7 +65,7 @@ const FormPriveGameConv = ({
           onChange={handleChangeTextArea}
           onKeyDown={handleSubmit}
           placeholder="Type here..."
-          className="w-full p-2 rounded-sm m-1 shadow-lg font-sans resize-none"
+          className="w-full p-2 rounded-sm m-1 shadow-lg font-sans resize-none bg-inherit border-2 border-gray-300"
         />
         <IconButton
           className="flex justify-center items-center"

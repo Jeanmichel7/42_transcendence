@@ -41,7 +41,6 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Vérification de la taille (e.g. 5MB ici)
     if (file.size > 5 * 1024 * 1024) {
       dispatch(
         setPersonalizedErrorSnackbar('File size should be less than 5MB'),
@@ -74,7 +73,7 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
         canvas.width = width;
         canvas.height = height;
         ctx?.drawImage(originalImage, 0, 0, width, height);
-        const compressedImage = canvas.toDataURL('image/jpeg', 0.8); // 0.8 est le taux de qualité
+        const compressedImage = canvas.toDataURL('image/jpeg', 0.8);
 
         setPreviewAvatar(compressedImage);
       };
@@ -87,12 +86,11 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
 
     setIsLoading(true);
 
-    // Convertir Data URL en Blob
     const fetchRes = await fetch(previewAvatar);
     const blob = await fetchRes.blob();
 
     const formData: FormData = new FormData();
-    formData.append('avatar', blob, 'compressed_image.jpg'); // Nommez le fichier comme vous le souhaitez
+    formData.append('avatar', blob, 'compressed_image.jpg');
 
     const updatedUser: UserInterface | ApiErrorResponse =
       await patchUserAccount(formData);

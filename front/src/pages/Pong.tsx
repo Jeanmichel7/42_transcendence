@@ -307,12 +307,13 @@ function Pong() {
         </div>
       </div>
 
-      <div className={`h-full ${chatOpen ? 'w-1/4' : 'hidden'} bg-[#e5e5f2]`}>
+      <div className={`h-full ${chatOpen ? 'w-1/4' : 'hidden'} text-white`}>
         <ChatWrapper
           socket={socket}
           isSpectator={isSpectator}
           gameIdSpectator={gameIdInvitSpectate?.toString()}
           currentPage={currentPage}
+          setChatOpen={setChatOpen}
         />
       </div>
     </div>

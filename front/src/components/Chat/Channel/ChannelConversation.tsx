@@ -65,13 +65,14 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       useState<boolean>(false);
     const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] =
       useState<boolean>(false);
-    const bottomRef = useRef<HTMLDivElement>(null);
     const [allMessagesDisplayed, setAllMessagesDisplayed] =
       useState<boolean>(false);
+    const bottomRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useConnectionSocketChannel(
       socketRef.current,
-      id, //room id
+      id,
       userData.id,
       conv.id,
       setMessages,
@@ -84,8 +85,11 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       setShouldScrollToBottom(false);
 
       setIsLoadingPagination(true);
+      console.log('fetchOldMessages');
+
       const allMessages: ChatMsgInterface[] | ApiErrorResponse =
         await chatOldMessages(id, pageDisplay, offsetPagniation);
+      setIsLoadingPagination(false);
 
       if ('error' in allMessages) dispatch(setErrorSnackbar(allMessages));
       else {
@@ -93,7 +97,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         if (allMessages.length < 20) setAllMessagesDisplayed(true);
 
         //save pos scrool
-        const scrollContainer = document.querySelector('.overflow-y-auto');
+        const scrollContainer = scrollContainerRef.current;
         if (!scrollContainer) {
           setIsLoadingPagination(false);
           return;
@@ -106,6 +110,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         if (pageDisplay === 1) setMessages(reversedMessageFiltred);
         else setMessages(prev => [...reversedMessageFiltred, ...prev]);
 
+        if (!scrollContainer) return;
         //set pos scrool to top old messages
         requestAnimationFrame(() => {
           const newScrollHeight = scrollContainer.scrollHeight;
@@ -113,13 +118,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           setShouldScrollToBottom(true);
         });
       }
-      setIsLoadingPagination(false);
     }, [pageDisplay]);
 
     useEffect(() => {
       if (!room || !userData.id || userData.id === -1 || id === '-1') return;
       fetchOldMessages();
-    }, [fetchOldMessages, room?.id]);
+    }, [userData.id, id, fetchOldMessages]);
 
     const fetchRoomData = useCallback(async () => {
       if (conv == null) {
@@ -173,7 +177,6 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
               setWarningSnackbar('You are not in the room ' + conv.room.name),
             );
             navigate('/chat/channel');
-          } else {
           }
 
           // check if channel removed
@@ -272,6 +275,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                 className="overflow-y-auto max-h-[calc(100vh-110px)] h-full bg-[#efeff8] 
                 flex flex-col"
                 onScroll={handleScroll}
+                ref={scrollContainerRef}
               >
                 {/* display messages */}
                 {messages && userBlocked && (

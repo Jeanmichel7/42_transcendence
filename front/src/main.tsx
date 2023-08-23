@@ -21,8 +21,6 @@ const theme = createTheme({
       },
     },
   },
-
- 
 });
 
 const RootComponent =

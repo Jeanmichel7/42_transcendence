@@ -38,7 +38,7 @@ export function isRoomInterface(obj: any): obj is RoomInterface {
   return obj && obj.name !== undefined;
 }
 
-export function isConvAlreadyExist( // isConvEntityAlreadyExist
+export function isConvAlreadyExist(
   conv: UserInterface | RoomInterface,
   listConvs: ConversationInterface[],
 ): boolean {

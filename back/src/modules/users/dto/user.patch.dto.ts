@@ -6,6 +6,7 @@ import {
   MinLength,
   IsStrongPassword,
   IsEmail,
+  Max,
 } from 'class-validator';
 
 export class UserPatchDTO {
@@ -77,5 +78,8 @@ export class UserPatchDTO {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @Length(1, 256, {
+    message: 'The description must be between 1 and 256 characters',
+  })
   description?: string;
 }

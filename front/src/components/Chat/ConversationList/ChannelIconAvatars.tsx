@@ -96,13 +96,13 @@ const ConversationListRoomItemIcons = ({
           usersToDisplay.map((user, index) => (
             <div className="relative" key={user.id}>
               <div
-                style={{ left: `${-32 + 8 * index}px` }}
+                style={{ left: `${-32 + 12 * index}px` }}
                 className="absolute w-10 h-10"
               >
                 <DisplayImg
                   src={user.avatar}
                   alt="avatar"
-                  className={`w-10 h-10 rounded-full object-cover z-${index} border border-[#5f616f]`}
+                  className={`w-10 h-10 rounded-full object-cover z-${index} border-2 border-[#dfdfdf]`}
                 />
               </div>
             </div>

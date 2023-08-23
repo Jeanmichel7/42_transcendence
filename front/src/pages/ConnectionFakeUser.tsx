@@ -58,7 +58,7 @@ export default function AccountConnection() {
     return data;
   };
 
-  window.opener.postMessage({ msg: 'resize', width: 900, height: 550 }, '*');
+  window.opener.postMessage({ msg: 'resize', width: 900, height: 600 }, '*');
 
   return (
     <div className="bg-inherit">

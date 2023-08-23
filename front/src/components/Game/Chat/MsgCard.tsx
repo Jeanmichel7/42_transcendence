@@ -27,7 +27,7 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
   }, [userBlocked, data]);
 
   return (
-    <>
+    <div>
       {!isUserBlocked && (
         <div
           className={` my-1 flex items-center ${
@@ -47,7 +47,7 @@ const MessageCardChatGame = ({ data }: { data: MessageInterfaceTmp }) => {
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

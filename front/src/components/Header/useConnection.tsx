@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Socket, io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import {
   reduxAddConversationList,
   reduxAddNotReadMP,
@@ -35,10 +35,6 @@ const useConnection = () => {
   const userData: UserInterface = useSelector(
     (state: RootState) => state.user.userData,
   );
-  // const userIsLogged: boolean = useSelector(
-  //   (state: RootState) => state.user.isLogged,
-  // );
-  const socketRef = useRef<Socket>();
   const pathRef = useRef<string>(pathname);
 
   useEffect(() => {
@@ -46,48 +42,7 @@ const useConnection = () => {
   }, [pathname]);
 
   useEffect(() => {
-    /* MP */
-    socketRef.current?.on(
-      'notification_private_message',
-      (message: MessageInterface) => {
-        if (
-          pathRef.current.split('/')[1] === 'chat' &&
-          pathRef.current.split('/')[4] === message.ownerUser.id.toString()
-        )
-          return;
-
-        const snackbar: PutSnackbarInterface = {
-          open: true,
-          loginFrom: message.ownerUser.login,
-          message:
-            message.text.length > 10
-              ? message.text.substring(0, 7) + '...'
-              : message.text,
-          severity: 'info',
-          link:
-            '/chat/conv/x/' +
-            message.ownerUser.id +
-            '/' +
-            message.ownerUser.login,
-          avatar: message.ownerUser.avatar,
-        };
-        dispatch(setSnackbar(snackbar));
-        dispatch(
-          reduxAddNotReadMP({
-            userIdFrom: message.ownerUser.id,
-            userId: userData.id,
-          }),
-        );
-      },
-    );
-    return () => {
-      socketRef.current?.off('notification_private_message');
-    };
-  }, [userData.id, socketRef, dispatch]);
-
-  useEffect(() => {
     if (!userData.id || userData.id === -1) return;
-    // console.log('api url : ', API_URL);
     const socket = io('/notification', {
       withCredentials: true,
     });
@@ -232,10 +187,40 @@ const useConnection = () => {
       );
     });
 
-    socketRef.current = socket;
+    /* PRIVATE MESSAGE */
+    socket.on('notification_private_message', (message: MessageInterface) => {
+      console.log('message : ', message);
+      if (
+        pathRef.current.split('/')[1] === 'chat' &&
+        pathRef.current.split('/')[4] === message.ownerUser.id.toString()
+      )
+        return;
+
+      const snackbar: PutSnackbarInterface = {
+        open: true,
+        loginFrom: message.ownerUser.login,
+        message:
+          message.text.length > 10
+            ? message.text.substring(0, 7) + '...'
+            : message.text,
+        severity: 'info',
+        link:
+          '/chat/conv/x/' +
+          message.ownerUser.id +
+          '/' +
+          message.ownerUser.login,
+        avatar: message.ownerUser.avatar,
+      };
+      dispatch(setSnackbar(snackbar));
+      dispatch(
+        reduxAddNotReadMP({
+          userIdFrom: message.ownerUser.id,
+          userId: userData.id,
+        }),
+      );
+    });
 
     return () => {
-      // if (userIsLogged) return;
       socket.off('notification_friend_request');
       socket.off('notification_friend_request_accepted');
       socket.off('notification_friend_request_declined');
@@ -248,6 +233,7 @@ const useConnection = () => {
       socket.off('notification_game_invite');
       socket.off('notification_game_invite_accepted');
       socket.off('notification_game_invite_declined');
+      socket.off('notification_private_message');
       socket.disconnect();
     };
   }, [dispatch, userData.id]);

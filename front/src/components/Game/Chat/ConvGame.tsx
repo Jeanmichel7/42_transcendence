@@ -10,6 +10,7 @@ interface ConversationGameProps {
   socket: Socket;
   type: string;
   isSpectator: boolean;
+  setChatOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ConversationGame = ({
@@ -17,9 +18,9 @@ const ConversationGame = ({
   socket,
   type,
   isSpectator,
+  setChatOpen,
 }: ConversationGameProps) => {
   const [messages, setMessages] = useState<MessageInterfaceTmp[]>([]);
-  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const ConversationGame = ({
 
       socket.on('message', (data: MessageInterfaceTmp) => {
         setMessages(prev => [...prev, data]);
+        setChatOpen(true);
       });
     } catch (e) {
       // console.warn('error: ', e);
@@ -48,9 +50,8 @@ const ConversationGame = ({
     };
   }, [socket, gameId, type, isSpectator, location]);
 
-  // scroll to bottom
   useEffect(() => {
-    if (shouldScrollToBottom && bottomRef.current) {
+    if (bottomRef.current) {
       bottomRef.current.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
@@ -60,32 +61,17 @@ const ConversationGame = ({
   }, [messages]);
 
   return (
-    <>
-      <div className="flex flex-col h-full justify-between">
-        <h3 className="font-bold text-center text-xl py-2">{type} chat</h3>
-
-        <div className="overflow-y-auto max-h-[calc(100vh-117px)]">
-          {messages && (
-            <>
-              {messages.map((msg, i) => (
-                <MessageCardChatGame key={i} data={msg} />
-              ))}
-
-              {/* display form message */}
-              <div className="sticky bottom-0 bg-[#efeff8]">
-                <FormPriveGameConv
-                  setShouldScrollToBottom={setShouldScrollToBottom}
-                  socket={socket}
-                  gameId={gameId}
-                  type={type}
-                />
-              </div>
-            </>
-          )}
-          <div ref={bottomRef}></div>
-        </div>
+    <div className="flex flex-col h-full justify-between">
+      <h3 className="font-bold text-center text-xl py-2">{type} chat</h3>
+      <div className="flex-grow border-t-[1px] border-gray-100 mr-5"></div>
+      <div className="overflow-y-auto ">
+        {messages &&
+          messages.map((msg, i) => <MessageCardChatGame key={i} data={msg} />)}
+        <div ref={bottomRef}></div>
       </div>
-    </>
+
+      <FormPriveGameConv socket={socket} gameId={gameId} type={type} />
+    </div>
   );
 };
 

@@ -7,6 +7,7 @@ interface ChatWrapperProps {
   isSpectator: boolean;
   gameIdSpectator: string | undefined;
   currentPage: string;
+  setChatOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChatWrapper = ({
@@ -14,6 +15,7 @@ const ChatWrapper = ({
   isSpectator,
   gameIdSpectator,
   currentPage,
+  setChatOpen,
 }: ChatWrapperProps) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -29,9 +31,32 @@ const ChatWrapper = ({
         socket={socket}
         type={chatRoomType}
         isSpectator={isSpectator}
+        setChatOpen={setChatOpen}
       />
     </>
   );
 };
 
 export default ChatWrapper;
+
+/*
+  return (
+    <div className="h-full">
+      <ConversationGame
+        key={currentPage}
+        gameId={gameId}
+        socket={socket}
+        type={chatRoomType}
+        isSpectator={isSpectator}
+        setChatOpen={setChatOpen}
+      />
+      <div className="sticky bottom-0">
+        <FormPriveGameConv
+          socket={socket}
+          gameId={gameId}
+          type={chatRoomType}
+        />
+      </div>
+    </div>
+  );
+*/

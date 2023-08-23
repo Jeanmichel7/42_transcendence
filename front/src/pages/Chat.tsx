@@ -10,9 +10,11 @@ import { Divider } from '@mui/material';
 function Chat() {
   return (
     <div className="flex h-screen w-full min-h-md relative ">
-      <div className="h-full w-full max-w-[200px] min-w-fit bg-[#e5e5f2]">
+      <div className="h-full w-full max-w-[200px] min-w-fit bg-gray-200">
         <div className="w-full justify-center items-center">
-          <p className="p-[5px] bg-gray-300 text-blue-700 text-sm font-bold ">CHANNEL </p>
+          <p className="p-2 bg-gray-300 text-blue-700 text-sm font-bold ">
+            CHANNELS
+          </p>
           <ButtonCreateGroup />
           <ButtonInterfaceAddGroups />
         </div>

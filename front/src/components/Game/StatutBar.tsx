@@ -46,12 +46,13 @@ const StatutBar = ({
         {bonusActive && (
           <BonusBox bonusIsLoading={bonusIsLoading} bonusName={bonusName} />
         )}
-        {playersInfo && 
-        <DisplayImg
-          src={playersInfo?.playerLeftAvatar}
-          alt="avatar"
-          className="md:h-24 h-12 rounded-full"
-        />}
+        {playersInfo && (
+          <DisplayImg
+            src={playersInfo?.playerLeftAvatar}
+            alt="avatar"
+            className="md:h-24 h-12 rounded-full"
+          />
+        )}
         <h2 className="md:text-xl font-bold w-1/4 text-center truncate">
           {playersInfo?.playerLeftUsername}
         </h2>
@@ -63,12 +64,13 @@ const StatutBar = ({
         <h2 className="md:text-xl font-bold w-1/4 text-center truncate">
           {playersInfo?.playerRightUsername}
         </h2>
-        {playersInfo && 
-        <DisplayImg
-          src={playersInfo?.playerRightAvatar}
-          alt="avatar"
-          className="md:h-24 h-12 rounded-full"
-        />}
+        {playersInfo && (
+          <DisplayImg
+            src={playersInfo?.playerRightAvatar}
+            alt="avatar"
+            className="md:h-24 h-12 rounded-full"
+          />
+        )}
         {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (
           <BonusBox
             bonusIsLoading={bonusIsLoadingPlayerRight}
@@ -79,13 +81,27 @@ const StatutBar = ({
       </div>
     </StatutWrapper>
   );
-}
+};
 
 const areEqual = (prevProps: StatutBarProps, nextProps: StatutBarProps) => {
-  return ((
+  return (
     prevProps.scorePlayerLeft === nextProps.scorePlayerLeft &&
-    prevProps.scorePlayerRight === nextProps.scorePlayerRight) &&
-    prevProps.scorePlayerLeft !== 0 && prevProps.scorePlayerLeft !== 0
+    prevProps.scorePlayerRight === nextProps.scorePlayerRight &&
+    prevProps.bonusActive === nextProps.bonusActive &&
+    prevProps.bonusIsLoading === nextProps.bonusIsLoading &&
+    prevProps.bonusName === nextProps.bonusName &&
+    prevProps.bonusIsLoadingPlayerRight ===
+      nextProps.bonusIsLoadingPlayerRight &&
+    prevProps.bonusNamePlayerRight === nextProps.bonusNamePlayerRight &&
+    prevProps.spectateMode === nextProps.spectateMode &&
+    prevProps.playersInfo?.playerLeftAvatar ===
+      nextProps.playersInfo?.playerLeftAvatar &&
+    prevProps.playersInfo?.playerRightAvatar ===
+      nextProps.playersInfo?.playerRightAvatar &&
+    prevProps.playersInfo?.playerLeftUsername ===
+      nextProps.playersInfo?.playerLeftUsername &&
+    prevProps.playersInfo?.playerRightUsername ===
+      nextProps.playersInfo?.playerRightUsername
   );
 };
 
