@@ -236,10 +236,13 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
   }, [room.acceptedUsers]);
 
   return (
-    <div className="hidden md:block bg-gray-200">
+    <div
+      className="hidden md:block bg-gray-200 border-l-2 border-gray-300
+    h-full overflow-auto "
+    >
       {room.admins && (
         <>
-          <h3 className="font-bold text-blue-600 ml-1">
+          <h3 className="font-bold text-blue-600 p-1 bg-gray-300 text-center">
             ADMINS - {room.admins.length}
           </h3>
           {room.admins.map(user => (
@@ -250,7 +253,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
       {userWithoutAdmins && (
         <>
-          <h3 className="font-bold text-blue-600 ml-1">
+          <h3 className="font-bold text-blue-600 p-1 bg-gray-300 text-center">
             MEMBRES - {userWithoutAdmins.length}
           </h3>
           {userWithoutAdmins.map(user => (
@@ -261,7 +264,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
       {acceptedusersWithoudBot && acceptedusersWithoudBot.length > 0 && (
         <>
-          <h3 className="font-bold text-blue-600 ml-1">
+          <h3 className="font-bold text-blue-600 ml-1 bg-gray-300 text-center">
             WAITING - {acceptedusersWithoudBot.length}
           </h3>
           {acceptedusersWithoudBot.map(user => {

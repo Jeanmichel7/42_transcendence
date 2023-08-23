@@ -307,7 +307,9 @@ function Pong() {
         </div>
       </div>
 
-      <div className={`h-full ${chatOpen ? 'w-1/4' : 'hidden'} text-white`}>
+      <div
+        className={`${chatOpen ? 'w-1/4 max-w-[300px]' : 'hidden'} text-white`}
+      >
         <ChatWrapper
           socket={socket}
           isSpectator={isSpectator}

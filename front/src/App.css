@@ -27,3 +27,21 @@ div.font-extrabold,
 p.font-extrabold {
   font-family: 'Alegreya Sans SC', sans-serif;
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 30px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 30px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

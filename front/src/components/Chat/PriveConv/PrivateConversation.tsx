@@ -91,6 +91,7 @@ const PrivateConversation: React.FC = () => {
     else {
       dispatch(reduxResetNotReadMP({ userIdFrom: id, userId: userData.id }));
       if (allMessages.length === 0) return;
+
       //save pos scrool
       const scrollContainer = document.querySelector('.overflow-y-auto');
       if (!scrollContainer) return;
@@ -218,7 +219,6 @@ const PrivateConversation: React.FC = () => {
   }, [id, userFriend]);
 
   useEffect(() => {
-    console.log('userBlocked: ', userBlocked);
     if (id == -1 || !userBlocked) return;
     setIsBlocked(userBlocked.some(f => f.id == id));
   }, [id, userBlocked]);
@@ -323,115 +323,112 @@ const PrivateConversation: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex flex-col h-full justify-between">
-        <div className="flex w-full justify-between items-center text-lg text-blue text-center bg-slate-200">
-          <div className="mr-6">
+    <div className="flex flex-col h-full justify-between">
+      <div className="flex w-full justify-between items-center text-lg text-blue text-center bg-slate-200">
+        <div className="mr-6">
+          <Tooltip
+            title="Defi"
+            arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+            sx={{ p: 0, paddingX: 1, m: 0 }}
+          >
+            <IconButton
+              onClick={handleDefi}
+              color="success"
+              disabled={isLoadingDefi}
+            >
+              <SportsEsportsIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+
+        <p className="font-bold text-lg py-1">
+          <Link to={`/profile/${login}`}>{login.toUpperCase()}</Link>
+        </p>
+
+        <div>
+          {isFriend ? (
             <Tooltip
-              title="Defi"
+              title="Remove friend"
               arrow
               TransitionComponent={Zoom}
               TransitionProps={{ timeout: 600 }}
               sx={{ p: 0, paddingX: 1, m: 0 }}
             >
-              <IconButton
-                onClick={handleDefi}
-                color="success"
-                disabled={isLoadingDefi}
-              >
-                <SportsEsportsIcon />
+              <IconButton onClick={handleDeleteFriend} color="warning">
+                <PersonRemoveIcon />
               </IconButton>
             </Tooltip>
-          </div>
-
-          <p className="font-bold text-lg py-1">
-            <Link to={`/profile/${login}`}>{login.toUpperCase()}</Link>
-          </p>
-
-          <div>
-            {isFriend ? (
-              <Tooltip
-                title="Remove friend"
-                arrow
-                TransitionComponent={Zoom}
-                TransitionProps={{ timeout: 600 }}
-                sx={{ p: 0, paddingX: 1, m: 0 }}
-              >
-                <IconButton onClick={handleDeleteFriend} color="warning">
-                  <PersonRemoveIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip
-                title="Add friend"
-                arrow
-                TransitionComponent={Zoom}
-                TransitionProps={{ timeout: 600 }}
-                sx={{ p: 0, paddingX: 1, m: 0 }}
-              >
-                <IconButton onClick={handleAddFriend} color="success">
-                  <PersonAddIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-            {isBlocked ? (
-              <Tooltip
-                title="Unblock friend"
-                arrow
-                TransitionComponent={Zoom}
-                TransitionProps={{ timeout: 600 }}
-                sx={{ p: 0, paddingX: 1, m: 0 }}
-              >
-                <IconButton onClick={handleUnblockUser} color="warning">
-                  <BlockIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip
-                title="Block friend"
-                arrow
-                TransitionComponent={Zoom}
-                TransitionProps={{ timeout: 600 }}
-                sx={{ p: 0, paddingX: 1, m: 0 }}
-              >
-                <IconButton onClick={handleBlockUser} color="error">
-                  <BlockIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </div>
-          {isLoading && <CircularProgress />}
-        </div>
-
-        <div
-          className="overflow-y-auto max-h-[calc(100vh-108px)] bg-[#efeff8]"
-          onScroll={handleScroll}
-        >
-          {/* display messages */}
-          {messages && (
-            <div className="text-lg m-1 p-2 ">
-              {messages.map((message: MessageInterface) => (
-                <MessageItem
-                  key={message.id}
-                  message={message}
-                  isLoadingDeleteMsg={isLoadingDeleteMsg}
-                  handleDeleteMessage={handleDeleteMessage}
-                />
-              ))}
-
-              {/* display form message */}
-              <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
-                <FormPriveConv
-                  setShouldScrollToBottom={setShouldScrollToBottom}
-                />
-              </div>
-            </div>
+          ) : (
+            <Tooltip
+              title="Add friend"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+              sx={{ p: 0, paddingX: 1, m: 0 }}
+            >
+              <IconButton onClick={handleAddFriend} color="success">
+                <PersonAddIcon />
+              </IconButton>
+            </Tooltip>
           )}
-          <div ref={bottomRef}></div>
+          {isBlocked ? (
+            <Tooltip
+              title="Unblock friend"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+              sx={{ p: 0, paddingX: 1, m: 0 }}
+            >
+              <IconButton onClick={handleUnblockUser} color="warning">
+                <BlockIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip
+              title="Block friend"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+              sx={{ p: 0, paddingX: 1, m: 0 }}
+            >
+              <IconButton onClick={handleBlockUser} color="error">
+                <BlockIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
+        {isLoading && <CircularProgress />}
       </div>
-      {/* } */}
-    </>
+
+      <div
+        className="overflow-y-auto max-h-[calc(100vh-108px)]"
+        onScroll={handleScroll}
+      >
+        {/* display messages */}
+        {messages && (
+          <div className="text-lg m-1 p-2 ">
+            {messages.map((message: MessageInterface) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                isLoadingDeleteMsg={isLoadingDeleteMsg}
+                handleDeleteMessage={handleDeleteMessage}
+              />
+            ))}
+
+            {/* display form message */}
+            <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
+              <FormPriveConv
+                setShouldScrollToBottom={setShouldScrollToBottom}
+              />
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef}></div>
+      </div>
+    </div>
   );
 };
 

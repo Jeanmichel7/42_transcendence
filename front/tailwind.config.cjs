@@ -25,5 +25,23 @@ module.exports = {
       }),
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.custom-scrollbar::-webkit-scrollbar': {
+          width: '10px',
+        },
+        '.custom-scrollbar::-webkit-scrollbar-track': {
+          background: '#f1f1f1',
+        },
+        '.custom-scrollbar::-webkit-scrollbar-thumb': {
+          background: '#888',
+        },
+        '.custom-scrollbar::-webkit-scrollbar-thumb:hover': {
+          background: '#555',
+        },
+      };
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+  ],
 };

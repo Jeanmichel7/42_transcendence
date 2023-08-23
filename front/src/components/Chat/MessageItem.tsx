@@ -333,13 +333,15 @@ const MessageItem: FC<MessageItemProps> = ({
                     TransitionComponent={Zoom}
                     TransitionProps={{ timeout: 600 }}
                   >
-                    <IconButton
-                      onClick={handleDelete}
-                      color="warning"
-                      disabled={isLoadingDeleteMsg}
-                    >
-                      <CloseIcon />
-                    </IconButton>
+                    <span>
+                      <IconButton
+                        onClick={handleDelete}
+                        color="warning"
+                        disabled={isLoadingDeleteMsg}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </>
               )}
@@ -350,13 +352,15 @@ const MessageItem: FC<MessageItemProps> = ({
                   TransitionComponent={Zoom}
                   TransitionProps={{ timeout: 600 }}
                 >
-                  <IconButton
-                    onClick={handleDefi}
-                    color="success"
-                    disabled={isLoadingDefi}
-                  >
-                    <SportsEsportsIcon />
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      onClick={handleDefi}
+                      color="success"
+                      disabled={isLoadingDefi}
+                    >
+                      <SportsEsportsIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               )}
             </div>

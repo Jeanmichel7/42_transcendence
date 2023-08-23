@@ -48,10 +48,9 @@ export const useConnectionSocketChannel = (
   useEffect(() => {
     if (socket) {
       /* MESSAGE */
-      socket.on('chat_message', (message: ChatMsgInterface, acknowledge) => {
+      socket.on('chat_message', (message: ChatMsgInterface) => {
         setMessages(prevMessages => [...prevMessages, message]);
         setOffsetPagniation(prev => prev + 1);
-        acknowledge(true);
       });
 
       socket.on('chat_message_edit', message => {

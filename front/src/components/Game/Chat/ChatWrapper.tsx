@@ -24,23 +24,6 @@ const ChatWrapper = ({
   const chatRoomType = currentPage === 'searchOpponent' ? 'lobby' : currentPage;
 
   return (
-    <>
-      <ConversationGame
-        key={currentPage}
-        gameId={gameId}
-        socket={socket}
-        type={chatRoomType}
-        isSpectator={isSpectator}
-        setChatOpen={setChatOpen}
-      />
-    </>
-  );
-};
-
-export default ChatWrapper;
-
-/*
-  return (
     <div className="h-full">
       <ConversationGame
         key={currentPage}
@@ -50,13 +33,8 @@ export default ChatWrapper;
         isSpectator={isSpectator}
         setChatOpen={setChatOpen}
       />
-      <div className="sticky bottom-0">
-        <FormPriveGameConv
-          socket={socket}
-          gameId={gameId}
-          type={chatRoomType}
-        />
-      </div>
     </div>
   );
-*/
+};
+
+export default ChatWrapper;

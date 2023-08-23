@@ -94,23 +94,21 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
       if ('error' in allMessages) dispatch(setErrorSnackbar(allMessages));
       else {
         if (allMessages.length === 0) return;
-        if (allMessages.length < 20) setAllMessagesDisplayed(true);
 
         //save pos scrool
-        const scrollContainer = scrollContainerRef.current;
-        if (!scrollContainer) {
-          setIsLoadingPagination(false);
-          return;
-        }
+        const scrollContainer = document.querySelector('.overflow-y-auto');
+        if (!scrollContainer) return;
         const oldScrollHeight = scrollContainer.scrollHeight;
 
-        const reversedMessageFiltred = allMessages
-          .reverse()
-          .filter(message => !messages.some(msg => msg.id === message.id));
-        if (pageDisplay === 1) setMessages(reversedMessageFiltred);
-        else setMessages(prev => [...reversedMessageFiltred, ...prev]);
+        if (pageDisplay === 1) {
+          setMessages(allMessages.reverse());
+        } else {
+          const reversedMessageArray = allMessages
+            .reverse()
+            .filter(message => !messages.some(msg => msg.id === message.id));
+          setMessages(prev => [...reversedMessageArray, ...prev]);
+        }
 
-        if (!scrollContainer) return;
         //set pos scrool to top old messages
         requestAnimationFrame(() => {
           const newScrollHeight = scrollContainer.scrollHeight;
@@ -118,12 +116,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           setShouldScrollToBottom(true);
         });
       }
-    }, [pageDisplay]);
+    }, [id, conv, pageDisplay]);
 
     useEffect(() => {
       if (!room || !userData.id || userData.id === -1 || id === '-1') return;
       fetchOldMessages();
-    }, [userData.id, id, fetchOldMessages]);
+    }, [pageDisplay, userData.id, id, fetchOldMessages]);
 
     const fetchRoomData = useCallback(async () => {
       if (conv == null) {
@@ -198,7 +196,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
           console.error('WTF ?');
         }
       }
-    }, [dispatch, id, navigate, userData.id]);
+    }, [dispatch, id, name, navigate, userData.id]);
 
     useEffect(() => {
       if (!userData.id || userData.id == -1) return;
@@ -240,13 +238,8 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     //scrool top = fetch new page messages
     const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
       const element = e.target as HTMLDivElement;
-      if (
-        element.scrollTop === 0 &&
-        !isLoadingPagination &&
-        !allMessagesDisplayed
-      ) {
+      if (element.scrollTop === 0) {
         setPageDisplay(prev => prev + 1);
-        //display waiting message
       }
     };
 
@@ -272,8 +265,7 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
               </div>
 
               <div
-                className="overflow-y-auto max-h-[calc(100vh-110px)] h-full bg-[#efeff8] 
-                flex flex-col"
+                className="overflow-y-auto max-h-[calc(100vh-110px)]"
                 onScroll={handleScroll}
                 ref={scrollContainerRef}
               >
@@ -292,13 +284,14 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
                         />
                       ),
                     )}
+                    {/* display form message */}
+                    <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
+                      <FormChannel
+                        setShouldScrollToBottom={setShouldScrollToBottom}
+                      />
+                    </div>
                   </div>
                 )}
-                <div className="sticky bottom-0 px-1 pb-1 bg-[#efeff8]">
-                  <FormChannel
-                    setShouldScrollToBottom={setShouldScrollToBottom}
-                  />
-                </div>
                 <div ref={bottomRef}></div>
               </div>
             </div>

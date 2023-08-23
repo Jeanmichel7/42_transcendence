@@ -30,7 +30,6 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
         message,
         id,
       );
-      console.log('newMessage: ', newMessage);
       setIsSending(false);
       if ('error' in newMessage) {
         if (newMessage.error === 'Forbidden') setIsBlocked(true);
@@ -75,10 +74,6 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
     },
     [],
   );
-
-  useEffect(() => {
-    console.log('statusSendMsg updated:', statusSendMsg);
-  }, [statusSendMsg]);
 
   return (
     <>
