@@ -67,7 +67,7 @@ export function StatutBar({
           alt="avatar"
           className="md:h-24 h-12 rounded-full"
         />
-        {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (
+        {spectateMode && bonusActive && (
           <BonusBox
             bonusIsLoading={bonusIsLoadingPlayerRight}
             bonusName={bonusNamePlayerRight}
