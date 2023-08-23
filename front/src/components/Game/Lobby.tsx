@@ -7,6 +7,7 @@ import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { Socket } from 'socket.io-client';
 import { Sticker } from '../../utils/StyledTitle';
 import DisplayImg from '../../utils/displayImage';
+import keyDiagram from '../../assets/keyDiagram.png';
 
 export const fadeIn = keyframes`
   from {
@@ -164,7 +165,8 @@ function Lobby({
   }, []);
 
   const COLUMNS = 3;
-  const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
+  const fakeCardsCount =
+    lobbyData.length <= 2 ? COLUMNS - (lobbyData.length % COLUMNS) : 0;
   const fakeCards = Array.from({ length: fakeCardsCount });
   const handleCardClick = (gameId: number) => {
     setGameIdSpectate(gameId);

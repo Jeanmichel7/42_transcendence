@@ -7,7 +7,15 @@ import SearchIcon from '@mui/icons-material/Search';
 export function ButtonCreateGroup() {
   return (
     <Link to="/chat/createChannel" className="w-full">
-      <Button color="primary" className="w-full">
+      <Button
+        color="primary"
+        className="w-full"
+        sx={{
+          '&:hover': {
+            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+          },
+        }}
+      >
         <p className="mr-2 text-green-700 font-bold">Create</p>
         <AddCircleOutlineIcon color="success" />
       </Button>
@@ -18,7 +26,15 @@ export function ButtonCreateGroup() {
 export function ButtonInterfaceAddGroups() {
   return (
     <Link to="/chat/addChannels">
-      <Button color="primary" className="w-full">
+      <Button
+        color="primary"
+        className="w-full"
+        sx={{
+          '&:hover': {
+            backgroundColor: 'rgba(25, 118, 210, 0.15)',
+          },
+        }}
+      >
         <p className="mr-2 font-bold ">Search</p>
         <SearchIcon />
       </Button>

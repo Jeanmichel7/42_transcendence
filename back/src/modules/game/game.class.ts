@@ -12,7 +12,7 @@ const SCORE_FOR_WIN = 12;
 const INITIAL_BALL_SPEED = 0.25;
 const SPEED_INCREASE = 0.04;
 const BONUSES_TAB = [
-  { id: 'bigRacket', duration: 10000, timeStart: 0, activate: false },
+  { id: 'bigRacket', duration: 20000, timeStart: 0, activate: false },
   { id: 'slow', duration: 0, timeStart: 0, activate: false },
   { id: 'laser', duration: 10000, timeStart: 0, activate: false },
 ];
@@ -262,8 +262,12 @@ export class Game {
     }
     await new Promise(resolve => setTimeout(resolve, 3000));
 
+    // const bonus = {
+    //   ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+    // };
+
     const bonus = {
-      ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+      ...BONUSES_TAB[2],
     };
 
     if (this.bonusPlayer1Loading) {
@@ -335,7 +339,7 @@ export class Game {
         laserPosition1 <= this.racketRight + this.racketRightHeight
       ) {
         this.racketRightDamage += 1;
-        if (this.racketRightDamage >= 180) {
+        if (this.racketRightDamage >= 25) {
           this.racketRightHeight = 0;
           this.racketRightDamage = 0;
           this.player1Stats.numberOfLaserKills++;
@@ -349,7 +353,7 @@ export class Game {
         laserPosition2 <= this.racketLeft + this.racketLeftHeight
       ) {
         this.racketLeftDamage += 1;
-        if (this.racketLeftDamage >= 180) {
+        if (this.racketLeftDamage >= 25) {
           this.racketLeftHeight = 0;
           this.racketLeftDamage = 0;
           this.player2Stats.numberOfLaserKills++;

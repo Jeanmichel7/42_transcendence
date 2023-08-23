@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ButtonWrapper, StyledButton } from './Lobby';
 import { dotAnimation } from './Utils';
 import { Socket } from 'socket.io-client';
+import keyDiagram from '../../assets/keyDiagram.png';
 
 interface SearchingOpponentProps {
   socket: Socket;
@@ -34,7 +35,7 @@ const StyledCircle3 = styled(StyledCircle)`
   animation-delay: -0.32s;
 `;
 
-const FadingAnnimation = keyframes`
+const FadingAnimation = keyframes`
   0% {
     opacity: 0;
   }
@@ -46,12 +47,31 @@ const FadingAnnimation = keyframes`
   }
 `;
 
+const FadingAnimationControlScheme = keyframes`
+  0% {
+    opacity: 0;
+  }
+  50%{
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5;
+  }
+`;
+
+const FadeInControlScheme = styled.img`
+  opacity: 0;
+  width: 25%;
+  height: auto%;
+  animation: ${FadingAnimationControlScheme} 1s forwards;
+`;
+
 interface StyledButtonOrderProps {
   order: string;
 }
 
 const StyledButtonOrder = styled(StyledButton)<StyledButtonOrderProps>`
-  animation: ${FadingAnnimation} 1s ease-in-out forwards;
+  animation: ${FadingAnimation} 1s ease-in-out forwards;
   &::before {
     opacity: 0;
     transition: width 0.2s ease, opacity 1s ease-in-out;
@@ -193,6 +213,11 @@ function SearchingOpponent({
           </div>
         )}
       </ButtonWrapper>
+      <FadeInControlScheme
+        src={keyDiagram}
+        alt="key diagram"
+        className="w-1/4 mx-auto"
+      />
     </div>
   );
 }

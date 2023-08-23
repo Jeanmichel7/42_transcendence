@@ -37,6 +37,7 @@ export const Playground = styled.div`
   border: 10px 
   border: 0.2rem solid #fff;
   padding: 5em;
+  background-color: #1976d2;
   box-shadow: 0 0 .2rem #fff,
             0 0 .2rem #fff,
             0 0 2rem #bc13fe,
@@ -58,6 +59,8 @@ const INITIAL_BALL_SPEED = 0.25;
 // POSITION_THRESHOLD value for correction of ball position with server state
 const POSITION_THRESHOLD = 30;
 const SPEED_INCREASE = 0.04;
+const RACKET_SPEED = 20; // Vitesse normale
+const FINE_RACKET_SPEED = 5;
 
 // Variable constante for optimisation, don't change
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
@@ -461,17 +464,23 @@ function Game({
         animationFrameId = requestAnimationFrame(upLoop);
         return;
       }
+      const moveAmount = RACKET_SPEED * deltaTime;
+
       if (keyStateRef.current.ArrowDown) {
-        posRacket.current.left =
-          posRacket.current.left < 1000 - racketHeightRef.current.left
-            ? posRacket.current.left + 20
-            : posRacket.current.left;
+        const speed = keyStateRef.current.Shift
+          ? FINE_RACKET_SPEED
+          : RACKET_SPEED;
+        posRacket.current.left = Math.min(
+          1000 - racketHeightRef.current.left,
+          posRacket.current.left + speed,
+        );
       } else if (keyStateRef.current.ArrowUp) {
-        posRacket.current.left =
-          posRacket.current.left > 0
-            ? posRacket.current.left - 20
-            : posRacket.current.left;
+        const speed = keyStateRef.current.Shift
+          ? FINE_RACKET_SPEED
+          : RACKET_SPEED;
+        posRacket.current.left = Math.max(0, posRacket.current.left - speed);
       }
+
       setBall(oldBall => {
         const newBall = { ...oldBall };
 
