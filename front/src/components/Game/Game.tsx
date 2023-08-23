@@ -670,6 +670,11 @@ function Game({
         </Racket>
 
         {gameData.current?.isPaused && <DisconnectCountDown />}
+        {bonusValueRef.current && (
+          <p className="text-white  animate-pulse text-3xl absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
+            Press Espace to activate bonus
+          </p>
+        )}
       </Playground>
     </GameWrapper>
   );
