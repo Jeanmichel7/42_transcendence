@@ -28,23 +28,15 @@ const removeFriend = (state: UserState, userId: number) => {
 };
 
 // User blocked management
-const addUserBlocked = (state: UserState, userId: number) => {
-  const userToBlock: UserInterface | undefined = state.userFriends?.find(
-    u => u.id === userId,
-  );
-  if (!userToBlock) return;
-  if (!state.userBlocked) state.userBlocked = [userToBlock];
-  else state.userBlocked = [...state.userBlocked, userToBlock];
+const addUserBlocked = (state: UserState, user: UserInterface) => {
+  if (!state.userBlocked) state.userBlocked = [user];
+  else state.userBlocked = [...state.userBlocked, user];
 };
 
 const removeUserBlocked = (state: UserState, userId: number) => {
-  const userToUnBlock: UserInterface | undefined = state.userFriends?.find(
-    u => u.id === userId,
-  );
-  if (!userToUnBlock) return;
   if (!state.userBlocked) return;
   state.userBlocked = state.userBlocked.filter(
-    (userBlocked: UserInterface) => userBlocked.id !== userId,
+    (userBlocked: UserInterface) => userBlocked.id != userId,
   );
 };
 
@@ -213,9 +205,9 @@ export const userSlice = createSlice({
     reduxSetUserBlocked: (state, action: PayloadAction<UserInterface[]>) => {
       state.userBlocked = action.payload;
     },
-    reduxAddUserBlocked: (state, action: PayloadAction<number>) => {
+    reduxAddUserBlocked: (state, action: PayloadAction<UserInterface>) => {
       addUserBlocked(state, action.payload);
-      removeFriend(state, action.payload);
+      removeFriend(state, action.payload.id);
     },
     reduxRemoveUserBlocked: (state, action: PayloadAction<number>) => {
       removeUserBlocked(state, action.payload);

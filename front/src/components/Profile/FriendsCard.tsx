@@ -130,7 +130,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
       dispatch(setErrorSnackbar(res));
     } else {
       dispatch(setMsgSnackbar('User blocked'));
-      dispatch(reduxAddUserBlocked(userToBlock.id));
+      dispatch(reduxAddUserBlocked(userToBlock));
       if (userData.login == actualUserLogin && setFriends)
         setFriends((prev: UserInterface[]) =>
           prev.filter((f: UserInterface) => f.id !== userToBlock.id),
@@ -186,17 +186,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 alt={friend.login}
                 className="w-full h-32 object-cover"
               />
-              {/* <CardMedia
-                component="img"
-                image={friend.avatar}
-                alt={friend.login}
-                sx={{ height: 140, objectFit: 'cover' }}
-                onError={e => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = API_URL + '/avatars/defaultAvatar.png';
-                }}
-              /> */}
             </Badge>
           ) : (
             <DisplayImg
@@ -263,8 +252,25 @@ const FriendCard: React.FC<FriendCardProps> = ({
             <SportsEsportsIcon color="success" />
           </IconButton>
         </Tooltip>
-
-        {!isFriendOrRequestSent ? (
+        {userData.id != friend.id && (
+          <Tooltip
+            title={'Chat'}
+            arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
+          >
+            <div>
+              <IconButton
+                aria-label="chat friend"
+                sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
+                onClick={handleNavigateToChat}
+              >
+                <ChatIcon color="primary" />
+              </IconButton>
+            </div>
+          </Tooltip>
+        )}
+        {!isFriendOrRequestSent && (
           <Tooltip
             title={isRequestFriendSent() ? 'Waiting accept' : 'Add friend'}
             arrow
@@ -284,27 +290,6 @@ const FriendCard: React.FC<FriendCardProps> = ({
               </IconButton>
             </div>
           </Tooltip>
-        ) : (
-          <>
-            {userData.id != friend.id && (
-              <Tooltip
-                title={'Chat'}
-                arrow
-                TransitionComponent={Zoom}
-                TransitionProps={{ timeout: 600 }}
-              >
-                <div>
-                  <IconButton
-                    aria-label="chat friend"
-                    sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
-                    onClick={handleNavigateToChat}
-                  >
-                    <ChatIcon color="primary" />
-                  </IconButton>
-                </div>
-              </Tooltip>
-            )}
-          </>
         )}
 
         {userData && userData.login == actualUserLogin && (

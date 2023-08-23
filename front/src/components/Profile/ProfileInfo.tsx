@@ -81,7 +81,6 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
        font-bold rounded-t-lg box-border shadow-custom"
       >
         <span className="min-w-[300px]"></span>
-        <p className="ml-2"></p>
         <h2 className="text-3xl"> {user.firstName + ' ' + user.lastName} </h2>
         <div className="flex flex-row justify-center items-center mr-2">
           {userData.id &&
@@ -108,39 +107,42 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
                 </div>
               </Tooltip>
             )}
-
-          <Tooltip
-            title={'Chat'}
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <div>
-              <IconButton
-                aria-label="chat friend"
-                sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
-                onClick={handleNavigateToChat}
+          {userData.id && userData.id != user.id && (
+            <>
+              <Tooltip
+                title={'Chat'}
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
               >
-                <ChatIcon color="primary" />
-              </IconButton>
-            </div>
-          </Tooltip>
+                <div>
+                  <IconButton
+                    aria-label="chat friend"
+                    sx={{ margin: 0, padding: 0, paddingLeft: 1 }}
+                    onClick={handleNavigateToChat}
+                  >
+                    <ChatIcon color="primary" />
+                  </IconButton>
+                </div>
+              </Tooltip>
 
-          <Tooltip
-            title="Defi"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-            sx={{ p: 0, paddingX: 1, m: 0 }}
-          >
-            <IconButton
-              onClick={handleDefi}
-              color="success"
-              disabled={isLoading}
-            >
-              <SportsEsportsIcon />
-            </IconButton>
-          </Tooltip>
+              <Tooltip
+                title="Defi"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+                sx={{ p: 0, paddingX: 1, m: 0 }}
+              >
+                <IconButton
+                  onClick={handleDefi}
+                  color="success"
+                  disabled={isLoading}
+                >
+                  <SportsEsportsIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </div>
       </div>
       <div className="flex flex-col md:flex-row justify-between rounded-b-lg bg-white shadow-custom p-3 ">
@@ -164,37 +166,44 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               <p className="md:text-xl opacity-60 font-bold">Pseudo</p>
               <p className="md:text-xl opacity-60 font-bold">Email</p>
               <p className="md:text-xl opacity-60 font-bold">Status</p>
-              <p className="md:text-xl opacity-60 font-bold">Rank</p>
               <p className="md:text-xl opacity-60 font-bold">Score</p>
+              <p className="md:text-xl opacity-60 font-bold hidden md:block lg:hidden">
+                Rank
+              </p>
               <p className="md:text-xl opacity-60 font-bold">Level</p>
               <p className="md:text-xl opacity-60 font-bold">Experience</p>
             </div>
-            <div className="w-3/4 space-y-2 flex flex-col justify-between">
+            <div className="w-1/2 space-y-2 flex flex-col justify-between">
               <p className="md:text-xl">{user.login}</p>
               <p className="md:text-xl">{user.email}</p>
               <p className="md:text-xl">{user.status}</p>
-              <div className="flex items-center">
+              <div className="hidden md:flex lg:hidden items-center">
                 <img
                   src={ranksImages[user.rank]}
                   alt={user.rank}
                   className="h-8 w-8"
                 />
-                <p className="ml-2"> {user.rank.split('_').join(' ')} </p>
+                <span className="ml-2 text-md text-gray-600">
+                  ({user.rank.split('_').join(' ')})
+                </span>
               </div>
               <p className="md:text-xl">{Math.floor(user.score)}</p>
               <p className="md:text-xl">{user.level}</p>
-              <div className="flex justify-between items-center mr-2 lg:mr-24 max-w-sm">
-                <ExperienceBar
-                  currentExp={user.experience}
-                  currentLevel={user.level}
-                />
-              </div>
+              <ExperienceBar
+                currentExp={user.experience}
+                currentLevel={user.level}
+              />
             </div>
-            <img
-              src={cuteBallsClimbingVines}
-              alt="illustration"
-              className="absolute right-0 h-full hidden lg:block bottom-0"
-            />
+            <div className="w-1/4 flex flex-col justify-center items-center md:hidden lg:flex lg:justify-center lg:items-center">
+              <img
+                src={ranksImages[user.rank]}
+                alt={user.rank}
+                className="w-full max-h-[180px]"
+              />
+              <p className="italic text-gray-500 font-bold">
+                {user.rank.replace('_', ' ')}
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -20,6 +20,8 @@ import {
   Tab,
   Tabs,
   Theme,
+  Tooltip,
+  Zoom,
   useMediaQuery,
 } from '@mui/material';
 import FriendsSearch from '../components/Chat/ConversationList/outlet/FriendsSearchInterface';
@@ -129,7 +131,7 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className="bg-inherit">
+    <div className="bg-inherit h-full">
       <AppBar position="static">
         <div className="flex bg-gray-800 ">
           <Tabs
@@ -146,14 +148,14 @@ export default function FriendsPage() {
               label={'Online' + (onlineCount ? ' (' + onlineCount + ')' : '')}
               sx={{
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             />
             <Tab
               label={'All' + (friendsCount ? ' (' + friendsCount + ')' : '')}
               sx={{
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             />
             <Tab
@@ -163,7 +165,7 @@ export default function FriendsPage() {
               }
               sx={{
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             />
             <Tab
@@ -173,7 +175,7 @@ export default function FriendsPage() {
               }
               sx={{
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             />
             <Tab
@@ -182,7 +184,7 @@ export default function FriendsPage() {
               }
               sx={{
                 fontFamily: '"Alegreya Sans SC", sans-serif',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             />
             <Tab
@@ -190,35 +192,56 @@ export default function FriendsPage() {
               disabled
             />
           </Tabs>
-
-          <Button
-            sx={{
-              pr: 2,
-              m: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onClick={() => setViewType(viewType === 'grid' ? 'list' : 'grid')}
+          <Tooltip
+            title="Add friends"
+            arrow
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 600 }}
           >
-            {' '}
-            {viewType === 'grid' ? <ViewHeadlineIcon /> : <GridViewIcon />}
-          </Button>
+            <Button
+              aria-label="change view type"
+              sx={{
+                p: 0,
+                m: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onClick={() => {
+                setValue(5);
+                navigate(`?tab=${tabMapReverse[5]}`, { replace: true });
+                setViewType(viewType === 'grid' ? 'list' : 'grid');
+              }}
+            >
+              {viewType === 'grid' ? <ViewHeadlineIcon /> : <GridViewIcon />}
+            </Button>
+          </Tooltip>
 
           <Tab
-            label="Add Friend"
+            label={
+              <span
+                style={{
+                  padding: '8px',
+                  paddingInline: '20px',
+                  display: 'inline-block',
+                  color: '#00CB36',
+                  fontWeight: 'bold',
+                  border: '1px solid #00CB36',
+                  borderRadius: '8px',
+                }}
+              >
+                Add
+              </span>
+            }
             sx={{
-              color: '#00CB36',
-              fontWeight: 'bold',
-              border: '1px solid #00CB36',
-              borderRadius: '8px',
-                fontFamily: '"Alegreya Sans SC", sans-serif',
+              p: '0 !important',
+              m: '0 !important',
             }}
             onClick={() => {
               setValue(5);
               navigate(`?tab=${tabMapReverse[5]}`, { replace: true });
             }}
-          />
+          ></Tab>
         </div>
       </AppBar>
 

@@ -218,6 +218,7 @@ const PrivateConversation: React.FC = () => {
   }, [id, userFriend]);
 
   useEffect(() => {
+    console.log('userBlocked: ', userBlocked);
     if (id == -1 || !userBlocked) return;
     setIsBlocked(userBlocked.some(f => f.id == id));
   }, [id, userBlocked]);
@@ -230,37 +231,22 @@ const PrivateConversation: React.FC = () => {
     }
   };
 
+  /* USER RELATION */
   const handleBlockUser = async () => {
     setIsLoading(true);
+    const getUser: UserInterface | ApiErrorResponse = await getProfileByPseudo(
+      login,
+    );
+    if ('error' in getUser) return dispatch(setErrorSnackbar(getUser));
     const resBlockRequest: UserRelation | ApiErrorResponse = await apiBlockUser(
       id,
     );
-
     if ('error' in resBlockRequest) dispatch(setErrorSnackbar(resBlockRequest));
     else {
-      dispatch(reduxAddUserBlocked(id));
+      dispatch(reduxAddUserBlocked(getUser));
       dispatch(setMsgSnackbar('User blocked'));
     }
     setIsLoading(false);
-  };
-
-  const handleDeleteFriend = async () => {
-    setIsLoading(true);
-    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(id);
-    setIsLoading(false);
-
-    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
-      dispatch(setErrorSnackbar(resDeleteRequest));
-    else {
-      dispatch(reduxRemoveFriends(id));
-      dispatch(
-        reduxRemoveConversationToList({
-          convId: convId,
-          userId: userData.id,
-        }),
-      );
-      navigate('/chat');
-    }
   };
 
   const handleUnblockUser = async () => {
@@ -290,6 +276,26 @@ const PrivateConversation: React.FC = () => {
     }
   };
 
+  const handleDeleteFriend = async () => {
+    setIsLoading(true);
+    const resDeleteRequest: void | ApiErrorResponse = await deleteFriend(id);
+    setIsLoading(false);
+
+    if (typeof resDeleteRequest === 'object' && 'error' in resDeleteRequest)
+      dispatch(setErrorSnackbar(resDeleteRequest));
+    else {
+      dispatch(reduxRemoveFriends(id));
+      dispatch(
+        reduxRemoveConversationToList({
+          convId: convId,
+          userId: userData.id,
+        }),
+      );
+      navigate('/chat');
+    }
+  };
+
+  /* HANDLE MESSAGE*/
   const handleDeleteMessage = async (msgId: number) => {
     setIsLoadingDeleteMsg(true);
     const res: HttpStatusCode | ApiErrorResponse = await apiDeleteMessage(

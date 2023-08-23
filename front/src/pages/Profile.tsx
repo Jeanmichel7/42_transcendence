@@ -48,7 +48,7 @@ function Profile() {
           <CircularProgress />
         </div>
       ) : (
-        <div className="bg-[var(--background-color)] relative z-10 ">
+        <div className="bg-inherit relative z-10 ">
           <Box className="w-full">
             <ProfileInfo user={userProfile} />
             <ProfileFriends user={userProfile} />

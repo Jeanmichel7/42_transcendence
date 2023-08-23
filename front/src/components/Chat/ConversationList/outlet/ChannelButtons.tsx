@@ -30,7 +30,7 @@ export function ButtonInterfaceAddFriends() {
   return (
     <div className="bg-gray-300">
       <Link to="/chat/addFriends">
-        <Button color="primary">
+        <Button>
           <p className="mr-24 text-blue-700 font-bold "> add friends </p>
           <PersonAddOutlinedIcon color="success" />
         </Button>

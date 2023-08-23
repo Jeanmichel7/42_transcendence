@@ -35,7 +35,7 @@ const AllFriends = ({ userDataId }: AllFriendsProps) => {
 
     if ('error' in resBlockRequest) dispatch(setErrorSnackbar(resBlockRequest));
     else {
-      dispatch(reduxAddUserBlocked(userToBlock.id));
+      dispatch(reduxAddUserBlocked(userToBlock));
       dispatch(setMsgSnackbar('User blocked'));
     }
   };

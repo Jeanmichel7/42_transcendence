@@ -164,10 +164,8 @@ export default function FriendsSearch({ setHeight }: { setHeight: boolean }) {
         />
       )}
       <div
-        className={`flex flex-wrap justify-center 
-        overflow-auto ${
-          setHeight ? 'max-h-[calc(100vh-202px)]' : ''
-        } h-full px-2`}
+        className={`flex flex-wrap justify-center items-center
+        overflow-auto ${setHeight ? 'max-h-[calc(100vh-202px)]' : ''} px-2`}
       >
         <div ref={topRef} />
         {users.map((user: UserInterface) => {
@@ -175,6 +173,8 @@ export default function FriendsSearch({ setHeight }: { setHeight: boolean }) {
             return <FriendCard key={user.id} friend={user} />;
         })}
       </div>
+
+      <div className="flex-grow"></div>
 
       {/* Pagination  */}
       <div className="flex relative justify-center py-2">

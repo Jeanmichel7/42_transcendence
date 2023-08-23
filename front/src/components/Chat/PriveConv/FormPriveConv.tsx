@@ -21,7 +21,8 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
   useEffect(() => {
     const sendMessages = async () => {
       if (isSending) return;
-      if (messageQueue.length === 0) return setStatusSendMsg('');
+      if (messageQueue.length === 0) return;
+      setStatusSendMsg('sending');
       setIsSending(true);
       const message = messageQueue[0];
       setMessageQueue(prev => prev.slice(1));
@@ -29,12 +30,14 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
         message,
         id,
       );
+      console.log('newMessage: ', newMessage);
       setIsSending(false);
       if ('error' in newMessage) {
         if (newMessage.error === 'Forbidden') setIsBlocked(true);
         setStatusSendMsg(newMessage.message as string);
       } else {
         setShouldScrollToBottom(true);
+        setStatusSendMsg('');
       }
     };
     sendMessages();
@@ -61,7 +64,6 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
         return;
       }
       setMessageQueue(prev => (prev ? [...prev, text] : [text]));
-      setStatusSendMsg('sending');
       setText('');
     },
     [text],
@@ -73,6 +75,10 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
     },
     [],
   );
+
+  useEffect(() => {
+    console.log('statusSendMsg updated:', statusSendMsg);
+  }, [statusSendMsg]);
 
   return (
     <>
@@ -101,12 +107,12 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
         </Button>
 
         {/* display status send message */}
-        {statusSendMsg !== '' && (
+        {statusSendMsg == 'sending' && (
           <p
-            className={`${
-              statusSendMsg == 'sending' ? 'bg-yellow-500' : 'bg-red-500'
-            }
-          text-white p-1 rounded-md shadow-md flex whitespace-nowrap justify-center items-center px-2`}
+            className={`
+              text-white p-1 rounded-md shadow-md flex whitespace-nowrap justify-center items-center px-2 
+              bg-yellow-500
+            `}
             onClick={() => setStatusSendMsg('')}
           >
             {statusSendMsg}
@@ -114,7 +120,13 @@ const FormPriveConv = ({ setShouldScrollToBottom }: FormChannelProps) => {
           </p>
         )}
       </form>
-      <FormHelperText error>{isBlocked && 'Blocked relation'}</FormHelperText>
+      <FormHelperText error>
+        {isBlocked
+          ? 'Blocked relation'
+          : statusSendMsg != 'sending'
+          ? statusSendMsg
+          : ''}
+      </FormHelperText>
     </>
   );
 };
