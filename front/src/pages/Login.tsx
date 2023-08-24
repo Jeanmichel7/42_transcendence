@@ -55,7 +55,7 @@ const PingPongText = styled.span`
   bottom: 15vh;
   font-weight: bold;
   font-style: italic;
-  font-size: 2em;
+  font-size: 2rem;
   color: #ffffff;
   padding: 0.5em 1em;
   border-radius: 0.5em;
@@ -301,7 +301,15 @@ export default function Login() {
           Login
         </StyledLink>
       </TitleWrapper>
-      <PingPongText>Pong! Le jeu qui fait ping</PingPongText>
+      <PingPongText>
+        Welcome to Online Pong <br/>
+        {/* <ul>
+          <li className="text-[18px]"> Jrasser</li>
+          <li className="text-[18px]"> Ydumaine</li>
+          <li className="text-[18px]"> Wfermey</li>
+        </ul> */}
+        <span className="text-[20px]">By Jrasser, Ydumain, Wfermey</span>
+      </PingPongText>
     </LoginWrapper>
   );
 }

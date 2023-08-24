@@ -34,9 +34,9 @@ export const Playground = styled.div`
   height: 75%;
   bottom: 5%;
   position: absolute;
+  background-color: #000;
   border: 10px 
   border: 0.2rem solid #fff;
-  padding: 5em;
   box-shadow: 0 0 .2rem #fff,
             0 0 .2rem #fff,
             0 0 2rem #bc13fe,
@@ -57,7 +57,9 @@ export const GROUND_MAX_SIZE = 1000;
 const INITIAL_BALL_SPEED = 0.40;
 // POSITION_THRESHOLD value for correction of ball position with server state
 const POSITION_THRESHOLD = 30;
-const SPEED_INCREASE = 0.03;
+const SPEED_INCREASE = 0.04;
+const RACKET_SPEED = 20; // Vitesse normale
+const FINE_RACKET_SPEED = 5;
 
 // Variable constante for optimisation, don't change
 const RACKET_WIDTH_10 = RACKET_WIDTH * 10;
@@ -352,7 +354,9 @@ export const Laser = styled.div<LaserProps>`
 `;
 
 export const GameWrapper = styled.div`
-  animation: ${fadeIn} 2s ease;
+  animation: ${fadeIn} 1s ease-in-out;
+
+  width: 100%;
 `;
 
 export interface PlayersInfo {
@@ -461,17 +465,23 @@ function Game({
         animationFrameId = requestAnimationFrame(upLoop);
         return;
       }
+      const moveAmount = RACKET_SPEED * deltaTime;
+
       if (keyStateRef.current.ArrowDown) {
-        posRacket.current.left =
-          posRacket.current.left < 1000 - racketHeightRef.current.left
-            ? posRacket.current.left + 20
-            : posRacket.current.left;
+        const speed = keyStateRef.current.Shift
+          ? FINE_RACKET_SPEED
+          : RACKET_SPEED;
+        posRacket.current.left = Math.min(
+          1000 - racketHeightRef.current.left,
+          posRacket.current.left + speed,
+        );
       } else if (keyStateRef.current.ArrowUp) {
-        posRacket.current.left =
-          posRacket.current.left > 0
-            ? posRacket.current.left - 20
-            : posRacket.current.left;
+        const speed = keyStateRef.current.Shift
+          ? FINE_RACKET_SPEED
+          : RACKET_SPEED;
+        posRacket.current.left = Math.max(0, posRacket.current.left - speed);
       }
+
       setBall(oldBall => {
         const newBall = { ...oldBall };
 
@@ -532,31 +542,30 @@ function Game({
         newBall.y += newBall.vy * deltaTime;
 
         if (
-          Math.sign(newBall.vx) === Math.sign(gameData.current!.ball?.vx) ||
+          Math.sign(newBall.vx) === Math.sign(gameData.current!.ball.vx) ||
           newBall.vx === 0 ||
-          gameData.current?.ball?.vx === 0
+          gameData.current!.ball.vx === 0
         ) {
-          newBall.vx = gameData.current!.ball?.vx;
+          newBall.vx = gameData.current!.ball.vx;
         }
 
         if (
-          Math.sign(newBall.vy) === Math.sign(gameData.current!.ball?.vy) ||
+          Math.sign(newBall.vy) === Math.sign(gameData.current!.ball.vy) ||
           newBall.vy === 0 ||
-          gameData.current!.ball?.vy === 0
+          gameData.current!.ball.vy === 0
         ) {
-          newBall.vy = gameData.current!.ball?.vy;
+          newBall.vy = gameData.current!.ball.vy;
         }
         if (
-          Math.abs(newBall.x - gameData.current!.ball?.x) >
-            POSITION_THRESHOLD ||
-          Math.abs(newBall.y - gameData.current!.ball?.y) > POSITION_THRESHOLD
+          Math.abs(newBall.x - gameData.current!.ball.x) > POSITION_THRESHOLD ||
+          Math.abs(newBall.y - gameData.current!.ball.y) > POSITION_THRESHOLD
         ) {
           fail.current = false;
-          newBall.x = gameData.current!.ball?.x;
-          newBall.y = gameData.current!.ball?.y;
-          newBall.vx = gameData.current!.ball?.vx;
-          newBall.vy = gameData.current!.ball?.vy;
-          newBall.speed = gameData.current!.ball?.speed;
+          newBall.x = gameData.current!.ball.x;
+          newBall.y = gameData.current!.ball.y;
+          newBall.vx = gameData.current!.ball.vx;
+          newBall.vy = gameData.current!.ball.vy;
+          newBall.speed = gameData.current!.ball.speed;
         }
 
         return newBall;
@@ -611,7 +620,7 @@ function Game({
           socket={socket}
         />
       )}
-      <CountDown gameStarted={gameStarted} />
+      {!gameStarted && <CountDown />}
       <StatutBar
         playersInfo={playerInfo ? playerInfo : undefined}
         scorePlayerLeft={scorePlayers.current.left}
@@ -661,6 +670,11 @@ function Game({
         </Racket>
 
         {gameData.current?.isPaused && <DisconnectCountDown />}
+        {bonusValueRef.current && (
+          <p className="text-white  animate-pulse text-3xl absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
+            Press Espace to activate bonus
+          </p>
+        )}
       </Playground>
     </GameWrapper>
   );

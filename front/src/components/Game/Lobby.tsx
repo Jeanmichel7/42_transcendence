@@ -7,6 +7,7 @@ import { ClientToServerEvents, ServerToClientEvents } from './Interface';
 import { Socket } from 'socket.io-client';
 import { Sticker } from '../../utils/StyledTitle';
 import DisplayImg from '../../utils/displayImage';
+import keyDiagram from '../../assets/keyDiagram.png';
 
 export const fadeIn = keyframes`
   from {
@@ -36,12 +37,14 @@ export const StyledButton = styled.button<StyledButtonProps>`
   z-index: 10;
 
   &::before {
+    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+      0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
     content: '';
     position: absolute;
     top: 0;
     height: 5rem;
     width: 5rem;
-    background-color: #fff;
+    background-color: #000;
     border-radius: 3rem;
     transition: width 0.2s ease;
     z-index: -1;
@@ -56,7 +59,6 @@ export const StyledButton = styled.button<StyledButtonProps>`
     ${props =>
       props.activateEffect &&
       `
-    color: var(--color-primary);
       &::before {
         width: 139%;
       }
@@ -101,10 +103,12 @@ interface StyledCircleProps {
   pos: string;
 }
 const StyledCircle = styled.div<StyledCircleProps>`
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
   position: absolute;
   height: 5rem;
   width: 5rem;
-  background-color: #fff;
+  background-color: #000;
   border-radius: 3rem;
   z-index: 1;
   left: -20%;
@@ -164,7 +168,8 @@ function Lobby({
   }, []);
 
   const COLUMNS = 3;
-  const fakeCardsCount = COLUMNS - (lobbyData.length % COLUMNS);
+  const fakeCardsCount =
+    lobbyData.length <= 2 ? COLUMNS - (lobbyData.length % COLUMNS) : 0;
   const fakeCards = Array.from({ length: fakeCardsCount });
   const handleCardClick = (gameId: number) => {
     setGameIdSpectate(gameId);
@@ -203,6 +208,7 @@ function Lobby({
         >
           Normal Mode
         </StyledButton>
+
         <StyledButton
           activateEffect={enableEffect.bottom}
           onMouseOver={() => {
@@ -277,7 +283,7 @@ function Lobby({
           <div
             key={index}
             className={`border border-dashed rounded-lg h-44 m-4 w-72 bg-transparent ${
-              index > 0 ? 'hidden xl:block' : ''
+              index > 0 || lobbyData.length > 0 ? 'hidden xl:block' : ''
             }`}
           ></div>
         ))}

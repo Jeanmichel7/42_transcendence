@@ -65,13 +65,12 @@ const StatutBar = ({
           {playersInfo?.playerRightUsername}
         </h2>
         {playersInfo && (
-          <DisplayImg
-            src={playersInfo?.playerRightAvatar}
-            alt="avatar"
-            className="md:h-24 h-12 rounded-full"
-          />
-        )}
-        {spectateMode && bonusActive && bonusIsLoadingPlayerRight && (
+        <DisplayImg
+          src={playersInfo?.playerRightAvatar}
+          alt="avatar"
+          className="md:h-24 h-12 rounded-full"
+        />)}
+        {spectateMode && bonusActive && (
           <BonusBox
             bonusIsLoading={bonusIsLoadingPlayerRight}
             bonusName={bonusNamePlayerRight}

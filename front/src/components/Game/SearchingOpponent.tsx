@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { ButtonWrapper, StyledButton } from './Lobby';
 import { dotAnimation } from './Utils';
 import { Socket } from 'socket.io-client';
+import keyDiagram from '../../assets/keyDiagram.png';
 
 interface SearchingOpponentProps {
   socket: Socket;
@@ -16,7 +17,7 @@ interface StyledCircleProps {
 const StyledCircle = styled.div<StyledCircleProps>`
   height: 5rem;
   width: 5rem;
-  background-color: #fff;
+  background-color: #000;
   border-radius: 3rem;
   z-index: 1;
   transition: top 0.2s ease;
@@ -24,6 +25,8 @@ const StyledCircle = styled.div<StyledCircleProps>`
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
   animation: ${dotAnimation} 2s infinite ease-in-out both;
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
 
 const StyledCircle2 = styled(StyledCircle)`
@@ -34,7 +37,7 @@ const StyledCircle3 = styled(StyledCircle)`
   animation-delay: -0.32s;
 `;
 
-const FadingAnnimation = keyframes`
+const FadingAnimation = keyframes`
   0% {
     opacity: 0;
   }
@@ -46,12 +49,31 @@ const FadingAnnimation = keyframes`
   }
 `;
 
+const FadingAnimationControlScheme = keyframes`
+  0% {
+    opacity: 0;
+  }
+  50%{
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5;
+  }
+`;
+
+const FadeInControlScheme = styled.img`
+  opacity: 0;
+  height: 20%;
+  width: auto;
+  animation: ${FadingAnimationControlScheme} 1s forwards;
+`;
+
 interface StyledButtonOrderProps {
   order: string;
 }
 
 const StyledButtonOrder = styled(StyledButton)<StyledButtonOrderProps>`
-  animation: ${FadingAnnimation} 1s ease-in-out forwards;
+  animation: ${FadingAnimation} 1s ease-in-out forwards;
   &::before {
     opacity: 0;
     transition: width 0.2s ease, opacity 1s ease-in-out;
@@ -115,7 +137,7 @@ export const StyledOblong = styled.button<StyledOblongProps>`
   position: absolute;
   height: 5rem;
   animation: ${reduceSize} 1s ease-out forwards;
-  background-color: #fff;
+  background-color: #000;
   border-radius: 3rem;
   transition: width 0.2s ease;
   z-index: 1;
@@ -193,6 +215,11 @@ function SearchingOpponent({
           </div>
         )}
       </ButtonWrapper>
+      <FadeInControlScheme
+        src={keyDiagram}
+        alt="key diagram"
+        className="w-1/4 mx-auto"
+      />
     </div>
   );
 }
