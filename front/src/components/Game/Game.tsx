@@ -34,10 +34,9 @@ export const Playground = styled.div`
   height: 75%;
   bottom: 5%;
   position: absolute;
+  background-color: #000;
   border: 10px 
   border: 0.2rem solid #fff;
-  padding: 5em;
-  background-color: #1976d2;
   box-shadow: 0 0 .2rem #fff,
             0 0 .2rem #fff,
             0 0 2rem #bc13fe,
@@ -57,7 +56,7 @@ const BALL_RADIUS = BALL_DIAMETER / 2;
 export const GROUND_MAX_SIZE = 1000;
 const INITIAL_BALL_SPEED = 0.25;
 // POSITION_THRESHOLD value for correction of ball position with server state
-const POSITION_THRESHOLD = 30;
+const POSITION_THRESHOLD = 20;
 const SPEED_INCREASE = 0.04;
 const RACKET_SPEED = 20; // Vitesse normale
 const FINE_RACKET_SPEED = 5;
@@ -355,7 +354,9 @@ export const Laser = styled.div<LaserProps>`
 `;
 
 export const GameWrapper = styled.div`
-  animation: ${fadeIn} 2s ease;
+  animation: ${fadeIn} 1s ease-in-out;
+
+  width: 100%;
 `;
 
 export interface PlayersInfo {
@@ -541,31 +542,30 @@ function Game({
         newBall.y += newBall.vy * deltaTime;
 
         if (
-          Math.sign(newBall.vx) === Math.sign(gameData.current!.ball?.vx) ||
+          Math.sign(newBall.vx) === Math.sign(gameData.current!.ball.vx) ||
           newBall.vx === 0 ||
-          gameData.current?.ball?.vx === 0
+          gameData.current!.ball.vx === 0
         ) {
-          newBall.vx = gameData.current!.ball?.vx;
+          newBall.vx = gameData.current!.ball.vx;
         }
 
         if (
-          Math.sign(newBall.vy) === Math.sign(gameData.current!.ball?.vy) ||
+          Math.sign(newBall.vy) === Math.sign(gameData.current!.ball.vy) ||
           newBall.vy === 0 ||
-          gameData.current!.ball?.vy === 0
+          gameData.current!.ball.vy === 0
         ) {
-          newBall.vy = gameData.current!.ball?.vy;
+          newBall.vy = gameData.current!.ball.vy;
         }
         if (
-          Math.abs(newBall.x - gameData.current!.ball?.x) >
-            POSITION_THRESHOLD ||
-          Math.abs(newBall.y - gameData.current!.ball?.y) > POSITION_THRESHOLD
+          Math.abs(newBall.x - gameData.current!.ball.x) > POSITION_THRESHOLD ||
+          Math.abs(newBall.y - gameData.current!.ball.y) > POSITION_THRESHOLD
         ) {
           fail.current = false;
-          newBall.x = gameData.current!.ball?.x;
-          newBall.y = gameData.current!.ball?.y;
-          newBall.vx = gameData.current!.ball?.vx;
-          newBall.vy = gameData.current!.ball?.vy;
-          newBall.speed = gameData.current!.ball?.speed;
+          newBall.x = gameData.current!.ball.x;
+          newBall.y = gameData.current!.ball.y;
+          newBall.vx = gameData.current!.ball.vx;
+          newBall.vy = gameData.current!.ball.vy;
+          newBall.speed = gameData.current!.ball.speed;
         }
 
         return newBall;
@@ -620,7 +620,7 @@ function Game({
           socket={socket}
         />
       )}
-      <CountDown gameStarted={gameStarted} />
+      {!gameStarted && <CountDown />}
       <StatutBar
         playersInfo={playerInfo ? playerInfo : undefined}
         scorePlayerLeft={scorePlayers.current.left}

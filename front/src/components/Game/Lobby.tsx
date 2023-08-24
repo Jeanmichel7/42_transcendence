@@ -37,6 +37,8 @@ export const StyledButton = styled.button<StyledButtonProps>`
   z-index: 10;
 
   &::before {
+    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+      0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
     content: '';
     position: absolute;
     top: 0;
@@ -102,6 +104,8 @@ interface StyledCircleProps {
   pos: string;
 }
 const StyledCircle = styled.div<StyledCircleProps>`
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
   position: absolute;
   height: 5rem;
   width: 5rem;
@@ -205,6 +209,7 @@ function Lobby({
         >
           Normal Mode
         </StyledButton>
+
         <StyledButton
           activateEffect={enableEffect.bottom}
           onMouseOver={() => {
@@ -279,7 +284,7 @@ function Lobby({
           <div
             key={index}
             className={`border border-dashed rounded-lg h-44 m-4 w-72 bg-transparent ${
-              index > 0 ? 'hidden xl:block' : ''
+              index > 0 || lobbyData.length > 0 ? 'hidden xl:block' : ''
             }`}
           ></div>
         ))}

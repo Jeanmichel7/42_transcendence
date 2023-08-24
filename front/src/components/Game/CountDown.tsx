@@ -25,29 +25,18 @@ const CountdownWrapper = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: 10;
 `;
-interface NumberProps {
-  visible: boolean;
-}
 
-const Number = styled.span<NumberProps>`
+const Number = styled.span`
   font-size: 8em;
   color: #;
-  animation: ${props => (props.visible ? css`${fadeAndZoomIn} 1s ease-out` : 'none')};
-  opacity: ${props => (props.visible ? 1 : 0)};
+  animation: ${fadeAndZoomIn} 1s ease-out;
   transition: opacity 0.3s ease-out;
 `;
 
-const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
-  const [visible, setVisible] = useState(false);
+const Countdown = () => {
   const [count, setCount] = useState(3);
-  useEffect(() => {
-    if (gameStarted) {
-      setVisible(false);
-    } else {
-      setVisible(true);
-    }
-  }, [gameStarted]);
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -61,9 +50,7 @@ const Countdown = ({ gameStarted }: { gameStarted: boolean }) => {
 
   return (
     <CountdownWrapper>
-      <Number visible={visible} key={count}>
-        {count > 0 ? count : 'Go!'}
-      </Number>
+      <Number key={count}>{count > 0 ? count : 'Go!'}</Number>
     </CountdownWrapper>
   );
 };

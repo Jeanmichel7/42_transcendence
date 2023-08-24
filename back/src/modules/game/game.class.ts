@@ -331,7 +331,6 @@ export class Game {
     // Assuming laser position is always in the center of the racket
     const laserPosition1 = this.racketLeft + this.racketLeftHeight / 2;
     const laserPosition2 = this.racketRight + this.racketRightHeight / 2;
-
     if (this.player1Laser) {
       // Check if the laser is within the height range of the right racket
       if (

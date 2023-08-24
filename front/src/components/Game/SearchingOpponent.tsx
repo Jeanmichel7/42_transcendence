@@ -25,6 +25,8 @@ const StyledCircle = styled.div<StyledCircleProps>`
     return props.top === 'top' ? 'top: 0%;' : ' top: calc(100% - 5rem);';
   }}
   animation: ${dotAnimation} 2s infinite ease-in-out both;
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe,
+    0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 `;
 
 const StyledCircle2 = styled(StyledCircle)`
@@ -61,8 +63,8 @@ const FadingAnimationControlScheme = keyframes`
 
 const FadeInControlScheme = styled.img`
   opacity: 0;
-  width: 25%;
-  height: auto%;
+  height: 20%;
+  width: auto;
   animation: ${FadingAnimationControlScheme} 1s forwards;
 `;
 

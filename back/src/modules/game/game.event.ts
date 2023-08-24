@@ -102,13 +102,11 @@ export class GameEvents {
     @MessageBody() gameId: bigint,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('VALEUR DE GAME ID', gameId);
     Object.keys(client.rooms).forEach(roomId => {
       if (roomId !== client.id) {
         client.leave(roomId);
       }
     });
-    console.log(`spectating game ${gameId}`);
     client.join(`gameRoom-${gameId}`);
   }
 
