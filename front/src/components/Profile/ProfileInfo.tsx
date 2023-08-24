@@ -201,7 +201,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
               <img
                 src={ranksImages[user.rank]}
                 alt={user.rank}
-                className="w-full max-h-[180px]"
+                className="w-auto max-h-[180px]"
               />
               <p className="italic text-gray-500 font-bold">
                 {user.rank.replace('_', ' ')}
