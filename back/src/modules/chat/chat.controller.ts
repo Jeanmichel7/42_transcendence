@@ -204,7 +204,11 @@ export class ChatController {
     );
 
     setTimeout(async () => {
-      await this.ChatService.demuteUser(roomId, userIdToBeMuted);
+      try {
+        await this.ChatService.demuteUser(roomId, userIdToBeMuted);
+      } catch (e) {
+        console.log(e);
+      }
     }, parseInt(muteDurationSec) * 1000);
 
     return result;

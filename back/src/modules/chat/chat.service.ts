@@ -840,17 +840,20 @@ export class ChatService {
       select: ['id', 'type'],
       relations: ['users', 'mutedUsers'],
     });
-
+    console.log('room : ', room);
     if (!room.mutedUsers.find(muted => muted.id === userIdToBeDemuted))
       throw new ConflictException(
         `User ${userIdToBeDemuted} is not muted in room ${roomId}`,
       );
+    console.log('wtf jte vois pas' );
+
 
     const userToBeDemuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeDemuted },
       select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
+    console.log('user : ', userToBeDemuted);
 
     if (!userToBeDemuted)
       throw new NotFoundException(`User ${userIdToBeDemuted} not found`);

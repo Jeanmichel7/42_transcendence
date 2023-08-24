@@ -235,8 +235,10 @@ export class UsersService {
     const result: UserEntity = await this.userRepository.findOneBy({
       login: newUser.login,
     });
-    if (result)
+    if (result) {
+      console.log('la on throw une erreur');
       throw new ConflictException(`Login ${newUser.login} already exists`);
+    }
     try {
       const salt: string = await bcrypt.genSalt();
       const hash: string = await bcrypt.hash(newUser.password, salt);

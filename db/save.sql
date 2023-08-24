@@ -1302,10 +1302,10 @@ COPY public.users (id, "firstName", "lastName", login, email, password, role, av
 653	Pauline	Mueller	Pauline_Mueller66	Pauline77@hotmail.com	$2b$10$R4PnkrJYLjW/zC5yRgukEu42DLdO4xaHHho5fQElFZsGfvXNGHWoy	user	https://loremflickr.com/640/480/people?lock=66907260583936	Voluptatibus at dolore.	f	offline	\N	2023-08-21 22:16:40.138137	2023-08-22 13:07:13.628	2023-08-22 00:14:52.455	1528	4	180	0	0	0	0	0	36	0	gold_3
 656	Sara	Wiza	Sara_Wiza79	Sara.Wiza@hotmail.com	$2b$10$ZHW4g5vXfQZ0HHG5W70Cae5HOwRGSA0O/ymZT7KTApm50fuH2SyPC	user	https://loremflickr.com/640/480/people?lock=8269245968285696	Beatae cumque eos dolorem ullam at in.	f	offline	\N	2023-08-21 22:17:56.929376	2023-08-22 13:07:13.868	2023-08-22 00:11:31.488	1457	3	80	0	0	0	0	0	20	0	cooper_1
 652	Marilyn	Funk	Marilyn_Funk	Marilyn91@gmail.com	$2b$10$sW5dQhc46Aj6/F9fhWuyN.qF4szstqyTw4izV9mwCZG2w18fnZbZ6	user	https://loremflickr.com/640/480/people?lock=5249448787574784	Mollitia exercitationem distinctio eos magnam animi facilis.	f	offline	\N	2023-08-21 22:16:25.151917	2023-08-22 13:07:13.943	2023-08-22 00:12:12.264	1509	3	100	0	0	0	4	0	19	0	silver_1
-655	Elias	Heller	Elias29	Elias_Heller@gmail.com	$2b$10$BulSbNS6IDT5iKs7v78edO28tsd8Lljq65VJupbHmmsbLmJLmwGuW	user	https://loremflickr.com/cache/resized/65535_52614673091_2dbd1f91d4_320_240_nofilter.jpg	Itaque harum voluptates eos.	f	offline	\N	2023-08-21 22:17:13.58553	2023-08-22 13:07:13.736	2023-08-22 00:09:00.847	1402	3	100	0	0	0	0	0	28	0	cooper_2
-657	Lonnie	Welch	LonnieWelch	Lonnie.Welch62@gmail.com	$2b$10$AHdPPCdBQJt2FADVSshe5eVAZa3suf22eL7lMz2HmGkd8HpglncIe	user	https://loremflickr.com/cache/resized/65535_52627358729_53d4fef048_320_240_nofilter.jpg	Repellendus rerum facilis sed doloremque.	f	offline	\N	2023-08-21 22:18:22.882673	2023-08-22 13:07:13.927	2023-08-22 00:14:34.423	1476	3	90	0	0	0	0	0	19	0	silver_3
-659	Bradley	Pollich	Bradley_Pollich	Bradley.Pollich@hotmail.com	$2b$10$FIsWuuT4VXaJ48fhvcu1l.ImhjZJbyRZgWHBPy87NBOVcGxYcgkTK	user	https://loremflickr.com/cache/resized/65535_52313481544_4bf829068e_c_320_240_nofilter.jpg	Provident modi placeat eveniet minima.	f	offline	\N	2023-08-21 22:19:13.719386	2023-08-22 13:07:13.802	2023-08-22 00:04:37.586	1568	5	210	0	0	0	1	0	31	0	gold_2
-658	Ora	Weber	OraWeber	Ora.Weber84@yahoo.com	$2b$10$ifkNUk1RgyNhW6aY0uLkJeVoBO5hSGtBJ7J69cHEMazdj8ezeGXMO	user	https://loremflickr.com/cache/resized/65535_52219978770_6256f11dc9_320_240_nofilter.jpg	Deleniti laudantium inventore.	f	inactive	\N	2023-08-21 22:18:59.314227	2023-08-22 14:32:18.121	2023-08-22 13:31:48.865	1493	3	100	0	0	0	1	0	19	0	silver_2
+655	Elias	Heller	Elias29	Elias_Heller@gmail.com	$2b$10$BulSbNS6IDT5iKs7v78edO28tsd8Lljq65VJupbHmmsbLmJLmwGuW	user	https://loremflickr.com/640/480/people?lock=4413012997832704	Itaque harum voluptates eos.	f	offline	\N	2023-08-21 22:17:13.58553	2023-08-22 13:07:13.736	2023-08-22 00:09:00.847	1402	3	100	0	0	0	0	0	28	0	cooper_2
+657	Lonnie	Welch	LonnieWelch	Lonnie.Welch62@gmail.com	$2b$10$AHdPPCdBQJt2FADVSshe5eVAZa3suf22eL7lMz2HmGkd8HpglncIe	user	https://loremflickr.com/640/480/people?lock=2336006837633024	Repellendus rerum facilis sed doloremque.	f	offline	\N	2023-08-21 22:18:22.882673	2023-08-22 13:07:13.927	2023-08-22 00:14:34.423	1476	3	90	0	0	0	0	0	19	0	silver_3
+658	Ora	Weber	OraWeber	Ora.Weber84@yahoo.com	$2b$10$ifkNUk1RgyNhW6aY0uLkJeVoBO5hSGtBJ7J69cHEMazdj8ezeGXMO	user	https://loremflickr.com/640/480/people?lock=4086842330710016	Deleniti laudantium inventore.	f	offline	\N	2023-08-21 22:18:59.314227	2023-08-24 10:52:56.234	2023-08-22 13:31:48.865	1493	3	100	0	0	0	1	0	19	0	silver_2
+659	Bradley	Pollich	Bradley_Pollich	Bradley.Pollich@hotmail.com	$2b$10$FIsWuuT4VXaJ48fhvcu1l.ImhjZJbyRZgWHBPy87NBOVcGxYcgkTK	user	https://loremflickr.com/640/480/people?lock=7720313211060224	Provident modi placeat eveniet minima.	f	offline	\N	2023-08-21 22:19:13.719386	2023-08-22 13:07:13.802	2023-08-22 00:04:37.586	1568	5	210	0	0	0	1	0	31	0	gold_2
 \.
 
 
@@ -1451,14 +1451,14 @@ SELECT pg_catalog.setval('public.trophies_id_seq', 460, true);
 -- Name: trophies_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.trophies_progress_id_seq', 4044, true);
+SELECT pg_catalog.setval('public.trophies_progress_id_seq', 4149, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 678, true);
+SELECT pg_catalog.setval('public.users_id_seq', 683, true);
 
 
 --
