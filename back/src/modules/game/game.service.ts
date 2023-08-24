@@ -896,6 +896,7 @@ export class GameService {
       .createQueryBuilder('games')
       .leftJoinAndSelect('games.player1', 'player1')
       .leftJoinAndSelect('games.player2', 'player2')
+      .leftJoinAndSelect('games.winner', 'winner')
       .where(
         '(games.player1.id = :userId OR games.player2.id = :userId) AND games.status = :status',
         {
@@ -912,7 +913,7 @@ export class GameService {
         eloscore: isPlayer1 ? game.eloScorePlayer1 : game.eloScorePlayer2,
         exp: isPlayer1 ? game.expPlayer1 : game.expPlayer2,
         level: isPlayer1 ? game.levelPlayer1 : game.levelPlayer2,
-        win: isPlayer1 ? game.scorePlayer1 > game.scorePlayer2 : false,
+        win: game.winner.id == userId,
       };
     });
 
