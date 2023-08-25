@@ -61,6 +61,54 @@ Pour démarrer l'application:
 ---
 
 
+### Gallerie
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/login.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+     <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/account.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/profile1.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+     <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/profile2.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/lobbygame.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/game.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+     <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/gamebonus.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/leaderboard.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/channel.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/channelAdmin.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+     <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/messagerie.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+    <td>
+      <img src="https://github.com/Jeanmichel7/42_transcendence/blob/imageReadme/imageReadme/searchFriends.png?raw=true" alt="Alt text for image 1"/>
+    </td>
+  </tr>
+</table>
+
 ### 👥 Contributeurs
 
 - [Jean-Michel](https://github.com/Jeanmichel7)
