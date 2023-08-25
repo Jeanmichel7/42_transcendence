@@ -143,6 +143,7 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({ room }) => {
         <p className={'text-center'}> invite </p>
         <ArrowBackIosNewOutlinedIcon
           className={`${openEdit ? 'rotate-0' : 'rotate-180'}`}
+          fontSize="small"
         />
       </Button>
       <Collapse in={openEdit}>

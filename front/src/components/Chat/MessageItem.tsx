@@ -295,7 +295,10 @@ const MessageItem: FC<MessageItemProps> = ({
                   const formatedLine = formatingLine(line);
 
                   return (
-                    <span key={index}>
+                    <span
+                      key={index}
+                      className={`${message.ownerUser.id == 0 ? 'italic' : ''}`}
+                    >
                       {formatedLine}
                       {index !== message.text.split('\n').length - 1 && <br />}
                     </span>

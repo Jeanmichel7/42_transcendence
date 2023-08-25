@@ -245,13 +245,13 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
         ) : (
           <div className="flex h-full">
             <div className="flex flex-grow flex-col h-full justify-between">
-              <div className="w-full flex text-lg justify-between">
+              <div className="w-full flex text-lg justify-between items-center bg-gray-200">
                 {room && isAdmin ? (
                   <InvitationRoom room={room} />
                 ) : (
                   <span></span>
                 )}
-                <p className="font-bold text-lg py-1">{name.toUpperCase()}</p>
+                <p className="font-bold text-lg">{name.toUpperCase()}</p>
                 {room && isAdmin ? (
                   <SideBarAdmin room={room} convId={conv.id} />
                 ) : (

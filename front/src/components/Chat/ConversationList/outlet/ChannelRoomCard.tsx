@@ -100,7 +100,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
     <Card elevation={10} className="m-2 w-[220px] relative">
       {/* The owner badge */}
       {isOwner && (
-        <div className="absolute top-6 right-6 bg-blue-500 text-white py-1 px-10 transform rotate-45 translate-x-1/2 -translate-y-1/2 shadow-md font-bold">
+        <div className="absolute top-6 right-6 bg-violet-500 text-white py-1 px-10 transform rotate-45 translate-x-1/2 -translate-y-1/2 shadow-md font-bold">
           Owner
         </div>
       )}

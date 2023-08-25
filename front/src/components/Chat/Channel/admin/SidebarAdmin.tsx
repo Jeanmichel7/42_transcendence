@@ -186,6 +186,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
       <Button className="text-blue-500" onClick={handleOpenEdit}>
         <ArrowBackIosNewOutlinedIcon
           className={`${openEdit && 'rotate-180'}`}
+          fontSize="small"
         />
         <p className={'text-center'}> admin </p>
       </Button>
@@ -198,12 +199,13 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
             transition: 'transform 400ms ease-in-out',
           }}
         >
-          <div className="bg-white pt-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
+          <div className="bg-white font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
             {isOwner && (
               <Box
                 sx={{
                   bgcolor: 'background.paper',
                   pb: 1,
+                  pt: 1,
                 }}
               >
                 {isOpenRenameMenu && (
@@ -392,18 +394,76 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
               </Box>
             )}
 
-            {room.users &&
-              room.users.map((user: UserInterface) => (
-                <AdminUserCard
-                  key={user.id}
-                  user={user}
-                  room={room}
-                  timeToMute={timeToMute}
-                />
-              ))}
+            <p className="italic text-sm font-bold py-1 text-blue-600 bg-gray-200">
+              Owner
+            </p>
+            <AdminUserCard
+              key={room.ownerUser?.id}
+              user={room.ownerUser as UserInterface}
+              room={room}
+              timeToMute={timeToMute}
+            />
+
+            {room.admins && room.admins.length > 0 && (
+              <>
+                <p className="italic text-sm font-bold py-1 text-blue-600 bg-gray-200">
+                  Admins
+                </p>
+                {room.admins
+                  .filter(u => u.id != room.ownerUser?.id)
+                  .map((user: UserInterface) => (
+                    <AdminUserCard
+                      key={user.id}
+                      user={user}
+                      room={room}
+                      timeToMute={timeToMute}
+                    />
+                  ))}
+              </>
+            )}
+            {room.users && (
+              <>
+                <p className="italic text-sm py-1 font-bold text-blue-600 bg-gray-200">
+                  Members
+                </p>
+                {room.users
+                  .filter(u => u.id != room.ownerUser?.id)
+                  .filter(u => !room.admins?.some(a => a.id === u.id))
+                  .map((user: UserInterface) => (
+                    <AdminUserCard
+                      key={user.id}
+                      user={user}
+                      room={room}
+                      timeToMute={timeToMute}
+                    />
+                  ))}
+              </>
+            )}
+
+            {room.acceptedUsers && (
+              <>
+                <p className="italic text-sm py-1 font-bold text-green-600 bg-gray-200">
+                  Invited
+                </p>
+                {room.acceptedUsers
+                  .filter(u => u.id != room.ownerUser?.id)
+                  .filter(u => !room.admins?.some(a => a.id === u.id))
+                  .map((user: UserInterface) => (
+                    <AdminUserCard
+                      key={user.id}
+                      user={user}
+                      room={room}
+                      timeToMute={timeToMute}
+                    />
+                  ))}
+              </>
+            )}
+
             {room.bannedUsers && room.bannedUsers.length > 0 && (
               <>
-                <p className="italic text-sm py-1">banned</p>
+                <p className="italic text-sm py-1 font-bold text-red-600 bg-gray-200">
+                  banned
+                </p>
                 {room.bannedUsers.map((user: UserInterface) => (
                   <AdminUserCard
                     key={user.id}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getLeaderboard } from '../api/leaderBoard';
 import { UserInterface } from '../types';
 import { Sticker } from '../utils/StyledTitle';
-import { getAllUsersCount } from '../api/user';
+import { getAllUsersRanked } from '../api/user';
 import { setErrorSnackbar } from '../store/snackbarSlice';
 import { useDispatch } from 'react-redux';
 import {
@@ -29,7 +29,7 @@ const LeaderBoard = () => {
       setIsLoading(true);
 
       const [userCountRes, leaderBoardRes] = await Promise.all([
-        getAllUsersCount(),
+        getAllUsersRanked(),
         getLeaderboard(currentPage, userPerPage),
       ]);
 
@@ -112,14 +112,16 @@ const LeaderBoard = () => {
         </div>
 
         <div>
-          {leaderBoard.map((user: UserInterface, index: number) => (
-            <LeaderboardCard
-              key={user.id}
-              user={user}
-              indexUser={index}
-              classement={index + 1 + (currentPage - 1) * userPerPage}
-            />
-          ))}
+          {leaderBoard
+            // .filter(u => u.)
+            .map((user: UserInterface, index: number) => (
+              <LeaderboardCard
+                key={user.id}
+                user={user}
+                indexUser={index}
+                classement={index + 1 + (currentPage - 1) * userPerPage}
+              />
+            ))}
         </div>
 
         <div className="flex-grow"></div>

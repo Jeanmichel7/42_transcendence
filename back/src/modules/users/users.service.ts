@@ -6,7 +6,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import {
   createWriteStream,
@@ -209,6 +209,13 @@ export class UsersService {
 
   async countAllUsers(): Promise<number> {
     const count: number = await this.userRepository.count();
+    return count;
+  }
+
+  async countAllUsersRanked(): Promise<number> {
+    const count: number = await this.userRepository.count({
+      where: { numberOfGamesPlayed: Not(0) },
+    });
     return count;
   }
 
@@ -514,9 +521,11 @@ export class UsersService {
         'users.level',
         'users.rank',
         'users.experience',
+        'users.numberOfGamesPlayed',
       ])
       .orderBy('users.score', 'DESC')
       .where('users.login != :login', { login: 'Bot' })
+      .andWhere('users.numberOfGamesPlayed > 0')
       .skip((page - 1) * limit)
       .take(limit)
       .getMany();

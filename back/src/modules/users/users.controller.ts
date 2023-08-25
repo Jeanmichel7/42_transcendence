@@ -144,6 +144,12 @@ export class UsersController {
   /*                   LEADERBOARD                    */
   /* ************************************************ */
 
+  @Get('leaderboard/all-ranked')
+  async countAllUsersRanked(): Promise<number> {
+    const result: number = await this.usersService.countAllUsersRanked();
+    return result;
+  }
+
   @Get('leaderboard')
   async getLeaderboard(
     @Req() req: RequestWithUser,

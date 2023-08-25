@@ -196,7 +196,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
           )}
           <Divider />
           {/* </Badge> */}
-          <CardContent sx={{ padding: 1 }}>
+          <CardContent sx={{ padding: 1, Height: '120px' }}>
             <Typography
               gutterBottom
               variant="h2"
@@ -205,7 +205,8 @@ const FriendCard: React.FC<FriendCardProps> = ({
                 marginBottom: 2,
                 fontSize: '1.1rem',
                 overflow: 'hidden',
-                textOverflow: 'nowrap',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
                 textAlign: 'center',
                 fontWeight: 'bold',
                 fontFamily: '"Alegreya Sans SC", sans-serif',

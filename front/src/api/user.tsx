@@ -79,6 +79,14 @@ export async function getAllUsersCount(): Promise<number | ApiErrorResponse> {
   );
 }
 
+export async function getAllUsersRanked(): Promise<number | ApiErrorResponse> {
+  return apiRequest<number>(
+    'get',
+    '/users/leaderboard/all-ranked',
+    'Failed to get all users count: ',
+  );
+}
+
 export async function deleteAccount(): Promise<void | ApiErrorResponse> {
   return apiRequest<void>('delete', '/users', 'Failed to delete account: ');
 }

@@ -216,19 +216,21 @@ interface ChatMembersProps {
 }
 
 const ChatMembers = ({ room }: ChatMembersProps) => {
-  const [userWithoutAdmins, setUserWithoutAdmins] = useState<
-    UserInterface[] | null
-  >(null);
+  const [userAdmins, setUserAdmins] = useState<UserInterface[]>([]);
+  const [userWithoutAdmins, setUserWithoutAdmins] = useState<UserInterface[]>(
+    [],
+  );
   const [acceptedusersWithoudBot, setAcceptedUsersWithoutBot] = useState<
-    UserInterface[] | null
-  >(null);
+    UserInterface[]
+  >([]);
 
   useEffect(() => {
     if (!room.admins || !room.users) return;
     setUserWithoutAdmins(
       room.users.filter(u => !room.admins?.some(a => a.id === u.id)),
     );
-  }, [room.admins, room.users]);
+    setUserAdmins(room.admins.filter(a => a.id !== room.ownerUser?.id));
+  }, [room.admins, room.ownerUser?.id, room.users]);
 
   useEffect(() => {
     if (!room.acceptedUsers) return;
@@ -237,15 +239,23 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
   return (
     <div
-      className="hidden md:block bg-gray-200 border-l-2 border-gray-300
+      className="hidden md:block md:min-w-[180px] bg-gray-200 border-l-2 border-gray-300
       overflow-auto"
     >
+      <h3 className="font-bold text-blue-600 p-1 mb-1 bg-gray-300 text-center">
+        Owner
+      </h3>
+      <MembersCard
+        key={room.ownerUser?.id}
+        user={room.ownerUser as UserInterface}
+      />
+
       {room.admins && (
         <>
-          <h3 className="font-bold text-blue-600 p-1 mb-1 bg-gray-300 text-center">
-            ADMINS - {room.admins.length}
+          <h3 className="font-bold text-blue-600 p-1 my-1 bg-gray-300 text-center">
+            ADMINS - {userAdmins.length}
           </h3>
-          {room.admins.map(user => (
+          {userAdmins.map(user => (
             <MembersCard key={user.id} user={user} />
           ))}
         </>
@@ -265,7 +275,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
       {acceptedusersWithoudBot && acceptedusersWithoudBot.length > 0 && (
         <>
           <h3 className="font-bold text-blue-600 p-1 my-1 bg-gray-300 text-center">
-            WAITING - {acceptedusersWithoudBot.length}
+            INVITED - {acceptedusersWithoudBot.length}
           </h3>
           {acceptedusersWithoudBot.map(user => {
             if (user.id === 0) return null;
