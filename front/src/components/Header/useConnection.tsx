@@ -189,7 +189,6 @@ const useConnection = () => {
 
     /* PRIVATE MESSAGE */
     socket.on('notification_private_message', (message: MessageInterface) => {
-      console.log('message : ', message);
       if (
         pathRef.current.split('/')[1] === 'chat' &&
         pathRef.current.split('/')[4] === message.ownerUser.id.toString()

@@ -236,7 +236,6 @@ export class UsersService {
       login: newUser.login,
     });
     if (result) {
-      console.log('la on throw une erreur');
       throw new ConflictException(`Login ${newUser.login} already exists`);
     }
     try {

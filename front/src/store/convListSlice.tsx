@@ -127,6 +127,26 @@ const helperUpdateConversationList = (
   return false;
 };
 
+const helperAddUserMutelist = (
+  state: ChatState,
+  item: UserInterface,
+  roomId: number,
+) => {
+  const indexConvToUpdate = state.conversationsList.findIndex(
+    conv => conv.room.id === roomId,
+  );
+  if (indexConvToUpdate !== -1) {
+    const currentMutedUsers =
+      state.conversationsList[indexConvToUpdate].room.mutedUsers || [];
+    state.conversationsList[indexConvToUpdate].room.mutedUsers = [
+      ...currentMutedUsers,
+      item,
+    ];
+    return true;
+  }
+  return false;
+};
+
 const helperUpdatePrivateConversationList = (
   state: ChatState,
   item: UserInterface,
@@ -240,6 +260,47 @@ export const chatSlice = createSlice({
       }
     },
 
+    reduxAddMuteUserInRoom: (
+      state,
+      action: PayloadAction<{
+        roomId: number;
+        userToBeMuted: UserInterface;
+        userId: number;
+      }>,
+    ) => {
+      // console.log('REDUX ADD MUTE USER IN ROOM', action.payload);
+      const { roomId, userToBeMuted, userId } = action.payload;
+      helperAddUserMutelist(state, userToBeMuted, roomId);
+      localStorage.setItem(
+        'conversationsList' + userId,
+        JSON.stringify(state.conversationsList),
+      );
+    },
+    reduxRemoveMutedUserInRoom: (
+      state,
+      action: PayloadAction<{
+        roomId: number;
+        userToBeRemoved: UserInterface;
+        userId: number;
+      }>,
+    ) => {
+      // console.log('REDUX REMOVE USER IN ROOM', action.payload);
+      const { roomId, userToBeRemoved, userId } = action.payload;
+      const indexConvToUpdate = state.conversationsList.findIndex(
+        conv => conv.room.id === roomId,
+      );
+      if (indexConvToUpdate !== -1) {
+        state.conversationsList[indexConvToUpdate].room.mutedUsers =
+          state.conversationsList[indexConvToUpdate].room.mutedUsers?.filter(
+            (user: UserInterface) => user.id !== userToBeRemoved.id,
+          );
+        localStorage.setItem(
+          'conversationsList' + userId,
+          JSON.stringify(state.conversationsList),
+        );
+      }
+    },
+
     /* MP */
     reduxAddNotReadMP: (
       state,
@@ -288,6 +349,8 @@ export const {
   reduxAddNotReadMP,
   reduxResetNotReadMP,
   reduxUpdatePrivateConvList,
+  reduxAddMuteUserInRoom,
+  reduxRemoveMutedUserInRoom,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

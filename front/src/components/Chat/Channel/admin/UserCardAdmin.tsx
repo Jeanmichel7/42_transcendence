@@ -34,13 +34,18 @@ import {
 import { PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../../../store';
 import DisplayImg from '../../../../utils/displayImage';
+import {
+  reduxAddMuteUserInRoom,
+  reduxRemoveMutedUserInRoom,
+} from '../../../../store/convListSlice';
 
 interface UserCardProps {
   user: UserInterface;
   room: RoomInterface;
+  timeToMute: number;
 }
 
-const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
+const AdminUserCard: React.FC<UserCardProps> = ({ user, room, timeToMute }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -59,7 +64,16 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if (room.admins) setIsAdmin(room.admins.some(u => u.id === user.id));
     if (room.mutedUsers)
       setIsMuted(room.mutedUsers.some(u => u.id === user.id));
-  }, [room, room.ownerUser, room.admins, room.users, user, userData.id]);
+  }, [
+    room,
+    room.ownerUser,
+    room.admins,
+    room.users,
+    room.mutedUsers,
+    room.bannedUsers,
+    user,
+    userData.id,
+  ]);
 
   useEffect(() => {
     if (userData.id && room.ownerUser)
@@ -82,13 +96,28 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     const result: RoomInterface | ApiErrorResponse = await muteUser(
       room.id,
       user.id,
-      20,
-    ); //20sec
+      timeToMute,
+    );
     if ('error' in result) {
       dispatch(setErrorSnackbar(result));
     } else {
-      setIsMuted(true);
+      dispatch(
+        reduxAddMuteUserInRoom({
+          roomId: room.id,
+          userToBeMuted: user,
+          userId: userData.id,
+        }),
+      );
       dispatch(setMsgSnackbar('User muted'));
+      setTimeout(() => {
+        dispatch(
+          reduxRemoveMutedUserInRoom({
+            roomId: room.id,
+            userToBeRemoved: user,
+            userId: userData.id,
+          }),
+        );
+      }, timeToMute * 1000);
     }
     setIsLoading(false);
   };
@@ -113,7 +142,13 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     if ('error' in result) {
       dispatch(setErrorSnackbar(result));
     } else {
-      setIsMuted(false);
+      dispatch(
+        reduxRemoveMutedUserInRoom({
+          roomId: room.id,
+          userToBeRemoved: user,
+          userId: userData.id,
+        }),
+      );
       dispatch(setMsgSnackbar('User unmuted'));
     }
     setIsLoading(false);
@@ -256,6 +291,10 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
     setIsLoading(false);
   };
 
+  // useEffect(() => {
+  //   isMutedRef.current = isMuted;
+  // }, [isMuted]);
+
   return (
     <div>
       <div
@@ -331,113 +370,119 @@ const AdminUserCard: React.FC<UserCardProps> = ({ user, room }) => {
           </Typography>
         </Link>
 
-        {/* Add admin */}
-        {ImIOwner && !isOwner && !isAdmin && (
-          <Tooltip
-            title="Add admin"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              onClick={handleAddAdmin}
-              color="primary"
-              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-              disabled={isLoading}
-            >
-              <AddCircleOutlineSharpIcon color="success" />
-            </IconButton>
-          </Tooltip>
-        )}
-
-        {/* Remove admin */}
-        {ImIOwner && !isOwner && isAdmin && (
-          <Tooltip
-            title="Remove admin"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              onClick={handleRemoveAdmin}
-              color="warning"
-              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-              disabled={isLoading}
-            >
-              <RemoveCircleOutlineSharpIcon color="error" />
-            </IconButton>
-          </Tooltip>
-        )}
-
-        {/* Mute user limited time*/}
-        {!isMuted ? (
-          <Tooltip
-            title="Mute"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              onClick={handleMuteUser}
-              color="warning"
-              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-              disabled={isLoading}
-            >
-              <VolumeOffSharpIcon color="primary" />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip
-            title="Unmute"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              onClick={handleUnMuteUser}
-              color="warning"
-              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-              disabled={isLoading}
-            >
-              <VolumeMuteSharpIcon color="secondary" />
-            </IconButton>
-          </Tooltip>
-        )}
-
-        {/* Kick user */}
-        <Tooltip
-          title="Kick"
-          arrow
-          TransitionComponent={Zoom}
-          TransitionProps={{ timeout: 600 }}
-        >
-          <IconButton
-            onClick={handleKickuser}
-            color="warning"
-            sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-            disabled={isLoading}
-          >
-            <ExitToAppSharpIcon color="warning" />
-          </IconButton>
-        </Tooltip>
-
         {/* Ban user */}
         {!isBanned ? (
-          <Tooltip
-            title="Ban"
-            arrow
-            TransitionComponent={Zoom}
-            TransitionProps={{ timeout: 600 }}
-          >
-            <IconButton
-              onClick={handleBanUser}
-              color="warning"
-              sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
-              disabled={isLoading}
+          <>
+            {/* Add admin */}
+            {ImIOwner && !isOwner && !isAdmin && (
+              <Tooltip
+                title="Add admin"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+              >
+                <IconButton
+                  onClick={handleAddAdmin}
+                  color="primary"
+                  sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                  disabled={isLoading}
+                >
+                  <AddCircleOutlineSharpIcon color="success" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Remove admin */}
+            {ImIOwner && !isOwner && isAdmin && (
+              <Tooltip
+                title="Remove admin"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+              >
+                <IconButton
+                  onClick={handleRemoveAdmin}
+                  color="warning"
+                  sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                  disabled={isLoading}
+                >
+                  <RemoveCircleOutlineSharpIcon color="error" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Mute user limited time*/}
+            {!isMuted ? (
+              <Tooltip
+                title="Mute"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+              >
+                <span>
+                  <IconButton
+                    onClick={handleMuteUser}
+                    color="warning"
+                    sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                    disabled={isLoading}
+                  >
+                    <VolumeOffSharpIcon color="primary" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            ) : (
+              <Tooltip
+                title="Unmute"
+                arrow
+                TransitionComponent={Zoom}
+                TransitionProps={{ timeout: 600 }}
+              >
+                <span>
+                  <IconButton
+                    onClick={handleUnMuteUser}
+                    color="warning"
+                    sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                    disabled={isLoading}
+                  >
+                    <VolumeMuteSharpIcon color="secondary" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+
+            {/* Kick user */}
+            <Tooltip
+              title="Kick"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
             >
-              <RemoveCircleSharpIcon color="error" />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                onClick={handleKickuser}
+                color="warning"
+                sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                disabled={isLoading}
+              >
+                <ExitToAppSharpIcon color="warning" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip
+              title="Ban"
+              arrow
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 600 }}
+            >
+              <IconButton
+                onClick={handleBanUser}
+                color="warning"
+                sx={{ visibility: isHovered ? 'visible' : 'hidden' }}
+                disabled={isLoading}
+              >
+                <RemoveCircleSharpIcon color="error" />
+              </IconButton>
+            </Tooltip>
+          </>
         ) : (
           <Tooltip
             title="UnBan"

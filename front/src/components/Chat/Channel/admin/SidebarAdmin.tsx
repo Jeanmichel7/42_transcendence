@@ -15,6 +15,7 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Slider,
   Switch,
 } from '@mui/material';
 import {
@@ -48,6 +49,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [timeToMute, setTimeToMute] = useState(30);
   const [isOpenRenameMenu, setIsOpenRenameMenu] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorForm, setErrorForm] = useState<string | null>(null);
@@ -156,6 +158,13 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
       );
       navigate('/chat');
     }
+  };
+
+  const handleChangeMuteSlider = (
+    event: Event,
+    newValue: number | number[],
+  ) => {
+    setTimeToMute(newValue as number);
   };
 
   return (
@@ -283,7 +292,7 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
                   )}
 
                   {!isOpenRenameMenu && (
-                    <>
+                    <div className="flex justify-center items-center ">
                       <Button
                         type="submit"
                         variant="contained"
@@ -302,6 +311,27 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
                       >
                         Delete
                       </Button>
+                      <div className="flex flex-col m-0">
+                        <Slider
+                          aria-label="Seconds"
+                          defaultValue={30}
+                          // getAriaValueText={timeToMute}
+                          onChange={handleChangeMuteSlider}
+                          // valueLabelDisplay="auto"
+                          step={30}
+                          // marks
+                          min={30}
+                          max={600}
+                          sx={{
+                            width: '150px',
+                            ml: 3,
+                          }}
+                        />
+                        <p className="ml-3 text-sm">
+                          Muted time:{' '}
+                          <span className="font-bold">{timeToMute} sec</span>
+                        </p>
+                      </div>
                       <Dialog
                         open={openDialog}
                         onClose={handleCloseDialog}
@@ -331,14 +361,30 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
                           </Button>
                         </DialogActions>
                       </Dialog>
-                    </>
+                    </div>
                   )}
                 </Box>
               )}
 
               {room.users &&
                 room.users.map((user: UserInterface) => (
-                  <AdminUserCard key={user.id} user={user} room={room} />
+                  <AdminUserCard
+                    key={user.id}
+                    user={user}
+                    room={room}
+                    timeToMute={timeToMute}
+                  />
+                ))}
+              <p className="italic">banned</p>
+              {room.bannedUsers &&
+                room.bannedUsers.length > 0 &&
+                room.bannedUsers.map((user: UserInterface) => (
+                  <AdminUserCard
+                    key={user.id}
+                    user={user}
+                    room={room}
+                    timeToMute={timeToMute}
+                  />
                 ))}
             </div>
           </div>

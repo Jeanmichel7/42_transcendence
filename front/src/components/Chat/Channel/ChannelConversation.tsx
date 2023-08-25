@@ -61,11 +61,9 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
     const [pageDisplay, setPageDisplay] = useState<number>(1);
     const [messages, setMessages] = useState<ChatMsgInterface[]>([]);
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-    const [isLoadingPagination, setIsLoadingPagination] =
-      useState<boolean>(false);
+    // const [isLoadingPagination, setIsLoadingPagination] =
+    //   useState<boolean>(false);
     const [isLoadingDeleteMsg, setIsLoadingDeleteMsg] =
-      useState<boolean>(false);
-    const [allMessagesDisplayed, setAllMessagesDisplayed] =
       useState<boolean>(false);
     const bottomRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -81,15 +79,12 @@ const ChannelConversation: React.FC<ChannelConversationProps> = memo(
 
     const fetchOldMessages = useCallback(async () => {
       if (id === '-1' || !conv) return;
-      if (allMessagesDisplayed) return;
       setShouldScrollToBottom(false);
 
-      setIsLoadingPagination(true);
-      console.log('fetchOldMessages');
-
+      // setIsLoadingPagination(true);
       const allMessages: ChatMsgInterface[] | ApiErrorResponse =
         await chatOldMessages(id, pageDisplay, offsetPagniation);
-      setIsLoadingPagination(false);
+      // setIsLoadingPagination(false);
 
       if ('error' in allMessages) dispatch(setErrorSnackbar(allMessages));
       else {

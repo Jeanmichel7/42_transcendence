@@ -760,6 +760,7 @@ export class ChatService {
   async muteUser(
     roomId: bigint,
     userIdToBeMuted: bigint,
+    muteDurationSec: string,
   ): Promise<ChatRoomInterface> {
     const room: ChatRoomEntity = await this.roomRepository.findOne({
       where: { id: roomId },
@@ -805,7 +806,7 @@ export class ChatService {
       .getOne();
 
     const newBotMessage: ChatCreateMsgDTO = {
-      text: `${userToBeMuted.login} has been muted this idiot`,
+      text: `${userToBeMuted.login} has been muted ${muteDurationSec} seconds`,
     };
 
     // pour eviter de convertir un bigint en number
@@ -840,20 +841,16 @@ export class ChatService {
       select: ['id', 'type'],
       relations: ['users', 'mutedUsers'],
     });
-    console.log('room : ', room);
     if (!room.mutedUsers.find(muted => muted.id === userIdToBeDemuted))
       throw new ConflictException(
         `User ${userIdToBeDemuted} is not muted in room ${roomId}`,
       );
-    console.log('wtf jte vois pas' );
-
 
     const userToBeDemuted: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeDemuted },
       select: ['id', 'login'],
       relations: ['roomUsers', 'roomMutedUsers'],
     });
-    console.log('user : ', userToBeDemuted);
 
     if (!userToBeDemuted)
       throw new NotFoundException(`User ${userIdToBeDemuted} not found`);
@@ -1002,7 +999,7 @@ export class ChatService {
 
     const userToBeBanned: UserEntity = await this.userRepository.findOne({
       where: { id: userIdToBeBanned },
-      select: ['id', 'login'],
+      select: ['id', 'login', 'avatar', 'status'],
       relations: ['roomUsers', 'roomBannedUsers'],
     });
 

@@ -5,8 +5,8 @@ import ConversationListUserItem from './ConversationListItemUser';
 import { ConversationInterface } from '../../../types';
 import { isRoomInterface, isUserInterface } from '../../../utils/utils';
 import ConversationListRoomItem from './ConversationListItemRoom';
-import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
-import { ButtonInterfaceAddFriends } from './ChannelButtons';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Link } from 'react-router-dom';
 
 const ConversationList: React.FC = () => {
@@ -22,9 +22,15 @@ const ConversationList: React.FC = () => {
           <div className="mt-3">
             <Link to="/chat/addFriends">
               <p className="text-center">Add friend</p>
-              <p className="text-center">to start a conversation</p>
               <Button>
-                <PersonAddOutlinedIcon color="success" />
+                <PersonAddIcon color="success" />
+              </Button>
+            </Link>
+            <p className="text-center italic my-3 text-gray-500">or</p>
+            <Link to="/chat/addChannels">
+              <p className="text-center">Join channel</p>
+              <Button>
+                <GroupAddIcon color="success" />
               </Button>
             </Link>
           </div>

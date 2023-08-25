@@ -6,7 +6,7 @@ import { Socket, io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useConnectionSocketChat } from './useSocketChat';
-import Loaderperosnalized from '../../utils/LoaderPerosnalized';
+import HomeChat from './HomeChat';
 
 const ConversationWrapper = () => {
   const { convId, login, name } = useParams();
@@ -52,7 +52,7 @@ const ConversationWrapper = () => {
               socketRef={socketRef as React.MutableRefObject<Socket>}
             />
           ) : (
-            <Loaderperosnalized />
+            <HomeChat />
           )}
         </>
       )}

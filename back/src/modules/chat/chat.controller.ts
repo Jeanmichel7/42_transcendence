@@ -28,6 +28,7 @@ import {
   HttpStatus,
   Query,
   ParseIntPipe,
+  ConflictException,
 } from '@nestjs/common';
 
 @Controller('chat')
@@ -198,19 +199,20 @@ export class ChatController {
     @Body() data: ChatMuteUserDTO,
   ): Promise<ChatRoomInterface> {
     const muteDurationSec = data.muteDurationSec ? data.muteDurationSec : '10';
-    const result: ChatRoomInterface = await this.ChatService.muteUser(
+    let result: ChatRoomInterface = await this.ChatService.muteUser(
       roomId,
       userIdToBeMuted,
+      muteDurationSec,
     );
 
     setTimeout(async () => {
       try {
-        await this.ChatService.demuteUser(roomId, userIdToBeMuted);
+        result = await this.ChatService.demuteUser(roomId, userIdToBeMuted);
+        return result;
       } catch (e) {
-        console.log(e);
+        return e;
       }
     }, parseInt(muteDurationSec) * 1000);
-
     return result;
   }
 

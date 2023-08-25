@@ -44,6 +44,8 @@ const RoomCard = ({ room }: RoomCardProps) => {
   const { conversationsList } = useSelector((state: RootState) => state.chat);
   const { userData } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
+  const isOwner = room.ownerUser?.id === userData.id;
+
   const handleClickShowPassword = () => setShowPassword(show => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -95,7 +97,13 @@ const RoomCard = ({ room }: RoomCardProps) => {
   };
 
   return (
-    <Card elevation={10} className="m-2 w-[220px]">
+    <Card elevation={10} className="m-2 w-[220px] relative">
+      {/* The owner badge */}
+      {isOwner && (
+        <div className="absolute top-6 right-6 bg-blue-500 text-white py-1 px-10 transform rotate-45 translate-x-1/2 -translate-y-1/2 shadow-md font-bold">
+          Owner
+        </div>
+      )}
       <CardContent>
         <Grid container alignItems="center" spacing={2} className="mb-2">
           <Grid item xs={9}>

@@ -345,24 +345,27 @@ const MessageItem: FC<MessageItemProps> = ({
                   </Tooltip>
                 </>
               )}
-              {isHovered && message.ownerUser.id !== userData.id && !isDefi && (
-                <Tooltip
-                  title="Defi"
-                  arrow
-                  TransitionComponent={Zoom}
-                  TransitionProps={{ timeout: 600 }}
-                >
-                  <span>
-                    <IconButton
-                      onClick={handleDefi}
-                      color="success"
-                      disabled={isLoadingDefi}
-                    >
-                      <SportsEsportsIcon />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              )}
+              {isHovered &&
+                message.ownerUser.id !== userData.id &&
+                message.ownerUser.id != 0 &&
+                !isDefi && (
+                  <Tooltip
+                    title="Defi"
+                    arrow
+                    TransitionComponent={Zoom}
+                    TransitionProps={{ timeout: 600 }}
+                  >
+                    <span>
+                      <IconButton
+                        onClick={handleDefi}
+                        color="success"
+                        disabled={isLoadingDefi}
+                      >
+                        <SportsEsportsIcon />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                )}
             </div>
           </>
         )}
