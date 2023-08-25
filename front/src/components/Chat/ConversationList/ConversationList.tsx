@@ -17,7 +17,7 @@ const ConversationList: React.FC = () => {
   }
   return (
     <>
-      <div className="max-h-[calc(100vh-212px)] text-center transition-all overflow-auto">
+      <div className="max-h-[calc(100vh-220px)] text-center transition-all overflow-auto">
         {conversationsList.length === 0 ? (
           <div className="mt-3">
             <Link to="/chat/addFriends">

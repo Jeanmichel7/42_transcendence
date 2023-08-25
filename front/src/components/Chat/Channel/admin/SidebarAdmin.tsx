@@ -3,6 +3,7 @@ import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutl
 import {
   Box,
   Button,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -73,6 +74,16 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
     event.stopPropagation();
     setOpenEdit(!openEdit);
   };
+
+  useEffect(() => {
+    const ClickOutside = (event: any) => {
+      if (!ref.current.contains(event.target)) {
+        setOpenEdit(false);
+      }
+    };
+    document.addEventListener('mousedown', ClickOutside);
+    return () => document.removeEventListener('mousedown', ClickOutside);
+  }, [ref]);
 
   const handleChangeInput = (
     e: React.ChangeEvent<{ name?: string; value: unknown }>,
@@ -168,131 +179,145 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
   };
 
   return (
-    <div className="right-0 top-[64px]">
-      <div ref={ref} className={'border-stone-300 shadow-gray-300 text-right'}>
-        <Button className="text-blue-500" onClick={handleOpenEdit}>
-          <ArrowBackIosNewOutlinedIcon
-            className={`${openEdit && 'rotate-180'}`}
-          />
-          <p className={'text-center'}> admin </p>
-        </Button>
-        {openEdit && (
-          <div className="min-w-[50vw] rounded-md overflow-hidden origin-top-right bg-slate-400 border-stone-300 shadow-gray-300">
-            <div className="bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
-              {isOwner && (
-                <Box
-                  sx={{
-                    bgcolor: 'background.paper',
-                    pb: 1,
-                  }}
-                >
-                  {isOpenRenameMenu && (
-                    <Box component="form" onSubmit={handleValidateForm} sx={{}}>
-                      <div className="flex flex-col p-1 w-full">
-                        <FormControl sx={{ mb: 1 }}>
-                          <InputLabel htmlFor="outlined-adornment-name">
-                            Name
-                          </InputLabel>
-                          <OutlinedInput
-                            name="name"
-                            id="outlined-adornment-name"
-                            label="Name"
-                            type="text"
-                            value={form.name}
-                            onChange={handleChangeInput}
-                            autoComplete="off"
-                          />
-                        </FormControl>
+    <div
+      ref={ref}
+      className={'border-stone-300 shadow-gray-300 text-right relative w-full '}
+    >
+      <Button className="text-blue-500" onClick={handleOpenEdit}>
+        <ArrowBackIosNewOutlinedIcon
+          className={`${openEdit && 'rotate-180'}`}
+        />
+        <p className={'text-center'}> admin </p>
+      </Button>
+      <Collapse in={openEdit}>
+        <div
+          className="absolute min-w-[40vw] max-w-42 right-2 rounded-md overflow-hidden origin-top-right border-2 border-stone-300 shadow-gray-300"
+          style={{
+            transform: openEdit ? 'scaleX(1)' : 'scaleX(0)',
+            transformOrigin: 'top right',
+            transition: 'transform 400ms ease-in-out',
+          }}
+        >
+          <div className="bg-white pt-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
+            {isOwner && (
+              <Box
+                sx={{
+                  bgcolor: 'background.paper',
+                  pb: 1,
+                }}
+              >
+                {isOpenRenameMenu && (
+                  <Box
+                    component="form"
+                    onSubmit={handleValidateForm}
+                    sx={{ p: 1 }}
+                  >
+                    <div className="flex flex-col p-1 w-full">
+                      <FormControl sx={{ mb: 1 }}>
+                        <InputLabel htmlFor="outlined-adornment-name">
+                          Name
+                        </InputLabel>
+                        <OutlinedInput
+                          name="name"
+                          id="outlined-adornment-name"
+                          label="Name"
+                          type="text"
+                          value={form.name}
+                          onChange={handleChangeInput}
+                          autoComplete="off"
+                        />
+                      </FormControl>
 
-                        <FormControl sx={{ mb: 1 }}>
-                          <InputLabel htmlFor="outlined-adornment-password">
-                            Password
-                          </InputLabel>
-                          <OutlinedInput
-                            name="password"
-                            id="outlined-adornment-password"
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            value={form.password ? form.password : ''}
-                            onChange={handleChangeInput}
-                            autoComplete="off"
-                            endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  aria-label="toggle password visibility"
-                                  onClick={handleClickShowPassword}
-                                  onMouseDown={handleMouseDownPassword}
-                                  edge="end"
-                                >
-                                  {showPassword ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
+                      <FormControl sx={{ mb: 1 }}>
+                        <InputLabel htmlFor="outlined-adornment-password">
+                          Password
+                        </InputLabel>
+                        <OutlinedInput
+                          name="password"
+                          id="outlined-adornment-password"
+                          label="Password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={form.password ? form.password : ''}
+                          onChange={handleChangeInput}
+                          autoComplete="off"
+                          endAdornment={
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="toggle password visibility"
+                                onClick={handleClickShowPassword}
+                                onMouseDown={handleMouseDownPassword}
+                                edge="end"
+                              >
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          }
+                        />
+                      </FormControl>
+
+                      <div className="flex space-between items-center">
+                        <FormControl>
+                          <FormControlLabel
+                            label="Protected"
+                            labelPlacement="start"
+                            control={
+                              <Switch
+                                id="outlined-adornment-protected"
+                                checked={
+                                  form.isProtected
+                                    ? true
+                                    : form.password
+                                    ? true
+                                    : false
+                                }
+                                name="isProtected"
+                                onChange={handleChangeInput}
+                                inputProps={{ 'aria-label': 'controlled' }}
+                                sx={{ m: 0 }}
+                              />
                             }
+                            sx={{ m: 0 }}
                           />
                         </FormControl>
-
-                        <div className="flex space-between items-center">
-                          <FormControl>
-                            <FormControlLabel
-                              label="Protected"
-                              labelPlacement="start"
-                              control={
-                                <Switch
-                                  id="outlined-adornment-protected"
-                                  checked={
-                                    form.isProtected
-                                      ? true
-                                      : form.password
-                                      ? true
-                                      : false
-                                  }
-                                  name="isProtected"
-                                  onChange={handleChangeInput}
-                                  inputProps={{ 'aria-label': 'controlled' }}
-                                  sx={{ m: 0 }}
-                                />
-                              }
-                              sx={{ m: 0 }}
-                            />
-                          </FormControl>
-                        </div>
                       </div>
-                      <div>
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          disabled={isLoading}
-                          sx={{ m: 1 }}
-                        >
-                          Validate
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="error"
-                          onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
-                          sx={{ m: 1 }}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                      <FormHelperText
-                        error={errorForm ? true : false}
-                        disabled={errorForm ? false : true}
-                        id="outlined-weight-helper-text"
-                        sx={{ mb: 1, textAlign: 'center' }}
+                    </div>
+                    <div>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        disabled={isLoading}
+                        sx={{ m: 1 }}
                       >
-                        {errorForm}
-                      </FormHelperText>
-                    </Box>
-                  )}
+                        Validate
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => setIsOpenRenameMenu(!isOpenRenameMenu)}
+                        sx={{ m: 1 }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                    <FormHelperText
+                      error={errorForm ? true : false}
+                      disabled={errorForm ? false : true}
+                      id="outlined-weight-helper-text"
+                      sx={{ mb: 1, textAlign: 'center' }}
+                    >
+                      {errorForm}
+                    </FormHelperText>
+                  </Box>
+                )}
 
-                  {!isOpenRenameMenu && (
-                    <div className="flex justify-center items-center ">
+                {!isOpenRenameMenu && (
+                  <div className="flex flex-col justify-center items-center ">
+                    <div className="mt-2">
                       <Button
                         type="submit"
                         variant="contained"
@@ -311,63 +336,75 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
                       >
                         Delete
                       </Button>
-                      <div className="flex flex-col m-0">
-                        <Slider
-                          aria-label="Seconds"
-                          defaultValue={30}
-                          // getAriaValueText={timeToMute}
-                          onChange={handleChangeMuteSlider}
-                          // valueLabelDisplay="auto"
-                          step={30}
-                          // marks
-                          min={30}
-                          max={600}
-                          sx={{
-                            width: '150px',
-                            ml: 3,
-                          }}
-                        />
-                        <p className="ml-3 text-sm">
-                          Muted time:{' '}
-                          <span className="font-bold">{timeToMute} sec</span>
-                        </p>
-                      </div>
-                      <Dialog
-                        open={openDialog}
-                        onClose={handleCloseDialog}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                      >
-                        <DialogTitle id="alert-dialog-title">
-                          {'Are you sure you want to delete this channel ?'}
-                        </DialogTitle>
-                        <DialogContent>
-                          <DialogContentText id="alert-dialog-description">
-                            You are about to delete this channel. Please note
-                            that this action is irreversible and all the
-                            channel's content will be permanently deleted. Are
-                            you sure you want to proceed?
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleCloseDialog}>Cancel</Button>
-                          <Button
-                            onClick={event => handleDeleteChannel(event)}
-                            color="error"
-                            disabled={isLoading}
-                            autoFocus
-                          >
-                            Delete
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
                     </div>
-                  )}
-                </Box>
-              )}
+                    <div className="flex flex-col m-0">
+                      <Slider
+                        aria-label="Seconds"
+                        defaultValue={30}
+                        // getAriaValueText={timeToMute}
+                        onChange={handleChangeMuteSlider}
+                        // valueLabelDisplay="auto"
+                        step={30}
+                        // marks
+                        min={30}
+                        max={600}
+                        sx={{
+                          width: '150px',
+                          ml: 3,
+                        }}
+                      />
+                      <p className="ml-3 text-sm">
+                        Muted time:{' '}
+                        <span className="font-bold">{timeToMute} sec</span>
+                      </p>
+                    </div>
+                    <Dialog
+                      open={openDialog}
+                      onClose={handleCloseDialog}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        {'Are you sure you want to delete this channel ?'}
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          You are about to delete this channel. Please note that
+                          this action is irreversible and all the channel's
+                          content will be permanently deleted. Are you sure you
+                          want to proceed?
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCloseDialog}>Cancel</Button>
+                        <Button
+                          onClick={event => handleDeleteChannel(event)}
+                          color="error"
+                          disabled={isLoading}
+                          autoFocus
+                        >
+                          Delete
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </div>
+                )}
+              </Box>
+            )}
 
-              {room.users &&
-                room.users.map((user: UserInterface) => (
+            {room.users &&
+              room.users.map((user: UserInterface) => (
+                <AdminUserCard
+                  key={user.id}
+                  user={user}
+                  room={room}
+                  timeToMute={timeToMute}
+                />
+              ))}
+            {room.bannedUsers && room.bannedUsers.length > 0 && (
+              <>
+                <p className="italic text-sm py-1">banned</p>
+                {room.bannedUsers.map((user: UserInterface) => (
                   <AdminUserCard
                     key={user.id}
                     user={user}
@@ -375,21 +412,11 @@ const SideBarAdmin: React.FC<SideBarProps> = ({ room, convId }) => {
                     timeToMute={timeToMute}
                   />
                 ))}
-              <p className="italic">banned</p>
-              {room.bannedUsers &&
-                room.bannedUsers.length > 0 &&
-                room.bannedUsers.map((user: UserInterface) => (
-                  <AdminUserCard
-                    key={user.id}
-                    user={user}
-                    room={room}
-                    timeToMute={timeToMute}
-                  />
-                ))}
-            </div>
+              </>
+            )}
           </div>
-        )}{' '}
-      </div>
+        </div>
+      </Collapse>
     </div>
   );
 };

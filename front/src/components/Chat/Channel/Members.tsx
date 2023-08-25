@@ -73,7 +73,7 @@ const MembersCard = ({ user }: { user: UserInterface }) => {
   return (
     <>
       {!user ? null : (
-        <div className="flex flex-grow text-black p-1 pl-2 items-center font-bold hover:bg-gray-200 rounded-md">
+        <div className="flex flex-grow text-black p-1 items-center font-bold hover:bg-gray-200 rounded-md">
           <Link
             key={user.id}
             to={'/profile/' + user.login}
@@ -238,11 +238,11 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
   return (
     <div
       className="hidden md:block bg-gray-200 border-l-2 border-gray-300
-    h-full overflow-auto "
+      overflow-auto"
     >
       {room.admins && (
         <>
-          <h3 className="font-bold text-blue-600 p-1 bg-gray-300 text-center">
+          <h3 className="font-bold text-blue-600 p-1 mb-1 bg-gray-300 text-center">
             ADMINS - {room.admins.length}
           </h3>
           {room.admins.map(user => (
@@ -253,8 +253,8 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
       {userWithoutAdmins && (
         <>
-          <h3 className="font-bold text-blue-600 p-1 bg-gray-300 text-center">
-            MEMBRES - {userWithoutAdmins.length}
+          <h3 className="font-bold text-blue-600 p-1 my-1 bg-gray-300 text-center">
+            MEMBERS - {userWithoutAdmins.length}
           </h3>
           {userWithoutAdmins.map(user => (
             <MembersCard key={user.id} user={user} />
@@ -264,7 +264,7 @@ const ChatMembers = ({ room }: ChatMembersProps) => {
 
       {acceptedusersWithoudBot && acceptedusersWithoudBot.length > 0 && (
         <>
-          <h3 className="font-bold text-blue-600 ml-1 bg-gray-300 text-center">
+          <h3 className="font-bold text-blue-600 p-1 my-1 bg-gray-300 text-center">
             WAITING - {acceptedusersWithoudBot.length}
           </h3>
           {acceptedusersWithoudBot.map(user => {

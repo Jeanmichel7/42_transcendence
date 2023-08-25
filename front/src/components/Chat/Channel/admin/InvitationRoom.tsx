@@ -5,6 +5,7 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Collapse,
   FormControlLabel,
   FormGroup,
 } from '@mui/material';
@@ -134,59 +135,73 @@ const InvitationRoom: React.FC<InvitationRoomProps> = ({ room }) => {
   };
 
   return (
-    <div className="left-120 top-[64px]">
-      <div ref={ref} className={'border-stone-300 shadow-gray-300 text-left'}>
-        <Button className="text-blue-500" onClick={handleOpenEdit}>
-          <p className={'text-center'}> invite </p>
-          <ArrowBackIosNewOutlinedIcon
-            className={`${openEdit ? 'rotate-0' : 'rotate-180'}`}
-          />
-        </Button>
-
-        {openEdit && (
-          <div className="min-w-[50vw] rounded-md overflow-hidden origin-top-right bg-slate-400 border-stone-300 shadow-gray-300">
-            <div className="bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
-              {isAdmin && (
-                <Box
-                  component="form"
-                  onSubmit={handleValidateForm}
+    <div
+      ref={ref}
+      className={'border-stone-300 shadow-gray-300 text-left relative w-full'}
+    >
+      <Button className="text-blue-500" onClick={handleOpenEdit}>
+        <p className={'text-center'}> invite </p>
+        <ArrowBackIosNewOutlinedIcon
+          className={`${openEdit ? 'rotate-0' : 'rotate-180'}`}
+        />
+      </Button>
+      <Collapse in={openEdit}>
+        <div
+          className="absolute min-w-[30vw] rounded-md overflow-hidden origin-top-right bg-slate-400 border-stone-300 shadow-gray-300"
+          style={{
+            transform: openEdit ? 'scaleX(1)' : 'scaleX(0)',
+            transformOrigin: 'top left',
+            transition: 'transform 400ms ease-in-out',
+          }}
+        >
+          <div className="bg-white m-1 p-2 font-mono shadow rounded-md shadow-gray-300 flex flex-col text-center">
+            {isAdmin && (
+              <Box
+                component="form"
+                onSubmit={handleValidateForm}
+                sx={{
+                  '& .MuiTextField-root': { m: 1, width: '25ch' },
+                }}
+              >
+                <h3 className="mb-3">Select user to invit</h3>
+                <FormGroup
                   sx={{
-                    '& .MuiTextField-root': { m: 1, width: '25ch' },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                   }}
                 >
-                  <FormGroup>
-                    {userFriendsToInvite?.length === 0 && (
-                      <p className="ml-4 mb-4">No friends to invite</p>
-                    )}
-                    {userFriendsToInvite?.map((user: UserInterface) => (
-                      <FormControlLabel
-                        key={user.id}
-                        label={<RowOfFriendToInvit user={user} />}
-                        control={
-                          <Checkbox
-                            onChange={e =>
-                              handleSelectUser(user, e.target.checked)
-                            }
-                          />
-                        }
-                      />
-                    ))}
-                  </FormGroup>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    className="text-blue-500"
-                    sx={{ mr: 1 }}
-                  >
-                    Invite
-                  </Button>
-                  {isLoading && <CircularProgress />}
-                </Box>
-              )}
-            </div>
+                  {userFriendsToInvite?.length === 0 && (
+                    <p className="ml-4 mb-4">No friends to invite</p>
+                  )}
+                  {userFriendsToInvite?.map((user: UserInterface) => (
+                    <FormControlLabel
+                      key={user.id}
+                      label={<RowOfFriendToInvit user={user} />}
+                      control={
+                        <Checkbox
+                          onChange={e =>
+                            handleSelectUser(user, e.target.checked)
+                          }
+                        />
+                      }
+                    />
+                  ))}
+                </FormGroup>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  className="text-blue-500"
+                  sx={{ mr: 1 }}
+                >
+                  Invite
+                </Button>
+                {isLoading && <CircularProgress />}
+              </Box>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </Collapse>
     </div>
   );
 };
