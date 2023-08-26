@@ -156,8 +156,8 @@ export default function AccountItem({ keyName, value }: ItemProps) {
 
   return (
     <div className="flex items-center w-full pb-3 ">
-      <div className="w-1/4">
-        <h2 className="font-bold"> {parseKeyName(keyName)} </h2>
+      <div className="w-1/4 pl-3">
+        <h2 className="font-bold text-lg"> {parseKeyName(keyName)} </h2>
       </div>
 
       {/* Display or Input */}

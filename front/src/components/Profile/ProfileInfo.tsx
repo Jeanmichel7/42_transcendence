@@ -11,7 +11,6 @@ import { IconButton, Tooltip, Zoom } from '@mui/material';
 import { RootState } from '../../store';
 import { ranksImages } from '../../utils/rankImages';
 import { reduxAddWaitingFriendsSent } from '../../store/userSlice';
-import cuteBallsClimbingVines from '../../assets/cuteBallsClimbingVines.png';
 import ExperienceBar from './ExperienceBar';
 import { inviteGameUser } from '../../api/game';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
@@ -164,7 +163,7 @@ export default function ProfileInfo({ user }: { user: UserInterface }) {
         </div>
 
         <div className="relative flex-grow">
-          <div className="flex justify-between p-3 ml-5">
+          <div className="flex justify-around p-3 ml-5">
             <div className="w-1/4 space-y-2 flex flex-col justify-between">
               <p className="md:text-xl opacity-60 font-bold">Pseudo</p>
               <p className="md:text-xl opacity-60 font-bold">Email</p>

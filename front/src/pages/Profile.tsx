@@ -9,7 +9,6 @@ import HistoryGame from '../components/Profile/HistoryGame';
 import { getProfileByPseudo } from '../api/user';
 import { ApiErrorResponse, UserInterface } from '../types';
 
-import Box from '@mui/material/Box';
 // import ErrorBoundary from '../utils/errorBoundaries';
 import ProfileInfo from '../components/Profile/ProfileInfo';
 import ProfileTrophies from '../components/Profile/ProfileTrophies';
@@ -48,14 +47,12 @@ function Profile() {
           <CircularProgress />
         </div>
       ) : (
-        <div className="bg-inherit relative z-10 ">
-          <Box className="w-full">
-            <ProfileInfo user={userProfile} />
-            <ProfileFriends user={userProfile} />
-            <ProfileTrophies user={userProfile} />
-            <StatsGame user={userProfile} />
-            <HistoryGame user={userProfile} />
-          </Box>
+        <div className="w-full bg-inherit relative z-10 ">
+          <ProfileInfo user={userProfile} />
+          <ProfileFriends user={userProfile} />
+          <ProfileTrophies user={userProfile} />
+          <StatsGame user={userProfile} />
+          <HistoryGame user={userProfile} />
         </div>
       )}
     </>

@@ -13,7 +13,7 @@ export default function ProfileTrophies({ user }: { user: UserInterface }) {
       {user.trophies?.length === 0 && (
         <Nothing text={'No trophy won'} angry={false} />
       )}
-      <div className="flex flex-wrap justify-center">
+      <div className="flex flex-wrap justify-center w-full">
         {user.trophies?.map(trophy => {
           trophy.isHeld = true;
           return <TrophyCard key={trophy.id} trophy={trophy} />;

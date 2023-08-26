@@ -230,7 +230,6 @@ const AccountProfile: React.FC<AccountProfileProps> = ({ user }) => {
             <AccountItem keyName="firstName" value={user.firstName} />
             <AccountItem keyName="lastName" value={user.lastName} />
             <AccountItem keyName="password" value="********" />
-
             <AccountItem keyName="description" value={user.description} />
 
             {user.is2FAEnabled != null && user.is2FAEnabled != undefined && (
