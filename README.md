@@ -14,6 +14,7 @@
 ```bash 
    docker-compose up
 ```
+Application disponible sur <nom d'hote>:3006 ou localhost:3006 
 ## 💡 Caractéristiques Principales
 
 - ***Jeu Pong en temps réel***: Jouez contre d'autres utilisateurs en temps réel.
