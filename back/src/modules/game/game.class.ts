@@ -262,13 +262,9 @@ export class Game {
     }
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    // const bonus = {
-    //   ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
-    // };
-
-    const bonus = {
-      ...BONUSES_TAB[2],
-    };
+     const bonus = {
+       ...BONUSES_TAB[Math.floor(Math.random() * BONUSES_TAB.length)],
+     };
 
     if (this.bonusPlayer1Loading) {
       if (
