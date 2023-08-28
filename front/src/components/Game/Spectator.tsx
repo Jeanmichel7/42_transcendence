@@ -30,10 +30,7 @@ function GameSpectator({
   const gameDimensions = useRef({ width: 0, height: 0 });
   const { gameData }: { gameData: GameData | undefined } =
     useSocketConnectionSpectator(socket, gameIdInvit);
-  if (gameData?.winner) {
-    setCurrentPage('lobby');
-  }
-
+ 
   useEffect(() => {
     if (gameData?.winner) {
       setCurrentPage('lobby');

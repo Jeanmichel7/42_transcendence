@@ -39,6 +39,7 @@ export class Game {
   racketRight: number;
   isOver: boolean;
   winner: string;
+  winnerId: bigint;
   socketPlayer1Id: string;
   socketPlayer2Id: string;
   player1Username: string;
@@ -486,6 +487,7 @@ export class Game {
       ) {
         this.isOver = true;
         this.winner = this.player2Username;
+        this.winnerId = this.player2Info.id;
       } else {
         this.resetBallAndRackets(true);
       }
@@ -503,6 +505,7 @@ export class Game {
       ) {
         this.isOver = true;
         this.winner = this.player1Username;
+        this.winnerId = this.player1Info.id;
       } else {
         this.resetBallAndRackets(false);
       }

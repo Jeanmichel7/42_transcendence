@@ -56,7 +56,7 @@ export class AuthGuard implements CanActivate {
     if (!user) throw new UnauthorizedException('User not found');
 
     user.lastActivity = new Date();
-    if (user.status !== 'online') {
+    if (user.status !== 'online' && user.status != 'in game') {
       const userUpdated = new UserUpdateEvent({
         id: user.id,
         status: 'online',
@@ -68,7 +68,6 @@ export class AuthGuard implements CanActivate {
       user.status = 'online';
     }
     await this.userRepository.save(user);
-
     return true;
   }
 

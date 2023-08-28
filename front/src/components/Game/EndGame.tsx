@@ -323,7 +323,7 @@ function EndGame({ setCurrentPage, lastGameInfo }: LooseProps) {
           </>
         ) : (
           <>
-            <StyledNeonH1>Defeate !</StyledNeonH1>
+            <StyledNeonH1>Defeat !</StyledNeonH1>
             <NeonSign>Nice Try</NeonSign>
           </>
         )}

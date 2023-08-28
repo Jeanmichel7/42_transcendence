@@ -132,6 +132,7 @@ const useConnection = () => {
 
     /* user update status */
     socket.on('update_user_status', (userStatus: UserStatusInterface) => {
+      console.log("UPDATE user status AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA : ", userStatus);
       dispatch(reduxUpdateUserStatus(userStatus));
       dispatch(
         reduxUpdateStatusUserConvList({

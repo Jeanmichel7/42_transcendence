@@ -78,7 +78,10 @@ export class GameEvents {
       const payload = await this.jwtService.verifyAsync(jwtToken, {
         secret: jwtSecret,
       });
-      client.data.userId = payload.login;
+      console.log('payload token : ', payload);
+      client.data.username = payload.login;
+      client.data.userId = payload.id;
+      console.log('client.data.userId', client.data.userId);
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
@@ -93,7 +96,7 @@ export class GameEvents {
 
   //desconexio
   handleDisconnect(client: Socket) {
-    this.gameService.removeFromQueue(client.id);
+    this.gameService.removeFromQueue(client.data.userId);
     this.gameService.breakGame(client.data.userId);
   }
 
@@ -133,7 +136,8 @@ export class GameEvents {
     )
       return 'error when joining/creating private lobby';
     const data = {
-      username: client.data.userId,
+      username: client.data.username,
+      userId: client.data.userId,
       socketId: client.id,
       gameId: update.gameId,
       mode: update.mode,
@@ -164,6 +168,7 @@ export class GameEvents {
     @ConnectedSocket() client: Socket,
   ) {
     if (!client.data.userId) {
+      console.log('y a pas de client.data.userId');
       return 'error';
     }
     if (message === 'cancel') {
@@ -172,6 +177,7 @@ export class GameEvents {
     } else if (message === 'searchNormal' || message === 'searchBonus') {
       const opponent = await this.gameService.addToQueue(
         client.id,
+        client.data.username,
         client.data.userId,
         message === 'searchBonus',
       );

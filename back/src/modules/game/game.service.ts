@@ -25,6 +25,7 @@ interface PlayerInfoPrivateLobby {
   gameId: bigint;
   mode: string;
   ready: boolean;
+  userId: bigint
 }
 
 export interface GameInfo {
@@ -100,10 +101,10 @@ export class GameService {
       this.privatesLobby.get(playerInfo.gameId).player1?.ready &&
       this.privatesLobby.get(playerInfo.gameId).player2?.ready &&
       !this.checkAlreadyInGame(
-        this.privatesLobby.get(playerInfo.gameId).player1.username,
+        this.privatesLobby.get(playerInfo.gameId).player1.userId,
       ) &&
       !this.checkAlreadyInGame(
-        this.privatesLobby.get(playerInfo.gameId).player2.username,
+        this.privatesLobby.get(playerInfo.gameId).player2.userId,
       ) &&
       this.privatesLobby.get(playerInfo.gameId).player1?.mode ===
         this.privatesLobby.get(playerInfo.gameId).player2?.mode
@@ -111,8 +112,10 @@ export class GameService {
       this.startNewGame(
         this.privatesLobby.get(playerInfo.gameId).player1.socketId,
         this.privatesLobby.get(playerInfo.gameId).player1.username,
+        this.privatesLobby.get(playerInfo.gameId).player1.userId,
         this.privatesLobby.get(playerInfo.gameId).player2.socketId,
         this.privatesLobby.get(playerInfo.gameId).player2.username,
+        this.privatesLobby.get(playerInfo.gameId).player2.userId,
         this.privatesLobby.get(playerInfo.gameId).player1.mode === 'bonus',
         this.privatesLobby.get(playerInfo.gameId).player1.gameId,
       );
@@ -136,7 +139,7 @@ export class GameService {
     if (game.isOver) {
       await this.saveEndGame(
         game.id,
-        game.winner,
+        game.winnerId,
         game.player1Score,
         game.player2Score,
         game.player1Stats,
@@ -150,10 +153,10 @@ export class GameService {
     return game.getState();
   }
 
-  checkAlreadyInGame(username: string): boolean {
+  checkAlreadyInGame(userId: bigint): boolean {
     try {
       this.games.forEach(game => {
-        if (game.player1Username === username) {
+        if (game.player1Info.id === userId) {
           if (!game.player1Connected) {
             game.player1Connected = true;
             clearTimeout(game.player1TimeoutId);
@@ -161,7 +164,7 @@ export class GameService {
           }
 
           throw new Error('Already in game');
-        } else if (game.player2Username === username) {
+        } else if (game.player2Info.id === userId) {
           if (!game.player2Connected) {
             game.player2Connected = true;
             clearTimeout(game.player2TimeoutId);
@@ -176,37 +179,38 @@ export class GameService {
     return false;
   }
 
-  updateClientSocketId(newSocketId: string, username: string) {
+  updateClientSocketId(newSocketId: string, userId: bigint) {
     this.games.forEach(game => {
-      if (game.player1Username === username) {
+      if (game.player1Info.id === userId) {
         game.socketPlayer1Id = newSocketId;
-      } else if (game.player2Username === username) {
+      } else if (game.player2Info.id === userId) {
         game.socketPlayer2Id = newSocketId;
       }
     });
   }
 
-  breakGame(username: string) {
+  breakGame(userId: bigint) {
     this.games.forEach(game => {
       if (
-        game.player1Username === username ||
-        game.player2Username === username
+        game.player1Info.id === userId ||
+        game.player2Info.id === userId
       ) {
         if (game.isPaused) {
-          if (game.player1Username === username) {
+          if (game.player1Info.id === userId) {
             game.player1Connected = false;
-          } else if (game.player2Username === username) {
+          } else if (game.player2Info.id === userId) {
             game.player2Connected = false;
           }
         } else {
           game.isPaused = true;
 
-          if (game.player1Username === username) {
+          if (game.player1Info.id === userId) {
             game.player1Connected = false;
             game.player1TimeoutId = setTimeout(() => {
               if (!game.player1Connected) {
                 game.isOver = true;
                 game.winner = game.player2Username;
+                game.winnerId = game.player2Info.id
                 game.isPaused = false;
               }
             }, 30000);
@@ -216,6 +220,7 @@ export class GameService {
               if (!game.player2Connected) {
                 game.isOver = true;
                 game.winner = game.player1Username;
+                game.winnerId = game.player1Info.id
                 game.isPaused = false;
               }
             }, 30000);
@@ -228,27 +233,29 @@ export class GameService {
   async startNewGame(
     socketId1: string,
     username1: string,
+    userId1: bigint,
     socketId2: string,
     username2: string,
+    userId2: bigint,
     bonusMode: boolean,
     gameId?: bigint,
   ): Promise<Game> {
     if (!gameId) {
       let res: GameInterface;
+      console.log('user1Id', userId1, 'user2Id', userId2)
       if (bonusMode) {
         res = await this.saveStartGame(
-          username2,
+          userId2,
           this.createdWaitingGameBonus.id,
         );
       } else {
-        res = await this.saveStartGame(username2, this.createdWaitingGame.id);
+        res = await this.saveStartGame(userId2, this.createdWaitingGame.id);
       }
       if (!res) throw new BadRequestException('erreur save start game');
       gameId = res.id;
     }
-
     const user1: UserEntity = await this.userRepository.findOne({
-      where: { login: username1 },
+      where: { id: userId1 },
       select: [
         'id',
         'firstName',
@@ -264,7 +271,7 @@ export class GameService {
     });
 
     const user2: UserEntity = await this.userRepository.findOne({
-      where: { login: username2 },
+      where:{id: userId2} ,
       select: [
         'id',
         'firstName',
@@ -304,31 +311,37 @@ export class GameService {
     });
     return gamesInfo;
   }
-  async addToQueue(socketId: string, username: string, bonusMode = false) {
-    if (this.checkAlreadyInGame(username)) return;
+  async addToQueue(socketId: string, username: string, userId: bigint, bonusMode = false) {
+    if (this.checkAlreadyInGame(userId)) return;
+    console.log('userId', userId)
     if (bonusMode) {
       if (this.playerWaiting1Bonus === undefined) {
         this.playerWaiting1Bonus = {
           socketId: socketId,
           username: username,
+          userId: userId
         };
+        console.log('userId1Bonus', this.playerWaiting1Bonus.userId);
         this.createdWaitingGameBonus = await this.saveCreateWaitingGame(
-          this.playerWaiting1Bonus.username,
+          this.playerWaiting1Bonus.userId,
         );
       } else if (
         this.playerWaiting2Bonus === undefined &&
-        this.playerWaiting1Bonus.username !== username
+        this.playerWaiting1Bonus.userId !== userId
       ) {
         this.playerWaiting2Bonus = {
           socketId: socketId,
           username: username,
+          userId: userId
         };
 
         const game = await this.startNewGame(
           this.playerWaiting1Bonus.socketId,
           this.playerWaiting1Bonus.username,
+          this.playerWaiting1Bonus.userId,
           this.playerWaiting2Bonus.socketId,
           this.playerWaiting2Bonus.username,
+          this.playerWaiting2Bonus.userId,
           true,
         );
         this.playerWaiting1Bonus = undefined;
@@ -342,25 +355,30 @@ export class GameService {
         this.playerWaiting1Normal = {
           socketId: socketId,
           username: username,
+          userId: userId
         };
         // createdWaitingGame
+        console.log('userId1Norma', this.playerWaiting1Normal.userId);
         this.createdWaitingGame = await this.saveCreateWaitingGame(
-          this.playerWaiting1Normal.username,
+          this.playerWaiting1Normal.userId,
         );
       } else if (
         this.playerWaiting2Normal === undefined &&
-        this.playerWaiting1Normal.username !== username
+        this.playerWaiting1Normal.userId !== userId
       ) {
         this.playerWaiting2Normal = {
           socketId: socketId,
           username: username,
+          userId: userId
         };
 
         const game = await this.startNewGame(
           this.playerWaiting1Normal.socketId,
           this.playerWaiting1Normal.username,
+          this.playerWaiting1Normal.userId,
           this.playerWaiting2Normal.socketId,
           this.playerWaiting2Normal.username,
+          this.playerWaiting2Normal.userId,
           false,
         );
 
@@ -371,12 +389,12 @@ export class GameService {
     }
   }
 
-  removeFromQueue(Username: string) {
-    if (this.playerWaiting1Normal?.username === Username) {
+  removeFromQueue(UserId: bigint) {
+    if (this.playerWaiting1Normal?.userId === UserId) {
       this.playerWaiting1Normal = undefined;
       this.saveCancelWaitingGame(this.createdWaitingGame.id);
       this.createdWaitingGame = {} as GameInterface;
-    } else if (this.playerWaiting1Bonus?.username === Username) {
+    } else if (this.playerWaiting1Bonus?.userId === UserId) {
       this.playerWaiting1Bonus = undefined;
       this.saveCancelWaitingGame(this.createdWaitingGameBonus.id);
       this.createdWaitingGameBonus = {} as GameInterface;
@@ -617,10 +635,10 @@ export class GameService {
     await this.gameRepository.delete({ id: roomId });
   }
 
-  async saveCreateWaitingGame(userlogin1: string): Promise<GameInterface> {
+  async saveCreateWaitingGame(user1Id: bigint): Promise<GameInterface> {
     const newGame = new GameEntity();
     newGame.player1 = await this.userRepository.findOne({
-      where: { login: userlogin1 },
+      where: { id: user1Id },
     });
     newGame.status = 'waiting';
     newGame.createdAt = new Date();
@@ -631,7 +649,7 @@ export class GameService {
   }
 
   async saveStartGame(
-    userlogin2: string,
+    userId2: bigint,
     gameId: bigint,
   ): Promise<GameInterface> {
     const findWaitingGame = await this.gameRepository.findOne({
@@ -641,12 +659,12 @@ export class GameService {
     if (!findWaitingGame) throw new NotFoundException('game not found');
 
     const player1 = await this.userRepository.findOne({
-      where: { login: findWaitingGame.player1.login },
+      where: { id: findWaitingGame.player1.id },
     });
     if (!player1) throw new NotFoundException('player1 not found');
 
     const player2 = await this.userRepository.findOne({
-      where: { login: userlogin2 },
+      where: { id: userId2 },
     });
     if (!player2) throw new NotFoundException('player2 not found');
 
@@ -658,12 +676,16 @@ export class GameService {
       findWaitingGame,
     );
 
+  
+
     player1.status = 'in game';
     player1.updatedAt = new Date();
-    await this.userRepository.save(player1);
+    let testuser1 = await this.userRepository.save(player1);
     player2.status = 'in game';
     player2.updatedAt = new Date();
-    await this.userRepository.save(player2);
+    let testuser2 = await this.userRepository.save(player2);
+    console.log('svaeStartGame : ', testuser1, testuser2);
+
 
     //event update status
     this.eventEmitter.emit(
@@ -699,7 +721,7 @@ export class GameService {
 
   async updateGameStatus(
     gameId: bigint,
-    winnerId: string,
+    winnerId: bigint,
     scorePlayer1: number,
     scorePlayer2: number,
   ) {
@@ -713,7 +735,7 @@ export class GameService {
     game.scorePlayer1 = scorePlayer1;
     game.scorePlayer2 = scorePlayer2;
     game.winner = await this.userRepository.findOne({
-      where: { login: winnerId },
+      where: { id: winnerId },
     });
 
     const { scoreEloP1, scoreEloP2 } = this.updateEloScore(
@@ -751,12 +773,12 @@ export class GameService {
 
   async updatePlayerStats(
     player: UserEntity,
-    winnerId: string,
+    winnerId: bigint,
     scoreElo: number,
     playerStats: PlayerStats,
     winWihoutLoseAPoint: boolean,
   ) {
-    if (player.login == winnerId) {
+    if (player.id == winnerId) {
       // do not update exp here
       player.level = this.computeLevel(player.experience);
       player.numberOfConsecutiveWins += 1;
@@ -778,7 +800,7 @@ export class GameService {
 
   async saveEndGame(
     gameId: bigint,
-    winnerId: string,
+    winnerId: bigint,
     scorePlayer1: number,
     scorePlayer2: number,
     player1Stats: PlayerStats,
@@ -845,7 +867,6 @@ export class GameService {
       }),
     );
     const result: GameInterface = game;
-    // console.log('result end game : ', result);
     return result;
   }
 

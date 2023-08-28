@@ -165,7 +165,7 @@ export default function FriendsSearch({ setHeight }: { setHeight: boolean }) {
       )}
       <div
         className={`flex flex-wrap justify-center items-center
-        overflow-auto ${setHeight ? 'max-h-[calc(100vh-202px)]' : ''} px-2`}
+        overflow-auto ${setHeight ? 'max-h-[calc(100vh-202px)]' : 'max-h-[calc(100vh-298px)]'} px-2`}
       >
         <div ref={topRef} />
         {users.map((user: UserInterface) => {

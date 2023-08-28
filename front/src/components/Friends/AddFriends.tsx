@@ -77,8 +77,12 @@ const AddFriendsRaw = () => {
     }
   };
 
+
   return (
-    <>
+    <div
+      className="justify-center items-center
+      overflow-auto max-h-[calc(100vh-168px)] px-2"
+    >
       {userData.id == -1 ||
       !userFriends ||
       !userBlocked ||
@@ -95,7 +99,7 @@ const AddFriendsRaw = () => {
         ))
       )}
       {isLoading && <CircularProgress />}
-    </>
+    </div>
   );
 };
 
