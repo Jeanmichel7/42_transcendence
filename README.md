@@ -1,64 +1,82 @@
-# TRANSCENDANCE 
-## Pong Contest Website 🏓
-**Jouez au Pong en ligne avec vos amis et discutez en temps réel.**
+# Projet Transcendance : Pong Contest Website 🏓
+Jouez au Pong en ligne avec vos amis et discutez en temps réel.
+
+## 📋 Résumé
+
+Ce projet est une application web permettant aux utilisateurs de jouer au Pong contre d'autres utilisateurs en temps réel. L'application offre également un chat intégré, une fonctionnalité d'ajout d'amis, et bien d'autres fonctionnalités pour enrichir l'expérience utilisateur.
+
+---
+
+## 💻 Technologies Utilisées
+
+### Frontend
+- 📘 React.js
+- 🛣️ React Router
+- 🌀 Vite
+- 🔍 Redux
+- 🔧 TypeScript
+- 💨 TailwindCSS
+- 🎨 Styled-components
+- 🌈 Material-UI (MUI)
+
+### Backend
+- 🐦 NestJS
+- 🗃 TypeORM
+- 🔐 JWT
+- 🔒 Bcrypt
+- 🔏 Chiffrement RSA
+- 📂 Multer
+- 🖼️ Serveur statique
+
+### Containerisation et DB
+- 🐳 Docker, Docker-compose
+- 🗄️ PostgreSQL
+- 🖥️ pgAdmin
 
 
-## 🚀 Installation
+## 📦 Installation
 
 ```bash
+  cd ~
   git clone https://github.com/Jeanmichel7/42_transcendence.git
   cd 42_transcendance && make
 ```
+Pour le développement, les volumes front et back sont reliés a l'host.  `FRONT_VOLUME` est défini comme `${HOME}/42_transcendence/front`.
 
-Application disponible sur <nom d'hote>:3006 ou localhost:3006 
-## 💡 Caractéristiques Principales
-
-- ***Jeu Pong en temps réel***: Jouez contre d'autres utilisateurs en temps réel.
-- ***Chat intégré***: Créez des salons de discussion, envoyez des messages directs et invitez des amis à jouer.
-- ***Amis***: Établissez des relations authentiques avec un système complet de requêtes d'amis, d'attentes et d'options pour bloquer des utilisateurs, 
-- ***Notifications***: Recevez des notifications en temps réel pour les événements importants.
-- ***Connexion***: Authentification simplifiée via OAuth2.0 ou utilisez un compte standard.
-- ***2FA avec RSA***: Sécurisez votre compte avec une authentification à deux facteurs basée sur RSA.
-- ***Disponibilité LAN***: Accédez au site depuis n'importe quel appareil sur le même réseau local.
-- ***Local Storage***: Les préférences de l'utilisateur et certaines données sont sauvegardées localement pour une meilleure expérience utilisateur.
-- ***Leaderboard***: Affichez les classements des meilleurs joueurs et voyez où vous vous situez par rapport aux autres.
-- ***Graphiques de performance***: Analysez vos performances et progrès avec des graphiques détaillés.
+## 🛠️ Utilisation
+Application disponible sur <nom d'hôte>:3006 et localhost:3006.
 
 
-
-## 🛠️ Technologies Utilisées
-
-### Docker
-🐳 Docker-compose : Plateforme pour automatiser le déploiement d'applications dans des conteneurs légers.  
-
-### Frontend
-
-📘 **React.js** - Bibliothèque JavaScript pour la construction d'interfaces utilisateurs.  
-🛣️ **React Router** - Gestionnaire de routage pour les applications React.  
-🌀 **Vite** - Outil de build qui facilite le développement rapide. Configuration proxy pour accéder au site en localhost ou hostname.  
-🔍 **Redux** - Bibliothèque de gestion d'état pour JavaScript.  
-🔧 **TypeScript** - Langage de programmation typé basé sur JavaScript.  
-💨 **TailwindCSS** - Framework CSS pour la création rapide d'interfaces utilisateur modernes.  
-🎨 **Styled-components** - Bibliothèque pour styliser les composants avec des styles CSS-in-JS.  
-🌈 **Material-UI (MUI)** - Bibliothèque de composants React pour un design rapide et facile.  
+## 📜 Règles du Projet
+- Backend écrit en NestJS
+- Frontend utilisant un framework TypeScript de votre choix
+- Utilisation obligatoire de la base de données PostgreSQL
+- Application Single Page
+- Compatible avec la dernière version stable de Google Chrome et un autre navigateur de votre choix
+- Aucune erreur ou avertissement ne doit être rencontré lors de la navigation sur le site
+- Tout doit être lancé par une seule commande : \```docker-compose up --build\```
 
 
-### Backend
+## 💡 Fonctionnalites
 
-🐦 **NestJS** - Framework progressif pour la construction de serveurs efficaces et évolutifs en JavaScript et TypeScript.  
-🗃 **TypeORM** - ORM pour TypeScript et JavaScript.  
-🔐 **JWT** - Utilisé pour l'authentification et la sécurité.  
-🔒 **Bcrypt** - Pour le hachage sécurisé des mots de passe.  
-🔏 **Chiffrement RSA** - Algorithme de cryptographie à clé publique/privée pour la sécurisation des données.  
-📂 **Multer** - Middleware pour la gestion des uploads de fichiers.  
-🖼️ **Serveur statique** - Utilisé pour héberger les images et autres ressources statiques.  
-
-### Base de Données
-
-🗄️ **PostgreSQL** - Système de gestion de base de données relationnelle.  
-🖥️ **pgAdmin** - Outil d'administration et de gestion pour PostgreSQL.  
-  
-
+- **Jeu Pong en temps réel avec mode bonus**  
+- **Disponibilité LAN**  
+- **Chat intégré**:    
+  Créez des salons de discussion, envoyez des messages directs et invitez des amis à jouer.
+- **Amis**:    
+  Établissez des relations authentiques avec un système complet de requêtes d'amis, d'attentes et d'options pour bloquer des utilisateurs, 
+- **Notifications**:    
+   Recevez des notifications en temps réel pour les événements importants.
+- **Connexion**:      
+    Authentification simplifiée via OAuth2.0 ou utilisez un compte standard.
+- **2FA avec RSA**:      
+    Sécurisez votre compte avec une authentification TOTP (secret 2FA chiffré en RSA).
+- **Local Storage**:    
+    Les préférences de l'utilisateur et certaines données sont sauvegardées localement pour une meilleure expérience utilisateur.
+- **Leaderboard**:    
+    Affichez les classements des meilleurs joueurs et voyez où vous vous situez par rapport aux autres.
+- **Graphiques de performance**:    
+    Analysez vos performances et progrès avec des graphiques détaillés.
 
       
 ## Gallerie
