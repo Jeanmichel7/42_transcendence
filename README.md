@@ -5,15 +5,11 @@
 
 ## 🚀 Installation
 
-**Makefile** 
 ```bash
-  make
+  git clone https://github.com/Jeanmichel7/42_transcendence.git
+  cd 42_transcendance && make
 ```
 
-**Docker** 
-```bash 
-   docker-compose up
-```
 Application disponible sur <nom d'hote>:3006 ou localhost:3006 
 ## 💡 Caractéristiques Principales
 
@@ -65,8 +61,7 @@ Application disponible sur <nom d'hote>:3006 ou localhost:3006
 
 
       
-### Gallerie
-----
+## Gallerie
 <table>
   <tr>
     <td>
@@ -114,11 +109,16 @@ Application disponible sur <nom d'hote>:3006 ou localhost:3006
   </tr>
 </table>
 
-### 👥 Contributeurs
+## 🤝 Contributeurs
 
-- [Jean-Michel](https://github.com/Jeanmichel7)
-- [YannUFLL](https://github.com/YannUFLL)
-- [Wilhelm Fermey](https://github.com/Wilhelm-Fermey)
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Jeanmichel7"><img src="https://github.com/Jeanmichel7.png?size=100" width="100px;" alt=""/><br /><sub><b>Jeanmichel7</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/YannUFLL"><img src="https://github.com/YannUFLL.png?size=100" width="100px;" alt=""/><br /><sub><b>YannUFLL</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/Wilhelm-Fermey"><img src="https://github.com/Wilhelm-Fermey.png?size=100" width="100px;" alt=""/><br /><sub><b>Wilhelm-Fermey</b></sub></a><br /></td>
+
+  </tr>
+</table>
 
 ### 📜 Licence
 
