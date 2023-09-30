@@ -50,7 +50,7 @@ const WhiteBackground = keyframes`
   `;
 
 interface BonusBoxWrapperProps {
-  isLoading: boolean;
+  isLoading: boolean | undefined;
   bonusName: string;
   left: boolean;
 }
@@ -82,7 +82,7 @@ const BonusBoxWrapper = styled.div<BonusBoxWrapperProps>`
 `;
 
 interface BonusBoxProps {
-  bonusIsLoading: boolean;
+  bonusIsLoading: boolean | undefined;
   bonusName: string | undefined;
   left?: boolean;
 }
