@@ -3,16 +3,12 @@ services:
   nestjs:
     build:
       context: .
-      dockerfile: back/docker/Dockerfile
+      dockerfile: ./back/docker/Dockerfile
     container_name: nestjs
     ports:
       - 3000:3000
     depends_on:
       - postgres
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - back:/app
-      - /app/node_modules
     restart: always
     environment:
       API_URL: ${HOST_IP_FRONT}
@@ -36,7 +32,7 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: react
     ports:
-      - 3006:3006
+      - 80:80
     depends_on:
       - nestjs
     volumes:
@@ -74,3 +70,4 @@ volumes:
       type: none
       device: ${BACK_VOLUME}
       o: bind
+

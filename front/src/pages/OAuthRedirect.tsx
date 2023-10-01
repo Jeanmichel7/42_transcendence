@@ -105,9 +105,9 @@ const OAuthRedirect = () => {
 
   return (
     <>
-      <div className="absolute top-0 right-0 text-blue-500 m-5 font-extrabold">
+      {/* <div className="absolute top-0 right-0 text-blue-500 m-5 font-extrabold">
         <Link to="/accountconnection">Login Account</Link>
-      </div>
+      </div> */}
 
       <div className="absolute top-0 text-blue-500 left-0 m-5 font-extrabold">
         <Link to="/connection" onClick={() => setIs2FAactiv(false)}>

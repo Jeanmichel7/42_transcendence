@@ -10,6 +10,8 @@ async function bootstrap() {
       if (
         !origin ||
         origin.includes('localhost:3006') ||
+        origin.includes('transcendence42.fr') ||
+        origin.includes('www.transcendence42.fr') ||
         origin === process.env.API_URL
       ) {
         callback(null, true);

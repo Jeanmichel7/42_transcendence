@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { closeSnackbar } from '../store/snackbarSlice';
 import DisplayImg from '../utils/displayImage';
 
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'http://transcendence42.fr:3000';
 
 const SnackBarApp = () => {
   const { snackbar } = useSelector((state: RootState) => state.snackbar);

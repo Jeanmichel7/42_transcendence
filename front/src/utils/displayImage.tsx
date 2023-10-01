@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'http://transcendence42.fr:3000';
 
 interface Props {
   src: string | undefined;
@@ -10,6 +11,7 @@ const DisplayImg = ({ src, alt, className }: Props) => {
   const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
   if (!src?.match(urlRegex) && src !== 'pong-nav.png')
     src = API_URL + '/avatars/' + src;
+  // console.log('avtar: ', src);
   return (
     <img
       className={className}

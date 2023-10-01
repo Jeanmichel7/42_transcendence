@@ -10,7 +10,8 @@ import { registerFakeUser } from '../../api/auth';
 import { ApiErrorResponse, UserInterface } from '../../types';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'http://transcendence42.fr:3000';
 
 export interface FormDataUser {
   login: string;

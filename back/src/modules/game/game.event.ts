@@ -78,10 +78,8 @@ export class GameEvents {
       const payload = await this.jwtService.verifyAsync(jwtToken, {
         secret: jwtSecret,
       });
-      console.log('payload token : ', payload);
       client.data.username = payload.login;
       client.data.userId = payload.id;
-      console.log('client.data.userId', client.data.userId);
     } catch (e) {
       throw new UnauthorizedException('Authorization error', e.message);
     }
@@ -154,7 +152,7 @@ export class GameEvents {
     if (gameStarted) {
       this.server.to(socket).emit('userGameStatus', 'alreadyInGame');
       this.server.to(client.id).emit('userGameStatus', 'alreadyInGame');
-      console.log('game started');
+      // console.log('game started');
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -244,10 +242,10 @@ export class GameEvents {
     @MessageBody() data: { gameId: string; type: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(
-      'LEAVE chat room : ',
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
-    );
+    // console.log(
+    //   'LEAVE chat room : ',
+    //   'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
+    // );
     client.leave(
       'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
     );
@@ -259,11 +257,11 @@ export class GameEvents {
     data: { gameId: string; type: string; message: string; avatar: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('send private message ', data);
-    console.log(
-      'roomName',
-      'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
-    );
+    // console.log('send private message ', data);
+    // console.log(
+    //   'roomName',
+    //   'chatRoom_' + data.type + (data.type == 'lobby' ? '' : '_' + data.gameId),
+    // );
 
     // if (client.rooms.has('chatRoom_' + data.gameId)) {
     client.emit('message', {

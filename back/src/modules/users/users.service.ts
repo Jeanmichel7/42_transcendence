@@ -46,7 +46,7 @@ export class UsersService {
   ) {
     const absentDuration: number = 15 * 60 * 1000; // 15min
     this.intervalId = setInterval(() => {
-      console.log('check user status');
+      // console.log('check user status');
       this.checkUserStatus(absentDuration);
     }, 1 * 60 * 1000);
   }

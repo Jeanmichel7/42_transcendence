@@ -8,11 +8,12 @@ export HOST_IP_BACK=http://$(IP_HOST):3000
 export HOST_IP_FRONT=http://$(IP_HOST):3006
 
 all:
-	echo ${HOST_IP_FRONT}
+	echo "host ip front" ${HOST_IP_FRONT}
 	printf "Launch configuration ${NAME}..."
-	docker-compose up
+	docker-compose up 
 
 build:
+	echo ${HOST_IP_FRONT}
 	printf "Building configuration ${NAME}..."
 	docker-compose up --build
 

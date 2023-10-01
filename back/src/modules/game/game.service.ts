@@ -242,7 +242,7 @@ export class GameService {
   ): Promise<Game> {
     if (!gameId) {
       let res: GameInterface;
-      console.log('user1Id', userId1, 'user2Id', userId2)
+      // console.log('user1Id', userId1, 'user2Id', userId2)
       if (bonusMode) {
         res = await this.saveStartGame(
           userId2,
@@ -313,7 +313,7 @@ export class GameService {
   }
   async addToQueue(socketId: string, username: string, userId: bigint, bonusMode = false) {
     if (this.checkAlreadyInGame(userId)) return;
-    console.log('userId', userId)
+    // console.log('userId', userId)
     if (bonusMode) {
       if (this.playerWaiting1Bonus === undefined) {
         this.playerWaiting1Bonus = {
@@ -321,7 +321,7 @@ export class GameService {
           username: username,
           userId: userId
         };
-        console.log('userId1Bonus', this.playerWaiting1Bonus.userId);
+        // console.log('userId1Bonus', this.playerWaiting1Bonus.userId);
         this.createdWaitingGameBonus = await this.saveCreateWaitingGame(
           this.playerWaiting1Bonus.userId,
         );
@@ -358,7 +358,7 @@ export class GameService {
           userId: userId
         };
         // createdWaitingGame
-        console.log('userId1Norma', this.playerWaiting1Normal.userId);
+        // console.log('userId1Norma', this.playerWaiting1Normal.userId);
         this.createdWaitingGame = await this.saveCreateWaitingGame(
           this.playerWaiting1Normal.userId,
         );
@@ -684,7 +684,7 @@ export class GameService {
     player2.status = 'in game';
     player2.updatedAt = new Date();
     let testuser2 = await this.userRepository.save(player2);
-    console.log('svaeStartGame : ', testuser1, testuser2);
+    // console.log('svaeStartGame : ', testuser1, testuser2);
 
 
     //event update status

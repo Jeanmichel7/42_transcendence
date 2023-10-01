@@ -81,14 +81,11 @@ const helperUpdateUserStatus = (
   state: UserState,
   userStatus: UserStatusInterface,
 ) => {
-  console.log("redux update status : ", userStatus);
   // userFriends
   if (state.userFriends) {
     const userFriend = state.userFriends.find(u => u.id === userStatus.id);
-    if (userFriend) {
-      console.log("redux 2 : ", userFriend);
+    if (userFriend)
       userFriend.status = userStatus.status;
-    }
   }
 
   // userBlocked
